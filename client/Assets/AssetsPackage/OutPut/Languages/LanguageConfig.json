@@ -1,0 +1,17 @@
+[
+	{
+		"describe": "English",
+		"index": 0,
+		"name": "English"
+	},
+	{
+		"describe": "简体中文",
+		"index": 1,
+		"name": "ChineseSimplified"
+	},
+	{
+		"describe": "English",
+		"index": 2,
+		"name": "English"
+	}
+]

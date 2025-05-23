@@ -1,0 +1,8 @@
+--
+--time:{time}
+--{paramdesc} 
+--@desc 
+--
+function #NAME#:#NAME#(param)
+	
+end

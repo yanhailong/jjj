@@ -1,0 +1,28 @@
+----
+----time:{time}
+----{paramdesc} 
+----@desc 
+----
+-----@class LocalManager
+--LocalManager=Class("LocalManager")
+--local lang=require("Configs/CfgDes")
+--local langTab={}
+--local curSelect="zh_cn"
+--
+--function LocalManager:Init()
+--    for k,v in pairs(lang) do
+--        if curSelect=="zh_cn" then
+--            langTab[v.id]=v.zh_cn
+--        end
+--        if curSelect=="en_us" then
+--            langTab[v.id]=v.en_us
+--        end
+--    end
+--    look("初始化语音配置表",langTab)
+--end
+--
+--function LocalManager:GetStrById(langId)
+--    local numId=tonumber(langId)
+--    local str=langTab[numId]
+--    return str
+--end
