@@ -7,7 +7,7 @@ using WebSocketSharp;
 using System.Threading;
 using NetClient;
 using XLua;
-using YooAsset;
+using JiuJiuPrincess;
 public class WebSocketClient : SingletonMono<WebSocketClient>
 {
     

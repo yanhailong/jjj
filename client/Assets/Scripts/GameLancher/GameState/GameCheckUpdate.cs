@@ -1,6 +1,6 @@
 
+using JiuJiuPrincess;
 using UnityEngine;
-using YooAsset;
 
 public class GameCheckUpdate : GameBaseState
 {
@@ -85,9 +85,9 @@ public class GameCheckUpdate : GameBaseState
     {
         Debug.LogError("开始检查更新");
         gameLancher.preLoading.SetDesc("正在检测更新文件...", 0, true);
-        updateAssets = new UpdateAssets(AppConst.AssetLocalPath, AppConst.AssetUpdateUrl, CommonConfigManager.Instance.GetServerVersion());
+        updateAssets = new UpdateAssets(AppConst.AssetLocalPath, AppConst.AssetUpdateUrl,null ,CommonConfigManager.Instance.GetServerVersion());
         updateAssets.maxUpdateCount = 10;
-        updateAssets.StartUpdate(UpdateError, UpdateProgress, UpdateFinished);
+        updateAssets.StartUpdate(UpdateError, UpdateProgress, UpdateFinished,null);
     }
 
     /// <summary>
@@ -130,8 +130,7 @@ public class GameCheckUpdate : GameBaseState
         Debug.LogError("更新完成");
         StartUpGame();       
     }
-    
-    
+
     
     public override string getStateKey()
     {

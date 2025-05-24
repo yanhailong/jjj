@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.Networking;
 using XLua;
-using YooAsset;
+using JiuJiuPrincess;
 /// <summary>
 /// 游戏状态
 /// </summary>
@@ -127,6 +127,8 @@ public class GameLancher : MonoBehaviour
     {
         
         AssetsManager.Instance.Initialized();//初始化资源
+        LuaBytes.Instance.Init();//初始化lua代码
+        
         mStateMachine.changeState(GameState.EnterGame,this);
         // PreLoadingClose();
     }

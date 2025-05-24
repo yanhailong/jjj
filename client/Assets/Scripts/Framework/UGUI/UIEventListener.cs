@@ -88,7 +88,6 @@ public class UIEventListener
         btn.onClick.AddListener(() =>
         {
             luafunc.Call(go);
-            SoundManager.Instance.PlayClip("OutPut/Sound/ui_sound_effect_click");
         });
     }
 

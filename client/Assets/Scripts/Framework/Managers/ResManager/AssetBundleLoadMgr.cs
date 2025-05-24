@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YooAsset;
+using JiuJiuPrincess;
 /// <summary>
 /// AB资源加载同步异步卸载完整版本
 /// </summary>

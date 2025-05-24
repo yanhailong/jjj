@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YooAsset;
+using JiuJiuPrincess;
 public class AssetBundleDepMgr : Singleton<AssetBundleDepMgr>
 {
     private string manifestPath;

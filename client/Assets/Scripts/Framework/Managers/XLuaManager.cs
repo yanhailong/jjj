@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using XLua;
-using YooAsset;
+using JiuJiuPrincess;
 [CSharpCallLua]
 public class XLuaManager : SingletonMono<XLuaManager>
 {
@@ -48,22 +48,15 @@ public class XLuaManager : SingletonMono<XLuaManager>
         byte[] data = File.ReadAllBytes(scriptPath);
         return data;
 #else
-        // 发布模式去哪里去读----> ab 热更;
-        filePath = filePath.Replace(".", "/") + ".lua.bytes";
-        string path = Path.Combine(AppConst.AssetLocalPath,"luabyts/",filePath.ToLower());
-        path = RegularPath(path);
-        if (!File.Exists(path))
-        {
-            Debug.LogError("路径不存在："+path);
-        }
-        byte[] data = File.ReadAllBytes(path);
-        return Encypt.Decrypt(data);
+        filePath = filePath.Replace(".", "/") + ".lua";
+        byte[] data = LuaBytes.Instance.GetLuaByte(filePath);
+        return data;
 #endif
     }
     public void EnterGame(GameLancher lancher)
     {
         // 进入游戏逻辑, 跑Lua代码;
-        this.env.DoString("require(\"Main.main\")");
+        this.env.DoString("require(\"Logic.ZLancher.main\")");
         LuaTable tab= this.env.Global.Get<LuaTable>("main");
         tab.Get<LuaFunction>("init").Call(null,lancher);
         

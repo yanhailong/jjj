@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using YooAsset;
+using JiuJiuPrincess;
 public class PreLoading
 {
     private GameLancher gameLanucher;
@@ -127,7 +127,7 @@ public class PreLoading
     
     private IEnumerator InitPanel()
     {
-        Transform uiRoot = GameObject.Find("Global_UI/Canvas/Layer2").transform;
+        Transform uiRoot = GameObject.Find("Global/Canvas/Layer2").transform;
         string panelPath = "preloading/uipreloading.unity3d";
         string dataPath = null;
         //判断是否释放资源到磁盘

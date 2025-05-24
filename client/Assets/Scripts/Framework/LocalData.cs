@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
-using YooAsset;
+using JiuJiuPrincess;
 
 public class LocalData : Singleton<LocalData>
 {

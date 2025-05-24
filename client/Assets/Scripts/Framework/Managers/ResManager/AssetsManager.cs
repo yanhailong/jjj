@@ -5,7 +5,7 @@ using System.IO;
 using System;
 using Spine.Unity;
 using Object = UnityEngine.Object;
-using YooAsset;
+using JiuJiuPrincess;
 public class AssetsManager : SingletonMono<AssetsManager>
 {
     public void Initialized()
