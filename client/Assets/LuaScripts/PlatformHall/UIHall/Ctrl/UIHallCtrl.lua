@@ -28,6 +28,42 @@ end
 
 ---添加UI事件
 function UIHallCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_close,function(obj)
+		look("obj",obj)
+		self:Close()
+	end )
+
+	self.uiEventListener:AddLongPress(self.view.btn_close.gameObject,function(obj)
+		logError("AddLongPress")
+	end )
+	self.uiEventListener:AddPressDown(self.view.btn_close.gameObject,function(obj)
+		logError("AddPressDown")
+	end )
+	self.uiEventListener:AddPressUp(self.view.btn_close.gameObject,function(obj)
+		logError("AddPressUp")
+	end )
+	
+	self.uiEventListener:AddBeginDrag(self.view.btn_close.gameObject, function
+	(args)
+		--look("AddBeginDrag===？",args)
+	end)
+	self.uiEventListener:AddDrag(self.view.btn_close.gameObject, function
+	(args)
+		--look("AddDrag===？",args)
+		-----@type UnityEngine.EventSystems.PointerEventData
+		--local args=args
+		--self.view.btn_close.gameObject.transform.position=args.position
+	end)
+	self.uiEventListener:AddEndDrag(self.view.btn_close.gameObject, function
+	(args)
+		---@type UnityEngine.EventSystems.PointerEventData
+		local args=args
+		look("args",args)
+
+		local worldPos= Camera.main.ScreenToWorldPoint(args.position)
+		look("worldPos",worldPos)
+		self.view.btn_close.gameObject.transform.position=worldPos
+	end)
 
 end
 

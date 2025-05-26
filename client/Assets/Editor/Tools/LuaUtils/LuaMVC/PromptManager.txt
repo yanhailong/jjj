@@ -1,0 +1,5 @@
+CtrlNames.#name="#name";
+CtrlManager.CtrlsCollection[CtrlNames.#name]={};
+CtrlManager.CtrlsCollection[CtrlNames.#name].ctrl =require "#ctrlPath";
+CtrlManager.CtrlsCollection[CtrlNames.#name].view=require "#panelPath";
+CtrlManager.CtrlsCollection[CtrlNames.#name].model=require "#modelPath";

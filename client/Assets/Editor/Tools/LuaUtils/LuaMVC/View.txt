@@ -1,0 +1,36 @@
+---
+---Create by #user
+---DateTime: #dateTime
+---
+---@class #class:BaseView
+local #class=Class("#class",BaseView)
+
+---初始化panel
+function #class:InitView()
+	---@type #emmyLua
+    self.ctrl=self.ctrl
+	self:InitComponents()
+end
+
+---获取组件
+function #class:InitComponents()
+#InitPanelContent
+end
+
+---清空组件
+function #class:ClearComponents()
+#ClearComponents
+end
+
+---初始化View数据
+function #class:InitPanelData(args)
+	
+end
+
+---关闭界面
+function #class:Close()   
+    self.super.Close(self);
+end
+
+return #class
+

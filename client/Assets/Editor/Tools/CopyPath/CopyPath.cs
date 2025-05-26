@@ -10,6 +10,7 @@ public class CopyPath : MonoBehaviour
     public static void do_copy_path()
     {
         var go = Selection.activeObject;
+        Debug.LogError(go as GameObject);
         if (!AssetDatabase.IsNativeAsset(go)&&go as GameObject)
         {
             CopyUIComponentPath();
@@ -38,7 +39,7 @@ public class CopyPath : MonoBehaviour
         string newPath = string.Empty;
         while (true)
         {
-            if (dir.Name == "Lua"||dir.Name== "AssetsPackage"||dir.Name=="Assets")
+            if (dir.Name == "Lua"||dir.Name== "BuildResources"||dir.Name=="Arts"||dir.Name=="Assets")
                 break;
             newPath = dir.Name + "/" + newPath;
             dir = dir.Parent;
@@ -47,7 +48,6 @@ public class CopyPath : MonoBehaviour
         if (newPath.EndsWith("/"))
             newPath = newPath.Substring(0, newPath.Length - 1);
         newPath = newPath + "/" + Path.GetFileNameWithoutExtension(path);
-        Debug.Log(newPath);
         EditorGUIUtility.systemCopyBuffer = newPath;
     }
 

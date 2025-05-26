@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using XLua;
 using System.Reflection;
-using YooAsset;
+using JiuJiuPrincess;
 public static class GenConfig
 {
     //lua中要使用到C#库的配置，比如C#标准库，或者Unity API，第三方库等。
@@ -103,9 +103,8 @@ public static class GenConfig
             typeof(PlayerPrefs),
             typeof(System.GC),
             typeof(AsyncOperation),
-            typeof(YooAsset.CoroutineManager),
-            typeof(YooAsset.Util),
-            typeof(YooAsset.UIEventListener)
+            typeof(CoroutineManager),
+            typeof(Util),
         };
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         for (var i = 0; i < assemblies.Length; i++)

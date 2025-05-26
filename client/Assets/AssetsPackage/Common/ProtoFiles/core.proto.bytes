@@ -1,0 +1,43 @@
+package core;//网络状态枚举
+enum NetStatEnum {
+  NETWORK_CANT_USE = 0;  //网络不可用
+  NETWORK_SUCCESS = 1;  //连接成功
+  SERVICE_CANT_USE = 2;  //服务不可用
+  PLAYER_KICKOUT = 3;  //踢出下线
+}
+
+//响应,msgID=0x1003,desc=通知网络状态
+message NoticeServerStatus {
+  enum E_MsgID {def = 0; msgID = 4099;};
+  optional NetStatEnum result = 1;
+}
+
+//请求,msgID=0x1004
+message ReqAesExchange {
+  enum E_MsgID {def = 0; msgID = 4100;};
+  optional string key = 1;
+}
+
+//请求,msgID=0x1001,desc=心跳请求
+message ReqHeartBeat {
+  enum E_MsgID {def = 0; msgID = 4097;};
+  optional bool none = 1;
+}
+
+//响应,msgID=0x1005
+message ResAesExchange {
+  enum E_MsgID {def = 0; msgID = 4101;};
+  optional int32 code = 1;
+}
+
+//响应,msgID=0x1002,desc=心跳返回
+message ResHeartBeat {
+  enum E_MsgID {def = 0; msgID = 4098;};
+  optional int64 time = 1;
+}
+
+message Pack {
+  optional int32 cmd = 1;
+  optional bytes data = 2;
+}
+

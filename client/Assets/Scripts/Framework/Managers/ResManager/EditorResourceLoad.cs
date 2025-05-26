@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
-using YooAsset;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;

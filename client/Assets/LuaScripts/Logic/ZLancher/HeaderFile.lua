@@ -15,6 +15,6 @@ require "Common/CorUtils/coroutineUtils"
 require "Common/CorUtils/CorManager"
 require "Common/CorUtils/TimerManager"
 require("Common/Scroll/SimpleScroll")
---require "Debug/EmmyLuaDebugger"
+require "Debug/EmmyLuaDebugger"
 
 

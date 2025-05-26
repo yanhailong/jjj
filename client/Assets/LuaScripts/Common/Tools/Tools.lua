@@ -221,7 +221,6 @@ function this.GetInt(key)
         return nil
     end
 end
-
 -- 保存整形值
 function this.SaveInt(key, value)
     UnityEngine.PlayerPrefs.SetInt(key, value)

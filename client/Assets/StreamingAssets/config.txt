@@ -1,0 +1,15 @@
+{
+  "hallConfig": {
+    "Platform": "1",
+    "packageUrl": "",
+    "version": 10001
+  },
+  "games": [
+    {
+      "gameName": "gameName",
+      "gameVersion": 0,
+      "state": 1,
+      "layer": 0
+    }
+  ]
+}

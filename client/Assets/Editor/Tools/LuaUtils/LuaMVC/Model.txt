@@ -1,0 +1,31 @@
+---
+---Create by #user
+---DateTime: #dateTime
+---
+---@class #class:BaseModel
+local #class=Class("#class",BaseModel)
+
+function #class:Awake()
+	self.super.Awake(self);
+	---@type #emmyLua
+	self.ctrl=self.ctrl
+end
+
+function #class:Close()
+    self.super.Close(self);
+end
+
+function #class:AddEvent()
+#AddEvent
+end
+
+function #class:RemoveEvent()
+#RemoveEvent
+end
+
+--region 事件方法
+#EventFunction
+--endregion
+
+
+return #class

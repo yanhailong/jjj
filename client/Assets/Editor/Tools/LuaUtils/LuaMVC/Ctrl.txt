@@ -1,0 +1,49 @@
+---
+---Create by #user
+---DateTime: #dateTime
+---
+---@class #class:BaseCtrl
+local #class=Class("#class",BaseCtrl)
+
+---构造函数
+function #class:ctor(ctrlName,param)
+    self.layer=2;
+    self.abName="#abName";
+    self.prefabName="#prefabName"
+    self.super.ctor(self,ctrlName,param);
+	---@type #emmyLuaview
+	self.view = self.view
+	---@type #emmyLuamodel
+	self.model = self.model
+end
+
+---初始化
+function #class:CtrlInit(args)
+	self.super.CtrlInit(self,args);
+end
+
+function #class:Close()
+    self.super.Close(self);
+end
+
+---添加UI事件
+function #class:AddUIEvent()
+#AddUIEvent
+end
+
+---移除UI事件
+function #class:RemoveEvent()
+	self.super.RemoveEvent(self);
+end
+
+--region UI事件方法
+#EventFunction
+--endregion
+
+
+---销毁UI
+function #class:RealCloseDestroy()
+	self.super.RealCloseDestroy(self);
+end
+
+return #class
