@@ -60,7 +60,8 @@ function UIHallCtrl:AddUIEvent()
 		local args=args
 		look("args",args)
 
-		local worldPos= Camera.main.ScreenToWorldPoint(args.position)
+		local vew=Vector3(args.position.x,args.position.y,0)
+		local worldPos= Camera.main:ScreenToWorldPoint(vew)
 		look("worldPos",worldPos)
 		self.view.btn_close.gameObject.transform.position=worldPos
 	end)

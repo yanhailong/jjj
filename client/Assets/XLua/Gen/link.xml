@@ -1,0 +1,232 @@
+﻿
+
+<linker>
+
+	<assembly fullname="UnityEngine.CoreModule">
+	    <type fullname="UnityEngine.AsyncOperation" preserve="all"/>
+		<type fullname="UnityEngine.Object" preserve="all"/>
+		<type fullname="UnityEngine.Ray2D" preserve="all"/>
+		<type fullname="UnityEngine.GameObject" preserve="all"/>
+		<type fullname="UnityEngine.Component" preserve="all"/>
+		<type fullname="UnityEngine.Behaviour" preserve="all"/>
+		<type fullname="UnityEngine.Transform" preserve="all"/>
+		<type fullname="UnityEngine.Resources" preserve="all"/>
+		<type fullname="UnityEngine.TextAsset" preserve="all"/>
+		<type fullname="UnityEngine.Keyframe" preserve="all"/>
+		<type fullname="UnityEngine.AnimationCurve" preserve="all"/>
+		<type fullname="UnityEngine.MonoBehaviour" preserve="all"/>
+		<type fullname="UnityEngine.SkinnedMeshRenderer" preserve="all"/>
+		<type fullname="UnityEngine.Renderer" preserve="all"/>
+		<type fullname="UnityEngine.Debug" preserve="all"/>
+		<type fullname="UnityEngine.Events.UnityEvent" preserve="all"/>
+		<type fullname="UnityEngine.Bounds" preserve="all"/>
+		<type fullname="UnityEngine.Color" preserve="all"/>
+		<type fullname="UnityEngine.LayerMask" preserve="all"/>
+		<type fullname="UnityEngine.Mathf" preserve="all"/>
+		<type fullname="UnityEngine.Plane" preserve="all"/>
+		<type fullname="UnityEngine.Quaternion" preserve="all"/>
+		<type fullname="UnityEngine.Ray" preserve="all"/>
+		<type fullname="UnityEngine.Time" preserve="all"/>
+		<type fullname="UnityEngine.Vector2" preserve="all"/>
+		<type fullname="UnityEngine.Vector3" preserve="all"/>
+		<type fullname="UnityEngine.Vector4" preserve="all"/>
+		<type fullname="UnityEngine.Rect" preserve="all"/>
+		<type fullname="UnityEngine.RectTransform" preserve="all"/>
+		<type fullname="UnityEngine.RectOffset" preserve="all"/>
+		<type fullname="UnityEngine.Sprite" preserve="all"/>
+		<type fullname="UnityEngine.WaitUntil" preserve="all"/>
+		<type fullname="UnityEngine.WaitForSeconds" preserve="all"/>
+		<type fullname="UnityEngine.WaitForSecondsRealtime" preserve="all"/>
+		<type fullname="UnityEngine.ResourceRequest" preserve="all"/>
+		<type fullname="UnityEngine.SceneManagement.SceneManager" preserve="all"/>
+		<type fullname="UnityEngine.PlayerPrefs" preserve="all"/>
+		<type fullname="UnityEngine.AsyncOperation" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="GameLancher" preserve="all"/>
+		<type fullname="Tutorial.BaseClass" preserve="all"/>
+		<type fullname="Tutorial.TestEnum" preserve="all"/>
+		<type fullname="Tutorial.DerivedClass" preserve="all"/>
+		<type fullname="Tutorial.ICalc" preserve="all"/>
+		<type fullname="Tutorial.DerivedClassExtensions" preserve="all"/>
+		<type fullname="Tutorial.DerivedClass+TestEnumInner" preserve="all"/>
+		<type fullname="AssetsManager" preserve="all"/>
+		<type fullname="AssetBundleLoadMgr" preserve="all"/>
+		<type fullname="LocalData" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleAudio" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModulePhysics" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModulePhysics2D" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleSprite" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleUI" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleUnityVersion" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleUtils" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleUI+Utils" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForCompletion" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForRewind" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForKill" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForElapsedLoops" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForPosition" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenCYInstruction+WaitForStart" preserve="all"/>
+		<type fullname="DG.Tweening.DOTweenModuleUtils+Physics" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="mscorlib">
+	    <type fullname="System.Object" preserve="all"/>
+		<type fullname="System.Collections.Generic.List`1[System.Int32]" preserve="all"/>
+		<type fullname="System.Collections.Generic.Dictionary`2[System.String,UnityEngine.GameObject]" preserve="all"/>
+		<type fullname="System.GC" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.AnimationModule">
+	    <type fullname="UnityEngine.AnimationClip" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.ParticleSystemModule">
+	    <type fullname="UnityEngine.ParticleSystem" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.PhysicsModule">
+	    <type fullname="UnityEngine.RaycastHit" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.InputLegacyModule">
+	    <type fullname="UnityEngine.Touch" preserve="all"/>
+		<type fullname="UnityEngine.TouchPhase" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.UIModule">
+	    <type fullname="UnityEngine.RenderMode" preserve="all"/>
+		<type fullname="UnityEngine.Canvas" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.UI">
+	    <type fullname="UnityEngine.UI.CanvasScaler" preserve="all"/>
+		<type fullname="UnityEngine.UI.CanvasScaler+ScaleMode" preserve="all"/>
+		<type fullname="UnityEngine.UI.CanvasScaler+ScreenMatchMode" preserve="all"/>
+		<type fullname="UnityEngine.UI.GraphicRaycaster" preserve="all"/>
+		<type fullname="UnityEngine.UI.Text" preserve="all"/>
+		<type fullname="UnityEngine.UI.InputField" preserve="all"/>
+		<type fullname="UnityEngine.UI.Button" preserve="all"/>
+		<type fullname="UnityEngine.UI.Image" preserve="all"/>
+		<type fullname="UnityEngine.UI.Dropdown" preserve="all"/>
+		<type fullname="UnityEngine.UI.Dropdown+OptionData" preserve="all"/>
+		<type fullname="UnityEngine.UI.ScrollRect" preserve="all"/>
+		<type fullname="UnityEngine.UI.Scrollbar" preserve="all"/>
+		<type fullname="UnityEngine.UI.Toggle" preserve="all"/>
+		<type fullname="UnityEngine.UI.ToggleGroup" preserve="all"/>
+		<type fullname="UnityEngine.UI.Button+ButtonClickedEvent" preserve="all"/>
+		<type fullname="UnityEngine.UI.ScrollRect+ScrollRectEvent" preserve="all"/>
+		<type fullname="UnityEngine.UI.GridLayoutGroup" preserve="all"/>
+		<type fullname="UnityEngine.UI.ContentSizeFitter" preserve="all"/>
+		<type fullname="UnityEngine.UI.Slider" preserve="all"/>
+		<type fullname="UnityEngine.EventSystems.PointerEventData" preserve="all"/>
+		<type fullname="UnityEngine.EventSystems.BaseEventData" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.Physics2DModule">
+	    <type fullname="UnityEngine.Rigidbody2D" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="JiuJiuPrincess">
+	    <type fullname="JiuJiuPrincess.Util" preserve="all"/>
+		<type fullname="JiuJiuPrincess.UIEventListener" preserve="all"/>
+		<type fullname="JiuJiuPrincess.CoroutineManager" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween">
+	    <type fullname="DG.Tweening.AutoPlay" preserve="all"/>
+		<type fullname="DG.Tweening.AxisConstraint" preserve="all"/>
+		<type fullname="DG.Tweening.Color2" preserve="all"/>
+		<type fullname="DG.Tweening.DOCurve" preserve="all"/>
+		<type fullname="DG.Tweening.DOTween" preserve="all"/>
+		<type fullname="DG.Tweening.DOVirtual" preserve="all"/>
+		<type fullname="DG.Tweening.Ease" preserve="all"/>
+		<type fullname="DG.Tweening.EaseFactory" preserve="all"/>
+		<type fullname="DG.Tweening.IDOTweenInit" preserve="all"/>
+		<type fullname="DG.Tweening.LinkBehaviour" preserve="all"/>
+		<type fullname="DG.Tweening.PathMode" preserve="all"/>
+		<type fullname="DG.Tweening.PathType" preserve="all"/>
+		<type fullname="DG.Tweening.RotateMode" preserve="all"/>
+		<type fullname="DG.Tweening.ScrambleMode" preserve="all"/>
+		<type fullname="DG.Tweening.TweenExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.LoopType" preserve="all"/>
+		<type fullname="DG.Tweening.Sequence" preserve="all"/>
+		<type fullname="DG.Tweening.ShortcutExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.TweenParams" preserve="all"/>
+		<type fullname="DG.Tweening.TweenSettingsExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.LogBehaviour" preserve="all"/>
+		<type fullname="DG.Tweening.Tween" preserve="all"/>
+		<type fullname="DG.Tweening.Tweener" preserve="all"/>
+		<type fullname="DG.Tweening.TweenType" preserve="all"/>
+		<type fullname="DG.Tweening.UpdateType" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.CircleOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.CirclePlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.DoublePlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.LongPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.UlongPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Vector3ArrayPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.PathPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.ColorPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.IntPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.QuaternionPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.RectOffsetPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.RectPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.UintPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Vector2Plugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Vector4Plugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.StringPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.FloatPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Vector3Plugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.IPlugOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.OrientType" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.PathOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.QuaternionOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.UintOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.Vector3ArrayOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.NoOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.ColorOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.FloatOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.RectOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.StringOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Options.VectorOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Core.ITweenPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Core.PathCore.ControlPoint" preserve="all"/>
+		<type fullname="DG.Tweening.Plugins.Core.PathCore.Path" preserve="all"/>
+		<type fullname="DG.Tweening.CustomPlugins.PureQuaternionPlugin" preserve="all"/>
+		<type fullname="DG.Tweening.Core.ABSSequentiable" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Debugger" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenComponent" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenSettings" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Extensions" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenExternalCommand" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenUtils" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Enums.NestedTweenFailureBehaviour" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Enums.SafeModeLogBehaviour" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Enums.SpecialStartupMode" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Enums.UpdateNotice" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Enums.RewindCallbackMode" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Easing.Bounce" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Easing.EaseManager" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Easing.EaseCurve" preserve="all"/>
+		<type fullname="DG.Tweening.Core.Easing.Flash" preserve="all"/>
+		<type fullname="DG.Tweening.DOCurve+CubicBezier" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenSettings+SettingsLocation" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenSettings+SafeModeOptions" preserve="all"/>
+		<type fullname="DG.Tweening.Core.DOTweenSettings+ModulesSetup" preserve="all"/>
+		
+	</assembly>
+
+</linker>

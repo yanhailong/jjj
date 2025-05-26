@@ -92,10 +92,10 @@ GameObject:
   - component: {fileID: 6351524266405385084}
   - component: {fileID: 3569650419341047100}
   - component: {fileID: 3484898593089076106}
-  - component: {fileID: 3491307012635402539}
-  - component: {fileID: 6304954485615613688}
-  - component: {fileID: 5176811510278869195}
-  - component: {fileID: 6548428847458243703}
+  - component: {fileID: 6754490493731501290}
+  - component: {fileID: 8148316686310581194}
+  - component: {fileID: 9170419879952310893}
+  - component: {fileID: 7884278965759577062}
   m_Layer: 5
   m_Name: btn_close
   m_TagString: Untagged
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3491307012635402539
+--- !u!114 &6754490493731501290
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -215,7 +215,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441135079624049711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cb877544cf5eae4d80cbd193badac62, type: 3}
+  m_Script: {fileID: -1629891051, guid: 3f3000486d6d23846884566fa048ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onLongPress:
@@ -224,7 +224,7 @@ MonoBehaviour:
   holdTime: 0.5
   isRepeat: 0
   repeatRate: 0.2
---- !u!114 &6304954485615613688
+--- !u!114 &8148316686310581194
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -233,13 +233,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441135079624049711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30a5635a4e0fd674c9c4893f6c1d657b, type: 3}
+  m_Script: {fileID: -1041583770, guid: 3f3000486d6d23846884566fa048ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onLongPress:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5176811510278869195
+--- !u!114 &9170419879952310893
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -248,13 +248,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441135079624049711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81b1c95666d0de546af369b7736ea215, type: 3}
+  m_Script: {fileID: 1905289613, guid: 3f3000486d6d23846884566fa048ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onLongPress:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6548428847458243703
+--- !u!114 &7884278965759577062
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -263,7 +263,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441135079624049711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7860a2a4b774169469e54b73ec70d386, type: 3}
+  m_Script: {fileID: 1257860593, guid: 3f3000486d6d23846884566fa048ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5028307932146325733

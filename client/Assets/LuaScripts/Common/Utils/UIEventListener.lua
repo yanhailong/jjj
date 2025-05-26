@@ -1,4 +1,4 @@
-local listener = CS.UIEventListener
+local listener = CS.JiuJiuPrincess.UIEventListener
 ---@class UIEventListener
 local UIEventListener = Class("UIEventListener")
 ---@return UIEventListener
