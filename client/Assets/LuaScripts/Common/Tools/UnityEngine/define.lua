@@ -7,8 +7,8 @@
 ---
 ---@type FileUtil
 FileUtil = CS.FileUtil
----@type YooAsset.Util
-Util = CS.YooAsset.Util
+---@type JiuJiuPrincess.Util
+Util = CS.JiuJiuPrincess.Util
 ---@type AssetsManager
 resMgr = CS.AssetsManager.Instance
 ---@type AssetBundleLoadMgr
@@ -51,7 +51,7 @@ AnimationClip = CS.UnityEngine.AnimationClip
 UnityWebRequest = CS.UnityEngine.Networking.UnityWebRequest
 ---@type UnityEngine.Font
 Font = CS.UnityEngine.Font
----@type YooAsset.AppConst 应用程序自定义数据
+---@type JiuJiuPrincess.AppConst 应用程序自定义数据
 AppConst = CS.YooAsset.AppConst
 ---@type UnityEngine.Random
 Random = CS.UnityEngine.Random

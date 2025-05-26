@@ -24,7 +24,30 @@ function UILoginModel:RemoveEvent()
 end
 
 --region 事件方法
-
+function UILoginModel:Login()
+	local deviceId = LocalData:GetJsonByKey("jjqdeviceId")
+	if deviceId=="" then
+		deviceId=Util.GetTimeStamp(true)
+	end
+	LocalData:Save("jjqdeviceId",deviceId)
+	local data = {}
+	data.guest = deviceId;
+	local reqData = jsonEncode(data);
+	HttpManager.SendHttpPost(HttpApi.Guestlogin, reqData, function(args)
+		if args=="FailPost" then
+			logError("网络错误")
+			return
+		end
+		local qdata = jsonDecode(args)
+		if qdata then
+			if qdata.code == 200 then
+				self.ctrl:InitLogin(qdata)
+			else
+				logError("服务器错误：code"..qdata.code)
+			end
+		end
+	end)
+end
 --endregion
 
 

@@ -20,6 +20,12 @@ end
 ---初始化
 function UILoginCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self:InitData()
+	self.model:Login()
+end
+
+function UILoginCtrl:InitData()
+	self.serverInfo=nil
 end
 
 function UILoginCtrl:Close()
@@ -28,9 +34,10 @@ end
 
 ---添加UI事件
 function UILoginCtrl:AddUIEvent()
+	self.view.btn_login.gameObject:SetActive(false)
 	self.uiEventListener:AddClick(self.view.btn_login.gameObject, function
 	()
-		CtrlManager.SingleShow(CtrlNames.UIHall)
+		
 	end)
 end
 
@@ -39,9 +46,20 @@ function UILoginCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
---region UI事件方法
+function UILoginCtrl:InitLogin(serverInfo)
+	look("收到服务器信息",serverInfo)
+	self.serverInfo=serverInfo.data
+	self.view.btn_login.gameObject:SetActive(true)
+	
+end
+function UILoginCtrl:CreateSocket()
+	local uri=self.serverInfo.gameserver
+	logError("uri:"..uri)
+end
 
---endregion
+function UILoginCtrl:ReqLogin()
+
+end
 
 
 ---销毁UI

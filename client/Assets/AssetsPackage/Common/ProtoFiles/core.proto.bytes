@@ -12,22 +12,10 @@ message NoticeServerStatus {
   optional NetStatEnum result = 1;
 }
 
-//请求,msgID=0x1004
-message ReqAesExchange {
-  enum E_MsgID {def = 0; msgID = 4100;};
-  optional string key = 1;
-}
-
 //请求,msgID=0x1001,desc=心跳请求
 message ReqHeartBeat {
   enum E_MsgID {def = 0; msgID = 4097;};
   optional bool none = 1;
-}
-
-//响应,msgID=0x1005
-message ResAesExchange {
-  enum E_MsgID {def = 0; msgID = 4101;};
-  optional int32 code = 1;
 }
 
 //响应,msgID=0x1002,desc=心跳返回
@@ -39,5 +27,17 @@ message ResHeartBeat {
 message Pack {
   optional int32 cmd = 1;
   optional bytes data = 2;
+}
+
+//请求,msgID=0x3001,desc=登录请求
+message ReqLogin {
+  enum E_MsgID {def = 0; msgID = 12289;};
+  optional string token = 1;  //验证token
+}
+
+//响应,msgID=0x3002,desc=登录返回
+message ResLogin {
+  enum E_MsgID {def = 0; msgID = 12290;};
+  optional int32 code = 1;  //状态码
 }
 

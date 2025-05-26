@@ -16,5 +16,7 @@ require "Common/CorUtils/CorManager"
 require "Common/CorUtils/TimerManager"
 require("Common/Scroll/SimpleScroll")
 require "Debug/EmmyLuaDebugger"
+---网络层相关---
+require("Logic/NetWork/HttpManager")
 
 
