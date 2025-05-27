@@ -32,8 +32,6 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
     //消息分发
     private DispatchMessage dispatchMessage;
     
-    private Thread threadConnect;
-    
     void Awake()
     {
         msgLock = new object();
@@ -53,19 +51,7 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
         webSocket.OnError += OnError;
         webSocket.OnClose += OnClose;
         webSocket.OnMessage += OnMessage;
-        
-        threadConnect = new Thread(() =>
-        {
-            try
-            {
-                webSocket.Connect();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("连接失败！:"+e.Message.ToString());
-            }
-        });
-        threadConnect.Start();
+        webSocket.ConnectAsync();
     }
 
 
@@ -104,7 +90,7 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
             this.reveiveByteBuffer.OnRead(e.RawData, e.RawData.Length);
         }
     }
-
+    
     public void Send(int msgId, byte[] byteBuffer)
     {
         if (!isConnect)
@@ -113,47 +99,27 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
             return;
         }
         int msgLen = byteBuffer.Length;
-        byte[] sendBuffer = GetSendBuffer();
+        byte[] sendBuffer = new byte[msgLen + 4];//GetSendBuffer();
+        
+        ByteBuffer header = new ByteBuffer();
+        header.WriteInt(msgId);
+        
+        ByteBuffer sendMsgBuffer = new ByteBuffer();
+        sendMsgBuffer.WriteBuffer(header);
+        sendMsgBuffer.WriteBytes(byteBuffer);
+        header.Close();
+        
+        
         //消息长度转为byte
-        sendBuffer[0] = (byte)((msgLen >> 24) & 0xff);
-        sendBuffer[1] = (byte)((msgLen >> 16) & 0xff);
-        sendBuffer[2] = (byte)((msgLen >> 8) & 0xff);
-        sendBuffer[3] = (byte)(msgLen & 0xff);
-
-        sendBuffer[4] = (byte)((msgId >> 24) & 0xff);
-        sendBuffer[5] = (byte)((msgId >> 16) & 0xff);
-        sendBuffer[6] = (byte)((msgId >> 8) & 0xff);
-        sendBuffer[7] = (byte)(msgId & 0xff);
-            
-        Array.Copy(byteBuffer, 0, sendBuffer, 8, msgLen);
-        try
-        {
-            webSocket.SendAsync(ConvertToStream(sendBuffer),msgLen + 8, (isSucceed) =>
-            {
-
-            });
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e.ToString());
-        }
+        sendBuffer[3] = (byte)((msgId >> 24) & 0xff);
+        sendBuffer[2] = (byte)((msgId >> 16) & 0xff);
+        sendBuffer[1] = (byte)((msgId >> 8) & 0xff);
+        sendBuffer[0] = (byte)(msgId & 0xff);
+        
+        Array.Copy(byteBuffer, 0, sendBuffer, 4, msgLen);
+        webSocket.SendAsync(sendMsgBuffer.ToBytes());
     }
     
-    private Stream ConvertToStream(byte[]bytes)
-    {
-        Stream result;
-        try
-        {
-            Stream stream =  new  MemoryStream(bytes);
-            result = stream;
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
-        return result;
-    }
-
     private byte[] GetSendBuffer()
     {
         if (sendBufferPool.Count > 0)
@@ -188,18 +154,13 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
 
     public void Close()
     {
-        if (threadConnect != null)
-        {
-            threadConnect.Abort();
-            threadConnect = null;
-        }
         if (webSocket != null)
-        {           
-            webSocket.Close();
+        {
             webSocket.OnOpen -= OnOpen;
             webSocket.OnError -= OnError;
             webSocket.OnClose -= OnClose;
             webSocket.OnMessage -= OnMessage;
+            webSocket.CloseAsync();
         }
         webSocket = null;
         luaCall = null;
