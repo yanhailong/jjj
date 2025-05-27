@@ -18,5 +18,8 @@ require("Common/Scroll/SimpleScroll")
 require "Debug/EmmyLuaDebugger"
 ---网络层相关---
 require("Logic/NetWork/HttpManager")
+require("Logic/NetWork/WebSocket/WebNetworkManager")
+require("Logic/DataManager/DataConst")
+
 
 

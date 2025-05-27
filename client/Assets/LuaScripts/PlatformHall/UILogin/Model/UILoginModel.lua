@@ -16,13 +16,18 @@ function UILoginModel:Close()
 end
 
 function UILoginModel:AddEvent()
-
+	GlobalEvent.AddListener(WebNetworkConnectEvent.connectSuccess,self.OnConnectSuccess,self)
+	GlobalEvent.AddListener(WebNetworkConnectEvent.connectFailed,self.connectFailed,self)
+	WebNetEvent.AddListener(MsgId.ResLogin, self.ResLogin, self)
 end
 
 function UILoginModel:RemoveEvent()
-
+	GlobalEvent.Remove(WebNetworkConnectEvent.connectSuccess,self.OnConnectSuccess,self)
+	GlobalEvent.Remove(WebNetworkConnectEvent.connectFailed,self.connectFailed,self)
+	WebNetEvent.Remove(MsgId.ResLogin, self.ResLogin, self)
 end
 
+	
 --region 事件方法
 function UILoginModel:Login()
 	local deviceId = LocalData:GetJsonByKey("jjqdeviceId")
@@ -33,6 +38,7 @@ function UILoginModel:Login()
 	local data = {}
 	data.guest = deviceId;
 	local reqData = jsonEncode(data);
+	
 	HttpManager.SendHttpPost(HttpApi.Guestlogin, reqData, function(args)
 		if args=="FailPost" then
 			logError("网络错误")
@@ -48,7 +54,19 @@ function UILoginModel:Login()
 		end
 	end)
 end
---endregion
 
+function UILoginModel:OnConnectSuccess()
+	logError("链接服务器成功！ 开始请求登录！")
+	self.ctrl:ReqLogin()
+end
+
+function UILoginModel:connectFailed()
+	logError("服务器关闭")
+end
+
+function UILoginModel:ResLogin(msg)
+	look("登录成功",msg)
+	CtrlManager.SingleShow(CtrlNames.UIHall)
+end
 
 return UILoginModel

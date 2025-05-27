@@ -37,7 +37,7 @@ function UILoginCtrl:AddUIEvent()
 	self.view.btn_login.gameObject:SetActive(false)
 	self.uiEventListener:AddClick(self.view.btn_login.gameObject, function
 	()
-		
+		self:ReqLogin()
 	end)
 end
 
@@ -50,17 +50,21 @@ function UILoginCtrl:InitLogin(serverInfo)
 	look("收到服务器信息",serverInfo)
 	self.serverInfo=serverInfo.data
 	self.view.btn_login.gameObject:SetActive(true)
+	self:CreateSocket()
 	
 end
 function UILoginCtrl:CreateSocket()
 	local uri=self.serverInfo.gameserver
-	logError("uri:"..uri)
+	log("uri:"..uri)
+	WebNetworkManager.Connect(uri)
 end
 
+---请求登录
 function UILoginCtrl:ReqLogin()
-
+	local reqLogin = {}
+	reqLogin.token = self.serverInfo.token
+	WebNetworkManager.SendMsg(MsgId.ReqLogin, reqLogin)
 end
-
 
 ---销毁UI
 function UILoginCtrl:RealCloseDestroy()

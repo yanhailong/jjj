@@ -1,4 +1,4 @@
-package core;//网络状态枚举
+syntax = "proto3";//网络状态枚举
 enum NetStatEnum {
   NETWORK_CANT_USE = 0;  //网络不可用
   NETWORK_SUCCESS = 1;  //连接成功
@@ -9,35 +9,35 @@ enum NetStatEnum {
 //响应,msgID=0x1003,desc=通知网络状态
 message NoticeServerStatus {
   enum E_MsgID {def = 0; msgID = 4099;};
-  optional NetStatEnum result = 1;
+  NetStatEnum result = 1;
 }
 
 //请求,msgID=0x1001,desc=心跳请求
 message ReqHeartBeat {
   enum E_MsgID {def = 0; msgID = 4097;};
-  optional bool none = 1;
+  bool none = 1;
 }
 
 //响应,msgID=0x1002,desc=心跳返回
 message ResHeartBeat {
   enum E_MsgID {def = 0; msgID = 4098;};
-  optional int64 time = 1;
+  int64 time = 1;
 }
 
 message Pack {
-  optional int32 cmd = 1;
-  optional bytes data = 2;
+  int32 cmd = 1;
+  bytes data = 2;
 }
 
 //请求,msgID=0x3001,desc=登录请求
 message ReqLogin {
   enum E_MsgID {def = 0; msgID = 12289;};
-  optional string token = 1;  //验证token
+  string token = 1;  //验证token
 }
 
 //响应,msgID=0x3002,desc=登录返回
 message ResLogin {
   enum E_MsgID {def = 0; msgID = 12290;};
-  optional int32 code = 1;  //状态码
+  int32 code = 1;  //状态码
 }
 

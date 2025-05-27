@@ -3,8 +3,7 @@ PBHelper = {}
 local this = PBHelper
 local parser =require("Logic/Protoc/protoc").new()
 local pb = require "pb"
-local pbPath="ProtoFiles";
-
+local pbPath="Common/ProtoFiles";
 
 function this.LoadPB(pbName)
     local protoString = resMgr:LoadTextAssetStr(pbPath,pbName..".proto.bytes")
@@ -14,17 +13,24 @@ end
 function this.EnCode(msg_id, tb)
     local pbInfo=PbMsg[msg_id]
     if pbInfo then
-        return assert(pb.encode(pbInfo, tb))
+        local data={}
+        data.cmd=msg_id
+        data.data=assert(pb.encode(pbInfo, tb))
+        return assert(pb.encode("Pack", data))
     else
         logError("消息对应的pb为空！msg_id:"..msg_id)
     end
     
 end
 
-function this.Decode(msg_id, bytes)
-    local pbInfo=PbMsg[msg_id]
+
+function this.Decode(bytes)
+    local pack=assert(pb.decode("Pack", bytes))
+    local msgId=pack.cmd
+    local subBytes=pack.data
+    local pbInfo=PbMsg[msgId]
     if pbInfo then
-        return assert(pb.decode(pbInfo, bytes))
+        return msgId,assert(pb.decode(pbInfo, subBytes))
     else
         logError("消息对应的pb为空！msg_id:"..msg_id)
     end
