@@ -10,7 +10,6 @@ WebNetEvent = require "Logic/NetWork/WebSocket/WebNetEvent"
 local NetworkPing = require "Logic/NetWork/WebSocket/NetworkPing"
 require("Logic/NetWork/WebSocket/ServerTimeSync")
 local isContent = false
-local curContentUrl = nil
 local isOpenMsgLog = true
 local eventPool = {}
 ---网络连接事件
@@ -23,30 +22,72 @@ WebNetworkConnectEvent = {
     connectClose = "WebNetworkConnectEvent_connectClose"
 }
 
-function this.Connect(url)
-    WebSocketClient:Close()
+---@param 创建连接
+function this.CreateWebSocket(url)
+    ---@param 重连间隔时间
+    this.reconnectDelay = 10
+    ---@param 重连次数
+    this.maxconnectCount = 3
+    ---@type WebSocketClient
     WebSocketClient:Run(url, Handler(this, this.OnReceive), Handler(this, this.OnSocketConnentState))
-    curContentUrl = url
+    this.Connect()
+end
+
+---@param 开始连接
+function this.Connect()
+    WebSocketClient:ConnectAsync()
+end
+
+---@param 开始心跳
+function this.StartHeart()
     if this.ping then
         this.ping:OnDestory()
     end
     ---@type NetworkPing
     this.ping = NetworkPing.New(this)
     this.ping:Start()
+end
 
-    ---@param 重连间隔时间
-    this.reconnectDelay = 10
-    ---@param 重连次数
-    this.maxconnectCount = 3
+function this.StopHeart()
+    if this.ping then
+        this.ping:Stop()
+        this.ping:OnDestory()
+        this.ping=nil
+    end
+end
+
+function this:OnSocketConnentState(msg)
+    if msg == "Success" then
+        log("webSockt连接成功！")
+        TimerManager.StopAllTimer(this)
+        isContent = true
+        WebNetEvent.Notify(WebNetworkConnectEvent.connectSuccess, msg)
+        this.StartHeart()
+        return
+    end
+    if msg == "OnClose" then
+        log("服务器关闭连接！")
+        isContent = false
+        WebNetEvent.Notify(WebNetworkConnectEvent.connectFailed, msg)
+        this.Close()
+        return
+    end
+    if msg == "ReOpen" then
+        log("webSockt关闭！请求重新连接！")
+        isContent = false
+        this.Reconnect()
+        WebNetEvent.Notify(WebNetworkConnectEvent.connectClose, msg)
+        return
+    end
+    logError(msg)
 end
 
 function this.Close()
-    WebSocketClient:Close()
-    this.ping:Stop()
-end
-
-function this.PingStart()
-    this.ping:Start()
+    WebSocketClient:DisConnect()
+    this.StopHeart()
+    ---心跳超时 开始重新连接
+    isContent = false
+    this.Reconnect()
 end
 
 ---@param 发送消息
@@ -56,52 +97,22 @@ function this.SendMsg(id, pbMsg)
     end
     this.MsgLog(false, id, pbMsg)
     pbMsg = PBHelper.EnCode(id, pbMsg)
-    --local msgTab = PBHelper.Decode(id, pbMsg)
     WebSocketClient:Send(pbMsg)
 end
 
-function this:OnSocketConnentState(msg)
-    if msg == "Success" then
-        log("webSockt连接成功！")
-        isContent = true
-        WebNetEvent.Notify(WebNetworkConnectEvent.connectSuccess, msg)
-        return
-    end
-    if msg == "OnClose" then
-        log("链接服务器失败！")
-        isContent = false
-        WebNetEvent.Notify(WebNetworkConnectEvent.connectFailed, msg)
-        return
-    end
-    if msg == "ReOpen" then
-        log("webSockt关闭！")
-        isContent = false
-        this.Reconnect()
-        WebNetEvent.Notify(WebNetworkConnectEvent.connectClose, msg)
-        return
-    end
-    logError(msg)
-end
-
+---@param 接收消息
 function this:OnReceive(bytes)
     local msgId,msgTab = PBHelper.Decode(bytes)
     this.MsgLog(true, msgId, msgTab)
     WebNetEvent.Notify(msgId, msgTab)
 end
 
-function this.NotifyEvent(eventName, data)
-    if table.HasKey(eventPool, eventName) then
-        eventPool[eventName](data)
-        eventPool[eventName] = nil
-    else
-        WebNetEvent.Notify(eventName, data)
-    end
-end
-
+---@param 是否连接
 function this.IsConnect()
     return isContent
 end
 
+---@param 重连
 function this.Reconnect()
     if this.reconnectTimer then
         TimerManager.StopAllTimer(this)
@@ -112,10 +123,11 @@ function this.Reconnect()
         function()
             if isContent == true then
                 this.reconnectTimer:Stop()
+                this.reconnectTimer=nil
                 log("重连成功！")
                 return
             end
-            this.ping:SendTimeout()
+            this.Connect()
         end,
         this.reconnectDelay,
         this.maxconnectCount
@@ -126,9 +138,9 @@ function this.MsgLog(isRecive, msgID, msgTab)
     if not isOpenMsgLog then
         return
     end
-    if msgID == MsgId.ResHeartBeat  or msgID == MsgId.ReqHeartBeat then
-       return
-    end
+    --if msgID == MsgId.ResHeartBeat  or msgID == MsgId.ReqHeartBeat then
+    --   return
+    --end
     if isRecive then
         
         look("接收消息：", msgID, msgTab)

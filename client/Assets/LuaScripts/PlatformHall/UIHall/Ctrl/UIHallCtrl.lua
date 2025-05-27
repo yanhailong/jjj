@@ -65,6 +65,11 @@ function UIHallCtrl:AddUIEvent()
 		look("worldPos",worldPos)
 		self.view.btn_close.gameObject.transform.position=worldPos
 	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_closewebsockt, function
+	()
+		WebNetworkManager.Close()
+	end)
 
 end
 

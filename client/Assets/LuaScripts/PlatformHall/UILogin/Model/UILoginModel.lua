@@ -56,8 +56,7 @@ function UILoginModel:Login()
 end
 
 function UILoginModel:OnConnectSuccess()
-	logError("链接服务器成功！ 开始请求登录！")
-	self.ctrl:ReqLogin()
+	logError("链接服务器成功！")
 end
 
 function UILoginModel:connectFailed()

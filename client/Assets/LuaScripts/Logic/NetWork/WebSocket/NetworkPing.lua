@@ -21,6 +21,7 @@ end
 
 function NetworkPing:Start()
     self.timer:Start()
+    self.timeoutTimer:Start()
 end
 
 function NetworkPing:Stop()

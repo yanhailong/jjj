@@ -28,7 +28,7 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
         StateError = new Queue<string>();
     }
 
-    public void Run(string url,Action<byte[]> onReceive,Action<string> onWebState)
+    public WebSocket Run(string url,Action<byte[]> onReceive,Action<string> onWebState)
     {
         this.onReceive = onReceive;
         this.onWebState = onWebState;
@@ -41,7 +41,11 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
         webSocket.OnError += OnError;
         webSocket.OnClose += OnClose;
         webSocket.OnMessage += OnMessage;
+        return webSocket; 
+    }
 
+    public void ConnectAsync()
+    {
         webSocket.ConnectAsync();
     }
 
@@ -107,6 +111,11 @@ public class WebSocketClient : SingletonMono<WebSocketClient>
         {
             this.onReceive?.Invoke(queue.Dequeue());
         }
+    }
+
+    public void DisConnect()
+    {
+        this.webSocket.CloseAsync();
     }
 
     public void Close()

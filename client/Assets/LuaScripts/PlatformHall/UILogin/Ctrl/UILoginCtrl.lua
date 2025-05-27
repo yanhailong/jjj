@@ -56,7 +56,7 @@ end
 function UILoginCtrl:CreateSocket()
 	local uri=self.serverInfo.gameserver
 	log("uri:"..uri)
-	WebNetworkManager.Connect(uri)
+	WebNetworkManager.CreateWebSocket(uri)
 end
 
 ---请求登录
