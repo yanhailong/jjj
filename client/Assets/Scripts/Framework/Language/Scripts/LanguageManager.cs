@@ -16,10 +16,7 @@ using UnityEngine;
 public class LanguageManager
 {
 
-    private static string abName="OutPut/Languages";
-    
-    public const string LanguageIdentify = "LanguageIdentify";
-
+    private static string abName="Common/Languages";
     // public FontManager font;
     public static LanguageManager Instance = new LanguageManager();
 
@@ -59,28 +56,30 @@ public class LanguageManager
     {
         _fallbackFont = null;
         
-        var extra = GetLanguage("default_font_extra");
-        Font fontExtra = null;
-        if (!string.IsNullOrEmpty(extra))
-        {
-            // var assetRef = AssetRef.Parse(extra);
-            // fontExtra = assetRef?.Load<Font>();
-        }
-        if (fontExtra != null)
-        {
-            _fallbackFont = TMP_FontAsset.CreateFontAsset(fontExtra);
-            return;
-        }
+        // var extra = GetLanguage("default_font_extra");
+        // Font fontExtra = null;
+        // if (!string.IsNullOrEmpty(extra))
+        // {
+        //     // var assetRef = AssetRef.Parse(extra);
+        //     // fontExtra = assetRef?.Load<Font>();
+        // }
+        // if (fontExtra != null)
+        // {
+        //     _fallbackFont = TMP_FontAsset.CreateFontAsset(fontExtra);
+        //     return;
+        // }
         
-        #if UNITY_EDITOR
-        var fontName = GetLanguage("default_font_name");
-        #elif UNITY_ANDROID
-        var fontName = GetLanguage("default_font_name_android");
-        #elif UNITY_IOS
-        var fontName = GetLanguage("default_font_name_ios");
-        #else
+        // #if UNITY_EDITOR
+        // var fontName = GetLanguage("default_font_name");
+        // #elif UNITY_ANDROID
+        // var fontName = GetLanguage("default_font_name_android");
+        // #elif UNITY_IOS
+        // var fontName = GetLanguage("default_font_name_ios");
+        // #else
+        // var fontName = default(string);
+        // #endif
+        
         var fontName = default(string);
-        #endif
         if (string.IsNullOrEmpty(fontName))
             return;
         
@@ -149,7 +148,8 @@ public class LanguageManager
         {
             _cfgs[item.name] = item;
         }
-        var language = PlayerPrefs.GetString(LanguageIdentify, "");
+
+        var language = "";
         if (language == "")
         {
             var systemLanguage = Application.systemLanguage.ToString();

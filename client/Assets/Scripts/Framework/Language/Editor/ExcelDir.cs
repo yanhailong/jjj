@@ -5,5 +5,5 @@ using UnityEngine;
 public class ExcelDir
 {
     public const string excelPath = "./excel/LangExcel/";
-    public const string lanJsonPath = "/AssetsPackage/OutPut/Languages/";
+    public const string lanJsonPath = "/AssetsPackage/Common/Languages/";
 }
