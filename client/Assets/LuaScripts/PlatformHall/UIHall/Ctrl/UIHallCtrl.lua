@@ -11,7 +11,7 @@ require("SingleGames/Game002/MVCHead")
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
     self.layer=2;
-    self.abName="PlatformHall/prefabs/UIHall";
+    self.abName="PlatformHall/UIHall/Prefabs/UIHall";
     self.prefabName="UIHall"
     self.super.ctor(self,ctrlName,param);
 	---@type UIHallView

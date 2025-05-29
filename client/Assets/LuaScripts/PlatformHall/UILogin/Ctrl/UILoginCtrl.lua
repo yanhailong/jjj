@@ -8,7 +8,7 @@ require("PlatformHall/UIHall/MVCHead")
 ---构造函数
 function UILoginCtrl:ctor(ctrlName,param)
     self.layer=2;
-    self.abName="PlatformHall/prefabs/UILogin";
+    self.abName="PlatformHall/UILogin/Prefabs/UILogin";
     self.prefabName="UILogin"
     self.super.ctor(self,ctrlName,param);
 	---@type UILoginView
