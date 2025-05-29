@@ -444,7 +444,7 @@ end
 ---@return UnityEngine.Camera
 function this.GetUICamera()
     if this.uiCamera == nil then
-        this.uiCamera = GameObject.Find("Global_UI/UICamera"):GetComponent("Camera")
+        this.uiCamera = GameObject.Find("Global/UICamera"):GetComponent("Camera")
     end
     return this.uiCamera
 end
@@ -497,12 +497,12 @@ end
 ---获取平台类型
 function this.GetPlatformType()
     local platformName = AppConst.PlatformName
-    local accountType
+    local accountType=-1
     if platformName == "Android" then
         accountType = 1
     elseif platformName == "iOS" then
         accountType = 2
-    else
+    elseif platformName == "webgl" then
         accountType = 3
     end
     return accountType
@@ -954,17 +954,6 @@ function this.confuseName(name)
     local last = string.sub(name, (len * 3) - 2)
     local result = "*" .. last
     return result
-end
-
-function this.GoToAppStore()
-    local platform = this.GetPlatformType()
-    if platform == 1 then
-        -- android
-        Application.OpenURL("market://details?id=" .. AppConst.pkgName)
-    elseif platform == 2 then
-        -- ios
-        Application.OpenURL("itms-apps://itunes.apple.com/app/id" .. AppConst.pkgName)
-    end
 end
 
 function this.PlayerSpineAniByName(SkeletonGraphic, aniName, isLoop, needClearTrack)

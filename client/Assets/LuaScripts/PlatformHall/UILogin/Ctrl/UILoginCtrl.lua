@@ -22,6 +22,9 @@ function UILoginCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
 	self.model:Login()
+	
+	---@type ObjectPoolUtil
+	self.pool=ObjectPoolUtil.New(self.ctrlName)
 end
 
 function UILoginCtrl:InitData()
@@ -39,6 +42,7 @@ function UILoginCtrl:AddUIEvent()
 	()
 		self:ReqLogin()
 	end)
+	
 end
 
 ---移除UI事件

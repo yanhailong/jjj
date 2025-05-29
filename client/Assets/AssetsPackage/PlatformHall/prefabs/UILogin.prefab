@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 6146451848776855338}
   - component: {fileID: 6146451848776855336}
   - component: {fileID: 6146451848776855337}
+  - component: {fileID: 7071821883516308345}
   m_Layer: 5
   m_Name: tmp_login
   m_TagString: Untagged
@@ -142,7 +143,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Login\u754C\u9762"
+  m_text: "\u6D4B\u8BD5001"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9d4ba933d4fb8a74ca8a0b796fd6b070, type: 2}
   m_sharedMaterial: {fileID: -8853542674579157953, guid: 9d4ba933d4fb8a74ca8a0b796fd6b070, type: 2}
@@ -211,6 +212,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7071821883516308345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6146451848776855339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90addf8e06e547a0a0f28125c27cc8a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: 10002
+  condition: 3
 --- !u!1 &6146451848938756822
 GameObject:
   m_ObjectHideFlags: 0

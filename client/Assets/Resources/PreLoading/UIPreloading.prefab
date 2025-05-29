@@ -527,7 +527,6 @@ GameObject:
   - component: {fileID: 1564481757196405388}
   - component: {fileID: 1672093187285458510}
   - component: {fileID: 1672068424719137844}
-  - component: {fileID: -4052612904432708792}
   m_Layer: 5
   m_Name: btn_sure
   m_TagString: Untagged
@@ -638,41 +637,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &-4052612904432708792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631775865546121974}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b408cbd0d6acca4ea3a1c6ceb7f5c39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnClick:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPressDown:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPressUp:
-    m_PersistentCalls:
-      m_Calls: []
-  OnLongPress:
-    m_PersistentCalls:
-      m_Calls: []
-  OnEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  OnExit:
-    m_PersistentCalls:
-      m_Calls: []
-  baseBtn: {fileID: 0}
-  isPlayerScaleAni: 1
-  scaleDuration: 0.1
-  clickTime: 0.2
-  longPressTime: 1
 --- !u!1 &1631777326702595252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1136,7 +1100,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 03a8f407c86108f458cb5d5947a187ab, type: 3}
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 41
     m_FontStyle: 0
     m_BestFit: 0
@@ -1750,7 +1714,6 @@ GameObject:
   - component: {fileID: 3220351209344228276}
   - component: {fileID: 3220351209344228279}
   - component: {fileID: 3220351209344228278}
-  - component: {fileID: 2069786557146274576}
   m_Layer: 5
   m_Name: btn_16
   m_TagString: Untagged
@@ -1860,41 +1823,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2069786557146274576
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3220351209344228272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b408cbd0d6acca4ea3a1c6ceb7f5c39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnClick:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPressDown:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPressUp:
-    m_PersistentCalls:
-      m_Calls: []
-  OnLongPress:
-    m_PersistentCalls:
-      m_Calls: []
-  OnEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  OnExit:
-    m_PersistentCalls:
-      m_Calls: []
-  baseBtn: {fileID: 0}
-  isPlayerScaleAni: 1
-  scaleDuration: 0.1
-  clickTime: 0.2
-  longPressTime: 1
 --- !u!1 &8029978572815721880
 GameObject:
   m_ObjectHideFlags: 0

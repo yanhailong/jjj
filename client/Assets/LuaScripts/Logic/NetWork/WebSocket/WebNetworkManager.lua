@@ -138,9 +138,9 @@ function this.MsgLog(isRecive, msgID, msgTab)
     if not isOpenMsgLog then
         return
     end
-    --if msgID == MsgId.ResHeartBeat  or msgID == MsgId.ReqHeartBeat then
-    --   return
-    --end
+    if msgID == MsgId.ResHeartBeat  or msgID == MsgId.ReqHeartBeat then
+       return
+    end
     if isRecive then
         
         look("接收消息：", msgID, msgTab)

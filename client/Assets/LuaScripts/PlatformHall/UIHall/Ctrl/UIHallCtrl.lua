@@ -4,6 +4,9 @@
 ---
 ---@class UIHallCtrl:BaseCtrl
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
+require("SingleGames/Game001/MVCHead")
+require("SingleGames/Game002/MVCHead")
+
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -20,6 +23,8 @@ end
 ---初始化
 function UIHallCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+
+	self.pool=ObjectPoolUtil.New(self.ctrlName)
 end
 
 function UIHallCtrl:Close()
@@ -45,37 +50,44 @@ function UIHallCtrl:AddUIEvent()
 	
 	self.uiEventListener:AddBeginDrag(self.view.btn_close.gameObject, function
 	(args)
-		--look("AddBeginDrag===？",args)
 	end)
 	self.uiEventListener:AddDrag(self.view.btn_close.gameObject, function
 	(args)
-		--look("AddDrag===？",args)
-		-----@type UnityEngine.EventSystems.PointerEventData
-		--local args=args
-		--self.view.btn_close.gameObject.transform.position=args.position
+		---@type UnityEngine.EventSystems.PointerEventData
+		local args=args
+		local vew=Vector3(args.position.x,args.position.y,0)
+		local worldPos= Tools.GetUICamera():ScreenToWorldPoint(vew)
+		self.view.btn_close.gameObject.transform.position=worldPos
 	end)
 	self.uiEventListener:AddEndDrag(self.view.btn_close.gameObject, function
 	(args)
 		---@type UnityEngine.EventSystems.PointerEventData
 		local args=args
-		look("args",args)
-
 		local vew=Vector3(args.position.x,args.position.y,0)
-		local worldPos= Camera.main:ScreenToWorldPoint(vew)
-		look("worldPos",worldPos)
+		
+		look("Tools.GetUICamera():",Tools.GetUICamera())
+		local worldPos= Tools.GetUICamera():ScreenToWorldPoint(vew)
 		self.view.btn_close.gameObject.transform.position=worldPos
 	end)
 	
-	self.uiEventListener:AddClick(self.view.btn_closewebsockt, function
+	self.uiEventListener:AddClick(self.view.btn_game001, function
 	()
-		WebNetworkManager.Close()
+		CtrlManager.SingleShow(CtrlNames.GameMain)
 	end)
+	self.uiEventListener:AddClick(self.view.btn_game002, function
+	()
+		CtrlManager.SingleShow(CtrlNames.Game002Main)
+	end)
+
+
+	self.view.tmp_sy.text=LocalManager.GetStrById(10001)
 
 end
 
 ---移除UI事件
 function UIHallCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
+
 end
 
 --region UI事件方法

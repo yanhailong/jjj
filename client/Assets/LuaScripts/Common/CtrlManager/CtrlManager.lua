@@ -18,11 +18,9 @@ end
 ---创建UI面板
 function CtrlManager.CreatePanel(ctrl, isSync, loadGameObjectCallback)
     if isSync then
-        --logError("同步加载："..ctrl.prefabName)
         local go = PanelManager.CreatePanel(ctrl.abName, ctrl.prefabName, ctrl.layer);
         loadGameObjectCallback(go);
     else
-        --logError("异步加载："..ctrl.prefabName)
         PanelManager.CreatePanelAsync(ctrl.abName, ctrl.prefabName, ctrl.layer, loadGameObjectCallback);
     end
 

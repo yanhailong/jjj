@@ -30,6 +30,7 @@
 		<type fullname="UnityEngine.Vector2" preserve="all"/>
 		<type fullname="UnityEngine.Vector3" preserve="all"/>
 		<type fullname="UnityEngine.Vector4" preserve="all"/>
+		<type fullname="UnityEngine.Camera" preserve="all"/>
 		<type fullname="UnityEngine.Rect" preserve="all"/>
 		<type fullname="UnityEngine.RectTransform" preserve="all"/>
 		<type fullname="UnityEngine.RectOffset" preserve="all"/>
@@ -55,6 +56,9 @@
 		<type fullname="AssetsManager" preserve="all"/>
 		<type fullname="AssetBundleLoadMgr" preserve="all"/>
 		<type fullname="LocalData" preserve="all"/>
+		<type fullname="LanguageManager" preserve="all"/>
+		<type fullname="Language.LanguageText" preserve="all"/>
+		<type fullname="Language.LanguageExtendTextMeshPro" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModuleAudio" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModulePhysics" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModulePhysics2D" preserve="all"/>

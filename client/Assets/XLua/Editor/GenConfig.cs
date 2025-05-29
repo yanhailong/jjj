@@ -4,6 +4,8 @@ using UnityEngine;
 using XLua;
 using System.Reflection;
 using JiuJiuPrincess;
+using Language;
+
 public static class GenConfig
 {
     //lua中要使用到C#库的配置，比如C#标准库，或者Unity API，第三方库等。
@@ -57,6 +59,7 @@ public static class GenConfig
             typeof(RenderMode),
 
             // UGUI  
+            typeof(UnityEngine.Camera),
             typeof(UnityEngine.Canvas),
             typeof(UnityEngine.Rect),
             typeof(UnityEngine.RectTransform),
@@ -93,6 +96,9 @@ public static class GenConfig
             typeof(Util),
             typeof(UIEventListener),
             typeof(GameLancher),
+            typeof(LanguageManager),
+            typeof(LanguageText),
+            typeof(LanguageExtendTextMeshPro),
 
             // 场景、资源加载
             typeof(UnityEngine.Resources),

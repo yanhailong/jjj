@@ -1,7 +1,3 @@
----
----@author:Y00                   
----@CreateTime: 2022-12-15 16:58
----
 ------------------unity常用系统类重定义
 ---
 ---
@@ -52,7 +48,7 @@ UnityWebRequest = CS.UnityEngine.Networking.UnityWebRequest
 ---@type UnityEngine.Font
 Font = CS.UnityEngine.Font
 ---@type JiuJiuPrincess.AppConst 应用程序自定义数据
-AppConst = CS.YooAsset.AppConst
+AppConst = CS.JiuJiuPrincess.AppConst
 ---@type UnityEngine.Random
 Random = CS.UnityEngine.Random
 ---@type UnityEngine.Shader
@@ -94,9 +90,11 @@ RaycastHit = require "Common.Tools.UnityEngine.RaycastHit" -- CS.UnityEngine.Ray
 Touch = require "Common.Tools.UnityEngine.Touch"
 LayerMask = require "Common.Tools.UnityEngine.LayerMask"
 Plane = require "Common.Tools.UnityEngine.Plane"
+---@type UnityEngine.Time
 Time = CS.UnityEngine.Time -- require "Common.Tools.UnityEngine.Time"            --CS.UnityEngine.Time
 ---@class Object
 Object = require "Common.Tools.UnityEngine.Object"
+---@type UnityEngine.Rect
 Rect = CS.UnityEngine.Rect
 ---@type SoundManager
 SoundManager=CS.SoundManager.Instance

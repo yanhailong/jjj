@@ -7,7 +7,7 @@ UIEventListener = require "Common/Utils/UIEventListener"
 require "Common/CtrlManager/CtrlManager"
 require "Common/Tools/Tools"
 require "Common/Tools/UnityEngine/define"
-ObjectPoolManager=require("Common/Pool/ObjectPoolUtil")
+ObjectPoolUtil=require("Common/Pool/ObjectPoolUtil")
 GlobalEvent = require "Common/Utils/GlobalEvent"
 
 require "Common/CorUtils/UpdateManager"
@@ -15,11 +15,12 @@ require "Common/CorUtils/coroutineUtils"
 require "Common/CorUtils/CorManager"
 require "Common/CorUtils/TimerManager"
 require("Common/Scroll/SimpleScroll")
-require "Debug/EmmyLuaDebugger"
+require("Common/LocalManager/LocalManager")
 ---网络层相关---
 require("Logic/NetWork/HttpManager")
 require("Logic/NetWork/WebSocket/WebNetworkManager")
 require("Logic/DataManager/DataConst")
+
 
 
 

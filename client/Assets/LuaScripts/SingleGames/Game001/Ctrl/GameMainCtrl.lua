@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-23 16:55:00
+---DateTime: 2025-05-29 13:45:59
 ---
 ---@class GameMainCtrl:BaseCtrl
 local GameMainCtrl=Class("GameMainCtrl",BaseCtrl)
@@ -20,6 +20,12 @@ end
 ---初始化
 function GameMainCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self:InitData()
+end
+
+---初始化数据
+function GameMainCtrl:InitData()
+	
 end
 
 function GameMainCtrl:Close()
@@ -28,7 +34,10 @@ end
 
 ---添加UI事件
 function GameMainCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.btn_close, function
+	()
+		self:Close()
+	end)
 end
 
 ---移除UI事件

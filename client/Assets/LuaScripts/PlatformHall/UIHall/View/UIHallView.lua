@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-27 17:34:03
+---DateTime: 2025-05-29 13:49:07
 ---
 ---@class UIHallView:BaseView
 local UIHallView=Class("UIHallView",BaseView)
@@ -15,17 +15,17 @@ end
 ---获取组件
 function UIHallView:InitComponents()
     self.btn_game001=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game001");
+    self.btn_game002=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game002");
     self.tmp_sy=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_sy");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
-    self.btn_closewebsockt=ComponentUtilGet.Button(self.transform,"content/btn_closewebsockt");
 end
 
 ---清空组件
 function UIHallView:ClearComponents()
     self.btn_game001=nil;
+    self.btn_game002=nil;
     self.tmp_sy=nil;
     self.btn_close=nil;
-    self.btn_closewebsockt=nil;
 end
 
 ---初始化View数据

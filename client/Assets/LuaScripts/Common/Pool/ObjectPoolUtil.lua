@@ -4,7 +4,8 @@ require "Common/Pool/ObjectPool"
 ---@class ObjectPoolUtil
 local ObjectPoolUtil = Class("ObjectPoolUtil")
 
-function ObjectPoolUtil:ctor()
+function ObjectPoolUtil:ctor(name)
+    self.name=name
     self.poolFactory={}
 end
 
@@ -50,7 +51,7 @@ end
 --author:{author}
 --time:2020-11-20 16:46:35    
 --desc:回收预制体
-function ObjectPoolUtil:UnSpawnPrefabByPoolName(poolName,obj)
+ function ObjectPoolUtil:UnSpawnPrefabByPoolName(poolName,obj)
     if not isnull(obj) then
         self.poolFactory[poolName]:ReturnObjectToPool(poolName,obj)
     end

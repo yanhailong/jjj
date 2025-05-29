@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-23 16:55:00
+---DateTime: 2025-05-29 13:45:59
 ---
 ---@class GameMainView:BaseView
 local GameMainView=Class("GameMainView",BaseView)
@@ -14,14 +14,14 @@ end
 
 ---获取组件
 function GameMainView:InitComponents()
-    self.tmp_login=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_login");
-    self.btn_login=ComponentUtilGet.Button(self.transform,"content/btn_login");
+    self.tmp_gameName=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_gameName");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
 end
 
 ---清空组件
 function GameMainView:ClearComponents()
-    self.tmp_login=nil;
-    self.btn_login=nil;
+    self.tmp_gameName=nil;
+    self.btn_close=nil;
 end
 
 ---初始化View数据

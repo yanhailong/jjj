@@ -20,6 +20,12 @@ end
 ---初始化
 function #class:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self:InitData()
+end
+
+---初始化数据
+function #class:InitData()
+	
 end
 
 function #class:Close()
