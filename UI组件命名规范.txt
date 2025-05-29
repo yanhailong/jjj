@@ -1,4 +1,5 @@
 txt_==Text
+tmp_==TextMeshProUGUI
 img_==Image
 ipt_==InputField
 btn_==Button
