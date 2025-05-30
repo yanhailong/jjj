@@ -40,6 +40,7 @@ function UILoginCtrl:AddUIEvent()
 	self.view.btn_login.gameObject:SetActive(false)
 	self.uiEventListener:AddClick(self.view.btn_login.gameObject, function
 	()
+		SuspensionTipsUtil.SuspensionTips("请求登录！")
 		self:ReqLogin()
 	end)
 	

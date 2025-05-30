@@ -4,7 +4,7 @@
 --- DateTime: 2022/12/28 18:24
 ---
 local util=require("xLua/util")
-local corMgr=CS.YooAsset.CoroutineManager.Instance
+local corMgr=CS.JiuJiuPrincess.CoroutineManager.Instance
 local WaitForSeconds=CS.UnityEngine.WaitForSeconds
 local WaitForSecondsRealtime=CS.UnityEngine.WaitForSecondsRealtime
 local WaitUntil=CS.UnityEngine.WaitUntil
