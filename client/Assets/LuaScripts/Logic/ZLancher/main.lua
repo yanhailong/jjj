@@ -1,6 +1,7 @@
 -- 定义全局模块
 IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
+logError("Tools.GetPlatformType():"..Tools.GetPlatformType())
 if Tools.GetPlatformType()==-1 then
     require "Debug/EmmyLuaDebugger"
 end
@@ -11,9 +12,9 @@ function main:init(lancher)
     local canvas=GameObject.Find("Global/Canvas").transform:GetComponent("Canvas")
     canvas.pixelPerfect=true
     Application.targetFrameRate=60
-    require("PlatformHall/UILogin/MVCHead")
+    require("PlatformHall/UIHall/MVCHead")
 
-    CtrlManager.SingleShow(CtrlNames.UILogin, function
+    CtrlManager.SingleShow(CtrlNames.UIHall, function
     ()
        lancher:PreLoadingClose()
     end)

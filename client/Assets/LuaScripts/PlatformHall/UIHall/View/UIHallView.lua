@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-29 13:49:07
+---DateTime: 2025-06-05 15:24:47
 ---
 ---@class UIHallView:BaseView
 local UIHallView=Class("UIHallView",BaseView)
@@ -16,6 +16,7 @@ end
 function UIHallView:InitComponents()
     self.btn_game001=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game001");
     self.btn_game002=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game002");
+    self.btn_game003=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game003");
     self.tmp_sy=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_sy");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
 end
@@ -24,6 +25,7 @@ end
 function UIHallView:ClearComponents()
     self.btn_game001=nil;
     self.btn_game002=nil;
+    self.btn_game003=nil;
     self.tmp_sy=nil;
     self.btn_close=nil;
 end

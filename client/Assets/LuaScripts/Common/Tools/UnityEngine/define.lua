@@ -13,6 +13,10 @@ abLoad=CS.AssetBundleLoadMgr.Instance
 LocalData=CS.LocalData.Instance
 ---@type DG.Tweening.DOTween
 DOTween = CS.DG.Tweening.DOTween
+---@type DG
+DG=CS.DG
+
+
 ---@type UnityEngine.Application
 Application = CS.UnityEngine.Application
 ---@type UnityEngine
