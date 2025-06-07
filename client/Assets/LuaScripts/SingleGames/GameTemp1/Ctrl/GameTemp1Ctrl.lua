@@ -233,6 +233,18 @@ end
 ---销毁UI
 function GameTemp1Ctrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	for k,v in pairs(self.tweener) do
+		if v then
+			v:Kill()
+		end
+	end
+	for k,v in pairs(self.tweener1) do
+		if v then
+			v:Kill()
+		end
+	end
+	self.tweener={}
+	self.tweener1={}
 end
 
 return GameTemp1Ctrl

@@ -12,9 +12,9 @@ function main:init(lancher)
     local canvas=GameObject.Find("Global/Canvas").transform:GetComponent("Canvas")
     canvas.pixelPerfect=true
     Application.targetFrameRate=60
-    require("PlatformHall/UILogin/MVCHead")
+    require("PlatformHall/UIHall/MVCHead")
 
-    CtrlManager.SingleShow(CtrlNames.UILogin, function
+    CtrlManager.SingleShow(CtrlNames.UIHall, function
     ()
        lancher:PreLoadingClose()
     end)

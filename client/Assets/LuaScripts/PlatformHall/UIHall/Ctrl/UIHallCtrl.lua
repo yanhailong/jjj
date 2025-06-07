@@ -86,6 +86,37 @@ function UIHallCtrl:AddUIEvent()
 	end)
 	self.view.tmp_sy.text=LocalManager.GetStrById(10001)
 
+	self.uiEventListener:AddClick(self.view.btn_quality1, function
+	()
+		logError("111111")
+		QualitySettings.SetQualityLevel(0,true)	
+	end)
+	self.uiEventListener:AddClick(self.view.btn_quality2, function
+	()
+		logError("222222")
+		QualitySettings.SetQualityLevel(1,true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_quality3, function
+	()
+		logError("333333")
+		QualitySettings.SetQualityLevel(2,true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_quality4, function
+	()
+		logError("444444")
+		QualitySettings.SetQualityLevel(3,true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_quality5, function
+	()
+		logError("555555")
+		QualitySettings.SetQualityLevel(4,true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_quality6, function
+	()
+		logError("666666")
+		QualitySettings.SetQualityLevel(5,true)
+	end)
+
 end
 
 ---移除UI事件

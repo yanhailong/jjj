@@ -15,8 +15,8 @@ LocalData=CS.LocalData.Instance
 DOTween = CS.DG.Tweening.DOTween
 ---@type DG
 DG=CS.DG
-
-
+---@type UnityEngine.QualitySettings
+QualitySettings=CS.UnityEngine.QualitySettings
 ---@type UnityEngine.Application
 Application = CS.UnityEngine.Application
 ---@type UnityEngine

@@ -19,6 +19,13 @@ function UIHallView:InitComponents()
     self.btn_game003=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game003");
     self.tmp_sy=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_sy");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
+    
+    self.btn_quality1=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality1")
+    self.btn_quality2=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality2")
+    self.btn_quality3=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality3")
+    self.btn_quality4=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality4")
+    self.btn_quality5=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality5")
+    self.btn_quality6=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality6")
 end
 
 ---清空组件
