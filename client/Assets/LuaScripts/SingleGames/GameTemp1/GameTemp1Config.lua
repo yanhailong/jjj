@@ -29,11 +29,11 @@ this.curGameState=this.gameState.Normal;
 
 this.rollTime={
     dropTime={--下落总时间
-        [1]=1.2,
-        [2]=1.2,
-        [3]=1.2,
-        [4]=1.2,
-        [5]=1.2,
+        [1]=2,
+        [2]=2,
+        [3]=2,
+        [4]=2,
+        [5]=2,
     },
     rebackTime={--回弹时间
         [1]=0.1,
@@ -63,7 +63,7 @@ this.rollTime={
 
 
 this.ABNames={
-    icon="SingleGames/GameTemp/alats/icons",--icon
+    icon="SingleGames/GameTemp1/alats/icons",--icon
 }
 
 

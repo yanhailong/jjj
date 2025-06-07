@@ -89,7 +89,9 @@ function GameTemp1Ctrl:OnStartDoSpin()
 		for j = 1,3 do
 			local num=4
 			num=num-j
-			self.childsList[i][(config.itemNum[i]-3)]:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[i][num]]],self.realCard[i][num])
+			local realIndex=self.realCard[i][num]
+			local colIndex=config.itemNum[i]-j
+			self.childsList[i][colIndex]:SetSprite(config.icon_Pics[config.iocnPicName[realIndex]],realIndex)
 			--self.childsList[i][(config.itemNum[i]-7)+(i-1)*5+j]:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[i][num]]],self.realCard[i][num])
 		end
 	end
@@ -124,17 +126,17 @@ function GameTemp1Ctrl:StartCirle(wheelId)
 	local endpos1 = Vector3.New(parent_newObj.transform.localPosition.x, to1 ,parent_newObj.transform.localPosition.z)
 
 	self.tweener[wheelId]=parent_newObj.transform:DOLocalMove(endpos1, config.rollTime.dropTime[wheelId])
-	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.Linear);
+	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.OutSine);
 	self.tweener[wheelId].onComplete=function()
 		self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
 		self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.Linear);
 		self.tweener1[wheelId].onComplete=function()
-			--self:RestWheelPos(wheelId)
-			--parent_newObj.transform.localPosition =Vector3.New(
-			--		parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
-			--if (wheelId == 5) then
-			--	self:ShowResoult()-- 旋转结束处理服务器数据表现
-			--end
+			self:RestWheelPos(wheelId)
+			parent_newObj.transform.localPosition =Vector3.New(
+					parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
+			if (wheelId == 5) then
+				self:ShowResoult()-- 旋转结束处理服务器数据表现
+			end
 		end
 	end
 
