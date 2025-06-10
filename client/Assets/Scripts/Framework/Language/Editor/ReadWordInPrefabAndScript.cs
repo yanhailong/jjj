@@ -22,10 +22,10 @@ namespace Language.Editor
         private static List<string> Localization = null;
         private static string staticWriteText = "";
 
-        // [MenuItem ("Tools/清除管理类实例")]
-        // private static void Clear () {
-        //     LanguageManager.Instance.Clear ();
-        // }
+        [MenuItem ("Tools/清除多语言实例")]
+        private static void Clear () {
+            LanguageManager.Instance.Clear ();
+        }
 
         // [MenuItem ("Tools/导出预制体和脚本中文字")]
         // private static void ExportChinese () {
