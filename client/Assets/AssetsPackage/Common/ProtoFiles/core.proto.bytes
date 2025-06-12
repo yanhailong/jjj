@@ -29,15 +29,23 @@ message Pack {
   bytes data = 2;
 }
 
-//请求,msgID=0x3001,desc=登录请求
-message ReqLogin {
-  enum E_MsgID {def = 0; msgID = 12289;};
-  string token = 1;  //验证token
+//响应,msgID=0x4099,desc=推送金钱变化
+message NoticeMoneyChange {
+  enum E_MsgID {def = 0; msgID = 16537;};
+  int64 gold = 1;  //金币
+  int64 diamond = 2;  //钻石
 }
 
-//响应,msgID=0x3002,desc=登录返回
-message ResLogin {
-  enum E_MsgID {def = 0; msgID = 12290;};
+//请求,msgID=0x4001,desc=gm请求
+message ReqGm {
+  enum E_MsgID {def = 0; msgID = 16385;};
+  string order = 1;  //命令参数
+}
+
+//响应,msgID=0x4002,desc=gm返回
+message ResGm {
+  enum E_MsgID {def = 0; msgID = 16386;};
   int32 code = 1;  //状态码
+  string result = 2;
 }
 

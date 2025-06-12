@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-// using App.Config;
-// using FQDev.AssetBundles;
 using Language;
 using Newtonsoft.Json;
 using TMPro;
@@ -24,6 +22,25 @@ public class LanguageManager
     
     private TMP_FontAsset _fallbackFont;
     public TMP_FontAsset FallbackFont => _fallbackFont;
+    public delegate void EventFunc();
+    private event EventFunc _handler;
+
+    //public Dictionary<string, ConfigurationData> Cfgs => _cfgs;
+    //private readonly Dictionary<string, ConfigurationData> _cfgs = new Dictionary<string, ConfigurationData>();
+
+    // private Dictionary<string, LanguageData> languagesData;
+    /// <summary>
+    /// 存储所有支持的语言
+    /// </summary>
+    public HashSet<string> allLang = new HashSet<string>();
+    /// <summary>
+    /// 语言配置
+    /// </summary>
+    public ConfigurationData lanCfg;
+    /// <summary>
+    /// 存储当前语言key-value
+    /// </summary>
+    private Dictionary<string, string> curLangData;
 
     public string Language
     {
@@ -33,7 +50,7 @@ public class LanguageManager
             if (!string.IsNullOrEmpty(_curLanguage) && 
                 _curLanguage.Equals(value)) 
                 return;
-            if (!_cfgs.ContainsKey(value))
+            if (!allLang.Contains(value))
             {
                 Debug.unityLogger.Log(LogType.Error, "不支持该语言 " + value);
                 _curLanguage = SystemLanguage.English.ToString();
@@ -42,11 +59,8 @@ public class LanguageManager
             {
                 _curLanguage = value;
             }
-
-            //设置推送的语言
-            // Lang.L = (SystemLanguage) System.Enum.Parse (typeof (SystemLanguage), _curLanguage);
-
-            languagesData = LoadJson<Dictionary<string, string>>(_curLanguage);
+            
+            curLangData = LoadJson<Dictionary<string, string>>(_curLanguage);
             RefreshFallbackFont();
             _handler?.Invoke();
         }
@@ -89,7 +103,7 @@ public class LanguageManager
         var alterFont = default(string);
         foreach (var fontPath in fontPaths)
         {
-            if (Path.GetFileNameWithoutExtension(fontPath).Equals(fontName, StringComparison.InvariantCultureIgnoreCase))
+            if (System.IO.Path.GetFileNameWithoutExtension(fontPath).Equals(fontName, StringComparison.InvariantCultureIgnoreCase))
             {
                 alterFont = fontPath;
                 break;
@@ -99,7 +113,7 @@ public class LanguageManager
         if (string.IsNullOrEmpty(alterFont))
             foreach (var fontPath in fontPaths)
             {
-                if (Path.GetFileNameWithoutExtension(fontPath).Contains(fontName, StringComparison.InvariantCultureIgnoreCase))
+                if (System.IO.Path.GetFileNameWithoutExtension(fontPath).Contains(fontName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     alterFont = fontPath;
                     break;
@@ -115,14 +129,7 @@ public class LanguageManager
         _fallbackFont = TMP_FontAsset.CreateFontAsset(osFont);
         
     }
-    public delegate void EventFunc();
 
-    private event EventFunc _handler;
-
-    private readonly Dictionary<string, ConfigurationData> _cfgs = new Dictionary<string, ConfigurationData>();
-
-    // private Dictionary<string, LanguageData> languagesData;
-    private Dictionary<string, string> languagesData;
 
     private T LoadJson<T>(string file)
     {
@@ -141,34 +148,28 @@ public class LanguageManager
     public LanguageManager()
     {
         _curLanguage = null;
-        languagesData ??= new Dictionary<string, string>();
+        curLangData ??= new Dictionary<string, string>();
 
-        var cfgData = LoadJson<List<ConfigurationData>>("LanguageConfig");
-        foreach (var item in cfgData)
+        var langCfgData= LoadJson<LangCfgData>("lanconfig");
+        lanCfg = langCfgData.ConfigurationData;
+        foreach (var item in lanCfg.languages)
         {
-            _cfgs[item.name] = item;
+            allLang.Add(item);
         }
-
         var language = "";
         if (language == "")
         {
-            var systemLanguage = Application.systemLanguage.ToString();
-            if (_cfgs.ContainsKey(systemLanguage))
+            var systemLanguage = lanCfg.defaultLanguage;
+            if (allLang.Contains(systemLanguage))
             {
                 language = systemLanguage;
             }
             else
             {
-                var value = cfgData.Find(d => d.index == 0);
-                if (value != null) language = value.name;
-                else
-                {
-                    language = SystemLanguage.English.ToString();
-                    Debug.unityLogger.Log(LogType.Error, "语言种类配置文件中，没有Default标识!");
-                }
+                language = SystemLanguage.English.ToString();
+                Debug.unityLogger.Log(LogType.Error, "语言种类配置文件中，没有Default标识!");
             }
         }
-
         Language = language;
     }
 
@@ -204,8 +205,9 @@ public class LanguageManager
     /// </summary>
     public void Clear()
     {
-        _cfgs.Clear();
-        languagesData.Clear();
+        allLang.Clear();
+        lanCfg = null;
+        curLangData.Clear();
         Instance = new LanguageManager();
     }
 
@@ -233,38 +235,8 @@ public class LanguageManager
     /// <returns></returns>
     public List<string> GetLanguagesName()
     {
-        return _cfgs.Keys.ToList();
+        return lanCfg.languages.ToList();
     }
-
-    /// <summary>
-    /// 得到支持的语言描述
-    /// </summary>
-    /// <returns></returns>
-    public List<string> GetLanguagesDescribe()
-    {
-        var describes = new List<string>();
-        foreach (var item in _cfgs) describes.Add(item.Value.describe);
-        return describes;
-    }
-
-    public Dictionary<string, ConfigurationData> Cfgs => _cfgs;
-
-    /// <summary>
-    /// 得到语言名字通过下标(传入的下标如果没有找到数据，则返回"en")
-    /// </summary>
-    /// <param name="theIndex">下标</param>
-    /// <returns></returns>
-    public string GetLanguageName(int theIndex)
-    {
-        foreach (var item in _cfgs)
-        {
-            if (item.Value.index == theIndex)
-                return item.Key;
-        }
-
-        return "en";
-    }
-
     #endregion
 
     #region 语言数据
@@ -275,7 +247,7 @@ public class LanguageManager
     /// <returns></returns>
     public string[] GetLanguageKeys()
     {
-        return languagesData.Keys.ToArray();
+        return lanCfg.languages.ToArray();
     }
 
     /// <summary>
@@ -286,20 +258,14 @@ public class LanguageManager
     /// <returns></returns>
     public string GetLanguage(string key, string defaultValue = null)
     {
-        // if (!languagesData.ContainsKey (key)) return null;
-        // var data = languagesData[key];
-        // var content = data.Replace ("\\u3000", "\u3000");
-        // content = content.Replace ("\\n", "\n");
-        // data = content;
-        // return data;
-        if (languagesData.TryGetValue(key, out var data)) return data;
+        if (curLangData.TryGetValue(key, out var data)) return data;
         Debug.unityLogger.Log(LogType.Warning, $"键值不存在:{key}");
         return defaultValue;
     }
 
     public bool GetLanguage(string key, out string value)
     {
-        if (languagesData.TryGetValue(key, out value)) return true;
+        if (curLangData.TryGetValue(key, out value)) return true;
         Debug.unityLogger.Log(LogType.Warning, $"键值不存在:{key}");
         return false;
     }

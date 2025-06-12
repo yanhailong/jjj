@@ -1,0 +1,12 @@
+syntax = "proto3";//响应,msgID=0x7099,desc=推送基本配置
+message NoticeDollarExpressBaseConfig {
+  enum E_MsgID {def = 0; msgID = 28825;};
+  repeated DollarExpressBaseConfig configList = 1;
+}
+
+message DollarExpressBaseConfig {
+  int32 sid = 1;  //配置id
+  string name = 2;
+  int32 valueInt = 3;  //值
+}
+

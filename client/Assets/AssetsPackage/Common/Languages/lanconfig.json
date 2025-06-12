@@ -1,0 +1,14 @@
+{
+    "ConfigurationData": {
+        "defaultLanguage": "english",
+        "languages": [
+            "chinesesimplified",
+            "english"
+        ],
+        "pathcfg": {
+            "json": "language/json",
+            "texture": "language/texture",
+            "spine": ""
+        }
+    }
+}

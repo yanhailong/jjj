@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a35bbe0c06cb1814e9c82f6768a07271
+guid: 59c0e568228a58e4cbd32e692b490141
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Shanggu Round
+  - Microsoft YaHei
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

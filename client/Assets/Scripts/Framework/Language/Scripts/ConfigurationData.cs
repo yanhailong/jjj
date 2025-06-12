@@ -1,24 +1,41 @@
-﻿
+﻿using System.Collections.Generic;
+
 namespace Language
 {
-    /// <summary>
-    /// 配置数据
-    /// </summary>
+    public class LangCfgData
+    {
+        public ConfigurationData ConfigurationData;
+    }
+    public class Pathcfg
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string json { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string texture { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string spine { get; set; }
+    }
+
     public class ConfigurationData
     {
         /// <summary>
-        /// 索引
+        /// 
         /// </summary>
-        public int index;
+        public string defaultLanguage { get; set; }
         /// <summary>
-        /// 语言名字
+        /// 
         /// </summary>
-        public string name;
+        public List <string > languages { get; set; }
         /// <summary>
-        /// 描述
+        /// 
         /// </summary>
-        public string describe;
+        public Pathcfg pathcfg { get; set; }
     }
-
+    
 }
-

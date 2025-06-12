@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(LanguageManager);
-			Utils.BeginObjectRegister(type, L, translator, 0, 10, 3, 1);
+			Utils.BeginObjectRegister(type, L, translator, 0, 8, 4, 3);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "AddEventHandler", _m_AddEventHandler);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "RemoveEventHandler", _m_RemoveEventHandler);
@@ -29,17 +29,18 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Clear", _m_Clear);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetPrefab", _m_GetPrefab);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLanguagesName", _m_GetLanguagesName);
-			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLanguagesDescribe", _m_GetLanguagesDescribe);
-			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLanguageName", _m_GetLanguageName);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLanguageKeys", _m_GetLanguageKeys);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetLanguage", _m_GetLanguage);
 			
 			
 			Utils.RegisterFunc(L, Utils.GETTER_IDX, "FallbackFont", _g_get_FallbackFont);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "Language", _g_get_Language);
-            Utils.RegisterFunc(L, Utils.GETTER_IDX, "Cfgs", _g_get_Cfgs);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "allLang", _g_get_allLang);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "lanCfg", _g_get_lanCfg);
             
 			Utils.RegisterFunc(L, Utils.SETTER_IDX, "Language", _s_set_Language);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "allLang", _s_set_allLang);
+            Utils.RegisterFunc(L, Utils.SETTER_IDX, "lanCfg", _s_set_lanCfg);
             
 			
 			Utils.EndObjectRegister(type, L, translator, null, null,
@@ -257,63 +258,6 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _m_GetLanguagesDescribe(RealStatePtr L)
-        {
-		    try {
-            
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-            
-            
-                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
-            
-            
-                
-                {
-                    
-                        var gen_ret = gen_to_be_invoked.GetLanguagesDescribe(  );
-                        translator.Push(L, gen_ret);
-                    
-                    
-                    
-                    return 1;
-                }
-                
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _m_GetLanguageName(RealStatePtr L)
-        {
-		    try {
-            
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-            
-            
-                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
-            
-            
-                
-                {
-                    int _theIndex = LuaAPI.xlua_tointeger(L, 2);
-                    
-                        var gen_ret = gen_to_be_invoked.GetLanguageName( _theIndex );
-                        LuaAPI.lua_pushstring(L, gen_ret);
-                    
-                    
-                    
-                    return 1;
-                }
-                
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _m_GetLanguageKeys(RealStatePtr L)
         {
 		    try {
@@ -459,13 +403,11 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_Cfgs(RealStatePtr L)
+        static int _g_get_Instance(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			
-                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
-                translator.Push(L, gen_to_be_invoked.Cfgs);
+			    translator.Push(L, LanguageManager.Instance);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -473,11 +415,27 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_Instance(RealStatePtr L)
+        static int _g_get_allLang(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			    translator.Push(L, LanguageManager.Instance);
+			
+                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked.allLang);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_lanCfg(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked.lanCfg);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -507,6 +465,36 @@ namespace XLua.CSObjectWrap
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			    LanguageManager.Instance = (LanguageManager)translator.GetObject(L, 1, typeof(LanguageManager));
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_allLang(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.allLang = (System.Collections.Generic.HashSet<string>)translator.GetObject(L, 2, typeof(System.Collections.Generic.HashSet<string>));
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_lanCfg(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                LanguageManager gen_to_be_invoked = (LanguageManager)translator.FastGetCSObj(L, 1);
+                gen_to_be_invoked.lanCfg = (Language.ConfigurationData)translator.GetObject(L, 2, typeof(Language.ConfigurationData));
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

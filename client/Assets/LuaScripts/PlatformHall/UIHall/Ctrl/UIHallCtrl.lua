@@ -108,13 +108,11 @@ function UIHallCtrl:AddUIEvent()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_quality5, function
 	()
-		logError("555555")
-		QualitySettings.SetQualityLevel(4,true)
+		CS.LanguageManager.Instance.Language="chinesesimplified"
 	end)
 	self.uiEventListener:AddClick(self.view.btn_quality6, function
 	()
-		logError("666666")
-		QualitySettings.SetQualityLevel(5,true)
+		CS.LanguageManager.Instance.Language="english"
 	end)
 
 end
