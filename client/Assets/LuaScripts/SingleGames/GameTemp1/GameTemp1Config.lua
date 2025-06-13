@@ -3,9 +3,12 @@
 local GameTemp1Config=Class("GameTemp1Config")
 local  this = GameTemp1Config;
 
-this.itemSpace = -230 --行间距
+this.itemSpace = 180 --行间距
+this.itemStartPosY  = -268
 this.lieNum = 5
-this.itemNum = {32,32,32,32,32}
+this.rollItemNum = 11
+this.rollItemNumTime=0.2
+
 this.totalLineNum=25    --总线数
 this.isStandAlone = false --是否单机测试
 this.freeTotalNum = 0   --总免费次数
@@ -29,18 +32,18 @@ this.curGameState=this.gameState.Normal;
 
 this.rollTime={
     dropTime={--下落总时间
-        [1]=2,
-        [2]=2,
-        [3]=2,
-        [4]=2,
-        [5]=2,
+        [1]=3,
+        [2]=3,
+        [3]=3,
+        [4]=3,
+        [5]=3,
     },
     rebackTime={--回弹时间
-        [1]=0.1,
-        [2]=0.1,
-        [3]=0.1,
-        [4]=0.1,
-        [5]=0.1,
+        [1]=0.2,
+        [2]=0.2,
+        [3]=0.2,
+        [4]=0.2,
+        [5]=0.2,
     }
 }
 
@@ -70,31 +73,17 @@ this.ABNames={
 this.icon_Pics={}
 --iconName
 this.iocnPicName={
-    [1]="icon 1",
-    [2]="icon 2",
-    [3]="icon 3",
-    [4]="icon 4",
-    [5]="icon 5",
-    [6]="icon 6",
-    [7]="icon 7",
-    [8]="icon 8",
-    [9]="icon 9",
-    [10]="icon 10",
+    [1]="1053_symbol_000",
+    [2]="1053_symbol_001",
+    [3]="1053_symbol_002",
+    [4]="1053_symbol_003",
+    [5]="1053_symbol_004",
+    [6]="1053_symbol_005",
+    [7]="1053_symbol_103",
+    [8]="1053_symbol_007",
+    [9]="1053_symbol_008",
+    [10]="1053_symbol_009",
 }
-
-this.LinlIconName={
-    [1]="icon 1",
-    [2]="icon 2",
-    [3]="icon 3",
-    [4]="icon 4",
-    [5]="icon 5",
-    [6]="icon 6",
-    [7]="icon 7",
-    [8]="icon 8",
-    [9]="icon 9",
-    [10]="icon 10",
-}
-
 function this.InitIconPic()
     local pics=resMgr:LoadAllAssets(this.ABNames.icon,typeof(UnityEngine.Sprite))
     for i = 0, pics.Length-1 do

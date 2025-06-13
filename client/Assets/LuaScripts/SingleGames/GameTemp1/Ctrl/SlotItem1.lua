@@ -27,7 +27,7 @@ function SlotItem1:GetPosition()
    return self.transform.position
 end
 function SlotItem1:GetCurSprite()
-   return self.img.sprite
+   return self.img_icon.sprite
 end
 function SlotItem1:GetIconIndex()
    return self.iconIndex

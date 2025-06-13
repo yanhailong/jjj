@@ -64,11 +64,11 @@ function UILoginModel:Login()
 end
 
 function UILoginModel:OnConnectSuccess()
-	logError("链接服务器成功！")
+	log("链接服务器成功！")
 end
 
 function UILoginModel:connectFailed()
-	logError("服务器关闭")
+	log("服务器关闭")
 end
 
 function UILoginModel:ResLogin(msg)

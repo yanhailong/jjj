@@ -4,7 +4,7 @@
 ---
 ---@class GameTemp1Ctrl:BaseCtrl
 local GameTemp1Ctrl=Class("GameTempCtrl",BaseCtrl)
----@type GameSlotConfig
+---@type GameTemp1Config
 local config=require"SingleGames/GameTemp1/GameTemp1Config"
 local SlotItem=require"SingleGames/GameTemp1/Ctrl/SlotItem1"
 
@@ -43,6 +43,7 @@ function GameTemp1Ctrl:InitData()
 	self.isAward=0---是否中奖（0,1,2）--未中奖，小奖，大奖
 end
 
+
 -- 初始化第一批展示用的SlotPics
 function GameTemp1Ctrl:InitFirstSlotPics()
 	local dis = config.itemSpace
@@ -54,26 +55,25 @@ function GameTemp1Ctrl:InitFirstSlotPics()
 		table.insert(self.parentList, go.transform) -- 将创建的newobj插入parentList表中
 		self.childsList[i] = {}
 		self.showChildsList[i] = {}
-		local nCircels = config.itemNum[i]--config.itemNum + (i-1) * config.lieNum --圈数
+		local nCircels = config.rollItemNum
 		for j = 1, nCircels do
 			local card = instantiate(self.view.cardPrefab)
 			card:SetActive(true)
 			card.transform:SetParent(go.transform)
-			card.transform.localPosition = Vector3.New(0, -(j-3) * dis, 0) -- 设置slotItem的位置
+			card.transform.localPosition = Vector3.New(0, config.itemStartPosY+(j-2)* dis, 0) -- 设置slotItem的位置
 			card.transform.localScale = Vector3.one
 			card.name = tostring(j)
 			local iconItem=SlotItem.New(card)
-			local texId = math.random(1,10)
+			local texId = math.random(1,table.getCount(config.iocnPicName))
 			iconItem:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片       
 			table.insert(self.childsList[i], iconItem)
-			local m_index=5
+			local m_index=6
 			if j>1 and j<5 then
 				self.showChildsList[i][m_index-j] = iconItem
 			end
 		end
 	end
 end
-
 
 --开始抽奖旋转
 function GameTemp1Ctrl:OnStartDoSpin()
@@ -83,19 +83,6 @@ function GameTemp1Ctrl:OnStartDoSpin()
 	self.isOnclickStart = true
 	self:ReSetData()
 	self.realCard=self.model.CardPos
-	look("self.realCard ",self.realCard)
-	-- 预设置中奖的图片组
-	for i = 1,5 do
-		for j = 1,3 do
-			local num=4
-			num=num-j
-			local realIndex=self.realCard[i][num]
-			local colIndex=config.itemNum[i]-j
-			self.childsList[i][colIndex]:SetSprite(config.icon_Pics[config.iocnPicName[realIndex]],realIndex)
-			--self.childsList[i][(config.itemNum[i]-7)+(i-1)*5+j]:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[i][num]]],self.realCard[i][num])
-		end
-	end
-	
 	CorManager.StartCor(self,function()
 		for i = 1,5 do
 			self:StartCirle(i)
@@ -104,61 +91,97 @@ function GameTemp1Ctrl:OnStartDoSpin()
 
 end
 
+function GameTemp1Ctrl:SetRealIndex(wheelId)
+	for j = 1,4 do
+		local num=5
+		num=num-j
+		---@type SlotItem1
+		local item=self.childsList[wheelId][config.rollItemNum-num]
+		item:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[wheelId][num]]],self.realCard[wheelId][num])
+	end
+end
+
 ---重置数据
 function GameTemp1Ctrl:ReSetData()
 	self.isAllRoate=false
-
 	if self.cor001~=nil then
 		CorManager.StopCor(self,self.cor001)
 		self.cor001=nil
 	end
+	
+	---默认都转3圈结束转动
+	self.rollCircles={}
+	for i = 1,5 do
 
+		if i==5 then
+			self.rollCircles[i] = 15
+		else
+			self.rollCircles[i] = 3+i
+		end
+	end
 end
 
 --旋转
 function GameTemp1Ctrl:StartCirle(wheelId)
 	local parent_newObj = self.parentList[wheelId]-- parentList 就是newobj列表
 	-- self.childsList就是icon图标列表
-	local dis = #self.childsList[wheelId] - 5
-	local to = dis * (config.itemSpace)--最终位置
-	local to1 = to + config.itemSpace * 0.3--超出位置   
+	local dis = #self.childsList[wheelId]-6
+	local to = -dis * (config.itemSpace)--最终位置
 	local endpos = Vector3.New(parent_newObj.transform.localPosition.x, to, parent_newObj.transform.localPosition.z)
+	--停止时候超出为止
+	local to1 = to - config.itemSpace * 0.5--超出位置   
 	local endpos1 = Vector3.New(parent_newObj.transform.localPosition.x, to1 ,parent_newObj.transform.localPosition.z)
-
-	self.tweener[wheelId]=parent_newObj.transform:DOLocalMove(endpos1, config.rollTime.dropTime[wheelId])
-	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.OutSine);
+	
+	local stopPos=endpos
+	if self.rollCircles[wheelId]==0 then
+		stopPos=endpos1
+		self:SetRealIndex(wheelId)
+	end
+	self.tweener[wheelId]=parent_newObj.transform:DOLocalMove(stopPos, config.rollItemNumTime)
+	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.Linear);
 	self.tweener[wheelId].onComplete=function()
-		self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
-		self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.Linear);
-		self.tweener1[wheelId].onComplete=function()
+		if self.rollCircles[wheelId]==0 then
+			self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
+			self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
+			self.tweener1[wheelId].onComplete=function()
+				self:RestWheelPos(wheelId)
+				parent_newObj.transform.localPosition =Vector3.New(
+						parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
+				if (wheelId == 5) then
+					self:ShowResoult()-- 旋转结束处理服务器数据表现
+				end
+			end
+		else
+			self.rollCircles[wheelId]=self.rollCircles[wheelId]-1
 			self:RestWheelPos(wheelId)
 			parent_newObj.transform.localPosition =Vector3.New(
 					parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
-			if (wheelId == 5) then
-				self:ShowResoult()-- 旋转结束处理服务器数据表现
-			end
+			self:StartCirle(wheelId)
 		end
-	end
-
-	-- 如果转到第5个转动轴，并且动画有效--都转起来了
-	if(wheelId == 5) then
-		self.isAllRoate = true
 	end
 end
 -- 重置滚动轴的位置
 function GameTemp1Ctrl:RestWheelPos(wheelid)
 	local nCircels = #self.childsList[wheelid]
 	for j = 1,nCircels do
-		local index = math.random(1,10)
-		if(j > 1 and j <= 4) then
-			local num=5
+		local index = math.random(1,#config.iocnPicName)
+		if(j > 1 and j <= 5) then
+			local num=6
 			num=num-j
-			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[wheelid][num]]],self.realCard[wheelid][num])
+			---@type SlotItem1
+			local item=self.childsList[wheelid][config.rollItemNum-num]
+			self.childsList[wheelid][j]:SetSprite(item:GetCurSprite(),item:GetIconIndex())
 		else
 			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
 		end
 	end
 end
+
+
+
+
+
+
 --展示结果
 function GameTemp1Ctrl:ShowResoult()
 	if self.resoultCor then

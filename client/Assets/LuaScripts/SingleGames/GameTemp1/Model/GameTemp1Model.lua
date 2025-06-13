@@ -23,7 +23,7 @@ function GameTemp1Model:InitCardData()
 	self.CardPos={}
 	for i=1,5 do
 		self.CardPos[i]={}
-		for j=1,3 do
+		for j=1,4 do
 			self.CardPos[i][j]=1
 		end
 	end

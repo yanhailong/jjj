@@ -1,7 +1,6 @@
 -- 定义全局模块
 IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
-logError("Tools.GetPlatformType():"..Tools.GetPlatformType())
 if Tools.GetPlatformType()==-1 then
     require "Debug/EmmyLuaDebugger"
 end
