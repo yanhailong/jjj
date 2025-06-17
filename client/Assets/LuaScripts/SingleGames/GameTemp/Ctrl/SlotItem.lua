@@ -10,7 +10,7 @@ end
 
 function SlotItem:SetSprite(icon,index)
    self.img_icon.sprite=icon
-   --self.img:SetNativeSize()
+   self.img_icon:SetNativeSize()
    self.iconIndex=index
    self.tmp_name.text=index
 end

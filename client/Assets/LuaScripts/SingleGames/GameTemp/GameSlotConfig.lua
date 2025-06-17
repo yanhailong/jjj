@@ -3,7 +3,7 @@
 local GameSlotConfig=Class("GameSlotConfig")
 local  this = GameSlotConfig;
 
-this.itemSpace = -230 --行间距
+this.itemSpace = -280 --行间距
 this.lieNum = 5
 this.itemNum = 32
 this.totalLineNum=25--总线数
@@ -37,10 +37,10 @@ this.rollTime={
     },
     rebackTime={--回弹时间
         [1]=0.1,
-        [2]=0.1,
-        [3]=0.1,
-        [4]=0.1,
-        [5]=0.1,
+        [2]=0.15,
+        [3]=0.2,
+        [4]=0.25,
+        [5]=0.3,
     }
 }
 
@@ -53,29 +53,16 @@ this.ABNames={
 this.icon_Pics={}
 --iconName
 this.iocnPicName={
-    [1]="icon 1",
-    [2]="icon 2",
-    [3]="icon 3",
-    [4]="icon 4",
-    [5]="icon 5",
-    [6]="icon 6",
-    [7]="icon 7",
-    [8]="icon 8",
-    [9]="icon 9",
-    [10]="icon 10",
-}
-
-this.LinlIconName={
-    [1]="icon 1",
-    [2]="icon 2",
-    [3]="icon 3",
-    [4]="icon 4",
-    [5]="icon 5",
-    [6]="icon 6",
-    [7]="icon 7",
-    [8]="icon 8",
-    [9]="icon 9",
-    [10]="icon 10",
+    [1]="1053_symbol_000",
+    [2]="1053_symbol_001",
+    [3]="1053_symbol_002",
+    [4]="1053_symbol_003",
+    [5]="1053_symbol_004",
+    [6]="1053_symbol_005",
+    [7]="1053_symbol_103",
+    [8]="1053_symbol_007",
+    [9]="1053_symbol_008",
+    [10]="1053_symbol_009",
 }
 
 function this.InitIconPic()

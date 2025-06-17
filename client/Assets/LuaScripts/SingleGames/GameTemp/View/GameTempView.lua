@@ -17,7 +17,7 @@ end
 function GameTempView:InitComponents()
     self.trans_slots=ComponentUtilGet.Transform(self.transform,"content/gameCenter/slotsMain/wheelRoot/trans_slots");
     self.btn_start=ComponentUtilGet.Button(self.transform,"content/buttom/btn_start");
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/top/btn_clsoe");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/top/btn_close");
 end
 
 function GameTempView:InitWheelRoot()

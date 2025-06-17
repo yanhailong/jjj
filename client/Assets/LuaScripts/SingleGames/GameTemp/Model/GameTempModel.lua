@@ -28,7 +28,7 @@ function GameTempModel:InitCardData()
 	for i=1,5 do
 		self.CardPos[i]={}
 		for j=1,3 do
-			self.CardPos[i][j]=Tools.RandomInt(1,10)
+			self.CardPos[i][j]=1
 		end
 	end
 end

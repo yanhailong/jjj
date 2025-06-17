@@ -60,6 +60,7 @@ function GameTempCtrl:InitFirstSlotPics()
 			card:SetActive(true)
 			card.transform:SetParent(go.transform)
 			card.transform.localPosition = Vector3.New(0, -(j-3) * dis, 0) -- 设置slotItem的位置
+			--card.transform.localPosition = Vector3.New(0, config.itemStartPosY+(j-2)* dis, 0) -- 设置slotItem的位置
 			card.transform.localScale = Vector3.one
 			card.name = tostring(j)
 			local iconItem=SlotItem.New(card)
