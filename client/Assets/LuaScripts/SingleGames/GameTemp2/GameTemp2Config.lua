@@ -1,13 +1,20 @@
 --存储数据及一些配置
----@class GameTemp1Config
-local GameTemp1Config=Class("GameTemp1Config")
-local  this = GameTemp1Config;
+---@class GameTemp2Config
+local GameTemp2Config=Class("GameTemp2Config")
+local  this = GameTemp2Config;
+
+this.rowNum = 8 --行数
+this.colNum = 5 --列数
+this.startMoveAnimTime=0
+this.itemMoveTime=0.2
+
+
 
 this.itemSpace = 180 --行间距
 this.itemStartPosY  = -268
 this.lieNum = 5
 this.rollItemNum = 11
-this.rollItemNumTime=0.5
+this.rollItemNumTime=0.27
 
 this.totalLineNum=25    --总线数
 this.isStandAlone = false --是否单机测试
@@ -66,7 +73,7 @@ this.rollTime={
 
 
 this.ABNames={
-    icon="SingleGames/GameTemp1/alats/icons",--icon
+    icon="SingleGames/GameTemp2/alats/icons",--icon
 }
 
 

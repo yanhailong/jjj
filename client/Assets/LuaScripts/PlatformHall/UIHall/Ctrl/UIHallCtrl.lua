@@ -8,6 +8,7 @@ require("SingleGames/Game001/MVCHead")
 require("SingleGames/Game002/MVCHead")
 require("SingleGames/GameTemp/MVCHead")
 require("SingleGames/GameTemp1/MVCHead")
+require("SingleGames/GameTemp2/MVCHead")
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -73,7 +74,7 @@ function UIHallCtrl:AddUIEvent()
 	
 	self.uiEventListener:AddClick(self.view.btn_game001, function
 	()
-		CtrlManager.SingleShow(CtrlNames.GameMain)
+		CtrlManager.SingleShow(CtrlNames.GameTemp2)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_game002, function
 	()

@@ -144,7 +144,7 @@ function GameTemp1Ctrl:StartCirle(wheelId)
 			self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
 			self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
 			self.tweener1[wheelId].onComplete=function()
-				self:RestWheelPos(wheelId)
+				self:RestWheelPos(wheelId,true)
 				parent_newObj.transform.localPosition =Vector3.New(
 						parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
 				if (wheelId == 5) then
@@ -161,7 +161,7 @@ function GameTemp1Ctrl:StartCirle(wheelId)
 	end
 end
 -- 重置滚动轴的位置
-function GameTemp1Ctrl:RestWheelPos(wheelid)
+function GameTemp1Ctrl:RestWheelPos(wheelid,isEnd)
 	local nCircels = #self.childsList[wheelid]
 	for j = 1,nCircels do
 		local index = math.random(1,#config.iocnPicName)
@@ -172,7 +172,9 @@ function GameTemp1Ctrl:RestWheelPos(wheelid)
 			local item=self.childsList[wheelid][config.rollItemNum-num]
 			self.childsList[wheelid][j]:SetSprite(item:GetCurSprite(),item:GetIconIndex())
 		else
-			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
+			if not isEnd then
+				self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
+			end
 		end
 	end
 end

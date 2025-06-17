@@ -93,10 +93,8 @@ public class SortTransform : BaseEditorWindow
             int count = lineCount == 0 ? 1 : lineCount;
             for (int i = 1; i < list.Count; i++)
             {
-                int dy = i / count;
-                float yy = dy * y;
+                float yy =(i % count) * y;
                 float xx = (i % count) * x;
-
                 Vector3 offectPos = startPos + new Vector3(xx, yy, startPos.z);
                 list[i].localPosition = offectPos;
             }
