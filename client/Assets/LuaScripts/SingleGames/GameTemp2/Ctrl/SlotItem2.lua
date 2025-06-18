@@ -16,6 +16,8 @@ function SlotItem2:InitData()
    self.curTween=nil
    self.initPos=nil
    self.stopMove=false
+   self.needRollCircle=0
+   
 end
 
 function SlotItem2:SetSprite(icon,index)

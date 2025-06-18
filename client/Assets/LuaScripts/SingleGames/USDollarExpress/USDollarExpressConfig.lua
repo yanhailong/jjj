@@ -1,24 +1,13 @@
 --存储数据及一些配置
----@class GameTemp2Config
-local GameTemp2Config=Class("GameTemp2Config")
-local  this = GameTemp2Config;
-
-this.rowNum = 8 --行数
-this.colNum = 5 --列数
-this.startMoveAnimTime=0
-this.itemMoveTime=0.033
-
-this.rollCircleNum = 30
-
-
-
-
+---@class USDollarExpressConfig
+local USDollarExpressConfig=Class("USDollarExpressConfig")
+local  this = USDollarExpressConfig;
 
 this.itemSpace = 180 --行间距
 this.itemStartPosY  = -268
 this.lieNum = 5
 this.rollItemNum = 11
-this.rollItemNumTime=0.27
+this.rollItemNumTime=0.33
 
 this.totalLineNum=25    --总线数
 this.isStandAlone = false --是否单机测试
@@ -58,26 +47,8 @@ this.rollTime={
     }
 }
 
---this.rollTime={
---    dropTime={--下落总时间
---        [1]=1.2,
---        [2]=1.6,
---        [3]=2,
---        [4]=2.4,
---        [5]=2.8,
---    },
---    rebackTime={--回弹时间
---        [1]=0.1,
---        [2]=0.1,
---        [3]=0.1,
---        [4]=0.1,
---        [5]=0.1,
---    }
---}
-
-
 this.ABNames={
-    icon="SingleGames/GameTemp2/alats/icons",--icon
+    icon="SingleGames/GameTemp1/alats/icons",--icon
 }
 
 

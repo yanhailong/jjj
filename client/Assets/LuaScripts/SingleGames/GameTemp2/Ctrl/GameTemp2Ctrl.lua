@@ -78,7 +78,18 @@ end
 
 ---重置
 function GameTemp2Ctrl:Reset()
-
+	for i = 1, config.colNum do
+		for j = 1, config.rowNum do
+			---@type SlotItem2
+			local item=self.items[i][j];
+			if i==5 then
+				item.needRollCircle=200;
+			else
+				item.needRollCircle=50+i*10;
+			end
+			
+		end
+	end
 end
 
 ---开始转动
@@ -110,7 +121,6 @@ end
 
 ---@param item SlotItem2
 function GameTemp2Ctrl:PlayFastMove(item)
-	if item.stopMove then return end
 	local y=item:GetRectTrans().anchoredPosition.y-config.itemSpace;
 	local tween=item.rectTrans:DOAnchorPos(Vector2.New(0,y),config.itemMoveTime);
 	item.curTween=tween;
@@ -124,8 +134,13 @@ function GameTemp2Ctrl:PlayFastMove(item)
 			local texId = math.random(1,table.getCount(config.iocnPicName))
 			item:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片
 		end
-		if item.stopMove then return end
-		self:PlayFastMove(item);
+		item.needRollCircle=item.needRollCircle-1
+		if item.needRollCircle==0 then
+			logError("转动结束了===！")
+		else
+			self:PlayFastMove(item);
+		end
+		
 	end
 end
 
@@ -199,48 +214,6 @@ function GameTemp2Ctrl:ItemStopMove(itemInfo)
 		self:ItemStopMove(itemInfo);
 	end
 end
-
-
----停止移动时间计算
-function GameTemp2Ctrl:CalcStopMoveTweenTime(dis)
-	return dis/self.config.itemHeightCell*self.config.moveCellTime;
-end
-
-
----设置item返回数据
-function GameTemp2Ctrl:SetItemResultInfo(itemInfo,isRebuild)
-	local x=itemInfo.cellIndex;
-	local y=itemInfo.rawIndex;
-	local sprite;
-	if y==1 or y==self.config.column then
-		sprite=self.config:GetRandomIcon(itemInfo.cellIndex);
-	else
-		local iconIndex=self:GetResultIconId(x,y);
-		sprite=self.config:GetIconByIndex(iconIndex);
-	end
-	Tools.SetImageSprite(itemInfo.img,sprite);
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

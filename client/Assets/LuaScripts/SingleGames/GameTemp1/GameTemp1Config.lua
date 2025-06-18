@@ -7,7 +7,7 @@ this.itemSpace = 180 --行间距
 this.itemStartPosY  = -268
 this.lieNum = 5
 this.rollItemNum = 11
-this.rollItemNumTime=0.5
+this.rollItemNumTime=0.33
 
 this.totalLineNum=25    --总线数
 this.isStandAlone = false --是否单机测试
@@ -47,24 +47,6 @@ this.rollTime={
     }
 }
 
---this.rollTime={
---    dropTime={--下落总时间
---        [1]=1.2,
---        [2]=1.6,
---        [3]=2,
---        [4]=2.4,
---        [5]=2.8,
---    },
---    rebackTime={--回弹时间
---        [1]=0.1,
---        [2]=0.1,
---        [3]=0.1,
---        [4]=0.1,
---        [5]=0.1,
---    }
---}
-
-
 this.ABNames={
     icon="SingleGames/GameTemp1/alats/icons",--icon
 }
@@ -90,7 +72,6 @@ function this.InitIconPic()
         local pic=pics[i];
         this.icon_Pics[pic.name]=pic;
     end
-    look("this.icon_Pics",this.icon_Pics)
 end
 
 

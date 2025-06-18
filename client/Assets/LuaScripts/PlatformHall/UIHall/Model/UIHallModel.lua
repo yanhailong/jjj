@@ -16,15 +16,31 @@ function UIHallModel:Close()
 end
 
 function UIHallModel:AddEvent()
-
+	WebNetEvent.AddListener(MsgId.ResEnterGame,self.ResEnterGame,self)
 end
-
 function UIHallModel:RemoveEvent()
 
 end
 
 --region 事件方法
+---@param gameType
+function UIHallModel:ReqEnterGame(gameType)
+	local data = {}
+	data.gameType = gameType;
+	WebNetworkManager.SendMsg(MsgId.ReqEnterGame,data)
+end
 
+
+function UIHallModel:ResEnterGame(msg)
+	look("收到进入游戏返回",msg)
+	if msg.code==200 then
+		require(GameConfig[GameNames.USDollarExpress].Manager)
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressLoading)
+	end
+	 
+
+
+end
 --endregion
 
 
