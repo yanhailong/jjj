@@ -16,7 +16,7 @@ function UIHallModel:Close()
 end
 
 function UIHallModel:AddEvent()
-	WebNetEvent.AddListener(MsgId.ResEnterGame,self.ResEnterGame,self)
+	WebNetEvent.AddListener(MsgId.ResChooseGame,self.ResChooseGame,self)
 end
 function UIHallModel:RemoveEvent()
 
@@ -27,11 +27,11 @@ end
 function UIHallModel:ReqEnterGame(gameType)
 	local data = {}
 	data.gameType = gameType;
-	WebNetworkManager.SendMsg(MsgId.ReqEnterGame,data)
+	WebNetworkManager.SendMsg(MsgId.ReqChooseGame,data)
 end
 
 
-function UIHallModel:ResEnterGame(msg)
+function UIHallModel:ResChooseGame(msg)
 	look("收到进入游戏返回",msg)
 	if msg.code==200 then
 		require(GameConfig[GameNames.USDollarExpress].Manager)
