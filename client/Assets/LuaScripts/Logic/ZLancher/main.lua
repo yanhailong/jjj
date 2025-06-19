@@ -2,7 +2,7 @@
 IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
 if Tools.GetPlatformType()==-1 then
-    require "Debug/EmmyLuaDebugger"
+    --require "Debug/EmmyLuaDebugger"
 end
 main = {}
 

@@ -1,7 +1,23 @@
-syntax = "proto3";//请求,msgID=0x6003,desc=请求进入游戏
-message ReqEnterGame {
+syntax = "proto3";//每个场次配置信息
+message WareHouseConfigInfo {
+  int32 wareId = 1;  //场次id
+  string name = 2;  //场次名称
+  int64 pool = 3;  //奖池
+  int32 limitVipMin = 4;  //进入vip最低等级
+  int64 limitGoldMin = 5;  //进入最低金币数量
+}
+
+//请求,msgID=0x6003,desc=请求进入游戏
+message ReqChooseGame {
   enum E_MsgID {def = 0; msgID = 24579;};
   int32 gameType = 1;  //游戏类型
+}
+
+//请求,msgID=0x6005,desc=选择游戏场次进入
+message ReqChooseWare {
+  enum E_MsgID {def = 0; msgID = 24581;};
+  int32 gameType = 1;  //游戏类型
+  int32 wareId = 2;  //场次id
 }
 
 //请求,msgID=0x3001,desc=登录请求
@@ -12,8 +28,15 @@ message ReqLogin {
 }
 
 //响应,msgID=0x6004,desc=进入游戏返回
-message ResEnterGame {
+message ResChooseGame {
   enum E_MsgID {def = 0; msgID = 24580;};
+  int32 code = 1;  //状态码
+  repeated WareHouseConfigInfo wareHouseList = 2;  //场次列表
+}
+
+//响应,msgID=0x6006,desc=选择游戏场次进入
+message ResChooseWare {
+  enum E_MsgID {def = 0; msgID = 24582;};
   int32 code = 1;  //状态码
 }
 

@@ -1,26 +1,13 @@
-syntax = "proto3";//请求,msgID=0x7003,desc=选择游戏场次进入
-message ReqChooseWare {
-  enum E_MsgID {def = 0; msgID = 28675;};
-  int32 wareId = 1;  //场次id
+syntax = "proto3";//请求,msgID=0x7099,desc=开始游戏结果返回
+message NoticeConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28825;};
+  repeated int32 stakeList = 1;
 }
 
 //请求,msgID=0x7005,desc=请求开始游戏
 message ReqStartGame {
   enum E_MsgID {def = 0; msgID = 28677;};
   int64 stakeVlue = 1;  //下注金额
-}
-
-//请求,msgID=0x7001,desc=请求场次信息
-message ReqWareHouse {
-  enum E_MsgID {def = 0; msgID = 28673;};
-  int32 gameType = 1;  //游戏类型
-}
-
-//响应,msgID=0x7004,desc=选择游戏场次进入
-message ResChooseWare {
-  enum E_MsgID {def = 0; msgID = 28676;};
-  int32 code = 1;  //状态码
-  repeated int64 stakeList = 2;  //押注列表
 }
 
 //响应,msgID=0x7006,desc=开始游戏结果返回
@@ -33,27 +20,11 @@ message ResStartGame {
   int32 specialId = 5;  //特殊游戏id
 }
 
-//响应,msgID=0x7002,desc=返回场次列表
-message ResWareHouse {
-  enum E_MsgID {def = 0; msgID = 28674;};
-  int32 code = 1;  //状态码
-  repeated WareHouseConfigInfo wareHouseList = 2;  //场次列表
-}
-
 //每条中奖线信息
 message ResultLineInfo {
   int32 id = 1;  //中奖线id
   repeated int32 indexList = 2;  //这条线上中奖图标的坐标
   int32 times = 3;  //倍率
   int64 winGold = 4;  //中奖金币
-}
-
-//每个场次配置信息
-message WareHouseConfigInfo {
-  int32 sid = 1;  //场次id
-  string name = 2;  //场次名称
-  int64 pool = 3;  //奖池
-  int32 limitVipMin = 4;  //进入vip最低等级
-  int64 limitGoldMin = 5;  //进入最低金币数量
 }
 

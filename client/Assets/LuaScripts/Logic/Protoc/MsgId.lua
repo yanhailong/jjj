@@ -17,12 +17,20 @@ MsgId.ReqGm = 16385
 MsgId.ResGm = 16386
 --- 响应,msgID=0x4099,desc=推送金钱变化
 MsgId.NoticeMoneyChange = 16537
---- ReqEnterGame
-MsgId.ReqEnterGame = 24579
+--- 请求,msgID=0x6003,desc=请求进入游戏
+MsgId.ReqChooseGame = 24579
 --- 响应,msgID=0x6004,desc=进入游戏返回
-MsgId.ResEnterGame = 24580
---- NoticeDollarExpressBaseConfig
-MsgId.NoticeDollarExpressBaseConfig = 28825
+MsgId.ResChooseGame = 24580
+--- 请求,msgID=0x6005,desc=选择游戏场次进入
+MsgId.ReqChooseWare = 24581
+--- 响应,msgID=0x6006,desc=选择游戏场次进入
+MsgId.ResChooseWare = 24582
+--- 请求,msgID=0x7005,desc=请求开始游戏
+MsgId.ReqStartGame = 28677
+--- 响应,msgID=0x7006,desc=开始游戏结果返回
+MsgId.ResStartGame = 28678
+--- NoticeConfigInfo
+MsgId.NoticeConfigInfo = 28825
 PbMsg={}
 
 PbMsg[4097] = 'ReqHeartBeat'
@@ -33,9 +41,13 @@ PbMsg[12290] = 'ResLogin'
 PbMsg[16385] = 'ReqGm'
 PbMsg[16386] = 'ResGm'
 PbMsg[16537] = 'NoticeMoneyChange'
-PbMsg[24579] = 'ReqEnterGame'
-PbMsg[24580] = 'ResEnterGame'
-PbMsg[28825] = 'NoticeDollarExpressBaseConfig'
+PbMsg[24579] = 'ReqChooseGame'
+PbMsg[24580] = 'ResChooseGame'
+PbMsg[24581] = 'ReqChooseWare'
+PbMsg[24582] = 'ResChooseWare'
+PbMsg[28677] = 'ReqStartGame'
+PbMsg[28678] = 'ResStartGame'
+PbMsg[28825] = 'NoticeConfigInfo'
 
 PBHelper.LoadPB('core')
 PBHelper.LoadPB('dollarexpress')
