@@ -9,7 +9,7 @@ function NetworkPing:ctor(connect)
     self.connect = connect;
     self.sendTime = nil;
     
-    WebNetEvent.AddListener(MsgId.ResHeartBeat, self.ResHeartBeat, self)
+    WebNetEvent.AddListener(pb_PlatformHall.ResHeartBeat, self.ResHeartBeat, self)
     self.timer = TimerManager.CreateTimer(self, function()
         self:SendPing();
     end, pingTime, 1, true)
@@ -44,7 +44,7 @@ function NetworkPing:SendPing()
         return
     end
     local heartMsg = self:GetHeratMsg()
-    self.connect.SendMsg(MsgId.ReqHeartBeat, heartMsg);
+    self.connect.SendMsg(pb_PlatformHall.ReqHeartBeat, heartMsg);
     self:StopTimeoutTimer();
     self:ResetStartTimer(self.timeoutTimer);
 end

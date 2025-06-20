@@ -1,5 +1,5 @@
 require("Logic/Protoc/PBHelper")
-require("Logic/Protoc/MsgId")
+
 ---@class WebNetworkManager
 WebNetworkManager = {}
 local this = WebNetworkManager
@@ -138,7 +138,7 @@ function this.MsgLog(isRecive, msgID, msgTab)
     if not isOpenMsgLog then
         return
     end
-    if msgID == MsgId.ResHeartBeat  or msgID == MsgId.ReqHeartBeat then
+    if msgID == pb_PlatformHall.ResHeartBeat  or msgID == pb_PlatformHall.ReqHeartBeat then
        return
     end
     if isRecive then

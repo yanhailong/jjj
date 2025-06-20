@@ -17,7 +17,7 @@ function USDollarExpressMainModel:Close()
 end
 
 function USDollarExpressMainModel:AddEvent()
-
+	
 end
 
 function USDollarExpressMainModel:RemoveEvent()

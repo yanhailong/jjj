@@ -69,7 +69,7 @@ function UILoginCtrl:ReqLogin()
 	local reqLogin = {}
 	reqLogin.token = self.serverInfo.token
 	reqLogin.playerId=self.serverInfo.playerId
-	WebNetworkManager.SendMsg(MsgId.ReqLogin, reqLogin)
+	WebNetworkManager.SendMsg(pb_PlatformHall.ReqLogin, reqLogin)
 end
 
 ---销毁UI

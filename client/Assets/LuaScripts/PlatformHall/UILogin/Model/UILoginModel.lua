@@ -18,17 +18,17 @@ end
 function UILoginModel:AddEvent()
 	GlobalEvent.AddListener(WebNetworkConnectEvent.connectSuccess,self.OnConnectSuccess,self)
 	GlobalEvent.AddListener(WebNetworkConnectEvent.connectFailed,self.connectFailed,self)
-	WebNetEvent.AddListener(MsgId.ResLogin, self.ResLogin, self)
+	WebNetEvent.AddListener(pb_PlatformHall.ResLogin, self.ResLogin, self)
 
-	WebNetEvent.AddListener(MsgId.NoticeServerStatus, self.NoticeServerStatus, self)
+	WebNetEvent.AddListener(pb_PlatformHall.NoticeServerStatus, self.NoticeServerStatus, self)
 end
 
 function UILoginModel:RemoveEvent()
 	GlobalEvent.Remove(WebNetworkConnectEvent.connectSuccess,self.OnConnectSuccess,self)
 	GlobalEvent.Remove(WebNetworkConnectEvent.connectFailed,self.connectFailed,self)
-	WebNetEvent.Remove(MsgId.ResLogin, self.ResLogin, self)
+	WebNetEvent.Remove(pb_PlatformHall.ResLogin, self.ResLogin, self)
 
-	WebNetEvent.Remove(MsgId.NoticeServerStatus, self.NoticeServerStatus, self)
+	WebNetEvent.Remove(pb_PlatformHall.NoticeServerStatus, self.NoticeServerStatus, self)
 end
 
 function UILoginModel:NoticeServerStatus(msg)

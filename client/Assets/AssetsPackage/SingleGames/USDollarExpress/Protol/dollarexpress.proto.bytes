@@ -1,0 +1,70 @@
+syntax = "proto3";//响应,msgID=0x7099,desc=推送配置信息
+message NoticeConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28825;};
+  repeated int32 stakeList = 1;
+}
+
+//请求,msgID=0x7001,desc=请求选择免费模式的游戏
+message ReqChooseFreeModel {
+  enum E_MsgID {def = 0; msgID = 28673;};
+  int32 type = 1;  //选择类型 1.火车   2.免费游戏
+}
+
+//请求,msgID=0x7003,desc=选择投资地区
+message ReqInvestArea {
+  enum E_MsgID {def = 0; msgID = 28675;};
+  int32 areaId1 = 1;  //地区id1
+  int32 areaId2 = 2;  //地区id2
+  int32 areaId3 = 3;  //地区id3
+}
+
+//请求,msgID=0x7005,desc=请求开始游戏
+message ReqStartGame {
+  enum E_MsgID {def = 0; msgID = 28677;};
+  int64 stakeVlue = 1;  //下注金额
+}
+
+//响应,msgID=0x7002,desc=返回选择免费模式的游戏
+message ResChooseFreeModel {
+  enum E_MsgID {def = 0; msgID = 28674;};
+  int32 code = 1;  //状态码
+  TrainInfo trainInfo = 2;  //火车模式
+}
+
+//响应,msgID=0x7004,desc=选择投资地区返回
+message ResInvestArea {
+  enum E_MsgID {def = 0; msgID = 28676;};
+  int32 code = 1;  //状态码
+  int64 areaGold1 = 2;  //回报金额1
+  int64 areaGold2 = 3;  //回报金额2
+  int64 areaGold3 = 4;  //回报金额3
+  repeated TrainInfo trainInfoList = 5;  //火车信息
+}
+
+//响应,msgID=0x7006,desc=开始游戏结果返回
+message ResStartGame {
+  enum E_MsgID {def = 0; msgID = 28678;};
+  int32 code = 1;  //状态码
+  repeated int32 iconList = 2;  //图标id列表
+  repeated ResultLineInfo resultLineInfoList = 3;  //中奖信息
+  int64 allWinGold = 4;  //累计中奖金币
+  int32 specialType = 5;  //特殊游戏id
+  int32 freeCount = 6;  //免费次数
+  bool goldTrainInFree = 7;  //免费游戏中是否触发了金火车
+  repeated TrainInfo trainInfoList = 8;  //火车模式
+}
+
+//每条中奖线信息
+message ResultLineInfo {
+  int32 id = 1;  //中奖线id
+  repeated int32 indexList = 2;  //这条线上中奖图标的坐标
+  int32 times = 3;  //倍率
+  int64 winGold = 4;  //中奖金币
+}
+
+//火车信息
+message TrainInfo {
+  int32 type = 1;  //火车类型
+  repeated int64 goldList = 2;  //中奖金额列表
+}
+

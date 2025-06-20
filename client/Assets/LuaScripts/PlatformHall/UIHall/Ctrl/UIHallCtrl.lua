@@ -4,11 +4,7 @@
 ---
 ---@class UIHallCtrl:BaseCtrl
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
-require("SingleGames/Game001/MVCHead")
-require("SingleGames/Game002/MVCHead")
-require("SingleGames/GameTemp/MVCHead")
 require("SingleGames/GameTemp1/MVCHead")
-require("SingleGames/GameTemp2/MVCHead")
 require("Logic/Config/HallConfig")
 
 ---构造函数
@@ -75,7 +71,6 @@ function UIHallCtrl:AddUIEvent()
 	
 	self.uiEventListener:AddClick(self.view.btn_game001, function
 	()
-		--CtrlManager.SingleShow(CtrlNames.GameTemp2)
 		self.model:ReqEnterGame(GameConfig[GameNames.USDollarExpress].gameType)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_game002, function
@@ -85,7 +80,7 @@ function UIHallCtrl:AddUIEvent()
 
 	self.uiEventListener:AddClick(self.view.btn_game003, function
 	()
-		CtrlManager.SingleShow(CtrlNames.GameTemp)
+
 	end)
 	self.view.tmp_sy.text=LocalManager.GetStrById(10001)
 

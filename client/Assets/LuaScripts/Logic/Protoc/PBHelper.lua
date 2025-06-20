@@ -1,11 +1,12 @@
+---@class 存储消息Id与pb名字
+PbMsg={}
 ---@class
 PBHelper = {}
 local this = PBHelper
 local parser =require("Logic/Protoc/protoc").new()
 local pb = require "pb"
-local pbPath="Common/ProtoFiles";
 
-function this.LoadPB(pbName)
+function this.LoadPB(pbPath,pbName)
     local protoString = resMgr:LoadTextAssetStr(pbPath,pbName..".proto.bytes")
     parser:load(protoString, pbName..".proto")
 end

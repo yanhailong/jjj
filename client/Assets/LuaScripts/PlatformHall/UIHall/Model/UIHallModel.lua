@@ -16,7 +16,7 @@ function UIHallModel:Close()
 end
 
 function UIHallModel:AddEvent()
-	WebNetEvent.AddListener(MsgId.ResChooseGame,self.ResChooseGame,self)
+	WebNetEvent.AddListener(pb_PlatformHall.ResChooseGame,self.ResChooseGame,self)
 end
 function UIHallModel:RemoveEvent()
 
@@ -27,7 +27,7 @@ end
 function UIHallModel:ReqEnterGame(gameType)
 	local data = {}
 	data.gameType = gameType;
-	WebNetworkManager.SendMsg(MsgId.ReqChooseGame,data)
+	WebNetworkManager.SendMsg(pb_PlatformHall.ReqChooseGame,data)
 end
 
 

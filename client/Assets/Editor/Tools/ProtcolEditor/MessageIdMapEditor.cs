@@ -8,25 +8,23 @@ using XLua;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Unity.VisualScripting;
 
-public class MessageIdMapEditor : Editor
+public class MessageIdMapEditor
 {
-    private static string rootPath;
+    private const string rootPath = "./Assets/LuaScripts/";
+    private const string protolRoot = "./Assets/_Protol/";
+    private const string rawRoot = "./Assets/AssetsPackage/";
     
-    [MenuItem("Assets/消息ID映射", false, 0)]
-    static void Create()
+    public static void Create(string dirPath)
     {
-        var obj = Selection.assetGUIDs;
-        if (obj == null || obj.Length == 0)
+        if (dirPath == null || dirPath.Length == 0)
         {
             Debug.LogError("选择pb所在的文件夹目录");
             return;
         }
-        string guid = obj[0];
-        string path = AssetDatabase.GUIDToAssetPath(guid);
-        string[] files = Directory.GetFiles(path, "*.proto.bytes");
-        // MoveValueToFront(files,"bean.proto");
-        
+        string path = dirPath;
+        string[] files = Directory.GetFiles(path, "*.proto");
         if (files.Length == 0)
         {
             Debug.LogError("没有找到协议文件");
@@ -48,9 +46,18 @@ public class MessageIdMapEditor : Editor
             Root protoData = JsonConvert.DeserializeObject<Root>(json);
             protoDatas.Add(protoData);
         }
-
-        rootPath = Application.dataPath + "/LuaScripts/Logic/Protoc/MsgId.lua";
-        GeneratedMap(protoDatas);
+        
+        string protolRootDir = Path.GetFullPath(protolRoot);
+        DirectoryInfo dir = new DirectoryInfo(dirPath);
+        string pt = dir.FullName.Replace(protolRootDir, "");
+        string pbDir = rootPath + pt + "/Protol/";
+        if (!Directory.Exists(pbDir))
+            Directory.CreateDirectory(pbDir);
+        
+        string abPath=pt + "/Protol";
+        Debug.LogError("abPath:"+abPath);
+        
+        GeneratedMap(protoDatas,dir.Name,pbDir,abPath);
     }
     
     
@@ -116,14 +123,19 @@ public class MessageIdMapEditor : Editor
     }
     
     
-    static void GeneratedMap(List<Root> protoDatas)
+    static void GeneratedMap(List<Root> protoDatas,string pbLuaName,string pbDir,string abPath)
     {
+        Debug.LogError("pbLuaName:"+pbLuaName);
         List<PBData> msgIdDatas = new List<PBData>();
         List<int> msgIdNumbers = new List<int>();
         List<string> msgIdNames = new List<string>();
         List<string> pbNames=new List<string>();
 
         //Dictionary<string, List<ProtoField>> enumMap = new Dictionary<string, List<ProtoField>>();
+
+        string tabName = "pb_"+pbLuaName;//lua表名称
+        string LuaFilePath=pbDir+tabName+".lua";
+        abPath = abPath.Replace(@"\", "/");
     
         foreach (var protoData in protoDatas)
         {
@@ -196,7 +208,8 @@ public class MessageIdMapEditor : Editor
                     zs = pbzhus.zhushi;
             }
             zs = "--- " + zs;
-            string msgId ="\n"+ zs+"\nMsgId." + v.msgName + " = " + v.msgId;
+            
+            string msgId ="\n"+ zs+"\n"+tabName+"." + v.msgName + " = " + v.msgId;
             string map = string.Format("\nPbMsg[{0}] = '{1}'", v.msgId, v.msgName);
             msgIdContent += msgId;
             msgMapConent += map;
@@ -204,16 +217,16 @@ public class MessageIdMapEditor : Editor
 
         foreach (var v in pbNames)
         {
-            string msg = string.Format("\nPBHelper.LoadPB('{0}')", v);
+            string msg = string.Format("\nPBHelper.LoadPB('{0}','{1}')",abPath ,v);
             msgFileContent += msg;
         }
         
-        string content = "--生成的代码不要手动去修改!"+"\nMsgId={}"+ msgIdContent +"\nPbMsg={}"+ msgMapConent+msgFileContent;
-        if (File.Exists(rootPath))
+        string content = "--生成的代码不要手动去修改!"+"\n"+tabName+"={}"+ msgIdContent +"\n"+ msgMapConent+msgFileContent;
+        if (File.Exists(LuaFilePath))
         {
-            File.Delete(rootPath);
+            File.Delete(LuaFilePath);
         }
-        File.WriteAllText(rootPath, content);
+        File.WriteAllText(LuaFilePath, content);
         AssetDatabase.Refresh();
         Debug.Log("生成完成");
     }

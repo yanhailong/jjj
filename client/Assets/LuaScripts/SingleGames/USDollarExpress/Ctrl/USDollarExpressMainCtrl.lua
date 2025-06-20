@@ -89,7 +89,6 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 			self:StartCirle(i)
 		end
 	end)
-
 end
 
 function USDollarExpressMainCtrl:SetRealIndex(wheelId)
