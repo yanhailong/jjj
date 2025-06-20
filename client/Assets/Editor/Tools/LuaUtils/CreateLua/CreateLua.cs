@@ -50,8 +50,9 @@ class MyDoCreateScriptAsset : EndNameEditAction
         //bool encoderShouldEmitUTF8Identifier = true;
         //bool throwOnInvalidBytes = false;
         // UTF8Encoding encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier, throwOnInvalidBytes);
+        var utf8WithoutBom = new UTF8Encoding(false);
         bool append = false;
-        StreamWriter streamWriter = new StreamWriter(fullPath, append, Encoding.UTF8);
+        StreamWriter streamWriter = new StreamWriter(fullPath, append, utf8WithoutBom);
         streamWriter.Write(text);
         streamWriter.Close();
         AssetDatabase.ImportAsset(pathName);
