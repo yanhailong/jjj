@@ -26,6 +26,8 @@ function UIHallView:InitComponents()
     self.btn_quality4=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality4")
     self.btn_quality5=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality5")
     self.btn_quality6=ComponentUtilGet.Button(self.transform,"content/qualitys/btn_quality6")
+
+    self.btn_test=ComponentUtilGet.Button(self.transform,"content/btn_test")
 end
 
 ---清空组件

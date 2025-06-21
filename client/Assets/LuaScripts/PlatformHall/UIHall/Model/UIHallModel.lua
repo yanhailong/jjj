@@ -35,7 +35,7 @@ function UIHallModel:ResChooseGame(msg)
 	look("收到进入游戏返回",msg)
 	if msg.code==200 then
 		require(GameConfig[GameNames.USDollarExpress].Manager)
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressLoading)
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressSelect,msg)
 	end
 	 
 

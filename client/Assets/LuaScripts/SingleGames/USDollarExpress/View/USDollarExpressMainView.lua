@@ -11,6 +11,7 @@ function USDollarExpressMainView:InitView()
     self.ctrl=self.ctrl
 	self:InitComponents()
     self:InitWheelRoot()
+    self:InitChipInfo()
 end
 
 ---获取组件
@@ -39,6 +40,18 @@ function USDollarExpressMainView:InitWheelRoot()
 
     self.cardPrefab=self.transform:Find("content/gameCenter/item").gameObject
     self.cardPrefab:SetActive(false)
+end
+
+
+---:初始化ChipInfo
+function USDollarExpressMainView:InitChipInfo()
+    self.btn_add=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_add")
+    self.btn_reduce=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_reduce")
+    self.btn_max=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_max")
+    self.txt_chipInfo=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/chipInfo/txt_chipInfo")
+end
+function USDollarExpressMainView:SetChipText(num)
+    self.txt_chipInfo.text=num
 end
 
 ---初始化View数据

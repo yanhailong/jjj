@@ -103,6 +103,10 @@ end
 ---@param 接收消息
 function this:OnReceive(bytes)
     local msgId,msgTab = PBHelper.Decode(bytes)
+    if not msgTab then
+        logError("解析消息失败！msgId="..msgId)
+        return
+    end
     this.MsgLog(true, msgId, msgTab)
     WebNetEvent.Notify(msgId, msgTab)
 end

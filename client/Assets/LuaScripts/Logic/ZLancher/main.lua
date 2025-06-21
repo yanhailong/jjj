@@ -3,7 +3,7 @@ IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
 require("PlatformHall/Protol/pb_PlatformHall")
 if Tools.GetPlatformType()==-1 then
-    --require "Debug/EmmyLuaDebugger"
+    require "Debug/EmmyLuaDebugger"
 end
 main = {}
 

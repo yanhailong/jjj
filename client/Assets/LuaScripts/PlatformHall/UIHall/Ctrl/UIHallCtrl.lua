@@ -112,6 +112,12 @@ function UIHallCtrl:AddUIEvent()
 	()
 		CS.LanguageManager.Instance.Language="english"
 	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_test, function
+	()
+		require("PlatformHall/UITestScroll/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.UITestScroll)
+	end)
 
 end
 

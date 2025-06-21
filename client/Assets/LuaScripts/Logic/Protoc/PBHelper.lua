@@ -33,7 +33,8 @@ function this.Decode(bytes)
     if pbInfo then
         return msgId,assert(pb.decode(pbInfo, subBytes))
     else
-        logError("消息对应的pb为空！msg_id:"..msg_id)
+        logError("消息对应的pb为空！msg_id:"..msgId)
+        return msgId,nil
     end
     
 end

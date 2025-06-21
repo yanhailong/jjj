@@ -27,6 +27,8 @@ end
 function USDollarExpressMainCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	self.stakeList=args.stakeList--下注列表
+	self.view:SetChipText(self.stakeList[self.betIndex])--设置默认
 	config.InitIconPic()--初始化icon图片
 	self:InitFirstSlotPics()
 end
@@ -35,12 +37,20 @@ end
 function USDollarExpressMainCtrl:InitData()
 	self.parentList={}
 	self.childsList = {}
-	self.showChildsList = {}
+	self.showChildsList = {}---显示的card1-20
 
 	self.isOnclickStart=false
 	self.realCard={}
 	self.tweener={}
 	self.tweener1={}
+	self.betIndex=1--下注索引，默认为1
+	
+	
+	
+	
+	
+	
+	
 	self.freeState=false;
 	self.isAllRoate=false
 	self.isAward=0---是否中奖（0,1,2）--未中奖，小奖，大奖
@@ -55,7 +65,6 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 		go.transform.localPosition = Vector3.New(0,0,0)
 		table.insert(self.parentList, go.transform) -- 将创建的newobj插入parentList表中
 		self.childsList[i] = {}
-		self.showChildsList[i] = {}
 		local nCircels = config.rollItemNum
 		for j = 1, nCircels do
 			local card = instantiate(self.view.cardPrefab)
@@ -68,12 +77,17 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			local texId = math.random(1,table.getCount(config.iocnPicName))
 			iconItem:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片       
 			table.insert(self.childsList[i], iconItem)
-			local m_index=6
-			if j>1 and j<5 then
-				self.showChildsList[i][m_index-j] = iconItem
+
+			local numFF=6;
+			if(j<=5 and j>1) then
+				numFF=numFF-j
+				local index = (numFF-1)*5 + i  -- 计算原始索引
+				self.showChildsList[index] = iconItem
 			end
 		end
 	end
+	
+	look("self.showChildsList",self.showChildsList)
 end
 
 --开始抽奖旋转
@@ -112,13 +126,20 @@ function USDollarExpressMainCtrl:ReSetData()
 	---默认都转3圈结束转动
 	self.rollCircles={}
 	for i = 1,5 do
-
 		if i==5 then
 			self.rollCircles[i] = 15
 		else
 			self.rollCircles[i] = 3+i
 		end
 	end
+
+	if self.lineShowCor~=nil then
+		coroutine.stop(self.lineShowCor)
+	end
+	for i = 1, 20 do
+		self.showChildsList[i]:SetIsAward(false)
+	end
+	
 end
 
 --旋转
@@ -212,14 +233,76 @@ function USDollarExpressMainCtrl:ShowResoult()
 end
 
 function USDollarExpressMainCtrl:ShowAwardEffect()
-	logError("展示中奖效果")
+	local allWinGold=self.model.allWinGold
+	local resultLineInfoList=self.model.resultLineInfoList
+	local specialType=self.model.specialType
+	local totalAwardLineCount=0 --中奖总线
+
+	if allWinGold>=0 then
+		totalAwardLineCount=#resultLineInfoList--总中奖线
+		self:ShowCirculationLinesAnim()
+		config.showStep=config.showStep+1
+	else
+		log("未中奖")
+		config.showStep=config.showStep+1
+	end
+end
+
+---单线循环展示
+function USDollarExpressMainCtrl:ShowCirculationLinesAnim()
+	self.isShowXianbl=true
+	local showXianindex=0
+	if self.lineShowCor~=nil then
+		CorManager.StopCor(self,self.lineShowCor)
+	end
+	self.lineShowCor=nil
+	local lineList=self.model.resultLineInfoList
+	local lineCount=#lineList+1--所有中奖线个数
+	self.lineShowCor = CorManager.StartCor(self,function()
+		while self.isActive and self.isShowXianbl do
+			showXianindex=showXianindex%lineCount
+			if showXianindex == 0 then
+				for i=1,lineCount-1 do
+					local lineInfo=lineList[i]
+					self:SetIconEffect(lineInfo)
+				end
+			else
+				local lineInfo=lineList[showXianindex]
+				self:SetIconEffect(lineInfo)
+			end
+			coroutine.wait(1)
+			showXianindex=showXianindex+1
+		end
+	end)
+end
+
+
+function USDollarExpressMainCtrl:SetIconEffect(lineInfo)
+	local awardPos=lineInfo.indexList
+	for i=1,#awardPos do
+		---@type USDollarExpressSlotItem
+		local item=self.showChildsList[awardPos[i]+1]
+		if item then
+			item:SetIsAward(true)
+		else
+			logError("图标不存在"..awardPos[i]+1)
+		end
+	end
+	
+end
+
+
+function USDollarExpressMainCtrl:EnterSmallGame()
+	logError("进入拉火车小游戏")
+	if self.model.specialType==1 then
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+	end
+end
+
+function USDollarExpressMainCtrl:EndSmallGame()
 	config.showStep=config.showStep+1
 end
 
-function USDollarExpressMainCtrl:EnterSmallGame()
-	logError("进入小游戏")
-	config.showStep=config.showStep+1
-end
 
 function USDollarExpressMainCtrl:EnterFreeGame()
 	logError("进入免费模式")
@@ -243,8 +326,11 @@ function USDollarExpressMainCtrl:AddUIEvent()
 	end )
 	
 	self.uiEventListener:AddClick(self.view.btn_start,function()
-		self:OnStartDoSpin()
+		--self:OnStartDoSpin()
+		self.model:ReqStartGame(self.stakeList[self.betIndex])
 	end )
+	
+	self:InitChipInfoUiEvent()
 end
 
 ---移除UI事件
@@ -253,6 +339,54 @@ function USDollarExpressMainCtrl:RemoveEvent()
 end
 
 --region UI事件方法
+
+--下注相关--------------------
+function USDollarExpressMainCtrl:InitChipInfoUiEvent()
+	self.uiEventListener:AddClick(self.view.btn_add, function()
+		self:SetChipInfo("add")
+	end)
+	self.uiEventListener:AddClick(self.view.btn_reduce, function()
+		self:SetChipInfo("reduce")
+	end)
+	self.uiEventListener:AddClick(self.view.btn_max, function()
+		self:SetChipInfo("max")
+	end)
+end
+function USDollarExpressMainCtrl:SetChipInfo(str)
+	local chipMoney = self.stakeList[self.betIndex]
+	local playerMoney=1000000000000
+	if str == "max" then
+		if tonumber(chipMoney)> tonumber(playerMoney)   then
+			SuspensionTipsUtil.SuspensionTips("金币不足");
+			return
+		end
+		self.betIndex = #self.stakeList
+	elseif str == "add" then
+		if tonumber(chipMoney)> tonumber(playerMoney)  then
+			SuspensionTipsUtil.SuspensionTips("金币不足");
+			return
+		end
+		self.betIndex = self.betIndex%(#self.stakeList) + 1
+	elseif str == "reduce" then
+		if tonumber(chipMoney)> tonumber(playerMoney)   then
+			SuspensionTipsUtil.SuspensionTips("金币不足");
+			return
+		end
+		self.betIndex=self.betIndex-1;
+		if  self.betIndex<=0  then
+			self.betIndex=#self.stakeList
+		end
+	end
+	self.view:SetChipText(self.stakeList[self.betIndex])
+end
+--下注相关--------------------
+
+
+
+
+
+
+
 
 --endregion
 
