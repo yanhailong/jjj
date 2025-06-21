@@ -17,6 +17,7 @@ function UIHallView:InitComponents()
     self.btn_game001=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game001");
     self.btn_game002=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game002");
     self.btn_game003=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game003");
+    self.btn_game004=ComponentUtilGet.Button(self.transform,"content/ScrollView/Viewport/Content/btn_game004");
     self.tmp_sy=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_sy");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
     

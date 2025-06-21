@@ -5,7 +5,9 @@
 ---@class UIHallCtrl:BaseCtrl
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
 require("SingleGames/GameTemp1/MVCHead")
+require("SingleGames/Baccarat/MVCHead")
 require("Logic/Config/HallConfig")
+
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -81,6 +83,10 @@ function UIHallCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_game003, function
 	()
 
+	end)
+	self.uiEventListener:AddClick(self.view.btn_game004, function
+	()
+		CtrlManager.SingleShow(CtrlNames.BaccaratGame)
 	end)
 	self.view.tmp_sy.text=LocalManager.GetStrById(10001)
 
