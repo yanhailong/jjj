@@ -6,6 +6,7 @@ local this=HallConfig
 -- 子游戏的名字
 GameNames = {
 	USDollarExpress="USDollarExpress",--美元快递
+	DragonTigerFight="DragonTigerFight",--龙虎斗
 }
 
 -- 游戏的配置
@@ -14,6 +15,11 @@ GameConfig = {
 		gameType = 100100,
 		Manager = "SingleGames/USDollarExpress/MVCHead",
 		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
+	},
+	[GameNames.DragonTigerFight] = {
+		gameType = 200100,
+		Manager = "SingleGames/DragonTigerFight/MVCHead",
+		EnterCtrlName = CtrlNames.DragonTigerFight, --游戏入口界面
 	},
 }
 
