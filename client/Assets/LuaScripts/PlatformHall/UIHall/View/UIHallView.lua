@@ -16,6 +16,7 @@ end
 function UIHallView:InitComponents()
     self.btn_USDollarExpress=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/btn_USDollarExpress");
     self.btn_Baccarat=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/btn_Baccarat");
+    self.btn_LongHuDou=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/gametest001")
     self.uTabs_title=ComponentUtilGet.UGUITabGroup(self.transform,"content/left/uTabs_title");
     self.btn_yqs=ComponentUtilGet.Button(self.transform,"content/left/btn_yqs");
     self.img_head=ComponentUtilGet.Image(self.transform,"content/top/playerInfo/head/img_head");
@@ -52,6 +53,7 @@ end
 function UIHallView:ClearComponents()
     self.btn_USDollarExpress=nil;
     self.btn_Baccarat=nil;
+    self.btn_LongHuDou=nil;
     self.uTabs_title=nil;
     self.btn_yqs=nil;
     self.img_head=nil;
