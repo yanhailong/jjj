@@ -40,6 +40,10 @@ function UIHallCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_USDollarExpress, function
 	()
 		self.model:ReqEnterGame(GameConfig[GameNames.USDollarExpress].gameType)
+	end)	
+	self.uiEventListener:AddClick(self.view.btn_Baccarat, function
+	()
+		CtrlManager.SingleShow(CtrlNames.BaccaratGame)
 	end)
 	local isUp=false
 	self.isCanClickBtnArrow=true

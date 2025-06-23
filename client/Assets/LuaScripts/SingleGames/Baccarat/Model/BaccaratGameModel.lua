@@ -23,6 +23,10 @@ function BaccaratGameModel:RemoveEvent()
 
 end
 
+function BaccaratGameModel:GetCardNum()
+	return Random.Range(1,14);
+end
+
 --region 事件方法
 
 --endregion
