@@ -319,8 +319,8 @@ function this.ConvertPosInit()
     if mCanvasScaler == nil then
         screenWidth = UnityEngine.Screen.width
         screenHeight = UnityEngine.Screen.height
-        mCanvasScaler = UnityEngine.GameObject.Find("Global_UI/Canvas"):GetComponent("CanvasScaler")
-        mCanvasTrans = UnityEngine.GameObject.Find("Global_UI/Canvas").transform
+        mCanvasScaler = UnityEngine.GameObject.Find("Global/Canvas"):GetComponent("CanvasScaler")
+        mCanvasTrans = UnityEngine.GameObject.Find("Global/Canvas").transform
         ReferenceScreenWidth = mCanvasScaler.referenceResolution.x
         ReferenceScreenHeight = mCanvasScaler.referenceResolution.y
         mScaleFactorW = ReferenceScreenWidth / screenWidth

@@ -27,12 +27,42 @@ end
 
 ---初始化数据
 function USDollarExpressCarCtrl:InitData()
-	
+	self:InitCars()
 end
 
 ---初始化火车厢
 function USDollarExpressCarCtrl:InitCars()
+	self.WidthSpace=1280
+	self.allItems={}
+	for i = 1, 10 do
+		local card = instantiate(self.view.objCar)
+		card:SetActive(true)
+		card.transform:SetParent(self.view.trans_root)
+		card.transform.localPosition = Vector3.New(i* -self.WidthSpace, 0, 0) -- 设置slotItem的位置
+		card.transform.localScale = Vector3.one
+		card.name = tostring(i)
+		self.allItems[i]=card
+	end
 	
+	self.maxMoveIndex=10
+	self.curMoveIndex=1
+	self:Move()
+	 
+end
+
+function USDollarExpressCarCtrl:Move()
+	self.tweener=self.view.trans_root:DOLocalMoveX(self.WidthSpace*self.curMoveIndex, 2)
+	self.tweener:SetEase(DG.Tweening.Ease.Linear);
+	self.tweener.onComplete=function()
+		logError("移动完毕")
+		---@type UnityEngine.GameObject
+		local obj= self.allItems[self.curMoveIndex]
+		obj.transform:DOScale(1.5, 0.1)
+		self.curMoveIndex=self.curMoveIndex+1
+		if self.curMoveIndex<=self.maxMoveIndex then
+			self:Move()
+		end
+	end
 end
 
 
