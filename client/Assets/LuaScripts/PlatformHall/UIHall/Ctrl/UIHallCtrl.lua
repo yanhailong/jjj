@@ -1,13 +1,11 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-24 09:23:06
+---DateTime: 2025-06-23 17:21:44
 ---
 ---@class UIHallCtrl:BaseCtrl
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
-require("SingleGames/GameTemp1/MVCHead")
 require("SingleGames/Baccarat/MVCHead")
 require("Logic/Config/HallConfig")
-
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -24,8 +22,13 @@ end
 ---初始化
 function UIHallCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self:InitData()
+end
 
-	self.pool=ObjectPoolUtil.New(self.ctrlName)
+---初始化数据
+function UIHallCtrl:InitData()
+	self.img_buttom_diMoveUpPosY=91
+	self.img_buttom_diMoveDownPosy=-178
 end
 
 function UIHallCtrl:Close()
@@ -34,106 +37,46 @@ end
 
 ---添加UI事件
 function UIHallCtrl:AddUIEvent()
-	self.uiEventListener:AddClick(self.view.btn_close,function(obj)
-		look("obj",obj)
-		self:Close()
-	end )
-
-	self.uiEventListener:AddLongPress(self.view.btn_close.gameObject,function(obj)
-		logError("AddLongPress")
-	end )
-	self.uiEventListener:AddPressDown(self.view.btn_close.gameObject,function(obj)
-		logError("AddPressDown")
-	end )
-	self.uiEventListener:AddPressUp(self.view.btn_close.gameObject,function(obj)
-		logError("AddPressUp")
-	end )
-	
-	self.uiEventListener:AddBeginDrag(self.view.btn_close.gameObject, function
-	(args)
-	end)
-	self.uiEventListener:AddDrag(self.view.btn_close.gameObject, function
-	(args)
-		---@type UnityEngine.EventSystems.PointerEventData
-		local args=args
-		local vew=Vector3(args.position.x,args.position.y,0)
-		local worldPos= Tools.GetUICamera():ScreenToWorldPoint(vew)
-		self.view.btn_close.gameObject.transform.position=worldPos
-	end)
-	self.uiEventListener:AddEndDrag(self.view.btn_close.gameObject, function
-	(args)
-		---@type UnityEngine.EventSystems.PointerEventData
-		local args=args
-		local vew=Vector3(args.position.x,args.position.y,0)
-		
-		look("Tools.GetUICamera():",Tools.GetUICamera())
-		local worldPos= Tools.GetUICamera():ScreenToWorldPoint(vew)
-		self.view.btn_close.gameObject.transform.position=worldPos
-	end)
-	
-	self.uiEventListener:AddClick(self.view.btn_game001, function
+	self.uiEventListener:AddClick(self.view.btn_USDollarExpress, function
 	()
 		self.model:ReqEnterGame(GameConfig[GameNames.USDollarExpress].gameType)
 	end)
-	self.uiEventListener:AddClick(self.view.btn_game002, function
+	local isUp=false
+	self.isCanClickBtnArrow=true
+	self.uiEventListener:AddClick(self.view.btn_arrow, function
 	()
-		CtrlManager.SingleShow(CtrlNames.GameTemp1)
+		if not self.isCanClickBtnArrow then
+			return
+		end
+		self.isCanClickBtnArrow=false
+		isUp=not isUp
+		self:MoveBUttomDi(isUp)
 	end)
-
-	self.uiEventListener:AddClick(self.view.btn_game003, function
-	()
-
-	end)
-	self.uiEventListener:AddClick(self.view.btn_game004, function
-	()
-		CtrlManager.SingleShow(CtrlNames.BaccaratGame)
-	end)
-	self.view.tmp_sy.text=LocalManager.GetStrById(10001)
-
-	self.uiEventListener:AddClick(self.view.btn_quality1, function
-	()
-		logError("111111")
-		QualitySettings.SetQualityLevel(0,true)	
-	end)
-	self.uiEventListener:AddClick(self.view.btn_quality2, function
-	()
-		logError("222222")
-		QualitySettings.SetQualityLevel(1,true)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_quality3, function
-	()
-		logError("333333")
-		QualitySettings.SetQualityLevel(2,true)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_quality4, function
-	()
-		logError("444444")
-		QualitySettings.SetQualityLevel(3,true)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_quality5, function
-	()
-		CS.LanguageManager.Instance.Language="chinesesimplified"
-	end)
-	self.uiEventListener:AddClick(self.view.btn_quality6, function
-	()
-		CS.LanguageManager.Instance.Language="english"
-	end)
-	
-	self.uiEventListener:AddClick(self.view.btn_test, function
-	()
-		require("PlatformHall/UITestScroll/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.UITestScroll)
-	end)
-
 end
 
 ---移除UI事件
 function UIHallCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
-
 end
 
 --region UI事件方法
+function UIHallCtrl:MoveBUttomDi(isUp)
+	---@type DG.Tweening.Tween
+	local tw_img_buttom_di= self.view.img_buttom_di.transform:DOLocalMoveY(isUp and self.img_buttom_diMoveUpPosY or self.img_buttom_diMoveDownPosy,0.5)
+	tw_img_buttom_di.onComplete=function()
+		self.isCanClickBtnArrow=true
+		if isUp==true then
+			self.view.obj_two:SetActive(true)
+		end
+	end
+	if isUp==false then
+		self.view.obj_two:SetActive(false)
+	end
+	self.view.btn_arrow.transform.localScale =isUp and Vector3.New(1, -1, 1) or Vector3.New(1, 1, 1)
+	
+end
+
+
 
 --endregion
 

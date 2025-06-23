@@ -16,6 +16,7 @@ end
 ---获取组件
 function USDollarExpressSelectView:InitComponents()
     self.tmp_loading=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_loading");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close")
 end
 
 function USDollarExpressSelectView:InitSelect()

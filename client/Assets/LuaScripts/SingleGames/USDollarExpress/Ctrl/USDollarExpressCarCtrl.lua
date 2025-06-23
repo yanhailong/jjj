@@ -22,11 +22,15 @@ function USDollarExpressCarCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
 	self.trainInfoList=args
+	
+	
 	look("拉火车数据",self.trainInfoList)
 end
 
 ---初始化数据
 function USDollarExpressCarCtrl:InitData()
+	---@type Queue
+	self.CarQueue=Queue.New()
 	self:InitCars()
 end
 
@@ -57,7 +61,7 @@ function USDollarExpressCarCtrl:Move()
 		logError("移动完毕")
 		---@type UnityEngine.GameObject
 		local obj= self.allItems[self.curMoveIndex]
-		obj.transform:DOScale(1.5, 0.1)
+		obj.transform:DOScale(1.1, 0.2)
 		self.curMoveIndex=self.curMoveIndex+1
 		if self.curMoveIndex<=self.maxMoveIndex then
 			self:Move()

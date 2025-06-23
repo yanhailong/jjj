@@ -12,7 +12,7 @@ function UIHallModel:Awake()
 end
 
 function UIHallModel:Close()
-    self.super.Close(self);
+	self.super.Close(self);
 end
 
 function UIHallModel:AddEvent()
@@ -37,7 +37,7 @@ function UIHallModel:ResChooseGame(msg)
 		require(GameConfig[GameNames.USDollarExpress].Manager)
 		CtrlManager.SingleShow(CtrlNames.USDollarExpressSelect,msg)
 	end
-	 
+
 
 
 end

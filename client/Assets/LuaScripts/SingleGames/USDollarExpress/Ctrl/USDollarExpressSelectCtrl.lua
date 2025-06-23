@@ -54,8 +54,10 @@ end
 
 ---添加UI事件
 function USDollarExpressSelectCtrl:AddUIEvent()
-
-end
+	self.uiEventListener:AddClick(self.view.btn_close,function()
+		self:Close()
+	end)
+end	
 
 ---移除UI事件
 function USDollarExpressSelectCtrl:RemoveEvent()
