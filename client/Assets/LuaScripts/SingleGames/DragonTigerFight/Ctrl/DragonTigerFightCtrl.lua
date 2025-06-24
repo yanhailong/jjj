@@ -62,6 +62,19 @@ function DragonTigerFightCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.heClickArea,function(obj)
 		self:OnClickCenterYaZhuSide(obj)
 	end)
+
+	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
+		---测试
+		GlobalEvent.Notify("UPDATE_PLAYER",{})
+		TimerManager.StartTimer(self, function
+		()
+			GlobalEvent.Notify("XIAZHU",{})
+		end, 0.2, 30, true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
+		---测试
+		GlobalEvent.Notify("XIAZHU_END",{})
+	end)
 end
 
 ---中心下注区域
