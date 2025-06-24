@@ -67,19 +67,27 @@ end
 ---中心下注区域
 function DragonTigerFightCtrl:OnClickCenterYaZhuSide(obj)
 	look("点击了下注节点：",obj)
-	config.selfDiZhuNums[config.dizhuIndex] = config.selfDiZhuNums[config.dizhuIndex] + config.dizhuNumArr[config.dizhuIndex]
+
 	if obj.name == self.view.longClickArea.name then
 		look("下注了龙:",config.dizhuNumArr[config.dizhuIndex])
+		self:XiaZhu(1)
 		self.view:PayXiaZhuCoinFly(1)
 	end
 	if obj.name == self.view.huClickArea.name then
 		look("下注了虎:",config.dizhuNumArr[config.dizhuIndex])
+		self:XiaZhu(2)
 		self.view:PayXiaZhuCoinFly(2)
 	end
 	if obj.name == self.view.heClickArea.name then
 		look("下注了和:",config.dizhuNumArr[config.dizhuIndex])
+		self:XiaZhu(3)
 		self.view:PayXiaZhuCoinFly(3)
 	end
+end
+
+function DragonTigerFightCtrl:XiaZhu(index)
+	config.selfDiZhuNums[index] = config.selfDiZhuNums[index] + config.dizhuNumArr[config.dizhuIndex]
+	config.totalDiZhuNums[index] = config.totalDiZhuNums[index] + config.dizhuNumArr[config.dizhuIndex]
 end
 ---
 function DragonTigerFightCtrl:InitChipINof()

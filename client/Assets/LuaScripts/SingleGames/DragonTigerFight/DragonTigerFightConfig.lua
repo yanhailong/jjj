@@ -16,4 +16,5 @@ this.allow = true
 ---当前总底注
 this.totalDiZhuNums = {0,0,0}
 this.selfDiZhuNums = {0,0,0}
+
 return this

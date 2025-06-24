@@ -5,8 +5,7 @@
 ---@class DragonTigerFightView:BaseView
 local DragonTigerFightView=Class("DragonTigerFightView",BaseView)
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
-local coinFlyAnim = require("SingleGames/DragonTigerFight/View/CoinFlyAnimation")
-
+local coinFlyAnim = require("SingleGames/DragonTigerFight/View/PlayCoin")
 ---初始化panel
 function DragonTigerFightView:InitView()
 	---@type DragonTigerFightCtrl
@@ -91,17 +90,18 @@ end
 ---下注动画
 function DragonTigerFightView:PayXiaZhuCoinFly(index)
     coinFlyAnim:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.btn_players.transform.position,self.xiazhuStarAreas[index])
-    self.xiazhuSelfNumsLabels[index].GameObject.transform.parent.gameObject:SetActive(true)
-    self.xiazhuNumLabels[index].GameObject.transform.parent.gameObject:SetActive(true)
-    self.xiazhuSelfNumsLabels[index].SetText(config.selfDiZhuNums[config.dizhuIndex])
-    self.xiazhuNumLabels[index].SetText(config.totalDiZhuNums[config.dizhuIndex])
+    look("下注动画"..index)
+    self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(true)
+    self.xiazhuNumLabels[index].transform.parent.gameObject:SetActive(true)
+    self.xiazhuSelfNumsLabels[index].text = config.selfDiZhuNums[index]
+    self.xiazhuNumLabels[index].text = config.totalDiZhuNums[index]
 end
 
 ---初始界面
 function DragonTigerFightView:InitUI()
     for i=1,3 do
-        self.xiazhuSelfNumsLabels[i].gameObject.transform.parent.gameObject:SetActive(false)
-        self.xiazhuNumLabels[i].gameObject.transform.parent.gameObject:SetActive(false)
+        self.xiazhuSelfNumsLabels[i].transform.parent.gameObject:SetActive(false)
+        self.xiazhuNumLabels[i].transform.parent.gameObject:SetActive(false)
     end
 end
 ---初始化View数据

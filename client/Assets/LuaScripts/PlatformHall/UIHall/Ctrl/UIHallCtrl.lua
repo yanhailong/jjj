@@ -6,6 +6,7 @@
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
 require("SingleGames/Baccarat/MVCHead")
 require("Logic/Config/HallConfig")
+require("SingleGames/DragonTigerFight/MVCHead")
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -44,6 +45,10 @@ function UIHallCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_Baccarat, function
 	()
 		CtrlManager.SingleShow(CtrlNames.BaccaratGame)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_LongHuDou, function
+	()
+		CtrlManager.SingleShow(CtrlNames.DragonTigerFight)
 	end)
 	local isUp=false
 	self.isCanClickBtnArrow=true
