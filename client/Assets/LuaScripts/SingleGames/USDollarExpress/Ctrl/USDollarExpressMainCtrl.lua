@@ -126,11 +126,12 @@ function USDollarExpressMainCtrl:ReSetData()
 	---默认都转3圈结束转动
 	self.rollCircles={}
 	for i = 1,5 do
-		if i==5 then
-			self.rollCircles[i] = 15
-		else
-			self.rollCircles[i] = 3+i
-		end
+		--if i==5 then
+		--	self.rollCircles[i] = 15
+		--else
+		--	self.rollCircles[i] = 3+i
+		--end
+		self.rollCircles[i] = 3+i
 	end
 
 	if self.lineShowCor~=nil then

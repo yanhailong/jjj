@@ -172,7 +172,7 @@ public class PreLoading
         private Text txt_version;
         private Text txt_por;
         private Text txt_desc;
-        private Slider sli_por;
+        private Image sli_por;
         private Transform trans;
         private GameObject obj_bottomSilder;
         private Transform obj_tipsPanel;
@@ -184,7 +184,7 @@ public class PreLoading
             txt_version = trans.Find("txt_version").GetComponent<Text>();
             txt_desc = trans.Find("bottom/txt_desc").GetComponent<Text>();
             txt_por = trans.Find("bottom/txt_por").GetComponent<Text>();
-            sli_por = trans.Find("bottom/sli_por").GetComponent<Slider>();
+            sli_por = trans.Find("bottom/sli_por/img_fill").GetComponent<Image>();
             obj_bottomSilder = panel.Find("bottom").gameObject;
             obj_tipsPanel = trans.Find("tipsPanel");
             isGetComponentSuccess = true;
@@ -211,7 +211,7 @@ public class PreLoading
         {
             if (!this.isGetComponentSuccess)
                 return;
-            this.sli_por.value = v;
+            this.sli_por.fillAmount = v;
             this.txt_por.text = (v * 100).ToString("F1") + "%";
         }
         public Transform GetTipsPanel()

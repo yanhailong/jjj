@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-05-28 10:26:55
+---DateTime: 2025-06-24 15:49:59
 ---
 ---@class UILoginView:BaseView
 local UILoginView=Class("UILoginView",BaseView)
@@ -14,14 +14,16 @@ end
 
 ---获取组件
 function UILoginView:InitComponents()
-    self.tmp_login=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_login");
-    self.btn_login=ComponentUtilGet.Button(self.transform,"content/btn_login");
+    self.btn_phone=ComponentUtilGet.Button(self.transform,"content/btn_phone");
+    self.btn_google=ComponentUtilGet.Button(self.transform,"content/btn_google");
+    self.btn_youke=ComponentUtilGet.Button(self.transform,"content/btn_youke");
 end
 
 ---清空组件
 function UILoginView:ClearComponents()
-    self.tmp_login=nil;
-    self.btn_login=nil;
+    self.btn_phone=nil;
+    self.btn_google=nil;
+    self.btn_youke=nil;
 end
 
 ---初始化View数据

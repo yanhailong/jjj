@@ -37,11 +37,18 @@ end
 
 ---添加UI事件
 function UILoginCtrl:AddUIEvent()
-	self.view.btn_login.gameObject:SetActive(false)
-	self.uiEventListener:AddClick(self.view.btn_login.gameObject, function
+	self.uiEventListener:AddClick(self.view.btn_youke, function
 	()
-		SuspensionTipsUtil.SuspensionTips("请求登录！")
 		self:ReqLogin()
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_google, function
+	()
+		SuspensionTipsUtil.SuspensionTips("暂未开放！")
+	end)
+	self.uiEventListener:AddClick(self.view.btn_phone, function
+	()
+		SuspensionTipsUtil.SuspensionTips("暂未开放！")
 	end)
 	
 end
@@ -54,7 +61,6 @@ end
 function UILoginCtrl:InitLogin(serverInfo)
 	look("收到服务器信息",serverInfo)
 	self.serverInfo=serverInfo.data
-	self.view.btn_login.gameObject:SetActive(true)
 	self:CreateSocket()
 	
 end
@@ -62,6 +68,7 @@ function UILoginCtrl:CreateSocket()
 	local uri=self.serverInfo.gameserver
 	log("uri:"..uri)
 	WebNetworkManager.CreateWebSocket(uri)
+	
 end
 
 ---请求登录

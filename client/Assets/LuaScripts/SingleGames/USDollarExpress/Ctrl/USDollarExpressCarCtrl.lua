@@ -6,6 +6,8 @@
 local USDollarExpressCarCtrl=Class("USDollarExpressCarCtrl",BaseCtrl)
 ---@type USDollarExpressConfig
 local config=require("SingleGames/USDollarExpress/USDollarExpressConfig")
+---@type USDollarExpressTrainItem
+local USDollarExpressTrainItem=require("SingleGames/USDollarExpress/Ctrl/USDollarExpressTrainItem")
 
 ---构造函数
 function USDollarExpressCarCtrl:ctor(ctrlName,param)
@@ -66,21 +68,24 @@ function USDollarExpressCarCtrl:Move()
 	self.tweener:SetEase(DG.Tweening.Ease.Linear);
 	self.tweener.onComplete=function()
 		logError("移动完毕")
-		---@type UnityEngine.GameObject
-		local obj= self.allItems[self.curMoveIndex]
-		obj.transform:DOScale(1.1, 0.2)
-		self.curMoveIndex=self.curMoveIndex+1
-		if self.curMoveIndex<=self.maxMoveIndex then
-			self:Move()
-		else
-			CorManager.StartCor(self,function
-			()
+		CorManager.StartCor(self, function
+		()
+			---@type USDollarExpressTrainItem
+			local item= self.allItems[self.curMoveIndex]
+			item:DOPlayerAni()
+			coroutine.wait(0.05)
+			self.curMoveIndex=self.curMoveIndex+1
+			if self.curMoveIndex<=self.maxMoveIndex then
+				self:Move()
+			else
 				logError("当前火车移动完毕！！")
 				coroutine.wait(2)
 				self:InitCars()
-			end)
-			
-		end
+
+			end
+		end)
+		
+
 	end
 end
 
@@ -109,13 +114,15 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 	for i = 1, #goldList do
 		self.objPools:SpawnPrefab(function
 		(card)
+			---@type USDollarExpressTrainItem
+			local item=USDollarExpressTrainItem.New(card,self)
 			card:SetActive(true)
 			card.transform:SetParent(self.view.trans_root)
 			card.transform.localPosition = Vector3.New(i* -self.WidthSpace, 0, 0) -- 设置slotItem的位置
 			card.transform.localScale = Vector3.one
-			ComponentUtilGet.TextMeshProUGUI(card.transform,"tmp_value").text=tostring(goldList[i])
 			card.name = tostring(i)
-			self.allItems[i]=card
+			item:SetText(goldList[i])
+			self.allItems[i]=item
 		end, config.ABNames.train, config.GetTrainItemByType(carType), self.view.trans_root)
 	end
 
@@ -125,6 +132,11 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 	
 end
 
+function USDollarExpressCarCtrl:Settmp_value(num)
+	local curNum=tonumber(self.view.tmp_value.text)
+	local nextNum=curNum+num
+	self.view.tmp_value.text=tostring(nextNum)
+end
 
 function USDollarExpressCarCtrl:Close()
     self.super.Close(self);
