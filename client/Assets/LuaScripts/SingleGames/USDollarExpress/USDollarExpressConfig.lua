@@ -29,6 +29,35 @@ this.gameState={
 }
 this.curGameState=this.gameState.Normal;
 
+---@火车颜色
+this.TrainColorType={
+    GreenTrain=10,--绿车
+    BlueTrain=11,--蓝车
+    VioletTrain=12,--紫车
+    RedTrain=13,--红车
+    GoldTrain=14,--金车
+}
+---@return string
+function this.GetTrainItemByType(colorType)
+    if colorType==this.TrainColorType.GreenTrain then
+        return "train_green"
+    end
+    if colorType==this.TrainColorType.BlueTrain then
+        return "train_blue"
+    end
+    if colorType==this.TrainColorType.VioletTrain then
+        return "train_violet"
+    end
+    if colorType==this.TrainColorType.RedTrain then
+        return "train_red"
+    end
+    if colorType==this.TrainColorType.GoldTrain then
+        return "train_gold"
+    end
+end 
+
+
+
 
 this.rollTime={
     dropTime={--下落总时间
@@ -49,6 +78,7 @@ this.rollTime={
 
 this.ABNames={
     icon="SingleGames/GameTemp1/alats/icons",--icon
+    train="SingleGames/USDollarExpress/prefabs/train"--火车
 }
 
 

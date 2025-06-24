@@ -254,6 +254,7 @@ end
 ---移除UI事件
 function BaccaratGameCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
+	TimerManager.StopAllTimer(self)
 end
 
 --region UI事件方法

@@ -19,8 +19,6 @@ function USDollarExpressCarView:InitComponents()
     self.tmp_value=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_value");
     
     self.btn_skip=ComponentUtilGet.Button(self.transform,"content/btn_skip")
-    self.objCar=ComponentUtilGet.GameObject(self.transform,"content/trans_root/car")
-    self.objCar:SetActive(false)
 end
 
 ---清空组件
