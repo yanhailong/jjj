@@ -21,13 +21,10 @@ end
 function UILoginCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	--self.model:Login()
+	self.model:Login()
 	
 	---@type ObjectPoolUtil
 	self.pool=ObjectPoolUtil.New(self.ctrlName)
-
-	require("SingleGames/DragonTigerFight/MVCHead")
-	CtrlManager.SingleShow(CtrlNames.DragonTigerFight)
 end
 
 function UILoginCtrl:InitData()
