@@ -20,27 +20,26 @@ function XiaoLuItem:ResetInfo()
     self.Hu:SetActive(false)
 end
 
-function XiaoLuItem:UpdateInfo(data, isMove, enable)
-    if data == nil then
+function XiaoLuItem:UpdateInfo(side, showFade)
+    if side == nil then
         self:ResetInfo()
     else
         self:ResetInfo()
         local activeObj = nil
-
-        self.infoData = data
-        if data.win_side == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG then      --龍win
+        
+        if side == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG then      --龍win
             self.Long:SetActive(true)
-            if isMove then
+            if showFade then
                 activeObj = self.Long
             end
-        elseif data.win_side == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then  --虎win
+        elseif side == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then  --虎win
             self.Hu:SetActive(true)
-            if isMove then
+            if showFade then
                 activeObj = self.Hu
             end
         end
 
-        if isMove and activeObj and enable then
+        if showFade and activeObj then
             Tools.StopTweeners(self.tweenTable)
             self.tweenTable = nil
             self.tweenTable = Tools.FadeParentAndChild(activeObj,config.fadeTime,config.fadeTimes)

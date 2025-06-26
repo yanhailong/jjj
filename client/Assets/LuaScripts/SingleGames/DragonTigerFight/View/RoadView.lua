@@ -81,7 +81,7 @@ function RoadView:ctor(go)
     self.xiaoLuPrefab=ComponentUtilGet.GameObject(self.transform,"XiaoLuScroll/Viewport/item/xiaolu")
     ---@type XiaoLuItem[]
     self.xiaoLuItems={}
-    self.xiaoLuNums=0
+    self.xiaoLuRecods={}
     for i=1,144 do
         local go = GameObject.Instantiate(self.xiaoLuPrefab)
         go.transform:SetParent(self.xiaoLuScrollContent,false)
@@ -94,7 +94,7 @@ function RoadView:ctor(go)
     self.yueYouLuPrefab=ComponentUtilGet.GameObject(self.transform,"YueYouLu/Viewport/item/yueyoulu")
     ---@type YueYouLuItem[]
     self.yueYouLuItems={}
-    self.yueYouLuNums=0
+    self.yueYouLuRecods={}
     for i=1,144 do
         local go = GameObject.Instantiate(self.yueYouLuPrefab)
         go.transform:SetParent(self.yueYouLuScrollContent,false)
@@ -110,6 +110,11 @@ function RoadView:ResetAllInfo()
     self.huWinNum.text=0
     self.heWinNum.text=0
     self.totalNum.text=0
+
+    self.longTotal = 0
+    self.huTotal = 0
+    self.heTotal = 0
+    self.count = 0
     
     for i=1,#self.zhuPanItems do
         self.zhuPanItems[i]:ResetInfo()
@@ -121,19 +126,27 @@ function RoadView:ResetAllInfo()
     self.daLuRecods={}
     
     for i=1,#self.zhiLuItems do
-        self.daLuItems[i]:ResetInfo()
+        self.zhiLuItems[i]:ResetInfo()
     end
     self.zhiLuRecods={}
     
     for i=1,#self.xiaoLuItems do
         self.xiaoLuItems[i]:ResetInfo()
     end
-    self.xiaoLuNums=0
+    self.xiaoLuRecods={}
     
     for i=1,#self.yueYouLuItems do
         self.yueYouLuItems[i]:ResetInfo()
     end
-    self.yueYouLuNums=0
+    self.yueYouLuRecods={}
+end
+
+function RoadView:Show()
+    self.gameObject:SetActive(false)
+end
+
+function RoadView:Hiden()
+    self.gameObject:SetActive(true)
 end
 
 function RoadView:UpdatePanelInfo(data,showFade)
@@ -152,6 +165,7 @@ function RoadView:UpdatePanelInfo(data,showFade)
     self:UpdateXiaoLuInfo()
     self:UpdateYueYouLuInfo()
     self:UpdateYuCeInfo()
+    self:UpdateRightTotalInfo()
 end
 
 function RoadView:UpdateZhuPianInfo()
@@ -198,93 +212,256 @@ function RoadView:UpdateDaLuInfo()
         end
     end
     look(self.daLuRecods)
-    
+
     ---更新UI
-    local rowCount = #self.daLuRecods
-    ---L型导致扩列的情况判断
-    local maxRowCount = rowCount
-    for i=1,rowCount do
-        maxRowCount = math.max(i+#self.daLuRecods[i]%6, maxRowCount)
+    if self.daLuRecods then
+        self:UpdateRightGridView(self.daLuItems,self.daLuRecods)
     end
-    
-    if maxRowCount>24 then
-        local prev=maxRowCount-24
-        for i=1,rowCount do
-            local colCount = #self.daLuRecods[i]
-            for c=1,colCount do
-                local data = self.daLuRecods[i][c]
-                if i>prev then
-                    if c>6 then
-                        ---L型显示
-                        local index = (i+c-6-prev)*6
-                        self.daLuItems[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
-                    else
-                        ---跳过右移的数据
-                        local index = (i-prev-1)*6+c
-                        self.daLuItems[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
-                    end
-                elseif c>6 and (i+c-6)>prev then
-                    ---被移动隐藏的L是否在显示的列里面
-                    local index = (i+c-6-prev)*6
-                    self.daLuItems[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
-                end
-            end
-        end
-    else
-        for i=1,rowCount do
-            local colCount = #self.daLuRecods[i]
-            for c=1,colCount do
-                local data = self.daLuRecods[i][c]
-                if c>6 then
-                    ---L型显示
-                    local index = (i+c-6)*6
-                    self.daLuItems[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
-                else
-                    local index = (i-1)*6+c
-                    self.daLuItems[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)     
-                end
-            end
-        end
+    if true then
+        return
     end
 end
 
+---规则
+---当第二列第二行出现子或者第三列第一行出现子开始分析
+---非第一列通过比较对应前一行前一列和前一例同行的数据是否都有数据或没有数据
+---第一例的比较 前两列数据数目相等
 function RoadView:UpdateZhiLuInfo()
     ---大眼子路数据处理
-    self.zhiLuRecods={}
-
-
+    self.zhiLuRecods=self:CacRightChildRoadData(2)
     ---更新UI
-    local rowCount = #self.zhiLuRecods
-    if rowCount>24 then
-        local prev=math.ceil((total-48)/6)*6
-    else
-        for i=1,rowCount do
-            local colCount = #self.zhiLuRecods[i]
-            for c=1,colCount do
-                local side = self.zhiLuRecods[i][c]
-                if c>6 then
-                    ---L型显示
-                    local index = (i-1)*6+6+(c-6)*6
-                    self.zhiLuItems[index]:UpdateInfo(side,self.ShowFade and rowCount==i and c==colCount)
-                else
-                    local index = (i-1)*6+c
-                    self.zhiLuItems[index]:UpdateInfo(side,self.ShowFade and rowCount==i and c==colCount)
-                end
-            end
-        end
+    if self.zhiLuRecods then
+        self:UpdateRightGridView(self.zhiLuItems,self.zhiLuRecods)
     end
 end
 
 function RoadView:UpdateXiaoLuInfo()
-
+    ---小路数据处理
+    self.xiaoLuRecods=self:CacRightChildRoadData(3)
+    ---更新UI
+    if self.xiaoLuRecods then
+        self:UpdateRightGridView(self.xiaoLuItems,self.xiaoLuRecods)
+    end
 end
 
 function RoadView:UpdateYueYouLuInfo()
-
+    ---曱甴路数据处理
+    self.yueYouLuRecods=self:CacRightChildRoadData(4)
+    ---更新UI
+    if self.yueYouLuRecods then
+        self:UpdateRightGridView(self.yueYouLuItems,self.yueYouLuRecods)
+    end
 end
 
-function RoadView:UpdateYuCeInfo()
+---处理右侧子路数据 【大眼子路、小路、曱甴路】
+function RoadView:CacRightChildRoadData(move)
+    local recods = {}
+    local index = 0
+    local side = 0
+    local old = 0
+    local before = move-1
+    ---排除没有达到触发条件的更新
+    if self.daLuRecods and #self.daLuRecods<move or (#self.daLuRecods<move+1 and #self.daLuRecods[move]<2) then
+        return nil
+    end
+
+    for i=move, #self.daLuRecods do
+        for c=1, #self.daLuRecods[i] do
+            if i>move then
+                if c==1 then
+                    if #self.daLuRecods[i-1] ~= #self.daLuRecods[i-move] then
+                        --无规则
+                        side = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO
+                    else
+                        --有规则
+                        side = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES
+                    end
+                else
+                    --都无数据或数据相等
+                    if self.daLuRecods[i-before][c] == nil and self.daLuRecods[i-before][c-1] ~= nil then
+                        --无规则
+                        side = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO
+                    else
+                        --有规则
+                        side = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES
+                    end
+                end
+
+                if side~=old then
+                    index = index+1
+                    recods[index] = {}
+                end
+                old = side
+                table.insert(recods[index],side)
+
+            elseif #self.daLuRecods[i-before]>=2 and c>=2 then
+                if self.daLuRecods[i-before][c] == nil and self.daLuRecods[i-before][c-1] ~= nil then
+                    --无规则
+                    side = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO
+                else
+                    --有规则
+                    side = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES
+                end
+
+                if side~=old then
+                    index = index+1
+                    recods[index] = {}
+                end
+                old = side
+                table.insert(recods[index],side)
+            end
+        end
+    end
     
+    return recods
+end
+
+---更新右侧各路信息 【大路、大眼子路、小路、曱甴路】
+function RoadView:UpdateRightGridView(items,recods)
+    ---更新UI
+    local rowCount = #recods
+    ---L型导致扩列的情况判断
+    local maxRowCount = rowCount
+    for i=1,rowCount do
+        local row = i
+        if #recods[i]>6 then
+            row = i+#recods[i]-6
+        end
+        maxRowCount = math.max(row, maxRowCount)
+    end
+
+    if maxRowCount>24 then
+        local prev=maxRowCount-24
+        for i=1,rowCount do
+            local colCount = #recods[i]
+            for c=1,colCount do
+                local data = recods[i][c]
+                if i>prev then
+                    if c>6 then
+                        ---L型显示
+                        local index = (i+c-6-prev)*6
+                        items[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
+                    else
+                        ---跳过右移的数据
+                        local index = (i-prev-1)*6+c
+                        items[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
+                    end
+                elseif c>6 and (i+c-6)>prev then
+                    ---被移动隐藏的L是否在显示的列里面
+                    local index = (i+c-6-prev)*6
+                    items[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
+                end
+            end
+        end
+    else
+        for i=1,rowCount do
+            local colCount = #recods[i]
+            for c=1,colCount do
+                local data = recods[i][c]
+                if c>6 then
+                    ---L型显示
+                    local index = (i+c-6)*6
+                    items[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
+                else
+                    local index = (i-1)*6+c
+                    items[index]:UpdateInfo(data,self.ShowFade and rowCount==i and c==colCount)
+                end
+            end
+        end
+    end
+end
+
+---更新预测信息
+function RoadView:UpdateYuCeInfo()
+    self:YuCeNextValue(self.nextLong,DRAGON_TIGER_FIGHT_WIN_SIDE.LONG)
+    self:YuCeNextValue(self.nextHu,DRAGON_TIGER_FIGHT_WIN_SIDE.HE)
+end
+
+---预测数据计算
+function RoadView:YuCeNextValue(yuceItems,winType)
+    local DaYanValue = nil
+    local XiaoLuValue = nil
+    local YueYouValue = nil
+
+    if self.zhiLuRecods and #self.zhiLuRecods>0 then
+        --有大眼 才有其他路
+        if self.daLuRecods and self.daLuRecods[#self.daLuRecods][1][1] == winType then
+            local count = #self.daLuRecods
+            local col = #self.daLuRecods[#self.daLuRecods]
+            if self.daLuRecods[count -1][col]~= nil and  self.daLuRecods[count -1][col +1]==nil then
+                DaYanValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+            else
+                DaYanValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+            end
+
+            if self.xiaoLuRecods and #self.xiaoLuRecods > 0 and #self.xiaoLuRecods[1]>0 then
+                if self.daLuRecods[count -2][col]~= nil and  self.daLuRecods[count -2][col +1]==nil then
+                    XiaoLuValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+                else
+                    XiaoLuValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+                end
+            end
+
+            if self.yueYouLuRecods and #self.yueYouLuRecods>0 and #self.yueYouLuRecods[1]>0 then
+                if self.daLuRecods[count -3][col]~= nil and  self.daLuRecods[count -3][col +1]==nil then
+                    YueYouValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+                else
+                    YueYouValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+                end
+            end
+        elseif self.daLuRecods[#self.daLuRecods].side ~= DRAGON_TIGER_FIGHT_WIN_SIDE.HE then
+            local cont = #self.daLuRecods
+            if #self.daLuRecods[cont] ~= #self.daLuRecods[cont -1] then
+                DaYanValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+            else
+                DaYanValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+            end
+
+            if self.xiaoLuRecods and #self.xiaoLuRecods > 0 and #self.xiaoLuRecods[1]>0 then
+                if #self.daLuRecods[cont] ~= #self.daLuRecods[cont -2] then
+                    XiaoLuValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+                else
+                    XiaoLuValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+                end
+            end
+
+            if self.yueYouLuRecods and #self.yueYouLuRecods>0 and #self.yueYouLuRecods[1]>0 then
+                if #self.daLuRecods[cont] ~= #self.daLuRecods[cont -3] then
+                    YueYouValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.YES 
+                else
+                    YueYouValue = DRAGON_TIGER_FIGHT_ROAD_SIDE.NO 
+                end
+            end
+        end
+    end
+
+    yuceItems.zilu:UpdateInfo(DaYanValue)
+    yuceItems.xiaolu:UpdateInfo(XiaoLuValue)
+    yuceItems.yueyoulu:UpdateInfo(YueYouValue)
+end
+
+---更新右侧统计数信息
+function RoadView:UpdateRightTotalInfo()
+    ---数据统计
+    self.longTotal = 0
+    self.huTotal = 0
+    self.heTotal = 0
+    self.count = #self.RoadHistoryRecord
+    
+    for i=1,self.count do
+        if self.RoadHistoryRecord[i].win_side == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG then
+            self.longTotal = self.longTotal+1
+        elseif self.RoadHistoryRecord[i].win_side == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
+            self.huTotal = self.huTotal+1
+        else
+            self.heTotal = self.heTotal+1
+        end
+    end
+    ---更新UI
+    self.longWinNum.text=self.longTotal
+    self.huWinNum.text=self.huTotal
+    self.heWinNum.text=self.heTotal
+    self.totalNum.text=self.count
 end
 
 return RoadView

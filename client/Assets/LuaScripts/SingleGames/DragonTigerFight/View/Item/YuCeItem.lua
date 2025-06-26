@@ -27,7 +27,7 @@ function YuCeItem:UpdateInfo(side)
         self:ResetInfo()
 
         self.side = side
-        if side == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG then      --龍win
+        if side == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG then    --龍win
             self.Long:SetActive(true)
         elseif side == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then  --虎win
             self.Hu:SetActive(true)

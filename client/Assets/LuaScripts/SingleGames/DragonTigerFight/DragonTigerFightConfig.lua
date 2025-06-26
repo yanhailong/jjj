@@ -28,4 +28,9 @@ DRAGON_TIGER_FIGHT_WIN_SIDE = {
     HE = 3
 }
 
+DRAGON_TIGER_FIGHT_ROAD_SIDE = {
+    YES = 2,
+    NO = 1
+}
+
 return this

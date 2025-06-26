@@ -50,6 +50,8 @@ function DragonTigerFightCtrl:AddUIEvent()
 				self.view:ChangeDiZhu(i)
 				config.dizhuIndex = i
 				look("btn 抵住数值"..config.dizhuNumArr[config.dizhuIndex])
+				---测试数据生成 龙虎和 对应前三个币
+				GlobalEvent.Notify("UPDATE_HIS_ITEMS",i)
 			end
 		end)
 	end
@@ -73,9 +75,9 @@ function DragonTigerFightCtrl:AddUIEvent()
 		end, 0.2, 30, true)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
+		CtrlManager.SingleShow(CtrlNames.DragonTigerFightPlayerRank)
 		---测试
 		GlobalEvent.Notify("XIAZHU_END",{})
-		GlobalEvent.Notify("UPDATE_HIS_ITEMS",{})
 	end)
 end
 
