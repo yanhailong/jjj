@@ -1153,3 +1153,49 @@ function  this.numberToString(szNum)
     end
     return removeZero(szChMoney)
 end
+
+
+---关闭所有doteen
+function this.StopTweeners(tweenTable)
+    if tweenTable == nil then return end
+    for k,v in ipairs(tweenTable) do
+        v:Kill(false)
+    end
+end
+
+---透明父节点和子节点的Image和Text
+function this.FadeParentAndChild(parent,fadeTime,fadeTimes,startAlpha,endAlpha)
+    local _startAlpha = startAlpha or 1
+    local _endAlpha = endAlpha or 0
+    local allImages = parent:GetComponentsInChildren(typeof(UnityEngine.UI.Image));
+    local allText = parent:GetComponentsInChildren(typeof(UnityEngine.UI.Text));
+    local allComponents = {}
+    for i = 1,allImages.Length do
+        allImages[i-1].color = Color.New(allImages[i-1].color.r,allImages[i-1].color.g,allImages[i-1].color.b,_startAlpha)
+        table.insert(allComponents,allImages[i-1])
+    end
+    for i = 1, allText.Length do
+        allText[i-1].color = Color.New(allText[i-1].color.r,allText[i-1].color.g,allText[i-1].color.b,_startAlpha)
+        table.insert(allComponents,allText[i-1])
+    end
+    local allTweener = {}
+    for k,v in ipairs(allComponents) do
+        local sequence = nil
+        for i = 1,fadeTimes do
+            if sequence == nil then
+                sequence = DG.Tweening.DOTween.Sequence():Append(v:DOFade(_endAlpha, fadeTime)):Append(v:DOFade(_startAlpha, fadeTime))
+            else
+                sequence:Append(v:DOFade(_endAlpha, fadeTime)):Append(v:DOFade(_startAlpha, fadeTime))
+            end
+        end
+        sequence:OnComplete(function ()
+            if v then
+                v.color = Color.New(v.color.r, v.color.g, v.color.b, _startAlpha)
+            end
+            sequence:Kill(false)
+        end)
+        table.insert(allTweener,sequence)
+    end
+
+    return allTweener
+end

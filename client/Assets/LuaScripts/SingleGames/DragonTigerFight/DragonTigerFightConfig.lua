@@ -17,4 +17,15 @@ this.allow = true
 this.totalDiZhuNums = {0,0,0}
 this.selfDiZhuNums = {0,0,0}
 
+---闪烁时间
+this.fadeTime = 0.5
+---闪烁次数
+this.fadeTimes = 1
+
+DRAGON_TIGER_FIGHT_WIN_SIDE = {
+    LONG = 1,
+    HU = 2,
+    HE = 3
+}
+
 return this

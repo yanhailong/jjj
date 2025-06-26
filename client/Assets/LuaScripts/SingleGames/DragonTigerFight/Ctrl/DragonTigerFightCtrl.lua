@@ -36,6 +36,7 @@ function DragonTigerFightCtrl:Close()
     self.super.Close(self);
 end
 
+
 ---添加UI事件
 function DragonTigerFightCtrl:AddUIEvent()
 	--ObjectPoolUtil:SpawnPrefab()
@@ -61,6 +62,20 @@ function DragonTigerFightCtrl:AddUIEvent()
 	end)
 	self.uiEventListener:AddClick(self.view.heClickArea,function(obj)
 		self:OnClickCenterYaZhuSide(obj)
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
+		---测试
+		GlobalEvent.Notify("UPDATE_PLAYER",{})
+		TimerManager.StartTimer(self, function
+		()
+			GlobalEvent.Notify("XIAZHU",{})
+		end, 0.2, 30, true)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
+		---测试
+		GlobalEvent.Notify("XIAZHU_END",{})
+		GlobalEvent.Notify("UPDATE_HIS_ITEMS",{})
 	end)
 end
 
