@@ -14,3 +14,5 @@ CtrlNames.DragonTigerFightRule="DragonTigerFightRule";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule]={};
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].ctrl =require "SingleGames/DragonTigerFight/Ctrl/RuleCtrl";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].view=require "SingleGames/DragonTigerFight/View/RuleView";
+CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].model=require "SingleGames/DragonTigerFight/Model/RuleModel";
+

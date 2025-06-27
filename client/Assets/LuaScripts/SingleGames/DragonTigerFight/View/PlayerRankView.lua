@@ -46,9 +46,9 @@ function PlayerRankView:UpdateData(rankData)
 end
 
 ---关闭界面
-function PlayerRankView:Close()   
+function PlayerRankView:Close()
+    self.pool:DestroyAll()
     self.super.Close(self);
-    self.pool:Destory(self.name)
 end
 
 return PlayerRankView

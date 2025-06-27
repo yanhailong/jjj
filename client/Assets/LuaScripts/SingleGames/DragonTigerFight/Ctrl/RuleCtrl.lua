@@ -13,6 +13,8 @@ function RuleCtrl:ctor(ctrlName,param)
     self.super.ctor(self,ctrlName,param);
 	---@type RuleView
 	self.view = self.view
+	---@type RuleViewModel
+	self.model = self.model
 end
 
 ---初始化
@@ -32,7 +34,9 @@ end
 
 ---添加UI事件
 function RuleCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.btn_close,function()
+		self:Close()
+	end)
 end
 
 ---移除UI事件

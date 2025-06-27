@@ -9,6 +9,11 @@ local coinFlyAnim = require("SingleGames/DragonTigerFight/View/PlayCoin")
 local PlayerItem = require("SingleGames/DragonTigerFight/View/Item/PlayerItem")
 local ClockStateItem = require("SingleGames/DragonTigerFight/View/Item/ClockState")
 local RoadView = require("SingleGames/DragonTigerFight/View/RoadView")
+local CardItem = require("SingleGames/DragonTigerFight/View/Item/CardItem")
+local DOTween = CS.DG.Tweening.DOTween
+local Sequence = CS.DG.Tweening.Sequence
+local Ease = CS.DG.Tweening.Ease
+
 ---初始化panel
 function DragonTigerFightView:InitView()
 	---@type DragonTigerFightCtrl
@@ -19,8 +24,8 @@ end
 
 ---获取组件
 function DragonTigerFightView:InitComponents()
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/top/btn_close");
     self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
+    self.btn_2=ComponentUtilGet.Button(self.transform,"content/top/btn_2")
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/buttom/btn_repeat");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/buttom/btn_players");
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/buttom/dizhu");
@@ -72,19 +77,44 @@ function DragonTigerFightView:InitComponents()
         self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(ComponentUtilGet.GameObject(self.transform,rightPath..i))
     end
     self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
-    ---时钟状态提示
-    self.clockStateTips = ComponentUtilGet.GameObject(self.transform,"content/center/XiaZhu/clockStateTips")
-    ClockStateItem.New(self.clockStateTips)
-    self.centerTips = ComponentUtilGet.GameObject(self.transform,"content/center/XiaZhu/centerTips")
-    self.timeStartObj = ComponentUtilGet.GameObject(self.centerTips.transform,"timeStart")
-    self.timeStart = ComponentUtilGet.TextMeshProUGUI(self.timeStartObj.transform,"Timer/LeftTime")
-    self.timeStartBg = ComponentUtilGet.GameObject(self.timeStartObj.transform,"Timer/Bg")
-    self.timeStartLockAnim = ComponentUtilGet.GameObject(self.timeStartObj.transform,"Timer/LockAnim")
-    self.startXiaZhuTips = ComponentUtilGet.GameObject(self.centerTips.transform,"startXiaZhuTips")
-    self.endXiaZhuTips = ComponentUtilGet.GameObject(self.centerTips.transform,"endXiaZhuTips")
+    ---提示信息
+    self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
+    self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_end")
+    self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_xiazhu")
+    self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
+    
+    self.tipsCenterTxt = ComponentUtilGet.TextMeshProUGUI(self.tipsTrs,"tips_center/tips_center_txt")
+    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
+    self.colockStateTimeNum=ComponentUtilGet.TextMeshProUGUI(self.colockStateTimeTrs,"time") --倒计时
+    
+    self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
+    
     ---路单信息
     ---@type RoadView
     self.roadView=RoadView.New(ComponentUtilGet.GameObject(self.transform,"Background/RoadView"))
+    ---设置按钮
+    self.muenRect=ComponentUtilGet.RectTransform(self.transform,"content/setting/mask/muen")
+    self.btn_setting=ComponentUtilGet.Button(self.muenRect,"btn_setting")
+    self.btn_help=ComponentUtilGet.Button(self.muenRect,"btn_help")
+    self.btn_close=ComponentUtilGet.Button(self.muenRect,"btn_close")
+    self.btn_muen=ComponentUtilGet.Button(self.transform,"content/setting/btn_muen")
+    self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch")
+    ---结果信息
+    self.effectsTrs=ComponentUtilGet.Transform(self.transform,"content/effects")
+    self.resultTrs=ComponentUtilGet.Transform(self.effectsTrs,"resoult")
+    self.resultWinTrs=ComponentUtilGet.Transform(self.resultTrs,"win")
+    ---@type CardItem
+    self.resultCard1=CardItem.New(ComponentUtilGet.GameObject(self.resultTrs,"card/left"))
+    ---@type CardItem
+    self.resultCard2=CardItem.New(ComponentUtilGet.GameObject(self.resultTrs,"card/right"))
+    self.ctr_dot_p1=ComponentUtilGet.Transform(self.effectsTrs,"dot/p1")
+    self.ctr_dot_p2=ComponentUtilGet.Transform(self.effectsTrs,"dot/p2")
+
+    self.startTrs=ComponentUtilGet.Transform(self.effectsTrs,"start")
+    self.startLeftTrs=ComponentUtilGet.Transform(self.startTrs,"left")
+    self.startRightTrs=ComponentUtilGet.Transform(self.startTrs,"right")
+    self.startVsTrs=ComponentUtilGet.Transform(self.startTrs,"vs")
+    self.startVsImg=ComponentUtilGet.Image(self.startVsTrs)
     
 end
 
@@ -203,10 +233,163 @@ function DragonTigerFightView:InitUI()
     
     ---路单数据
     self.RoadHistoryRecord = nil
+    
+    self.startTrs.gameObject:SetActive(false)
+    self.resultTrs.gameObject:SetActive(false)
+    
+    self:StartEffect()
+    self:ResultEffect({
+        {Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
+        {Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
+    })
+    
 end
 ---初始化View数据
 function DragonTigerFightView:InitPanelData(args)
 	
+end
+
+---设置菜单显示隐藏
+function DragonTigerFightView:SettingFade()
+    if self.settingShow then
+        self.settingShow = false
+        self.muenRect:DOLocalMoveY(self.muenRect.sizeDelta.y+30,0.5):SetEase(Ease.InBack)
+        self.btn_touch.gameObject:SetActive(false)
+    else
+        self.settingShow = true
+        self.muenRect:DOLocalMoveY(0,0.5):SetEase(Ease.OutBack)
+        self.btn_touch.gameObject:SetActive(true)
+    end
+    
+end
+
+---显示牌面结果和播放动画
+---@param cards 龙虎牌型 牌型,牌值
+function DragonTigerFightView:ResultEffect(cards)
+    self:StartEffect()
+    
+    for i=1,3 do
+        self.resultWinTrs:GetChild(i-1).gameObject:SetActive(false)
+    end
+    self.resultWinTrs.gameObject:SetActive(true)
+    self.resultTrs.gameObject:SetActive(true)
+    self.resultCard1:LoadCard(cards[1][1],cards[1][2])
+    self.resultCard2:LoadCard(cards[2][1],cards[2][2])
+    local p1 = self.ctr_dot_p1.position
+    local p2 = self.ctr_dot_p2.position
+    
+    --下注结束
+    self.tipsCenterTxt.text = ""
+    self.tipsTimeEnd:SetActive(true)
+    
+    --出牌
+    self.resultCard1:Approach(p2,p1)
+    self.resultCard2:Approach(Vector3(-p2.x,p2.y),Vector3(-p1.x,p1.y))
+    TimerManager.StopAllTimer(self)
+    TimerManager.StartTimer(self, function
+    ()
+        --正在結算
+        self.tipsCenterTxt.text = LocalManager.GetStrById(200101010)
+    end, 1, 0, true)
+    TimerManager.StartTimer(self, function
+    ()
+        self.tipsTimeEnd:SetActive(false)
+        
+        self.resultCard1:ShowFront()
+    end, 2, 0, true)
+    TimerManager.StartTimer(self, function
+    ()
+        self.resultCard2:ShowFront()
+    end, 3, 0, true)
+    --结果
+    TimerManager.StartTimer(self, function
+    ()
+        local win = DRAGON_TIGER_FIGHT_WIN_SIDE.HE
+        if cards[1][2]>cards[2][2] then
+            win = DRAGON_TIGER_FIGHT_WIN_SIDE.Long
+            self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
+        elseif cards[1][2]<cards[2][2] then
+            win = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
+            self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
+        else
+            self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
+        end
+        --结果动画
+        
+    end, 4, 0, true)
+    
+    TimerManager.StartTimer(self, function
+    ()
+        self.resultWinTrs.gameObject:SetActive(false)
+    end,6, 0, true)
+    TimerManager.StartTimer(self, function
+    ()
+        self.resultCard1:Hiden()
+        self.resultCard2:Hiden()
+        --等待开局提示
+        self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
+        
+    end,7, 0, true)
+    TimerManager.StartTimer(self, function
+    ()
+        self.resultTrs.gameObject:SetActive(false)
+        --
+    end,8, 0, true)
+
+    self:PlayDaoJiShiEffect()
+end
+
+---开始动画播放
+function DragonTigerFightView:StartEffect()
+    self.startTrs.gameObject:SetActive(true)
+    
+    self.startLeftTrs.localPosition = Vector3(-3000,self.startLeftTrs.localPosition.y,0)
+    self.startRightTrs.localPosition = Vector3(3000,self.startRightTrs.localPosition.y,0)
+    self.startVsTrs.localScale=Vector3(20,20,1)
+    local sequence = DOTween.Sequence()
+    sequence:Insert(0,self.startLeftTrs:DOLocalMoveX(-540, 0.8):SetEase(Ease.InOutBounce))
+    sequence:Insert(0,self.startRightTrs:DOLocalMoveX(540, 0.8):SetEase(Ease.InOutBounce))
+    sequence:Append(self.startVsTrs:DOScale(Vector3(0.5,0.5,1),0.4))
+    sequence:Join(self.startVsImg:DOFade(1,0.3))
+    sequence:Append(self.startVsTrs:DOScale(Vector3(1.5,1.5,1),0.2))
+    sequence:AppendInterval(1.2)
+    sequence:Append(self.startLeftTrs:DOLocalMoveX(-3000, 0.6))
+    sequence:Join(self.startRightTrs:DOLocalMoveX(3000, 0.6))
+    sequence:Join(self.startVsImg:DOFade(0, 0.6))
+    
+    sequence:OnComplete(function()
+        sequence:Kill(false)
+        --开始下注提示
+        self.tipsStartXiaZhu:SetActive(true)
+        TimerManager.StartTimer(self,function()
+            self.tipsStartXiaZhu:SetActive(false)
+        end,1.5,0,false)
+    end)
+    sequence:Play()
+    
+end
+
+---倒计时
+function DragonTigerFightView:PlayDaoJiShiEffect()
+    for i=0,2 do
+        self.three:GetChild(i).gameObject:SetActive(false)
+    end
+    self.three.gameObject:SetActive(true)
+    self.tipsTimeThree:SetActive(true)
+
+    for i=0,3 do
+        TimerManager.StartTimer(self,function()
+            if i==3 then
+                self.three.gameObject:SetActive(false)
+                self.tipsTimeThree:SetActive(false)
+                return
+            end
+            if i>0 then
+                self.three:GetChild(3-i).gameObject:SetActive(false)
+            end
+            self.three:GetChild(2-i).gameObject:SetActive(true)
+        end,1+i,0,false)
+    end
 end
 
 ---其他玩家信息更新
@@ -233,7 +416,8 @@ function DragonTigerFightView:UpdateRoleView(data)
 end
 
 ---关闭界面
-function DragonTigerFightView:Close()   
+function DragonTigerFightView:Close()
+    coinFlyAnim:Destroy()
     self.super.Close(self);
 end
 

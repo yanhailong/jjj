@@ -2,7 +2,6 @@ local Vector2 = CS.UnityEngine.Vector2
 local Vector3 = CS.UnityEngine.Vector3
 local Quaternion = CS.UnityEngine.Quaternion
 local DOTween = CS.DG.Tweening.DOTween
-local Sequence = CS.DG.Tweening.Sequence
 local Ease = CS.DG.Tweening.Ease
 local RotateMode = CS.DG.Tweening.RotateMode
 local Rect = UnityEngine.Rect
@@ -155,5 +154,8 @@ function distributeCoins(totalCoins, ratios)
     return result
 end
 
+function PlayCoin:Destroy()
+    pool:DestroyAll()
+end
 
 return PlayCoin

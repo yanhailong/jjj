@@ -6,6 +6,7 @@
 local DragonTigerFightCtrl=Class("DragonTigerFightCtrl",BaseCtrl)
 ---@type DragonTigerFightConfig
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
+require("SingleGames/DragonTigerFight/PokerConfig")
 
 ---构造函数
 function DragonTigerFightCtrl:ctor(ctrlName,param)
@@ -43,6 +44,12 @@ function DragonTigerFightCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close()
 	end)
+	self.uiEventListener:AddClick(self.view.btn_help,function()
+		CtrlManager.SingleShow(CtrlNames.DragonTigerFightRule)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_setting,function()
+		look("打开设置界面")
+	end)
 	---压注按钮
 	for i=1,#self.view.chipInfos do
 		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()
@@ -79,6 +86,19 @@ function DragonTigerFightCtrl:AddUIEvent()
 		---测试
 		GlobalEvent.Notify("XIAZHU_END",{})
 	end)
+	self.uiEventListener:AddClick(self.view.btn_2,function()
+		self.view:ResultEffect({
+			{Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
+			{Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
+		})
+	end)
+	self.uiEventListener:AddClick(self.view.btn_muen,function()
+		self.view:SettingFade()
+	end)
+	self.uiEventListener:AddClick(self.view.btn_touch,function()
+		self.view:SettingFade()
+	end)
+	
 end
 
 ---中心下注区域
