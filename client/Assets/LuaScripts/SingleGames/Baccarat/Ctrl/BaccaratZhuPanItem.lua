@@ -6,9 +6,9 @@ local config=require("SingleGames/Baccarat/BaccaratConfig")
 local DOTween = CS.DG.Tweening.DOTween
 local loopType =  CS.DG.Tweening.LoopType;
 
-local image;
-
 function BaccaratZhuPanItem:ctor(obj,ctrl)
+    ---@type ObjectPoolUtil
+    self.objPools=ObjectPoolUtil.New()
     ---@type UnityEngine.GameObject
     self.gameObject = obj
     ---@type UnityEngine.Transform
@@ -38,6 +38,7 @@ function BaccaratZhuPanItem:RefreshShow(data,isFlicker)
     self.obj_BankerPoint:SetActive(data[2]);
     self.obj_PlayerPoint:SetActive(data[3]);
     if(isFlicker) then
+        local image;
         if(data[1] == config.WhoWin.BankerWin) then
             image = ComponentUtilGet.Image(self.obj_Banker);
         elseif (data[1] == config.WhoWin.PlayerWin) then

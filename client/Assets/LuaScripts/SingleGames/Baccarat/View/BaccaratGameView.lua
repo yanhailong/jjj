@@ -15,8 +15,18 @@ end
 ---获取组件
 function BaccaratGameView:InitComponents()
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
+    
+    self.ZhuPanScroll = ComponentUtilGet.ScrollRect(self.transform,"content/TopRoot/BaccaratItem/ZhuPanScroll")
+    self.DaLuScroll = ComponentUtilGet.ScrollRect(self.transform,"content/TopRoot/BaccaratItem/DaLuScroll")
+    self.DaluZiluScroll = ComponentUtilGet.ScrollRect(self.transform,"content/TopRoot/BaccaratItem/DaluZiluScroll")
+    self.XiaoLuScroll = ComponentUtilGet.ScrollRect(self.transform,"content/TopRoot/BaccaratItem/XiaoLuScroll")
+    self.YueYouLuScroll = ComponentUtilGet.ScrollRect(self.transform,"content/TopRoot/BaccaratItem/YueYouLuScroll") 
+    
     self.obj_ZhuPanContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/ZhuPanScroll/Viewport/obj_ZhuPanContent")
     self.obj_DaLuContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/DaLuScroll/Viewport/obj_DaLuContent")
+    self.obj_DaluZiluContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/DaluZiluScroll/Viewport/obj_DaluZiluContent")
+    self.obj_XiaoLuContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/XiaoLuScroll/Viewport/obj_XiaoLuContent")
+    self.obj_YueYouLuContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/YueYouLuScroll/Viewport/obj_YueYouLuContent")
     self.tmp_ZNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_ZNum");
     self.tmp_XNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_XNum");
     self.tmp_HNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_HNum");
@@ -105,8 +115,16 @@ end
 ---清空组件
 function BaccaratGameView:ClearComponents()
     self.btn_close=nil;
+    self.ZhuPanScroll = nil;
+    self.DaLuScroll =nil;
+    self.DaluZiluScroll =nil;
+    self.XiaoLuScroll =nil;
+    self.YueYouLuScroll =nil;
     self.obj_ZhuPanContent = nil;
     self.obj_DaLuContent = nil;
+    self.obj_DaluZiluContent = nil;
+    self.obj_XiaoLuContent = nil;
+    self.obj_YueYouLuContent = nil;
     self.tmp_ZNum=nil;
     self.tmp_XNum=nil;
     self.tmp_HNum=nil;

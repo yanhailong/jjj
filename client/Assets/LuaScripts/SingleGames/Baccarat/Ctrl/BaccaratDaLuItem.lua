@@ -3,6 +3,8 @@ local BaccaratDaLuItem=Class("BaccaratAllLuItem")
 ---@type BaccaratConfig
 local config=require("SingleGames/Baccarat/BaccaratConfig")
 function BaccaratDaLuItem:ctor(obj,ctrl)
+    ---@type ObjectPoolUtil
+    self.objPools=ObjectPoolUtil.New()
     ---@type UnityEngine.GameObject
     self.gameObject = obj
     ---@type UnityEngine.Transform
@@ -37,9 +39,14 @@ function BaccaratDaLuItem:RefreshTieNumShow(num)
     self.tmp_HeNum.gameObject:SetActive(true)
     self.tmp_HeNum.text = num;
 end
-
+---获取索引
 function BaccaratDaLuItem:GetIndex()
     return self.Index ;
 end
+
+function BaccaratDaLuItem:Destroy()
+    
+end
+
 
 return BaccaratDaLuItem
