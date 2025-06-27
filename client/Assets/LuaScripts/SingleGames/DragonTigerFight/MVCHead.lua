@@ -14,7 +14,3 @@ CtrlNames.DragonTigerFightRule="DragonTigerFightRule";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule]={};
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].ctrl =require "SingleGames/DragonTigerFight/Ctrl/RuleCtrl";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].view=require "SingleGames/DragonTigerFight/View/RuleView";
-
-package.cpath = package.cpath .. ';C:/Users/Administrator/AppData/Roaming/JetBrains/Rider2020.3/plugins/intellij-emmylua/classes/debugger/emmy/windows/x64/?.dll'
-local dbg = require('emmy_core')
-dbg.tcpConnect('localhost', 9966)
