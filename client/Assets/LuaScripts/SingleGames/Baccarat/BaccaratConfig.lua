@@ -19,6 +19,11 @@ this.BetState={
 }
 
 
+this.WhoWin = {
+    BankerWin = 1,
+    PlayerWin =2,
+    TieWin = 3,
+}
 this.ABNames={
     icons="SingleGames/Baccarat/alats/icons",--icon
     chipPool="SingleGames/Baccarat/prefabs/Pool",--筹码

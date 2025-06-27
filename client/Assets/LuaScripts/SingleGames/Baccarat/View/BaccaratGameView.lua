@@ -16,6 +16,7 @@ end
 function BaccaratGameView:InitComponents()
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
     self.obj_ZhuPanContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/ZhuPanScroll/Viewport/obj_ZhuPanContent")
+    self.obj_DaLuContent = ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratItem/DaLuScroll/Viewport/obj_DaLuContent")
     self.tmp_ZNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_ZNum");
     self.tmp_XNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_XNum");
     self.tmp_HNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/BaccaratItem/tmp_HNum");
@@ -105,6 +106,7 @@ end
 function BaccaratGameView:ClearComponents()
     self.btn_close=nil;
     self.obj_ZhuPanContent = nil;
+    self.obj_DaLuContent = nil;
     self.tmp_ZNum=nil;
     self.tmp_XNum=nil;
     self.tmp_HNum=nil;

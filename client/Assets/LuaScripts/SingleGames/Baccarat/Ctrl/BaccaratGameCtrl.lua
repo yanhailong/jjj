@@ -9,6 +9,8 @@ local config=require("SingleGames/Baccarat/BaccaratConfig")
 
 ---@type BaccaratZhuPanItem
 local BaccaratZhuPanItem = require"SingleGames/Baccarat/Ctrl/BaccaratZhuPanItem"
+---@type BaccaratDaLuItem
+local BaccaratDaLuItem = require"SingleGames/Baccarat/Ctrl/BaccaratDaLuItem"
 
 ---游戏阶段
 local  gameStage ={
@@ -17,11 +19,6 @@ local  gameStage ={
 	Settlement =3,--结算阶段
 }
 
-local WhoWin = {
-	BankerWin = 1,
-	PlayerWin =2,
-	TieWin = 3,
-}
 
 local CurWhoWin;
 
@@ -57,6 +54,19 @@ local BetPPairAllNum;
 local BetBPairAllNum;
 ---筹码下注的集合表
 local ChipTable={};
+
+---主盘表
+local ZhuPanTable = {};
+---主盘数据表(进入游戏向服务器拿到数据后打开界面刷新主盘数据显示)
+local ZhuPanDataTable = {};
+---大路表
+local DaLuTable = {};
+---大路数据表
+local DaLuDataTable = {};
+
+local DaYanZaiLuTable ={};
+local xiaoLuTable ={};
+local YueYouLuTable = {};
 ---构造函数
 function BaccaratGameCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -67,21 +77,23 @@ function BaccaratGameCtrl:ctor(ctrlName,param)
 	self.view = self.view
 	---@type BaccaratGameModel
 	self.model = self.model
-
-	
 end
 
 ---初始化
 function BaccaratGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
 	config.InitIconPic();
 	CurSelectChip = 0;
+	self:InitZhuPanTable()
+	self:InitDaLuTable()
 	self:InitData()
 end
 
 ---初始化数据
 function BaccaratGameCtrl:InitData()
-	countDownTime = 12;
+	countDownTime = 2;
 	
 	BetBankerAllNum = 0;
 	BetPlayerAllNum = 0;
@@ -138,20 +150,39 @@ function BaccaratGameCtrl:InitData()
 	self.betCountDownTimer = TimerManager:CreateTimer(function()
 		countDownTime = countDownTime-1;
 		self.view.tmp_Countdown.text = countDownTime;
-		if countDownTime<=0 then
-			curGameStage =gameStage.Settlement;
-			self:RefreshGameStage();
-		end
-	end,1,12,true);
+	end,1,countDownTime,true,function()
+		curGameStage =gameStage.Settlement;
+		self:RefreshGameStage();
+	end);
 	
-	---@type ObjectPoolUtil
-	self.objPools=ObjectPoolUtil.New()
+	
 	curGameStage = gameStage.Begin;
 	
 	self:SetCheckedShow();
 	---从服务器那边拿数据然后看在哪个阶段了，目前写一个假数据每次进来都是第一阶段
 	self:RefreshGameStage()
 end
+---初始化主盘预制体
+function BaccaratGameCtrl:InitZhuPanTable()
+	for _, v in ipairs(ZhuPanDataTable) do
+		self:RefreshZhuPanShow(v,false)
+	end
+end
+---初始化大路预制体表
+function BaccaratGameCtrl:InitDaLuTable()
+	for i = 1, 6*24 do
+		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem")
+		---@type BaccaratDaLuItem
+		local item = BaccaratDaLuItem.New(obj,self);
+		obj:SetActive(true);
+		obj.transform:SetParent(self.view.obj_DaLuContent.transform);
+		obj.transform.localScale = Vector3.one;
+		item:InitState();
+		item:InitIndex(i);
+		table.insert(DaLuTable,item);
+	end
+end
+
 ---同步游戏当前在哪个阶段
 function BaccaratGameCtrl:RefreshGameStage()
 	if curGameStage == gameStage.Begin then
@@ -292,58 +323,140 @@ function BaccaratGameCtrl:PlayChipToPlayer(chip)
 	end)
 end
 
----是闪烁对应区域
+---闪烁对应区域
 function BaccaratGameCtrl:Flicker(playerCardNum,BankerCardNum)
 	if playerCardNum == BankerCardNum then--和
-		CurWhoWin = WhoWin.TieWin;
-		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_TieWin.transform))
+		CurWhoWin =config.WhoWin.TieWin;
+		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_TieWin.transform),true)
 	elseif BankerCardNum > playerCardNum then--庄赢
-		CurWhoWin = WhoWin.BankerWin
-		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_BankerWin.transform))
+		CurWhoWin = config.WhoWin.BankerWin
+		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_BankerWin.transform),true)
 	elseif playerCardNum>BankerCardNum then--闲赢
-		CurWhoWin = WhoWin.PlayerWin
-		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_PlayerWin.transform))
+		CurWhoWin = config.WhoWin.PlayerWin
+		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_PlayerWin.transform),true)
 	end
 	if BankerIsPairing then--庄家对子
-		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_PPairWin.transform))
+		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_PPairWin.transform),false)
 	end
 	if playerIsPairing then--闲对子
-		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_BPairWin.transform))
+		self:PlayFlicker(ComponentUtilGet.Image(self.view.obj_BPairWin.transform),false)
 	end
 end
-
-function BaccaratGameCtrl:PlayFlicker(image)
+---播放赢的区域闪烁(播放完开始下一局)
+function BaccaratGameCtrl:PlayFlicker(image,isInitData)
 	self.flickerSequence = DOTween.Sequence()
 	self.flickerSequence:Append(image:DOFade(1,0.5))
 	self.flickerSequence:SetLoops(8,loopType.Yoyo)
 	self.flickerSequence:OnComplete(function()
-		self:InitData();
-		self:RefreshZhuPanShow()
+		if(isInitData) then
+			self:InitData();
+			local data = {};
+			data[1] = CurWhoWin
+			data[2] = BankerIsPairing
+			data[3] = playerIsPairing;
+			self:RefreshZhuPanShow(data,true)
+			table.insert(ZhuPanDataTable,data);
+		end
 	end)
+
 	self.flickerSequence:Play();
 end
 
 ---刷新主盘显示
-function BaccaratGameCtrl:RefreshZhuPanShow()
+function BaccaratGameCtrl:RefreshZhuPanShow(data,isFlicker)
 	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"BaccaratZhuPanItem")
+	---@type BaccaratZhuPanItem
 	local item = BaccaratZhuPanItem.New(obj,self);
 	obj:SetActive(true);
 	obj.transform:SetParent(self.view.obj_ZhuPanContent.transform);
 	obj.transform.localScale = Vector3.one;
-	item:SetSprite(config.GetIconPic(self:GetZhuPanWinIcon()))
-	self.zhuPanSequence = DOTween.Sequence()
-	self.zhuPanSequence:Append(item:GetImage():DOFade(0,0.5))
-	self.zhuPanSequence:SetLoops(6,loopType.Yoyo)
-	self.zhuPanSequence:Play();
+	item:RefreshShow(data,isFlicker)
+	table.insert(ZhuPanTable,item);
+	self:AddDaLuTableShow(data);
 end
----获取到对应赢的区域的主盘的图标名称
-function BaccaratGameCtrl:GetZhuPanWinIcon()
-	if(CurWhoWin == WhoWin.TieWin) then
-		return "bjl_zhuPanHe"
-	elseif(CurWhoWin == WhoWin.PlayerWin) then
-		return "bjl_zhuPanXian"
-	elseif(CurWhoWin == WhoWin.BankerWin) then
-		return "bjl_zhuPanZ"
+
+---大路新增显示
+function BaccaratGameCtrl:AddDaLuTableShow(data)
+	local curIndex = 0; --当前的索引
+	local curList = 0;--当前是第几列
+	local tieNum = 0;--和的数字
+	local whoWin;--谁赢
+	local dataTable = {};--缓存的需要加入到数据结构里面的表
+	local IsGoL; --是否走了L型了
+	if(#DaLuDataTable==0) then--刚开始
+		---@type BaccaratDaLuItem
+		local item = DaLuTable[1];
+		if(data[1] == config.WhoWin.TieWin) then
+			tieNum=tieNum+1;
+			item:RefreshTieNumShow(tieNum);
+		else
+			whoWin = data[1];
+			item:RefreshShow(whoWin);
+		end
+		curList = 1;
+		DaLuDataTable[curList] ={};
+		dataTable[1] = whoWin;
+		dataTable[2] = tieNum;
+		dataTable[3] = item;
+		dataTable[4] = false;
+		table.insert(DaLuDataTable[curList],dataTable)
+	else
+		curList = #DaLuDataTable;
+		local lastPiece= DaLuDataTable[curList]
+		tieNum = lastPiece[#lastPiece][2];
+
+		if data[1] == config.WhoWin.TieWin then --如果是和就不往下面加，而是显示数字
+			tieNum = tieNum+1;
+			lastPiece[#lastPiece][2] = tieNum;
+			---@type BaccaratDaLuItem
+			local lastItem = lastPiece[#lastPiece][3];
+			lastItem:RefreshTieNumShow(tieNum);
+		elseif(lastPiece[#lastPiece][1] == data[1]) then --如果和上一次的一样就往后面加
+			IsGoL = lastPiece[#lastPiece][4];
+			local lastItem = lastPiece[#lastPiece][3];
+			if(IsGoL) then -- 已经开始走L型了
+				curIndex = lastItem:GetIndex()+6;
+			else
+				curIndex = lastItem:GetIndex()+1;
+				---@type BaccaratDaLuItem
+				local item = DaLuTable[curIndex];
+				if(item:IsActive()or (curIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
+					curIndex = lastItem:GetIndex()+6;
+					IsGoL = true;
+				end
+			end
+			---@type BaccaratDaLuItem
+			local item = DaLuTable[curIndex];
+			dataTable[1] = data[1];
+			dataTable[2] = tieNum;
+			dataTable[3] = item;
+			dataTable[4] = IsGoL;
+			item:RefreshShow(data[1])
+			table.insert(DaLuDataTable[curList],dataTable)
+		elseif(lastPiece[#lastPiece][1] ~= data[1]) then --如果和上一次的不一样就往另外开一列
+			curList = #DaLuDataTable+1;
+			curIndex = #DaLuDataTable*6+1;
+			---@type BaccaratDaLuItem
+			local item = DaLuTable[curIndex];
+			dataTable[1] =  data[1];
+			dataTable[2] = tieNum;
+			dataTable[3] = item;
+			dataTable[4] = IsGoL;
+			item:RefreshShow(data[1])
+			DaLuDataTable[curList] ={};
+			table.insert(DaLuDataTable[curList],dataTable)
+	    end
+	end
+end
+
+function BaccaratGameCtrl:GetNeedShowDaLuItem()
+	local index = 1;
+	for i, v in ipairs(DaLuTable) do
+		if v:IsActive() then
+			if(i>index) then
+				index = i;
+			end
+		end
 	end
 end
 
@@ -490,16 +603,6 @@ end
 ---移除UI事件
 function BaccaratGameCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
-	if self.beginTimer.running then
-		self.beginTimer:Stop();
-	end
-	if self.betCountDownTimer.running then
-		self.betCountDownTimer:Stop();
-	end
-	if self.beginTimer2.running then
-		self.beginTimer2:Stop();
-	end
-	TimerManager.StopAllTimer(self)
 end
 
 --region UI事件方法
@@ -510,6 +613,18 @@ end
 ---销毁UI
 function BaccaratGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+
+	if self.beginTimer.running then
+		self.beginTimer:Stop();
+	end
+	if self.betCountDownTimer.running then
+		self.betCountDownTimer:Stop();
+	end
+	if self.beginTimer2.running then
+		self.beginTimer2:Stop();
+	end
+	TimerManager.StopAllTimer(self)
+	
 	if self.flickerSequence~=nil then
 		self.flickerSequence:Kill();
 	end
@@ -519,9 +634,12 @@ function BaccaratGameCtrl:RealCloseDestroy()
 	if self.PlayChipToPlayerSequence~=nil then
 		self.PlayChipToPlayerSequence:Kill();
 	end
-	if self.zhuPanSequence~=nil then
-		self.zhuPanSequence:Kill();
+	for _, v in ipairs(ZhuPanTable) do
+		---@type BaccaratZhuPanItem
+		local item =v;
+		item:Destroy();
 	end
+	ZhuPanTable = {};
 end
 
 return BaccaratGameCtrl

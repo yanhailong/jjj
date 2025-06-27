@@ -1297,7 +1297,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 1
   m_CellSize: {x: 9, y: 9}
-  m_Spacing: {x: 0, y: 0}
+  m_Spacing: {x: 0.36, y: 0}
   m_Constraint: 2
   m_ConstraintCount: 6
 --- !u!1 &1155934268659334283
@@ -2300,8 +2300,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 82.387, y: 71.67882}
-  m_SizeDelta: {x: 448.23, y: 112.6425}
+  m_AnchoredPosition: {x: 82.921364, y: 71.67882}
+  m_SizeDelta: {x: 447.1611, y: 112.6425}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4827056396981540446
 CanvasRenderer:
@@ -4843,7 +4843,7 @@ GameObject:
   - component: {fileID: 8047418805547807891}
   - component: {fileID: 3208158830227742968}
   m_Layer: 5
-  m_Name: Content
+  m_Name: obj_DaLuContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4890,7 +4890,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 1
   m_CellSize: {x: 18, y: 18}
-  m_Spacing: {x: 0, y: 0.7}
+  m_Spacing: {x: 0.7, y: 0.7}
   m_Constraint: 2
   m_ConstraintCount: 6
 --- !u!1 &4003525381381649808
@@ -8046,7 +8046,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 1
   m_CellSize: {x: 9, y: 9}
-  m_Spacing: {x: 0, y: 0}
+  m_Spacing: {x: 0.57, y: 0}
   m_Constraint: 2
   m_ConstraintCount: 6
 --- !u!1 &5750557000527148757
@@ -8242,7 +8242,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 1
   m_CellSize: {x: 9, y: 9}
-  m_Spacing: {x: 0, y: 0}
+  m_Spacing: {x: 0.45, y: 0}
   m_Constraint: 2
   m_ConstraintCount: 6
 --- !u!1 &5927681397772088312
