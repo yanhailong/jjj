@@ -27,10 +27,28 @@ end
 function USDollarExpressMainCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	self.stakeList=args.stakeList--下注列表
-	self.view:SetChipText(self.stakeList[self.betIndex])--设置默认
 	config.InitIconPic()--初始化icon图片
 	self:InitFirstSlotPics()
+	self.stakeList =
+	{
+		[1] = 100,
+		[2] = 200,
+		[3] = 300,
+		[4] = 400,
+		[5] = 500,
+		[6] = 1000,
+		[7] = 1500,
+		[8] = 2000,
+		[9] = 2500,
+		[10] = 5000,
+	}
+	self:InitPlayerInfos(self.stakeList)
+	
+end
+---设置玩家初始数据
+function USDollarExpressMainCtrl:InitPlayerInfos(stakeList)
+	config.stakeList=stakeList
+	self.view:SetChipText(self.stakeList[self.betIndex])--设置默认
 end
 
 ---初始化数据
@@ -44,12 +62,6 @@ function USDollarExpressMainCtrl:InitData()
 	self.tweener={}
 	self.tweener1={}
 	self.betIndex=1--下注索引，默认为1
-	
-	
-	
-	
-	
-	
 	
 	self.freeState=false;
 	self.isAllRoate=false

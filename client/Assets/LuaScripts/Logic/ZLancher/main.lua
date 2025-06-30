@@ -1,10 +1,10 @@
 -- 定义全局模块
 IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
-require("PlatformHall/Protol/pb_PlatformHall")
-if Tools.GetPlatformType()==-1 then
-    --require "Debug/EmmyLuaDebugger"
-end
+require("PlatformHall/MsgPro/pb_PlatformHall")
+require("Logic/Config/HallConfig")
+
+require "Debug/EmmyLuaDebugger"
 main = {}
 
 function main:init(lancher)
@@ -13,10 +13,13 @@ function main:init(lancher)
     canvas.pixelPerfect=true
     Application.targetFrameRate=60
     require("PlatformHall/UILogin/MVCHead")
+    require("PlatformHall/UIHall/MVCHead")
+    require("PlatformHall/UICommonSelection/MVCHead")
+
 
     CtrlManager.SingleShow(CtrlNames.UILogin, function
     ()
-       lancher:PreLoadingClose()
+        lancher:PreLoadingClose()
     end)
 end
 

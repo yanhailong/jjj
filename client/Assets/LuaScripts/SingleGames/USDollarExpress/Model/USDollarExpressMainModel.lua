@@ -17,7 +17,9 @@ function USDollarExpressMainModel:Close()
 end
 
 function USDollarExpressMainModel:AddEvent()
-	WebNetEvent.AddListener(pb_USDollarExpress.ResStartGame,self.ResStartGame,self)
+	--WebNetEvent.AddListener(pb_USDollarExpress.ResStartGame,self.ResStartGame,self)
+	local str= resMgr:LoadTextAssetStr("SingleGames/USDollarExpress","slotData.txt")
+	self.slotData=jsonDecode(str)
 end
 
 function USDollarExpressMainModel:RemoveEvent()
@@ -25,9 +27,11 @@ function USDollarExpressMainModel:RemoveEvent()
 end
 
 function USDollarExpressMainModel:ReqStartGame(stakeVlue)
-	local data={}
-	data.stakeVlue=stakeVlue
-	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
+	--local data={}
+	--data.stakeVlue=stakeVlue
+	--WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
+	self:ResStartGame(self.slotData)
+	
 end
 
 function USDollarExpressMainModel:ResStartGame(msg)

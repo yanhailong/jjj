@@ -245,10 +245,7 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(UnityEngine.EventSystems.BaseEventData), UnityEngineEventSystemsBaseEventDataWrap.__Register);
         
         
-            translator.DelayWrapLoader(typeof(AssetsManager), AssetsManagerWrap.__Register);
-        
-        
-            translator.DelayWrapLoader(typeof(AssetBundleLoadMgr), AssetBundleLoadMgrWrap.__Register);
+            translator.DelayWrapLoader(typeof(AssetManager), AssetManagerWrap.__Register);
         
         
             translator.DelayWrapLoader(typeof(LocalData), LocalDataWrap.__Register);
@@ -267,6 +264,9 @@ namespace XLua.CSObjectWrap
         
         
             translator.DelayWrapLoader(typeof(Language.LanguageExtendTextMeshPro), LanguageLanguageExtendTextMeshProWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(JiuJiuPrincess.UpdateAssets), JiuJiuPrincessUpdateAssetsWrap.__Register);
         
         
             translator.DelayWrapLoader(typeof(UnityEngine.ResourceRequest), UnityEngineResourceRequestWrap.__Register);

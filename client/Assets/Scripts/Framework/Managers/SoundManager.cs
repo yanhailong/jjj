@@ -122,7 +122,7 @@ public class SoundManager : SingletonMono<SoundManager>
                     return sounds[Abname];
             }
             string audname = Path.GetFileNameWithoutExtension(Abname);
-            AudioClip aud =AssetsManager.Instance.LoadAsset<AudioClip>(Abname, audname);
+            AudioClip aud =AssetManager.Instance.LoadAsset<AudioClip>(Abname, audname);
             if (aud == null)
             {
                 Debug.LogWarning(Abname + ":audio clip not fond！");

@@ -138,9 +138,8 @@ public class LanguageManager
         var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<TextAsset>(file);
         return JsonConvert.DeserializeObject<T>(asset.text);
 #else
-        var asset = AssetsManager.Instance.LoadAsset<TextAsset>(abName,file);
-        Debug.LogError("加载资源："+asset);
-        return JsonConvert.DeserializeObject<T>(asset.text);
+        string asset = AssetManager.Instance.LoadTextAssetStr(abName,file+".json");
+        return JsonConvert.DeserializeObject<T>(asset);
 #endif
     }
 
@@ -149,7 +148,7 @@ public class LanguageManager
     {
         _curLanguage = null;
         curLangData ??= new Dictionary<string, string>();
-
+        
         var langCfgData= LoadJson<LangCfgData>("lanconfig");
         lanCfg = langCfgData.ConfigurationData;
         foreach (var item in lanCfg.languages)

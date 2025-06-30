@@ -29,7 +29,7 @@ local function SetObjTips(content)
     objInfo.txt_msg.text=content;
 
     CorManager.StartCor(this,function ()
-        coroutine.wait(2.2)
+        coroutine.wait(1.5)
         if #objInfos>=maxCount then
             Tools.Destroy(objInfo.gameObject);
             objInfo=nil;

@@ -17,6 +17,8 @@ function UILoginView:InitComponents()
     self.btn_phone=ComponentUtilGet.Button(self.transform,"content/btn_phone");
     self.btn_google=ComponentUtilGet.Button(self.transform,"content/btn_google");
     self.btn_youke=ComponentUtilGet.Button(self.transform,"content/btn_youke");
+    
+    self.obj_test=ComponentUtilGet.GameObject(self.transform,"content/obj_test")
 end
 
 ---清空组件

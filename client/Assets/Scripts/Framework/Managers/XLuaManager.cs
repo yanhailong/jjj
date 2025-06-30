@@ -39,8 +39,8 @@ public class XLuaManager : SingletonMono<XLuaManager>
             return null;
         }
         string scriptPath = string.Empty;
-        
-#if UNITY_EDITOR  // 编辑器模式LuaScripts下面去读;
+
+#if UNITY_EDITOR // 编辑器模式LuaScripts下面去读;
         filePath = filePath.Replace(".", "/") + ".lua";
         scriptPath = Path.Combine(Application.dataPath, luaScriptsFolder);
         scriptPath = Path.Combine(scriptPath, filePath); 

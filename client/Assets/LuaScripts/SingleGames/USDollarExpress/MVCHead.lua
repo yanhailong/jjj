@@ -9,10 +9,3 @@ CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain]={};
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressMainCtrl";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].view=require "SingleGames/USDollarExpress/View/USDollarExpressMainView";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].model=require "SingleGames/USDollarExpress/Model/USDollarExpressMainModel";
-
-CtrlNames.USDollarExpressSelect="USDollarExpressSelect";
-CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressSelect]={};
-CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressSelect].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressSelectCtrl";
-CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressSelect].view=require "SingleGames/USDollarExpress/View/USDollarExpressSelectView";
-CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressSelect].model=require "SingleGames/USDollarExpress/Model/USDollarExpressSelectModel";
-

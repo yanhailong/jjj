@@ -18,6 +18,8 @@ this.freeState=false    --游戏状态
 this.isLinked=false     --link状态
 this.isFirestEnterLink=0--判断是否是第一次进入link
 
+this.stakeList={1,2,3,4}--下注列表从服务器获取
+
 
 ---游戏状态
 this.gameState={

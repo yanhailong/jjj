@@ -1,0 +1,1 @@
+{"trainInfoList":[{"goldList":[50,70,100,110,120,150,200,300,400,500,600,700],"type":13}],"specialType":1,"goldTrainInFree":false,"iconList":[10,11,7,10,9,8,9,9,7,26,24,22,10,8,10,12,19,10,10,3],"allWinGold":0,"resultLineInfoList":[],"freeCount":0,"code":200}

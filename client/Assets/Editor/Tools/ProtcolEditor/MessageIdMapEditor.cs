@@ -50,7 +50,7 @@ public class MessageIdMapEditor
         string protolRootDir = Path.GetFullPath(protolRoot);
         DirectoryInfo dir = new DirectoryInfo(dirPath);
         string pt = dir.FullName.Replace(protolRootDir, "");
-        string pbDir = rootPath + pt + "/Protol/";
+        string pbDir = rootPath + pt + "/MsgPro/";
         if (!Directory.Exists(pbDir))
             Directory.CreateDirectory(pbDir);
         

@@ -7,7 +7,7 @@ local parser =require("Logic/Protoc/protoc").new()
 local pb = require "pb"
 
 function this.LoadPB(pbPath,pbName)
-    local protoString = resMgr:LoadTextAssetStr(pbPath,pbName..".proto.bytes")
+    local protoString = resMgr:LoadTextAssetStr(pbPath,pbName..".proto")
     parser:load(protoString, pbName..".proto")
 end
 

@@ -90,8 +90,7 @@ public static class GenConfig
             typeof(UnityEngine.WaitForSecondsRealtime),
             typeof(UnityEngine.EventSystems.PointerEventData),
             typeof(UnityEngine.EventSystems.BaseEventData),
-            typeof(AssetsManager),
-            typeof(AssetBundleLoadMgr),
+            typeof(AssetManager),
             typeof(LocalData),
             typeof(Util),
             typeof(UIEventListener),
@@ -99,6 +98,7 @@ public static class GenConfig
             typeof(LanguageManager),
             typeof(LanguageText),
             typeof(LanguageExtendTextMeshPro),
+            typeof(UpdateAssets),
 
             // 场景、资源加载
             typeof(UnityEngine.Resources),
@@ -146,7 +146,9 @@ public static class GenConfig
         typeof(System.Collections.IEnumerator),
         typeof(UnityEngine.Events.UnityAction<Vector2>),
         typeof(DG.Tweening.Core.DOSetter<float>),
-        typeof(DG.Tweening.Core.DOGetter<float>),
+        typeof(Action<int, string>),
+        typeof(Action<int, int>),
+        typeof(Action<string>),
         
     };
     // 避免在IL2CPP下被裁剪

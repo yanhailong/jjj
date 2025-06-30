@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-06-23 17:39:22
+---DateTime: 2025-06-26 11:45:34
 ---
 ---@class UIHallView:BaseView
 local UIHallView=Class("UIHallView",BaseView)
@@ -14,9 +14,6 @@ end
 
 ---获取组件
 function UIHallView:InitComponents()
-    self.btn_USDollarExpress=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/btn_USDollarExpress");
-    self.btn_Baccarat=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/btn_Baccarat");
-    self.btn_LongHuDou=ComponentUtilGet.Button(self.transform,"content/middle/Scroll View/Viewport/Content/gametest001")
     self.uTabs_title=ComponentUtilGet.UGUITabGroup(self.transform,"content/left/uTabs_title");
     self.btn_yqs=ComponentUtilGet.Button(self.transform,"content/left/btn_yqs");
     self.img_head=ComponentUtilGet.Image(self.transform,"content/top/playerInfo/head/img_head");
@@ -51,9 +48,6 @@ end
 
 ---清空组件
 function UIHallView:ClearComponents()
-    self.btn_USDollarExpress=nil;
-    self.btn_Baccarat=nil;
-    self.btn_LongHuDou=nil;
     self.uTabs_title=nil;
     self.btn_yqs=nil;
     self.img_head=nil;

@@ -24,11 +24,8 @@ function UILoginModel:AddEvent()
 end
 
 function UILoginModel:RemoveEvent()
-	GlobalEvent.Remove(WebNetworkConnectEvent.connectSuccess,self.OnConnectSuccess,self)
-	GlobalEvent.Remove(WebNetworkConnectEvent.connectFailed,self.connectFailed,self)
-	WebNetEvent.Remove(pb_PlatformHall.ResLogin, self.ResLogin, self)
-
-	WebNetEvent.Remove(pb_PlatformHall.NoticeServerStatus, self.NoticeServerStatus, self)
+	GlobalEvent.RemoveAllTo(self)
+	WebNetEvent.RemoveAllTo(self)
 end
 
 function UILoginModel:NoticeServerStatus(msg)
@@ -73,7 +70,7 @@ end
 
 function UILoginModel:ResLogin(msg)
 	look("登录成功",msg)
-	CtrlManager.SingleShow(CtrlNames.UIHall)
+	CtrlManager.SingleShow(CtrlNames.UIHallGames)
 end
 
 return UILoginModel

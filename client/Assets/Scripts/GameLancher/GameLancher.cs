@@ -44,6 +44,7 @@ public class GameLancher : MonoBehaviour
         AppConst.DebugMode = true;
         mStateMachine.changeState(GameState.EnterGame,this);
 #else
+        AppConst.DebugMode = false;
         new PreLoading(this);
 #endif
     }
@@ -125,7 +126,7 @@ public class GameLancher : MonoBehaviour
     /// </summary>
     public void EnterGame()
     {
-        AssetsManager.Instance.Initialized();//初始化资源
+        AssetManager.Instance.Initialized();//初始化资源
         LuaBytes.Instance.Init();//初始化lua代码
         mStateMachine.changeState(GameState.EnterGame,this);
         // PreLoadingClose();

@@ -5,10 +5,8 @@
 FileUtil = CS.FileUtil
 ---@type JiuJiuPrincess.Util
 Util = CS.JiuJiuPrincess.Util
----@type AssetsManager
-resMgr = CS.AssetsManager.Instance
----@type AssetBundleLoadMgr
-abLoad=CS.AssetBundleLoadMgr.Instance
+---@type AssetManager
+resMgr = CS.AssetManager.Instance
 ---@type LocalData
 LocalData=CS.LocalData.Instance
 ---@type DG.Tweening.DOTween
@@ -80,6 +78,12 @@ TMP_InputField = CS.TMPro.TMP_InputField
 TMP_Text = CS.TMPro.TMP_Text
 ---@type TMPro
 TMPro=CS.TMPro
+---@type JiuJiuPrincess.LuaBytes
+LuaBytes=CS.JiuJiuPrincess.LuaBytes.Instance
+---@type JiuJiuPrincess.CommonConfigManager
+CommonConfigManager=CS.JiuJiuPrincess.CommonConfigManager.Instance
+---@type JiuJiuPrincess.UpdateAssets
+UpdateAssets=CS.JiuJiuPrincess.UpdateAssets
 -----------------------------------------end
 
 Mathf = require "Common.Tools.UnityEngine.Mathf" -- CS.UnityEngine.Mathf

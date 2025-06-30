@@ -86,7 +86,7 @@ public class GameCheckUpdate : GameBaseState
         Debug.LogError("开始检查更新");
         gameLancher.preLoading.SetDesc("正在检测更新文件...", 0, true);
         updateAssets = new UpdateAssets(AppConst.AssetLocalPath, AppConst.AssetUpdateUrl,null ,CommonConfigManager.Instance.GetServerVersion());
-        updateAssets.maxUpdateCount = 10;
+        updateAssets.MAXUPDATECOUNT = 10;
         updateAssets.StartUpdate(UpdateError, UpdateProgress, UpdateFinished,null);
     }
 
