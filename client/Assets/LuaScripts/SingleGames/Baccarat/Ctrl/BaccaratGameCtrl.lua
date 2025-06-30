@@ -155,17 +155,17 @@ function BaccaratGameCtrl:InitData()
 	self.view.tmp_TieBetNum.text = "0.00";
 	self.view.tmp_BPairBetNum.text = "0.00";
 	
-	self.beginTimer = TimerManager:CreateTimer(function()
+	self.beginTimer = TimerManager.CreateTimer(self,function()
 		self.view.obj_VS:SetActive(false);
 		curGameStage = gameStage.Bet;
 		self:RefreshGameStage();
 	end,1,1,true);
 	
-	self.beginTimer2 = TimerManager:CreateTimer(function()
+	self.beginTimer2 = TimerManager.CreateTimer(self,function()
 		self.view.obj_BeginBet:SetActive(false);
 	end,1,1,true);
 
-	self.betCountDownTimer = TimerManager:CreateTimer(function()
+	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.tmp_Countdown.text = countDownTime;
 		if(countDownTime<=0) then
@@ -228,11 +228,11 @@ end
 ---初始化大路预制体表
 function BaccaratGameCtrl:InitDaLuTable()
 	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem")
+		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem",self.view.obj_DaLuContent.transform)
 		---@type BaccaratDaLuItem
 		local item = BaccaratDaLuItem.New(obj,self);
 		obj:SetActive(true);
-		obj.transform:SetParent(self.view.obj_DaLuContent.transform);
+		--obj.transform:SetParent(self.view.obj_DaLuContent.transform);
 		obj.transform.localScale = Vector3.one;
 		item:InitState();
 		item:InitIndex(i);
@@ -243,11 +243,11 @@ end
 ---初始化大路大眼路预制体表
 function BaccaratGameCtrl:InitDaLuZiLuTable()
 	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem")
+		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem",self.view.obj_DaluZiluContent.transform)
 		---@type BaccaratAllChildLuItem
 		local item = BaccaratAllChildLuItem.New(obj,self);
 		obj:SetActive(true);
-		obj.transform:SetParent(self.view.obj_DaluZiluContent.transform);
+		--obj.transform:SetParent(self.view.obj_DaluZiluContent.transform);
 		obj.transform.localScale = Vector3.one;
 		item:InitState();
 		item:InitIndex(i);
@@ -259,11 +259,11 @@ end
 ---初始化大路大眼路预制体表
 function BaccaratGameCtrl:InitXiaoLuTable()
 	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem")
+		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem",self.view.obj_XiaoLuContent.transform)
 		---@type BaccaratAllChildLuItem
 		local item = BaccaratAllChildLuItem.New(obj,self);
 		obj:SetActive(true);
-		obj.transform:SetParent(self.view.obj_XiaoLuContent.transform);
+		--obj.transform:SetParent(self.view.obj_XiaoLuContent.transform);
 		obj.transform.localScale = Vector3.one;
 		item:InitState();
 		item:InitIndex(i);
@@ -275,11 +275,11 @@ end
 ---初始化曱甴路预制体表
 function BaccaratGameCtrl:InitYueYouLuTable()
 	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem")
+		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem",self.view.obj_YueYouLuContent.transform)
 		---@type BaccaratAllChildLuItem
 		local item = BaccaratAllChildLuItem.New(obj,self);
 		obj:SetActive(true);
-		obj.transform:SetParent(self.view.obj_YueYouLuContent.transform);
+		--obj.transform:SetParent(self.view.obj_YueYouLuContent.transform);
 		obj.transform.localScale = Vector3.one;
 		item:InitState();
 		item:InitIndex(i);
@@ -478,11 +478,11 @@ function BaccaratGameCtrl:RefreshZhuPanShow(data,isFlicker)
 			ZhuPanObjTable[i]:SetActive(false);
 		end
 	end
-	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"BaccaratZhuPanItem")
+	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"BaccaratZhuPanItem",self.view.obj_ZhuPanContent.transform)
 	---@type BaccaratZhuPanItem
 	local item = BaccaratZhuPanItem.New(obj,self);
 	obj:SetActive(true);
-	obj.transform:SetParent(self.view.obj_ZhuPanContent.transform);
+	--obj.transform:SetParent(self.view.obj_ZhuPanContent.transform);
 	obj.transform.localScale = Vector3.one;
 	table.insert(ZhuPanObjTable,obj);
 	item:RefreshShow(data,isFlicker)
@@ -982,16 +982,6 @@ end
 ---销毁UI
 function BaccaratGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
-
-	if self.beginTimer.running then
-		self.beginTimer:Stop();
-	end
-	if self.betCountDownTimer.running then
-		self.betCountDownTimer:Stop();
-	end
-	if self.beginTimer2.running then
-		self.beginTimer2:Stop();
-	end
 	TimerManager.StopAllTimer(self)
 	
 	if self.flickerSequence~=nil then
@@ -1008,12 +998,9 @@ function BaccaratGameCtrl:RealCloseDestroy()
 		local item =v;
 		item:Destroy();
 	end
-
-	for _, v in ipairs(ZhuPanObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
+	self.objPools:DestroyAll();
 	ZhuPanObjTable = {}
-	ZhuPanTable = {};
+	ZhuPanTable ={}
 	ZhuPanDataTable ={}
     
 	for _, v in ipairs(DaLuTable) do
@@ -1021,12 +1008,9 @@ function BaccaratGameCtrl:RealCloseDestroy()
 		local item =v;
 		item:Destroy();
 	end
-	for _, v in ipairs(DaLuObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
 	DaLuObjTable ={};
-	DaLuTable = {};
-	DaLuDataTable = {};
+	DaLuTable ={}
+	DaLuDataTable ={}
 
 
 	for _, v in ipairs(DaYanZaiLuTable) do
@@ -1034,23 +1018,18 @@ function BaccaratGameCtrl:RealCloseDestroy()
 		local item =v;
 		item:Destroy();
 	end
-	for _, v in ipairs(DaYanZaiLuObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
 	DaYanZaiLuObjTable = {}
-	DaYanZaiLuTable = {};	
-	DaYanZaiLuDataTable = {};	
+	DaYanZaiLuTable = {}
+	DaYanZaiLuDataTable = {}
 	
 	for _, v in ipairs(xiaoLuTable) do
 		---@type BaccaratAllChildLuItem
 		local item =v;
 		item:Destroy();
 	end
-	for _, v in ipairs(xiaoLuObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
+
 	xiaoLuObjTable ={}
-	xiaoLuTable = {};
+	xiaoLuTable = {}
 	xiaoLuDataTable ={}
 	
 	for _, v in ipairs(YueYouLuTable) do
@@ -1058,12 +1037,10 @@ function BaccaratGameCtrl:RealCloseDestroy()
 		local item =v;
 		item:Destroy();
 	end
-	for _, v in ipairs(YueYouLuObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
-	YueYouLuObjTable = {};
-	YueYouLuTable = {};
-	YueYouLuDataTable = {}
+	
+	YueYouLuObjTable = {}
+	YueYouLuTable ={}
+	YueYouLuDataTable ={}
 end
 
 return BaccaratGameCtrl
