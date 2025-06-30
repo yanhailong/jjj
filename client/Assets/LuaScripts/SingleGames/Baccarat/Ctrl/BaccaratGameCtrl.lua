@@ -168,10 +168,11 @@ function BaccaratGameCtrl:InitData()
 	self.betCountDownTimer = TimerManager:CreateTimer(function()
 		countDownTime = countDownTime-1;
 		self.view.tmp_Countdown.text = countDownTime;
-	end,1,countDownTime,true,function()
-		curGameStage =gameStage.Settlement;
-		self:RefreshGameStage();
-	end);
+		if(countDownTime<=0) then
+			curGameStage =gameStage.Settlement;
+			self:RefreshGameStage();
+		end
+	end,1,countDownTime,true);
 	curGameStage = gameStage.Begin;
 	self:SetCheckedShow();
 	---从服务器那边拿数据然后看在哪个阶段了，目前写一个假数据每次进来都是第一阶段
