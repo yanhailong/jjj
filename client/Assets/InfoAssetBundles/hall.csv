@@ -1,0 +1,15 @@
+大厅资源配置
+
+lang_english.unity3d,dir,Assets/AssetsPackage/PlatformHall/UIHall/alats/lang_english,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\alats\lang_english,AssetBundle
+main.unity3d,dir,Assets/AssetsPackage/PlatformHall/UIHall/alats/main,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\alats\main,AssetBundle
+vip.unity3d,dir,Assets/AssetsPackage/PlatformHall/UIHall/fonts/vip,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\fonts\vip,AssetBundle
+uihall.unity3d,file,Assets/AssetsPackage/PlatformHall/UIHall/Prefabs/UIHall.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\Prefabs\UIHall.prefab,AssetBundle
+uitestscroll.unity3d,file,Assets/AssetsPackage/PlatformHall/UIHall/Prefabs/UITestScroll.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\Prefabs\UITestScroll.prefab,AssetBundle
+texture.unity3d,dir,Assets/AssetsPackage/PlatformHall/UIHall/texture,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\texture,AssetBundle
+lang_english.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/alats/lang_english,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\alats\lang_english,AssetBundle
+main.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/alats/main,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\alats\main,AssetBundle
+uilogin.unity3d,file,Assets/AssetsPackage/PlatformHall/UILogin/Prefabs/UILogin.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\Prefabs\UILogin.prefab,AssetBundle
+texture.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/texture,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\texture,AssetBundle
+protol.unity3d,dir,Assets/AssetsPackage/PlatformHall/Protol,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\Protol,AssetBundle
+prefabs.unity3d,dir,Assets/AssetsPackage/PlatformHall/GameState/prefabs,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\GameState\prefabs,AssetBundle
+uihallgames.unity3d,file,Assets/AssetsPackage/PlatformHall/UIHall/Prefabs/UIHallGames.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\Prefabs\UIHallGames.prefab,AssetBundle
