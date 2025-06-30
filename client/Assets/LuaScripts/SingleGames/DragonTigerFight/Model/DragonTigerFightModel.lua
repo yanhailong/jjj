@@ -4,6 +4,7 @@
 ---
 ---@class DragonTigerFightModel:BaseModel
 local DragonTigerFightModel=Class("DragonTigerFightModel",BaseModel)
+local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
 
 local EventBinner = {
 	XIAZHU = "XIAZHU",
@@ -44,8 +45,10 @@ end
 
 ---收到玩家下注消息
 function DragonTigerFightModel:PlayerXiaZhu()
-	local data  = {id=Tools.RandomInt(1,30),xiazhuNum=Tools.RandomInt(1,10),dizhuType=Tools.RandomInt(1,5),areaType=Tools.RandomInt(1,3)}
-	self.allXiaZhuData[#self.allXiaZhuData+1] = data
+	local data  = {id=Tools.RandomInt(1,30),dizhuType=Tools.RandomInt(1,5),areaType=Tools.RandomInt(1,3)}
+	config.allXiaZhuData[#config.allXiaZhuData+1] = data
+	config.totalDiZhuNums[data.areaType] = config.totalDiZhuNums[data.areaType]+config.dizhuNumArr[data.dizhuType]
+	
 	self.ctrl.view:PayOtherXiaZhuCoinFly(data)
 end
 
@@ -65,10 +68,10 @@ function DragonTigerFightModel:OnXiaZhuComplete()
 	local cards = {Tools.RandomInt(1,13),Tools.RandomInt(1,13)}
 	---显示结果动画
 	---回收金币奖励动画
-	self.ctrl.view:PlayCompeleCoinFLy(self.allXiaZhuData,self.players,cards)
+	self.ctrl.view:PlayCompeleCoinFLy(config.allXiaZhuData,self.players,cards)
 	
 	---清理下注数据
-	self.allXiaZhuData = {}
+	config.allXiaZhuData = {}
 end
 
 ---更新历史信息
@@ -108,6 +111,10 @@ function DragonTigerFightModel:UpdateHistoryRecord(side)
 	--	end
 	--	
 	--end
+	if side == nil then
+		look("side数据为nil")
+		return
+	end
 	if self.game_his_items == nil then
 		self.game_his_items = {}
 	end

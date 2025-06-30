@@ -28,6 +28,7 @@ function DragonTigerFightView:InitComponents()
     self.btn_2=ComponentUtilGet.Button(self.transform,"content/top/btn_2")
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/buttom/btn_repeat");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/buttom/btn_players");
+    self.tmp_totalPlayerNum=ComponentUtilGet.TextMeshProUGUI(self.btn_players.transform,"tmp_total_player_num")
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/buttom/dizhu");
     self.xiazhuArea = ComponentUtilGet.Transform(self.transform,"content/center/XiaZhu")
     self.longClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/longClick")
@@ -64,7 +65,6 @@ function DragonTigerFightView:InitComponents()
     end
     ---底注节点
     self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/buttom/nodes")
-    look("看下这个表",self.chipInfos)
     ---其他玩家信息 left right
     ---@type PlayerItem[]
     self.AllOtherPlayerHeads = {}
@@ -102,6 +102,7 @@ function DragonTigerFightView:InitComponents()
     ---结果信息
     self.effectsTrs=ComponentUtilGet.Transform(self.transform,"content/effects")
     self.resultTrs=ComponentUtilGet.Transform(self.effectsTrs,"resoult")
+    self.resultBgTrs=ComponentUtilGet.Transform(self.transform,"Background/resoult/bg")
     self.resultWinTrs=ComponentUtilGet.Transform(self.resultTrs,"win")
     ---@type CardItem
     self.resultCard1=CardItem.New(ComponentUtilGet.GameObject(self.resultTrs,"card/left"))
@@ -136,8 +137,16 @@ function DragonTigerFightView:ClearComponents()
     self.xiazhuNumLabels = nil;
     self.xiazhuSelfNumsLabels=nil;
     self.xiazhuStarAreas=nil;
-    
+    self.tmp_totalPlayerNum=nil
 end
+
+---进入房间 对当前房间阶段数据进行初始
+function DragonTigerFightView:EnterRoom()
+    ---下注阶段 需要先初始历史筹码和下注信息
+    ---下注完成等待结果阶段 历史筹码和下注信息 正在结算动画
+    ---完成结算等待开局 
+end
+
 
 ---切换当前选中的底注
 function DragonTigerFightView:ChangeDiZhu(index)
@@ -153,20 +162,24 @@ function DragonTigerFightView:ChangeDiZhu(index)
 end
 
 ---启用/禁用下注按钮
-function DragonTigerFightView:InteractableDiZhu(enbale)
+function DragonTigerFightView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = enbale
+        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<=config.goldRealNum
+    end
+end
+
+---设置续投按钮是否可以点击 当前局已经手动投注或者上局未投注不能点 其他可点
+function DragonTigerFightView:SetRepeatState(isOn)
+    if isOn then
+        self.btn_repeat.interactable = true;
+    else
+        self.btn_repeat.interactable = false;
     end
 end
 
 ---本玩家下注动画
-function DragonTigerFightView:PayXiaZhuCoinFly(index)
-    coinFlyAnim:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[index])
-    look("下注动画"..index)
-    self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(true)
-    self.xiazhuNumLabels[index].transform.parent.gameObject:SetActive(true)
-    self.xiazhuSelfNumsLabels[index].text = config.selfDiZhuNums[index]
-    self.xiazhuNumLabels[index].text = config.totalDiZhuNums[index]
+function DragonTigerFightView:PayXiaZhuCoinFly(side)
+    coinFlyAnim:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side])
 end
 ---通过id找到玩家
 function DragonTigerFightView:FindPlayerByID(id)
@@ -179,6 +192,8 @@ function DragonTigerFightView:FindPlayerByID(id)
 end
 ---其他玩家下注动画
 function DragonTigerFightView:PayOtherXiaZhuCoinFly(data)
+    self:UpdateXiaZhuLabel()
+    
     for i=1,#self.ctrl.model.players do
         ---其他Top玩家下注动画
         if data.id == self.ctrl.model.players[i].id then
@@ -192,6 +207,15 @@ function DragonTigerFightView:PayOtherXiaZhuCoinFly(data)
         if i>=6 then
             coinFlyAnim:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.xiazhuStarAreas[data.areaType])
             break
+        end
+    end
+end
+
+---显示房间已出的底注 不要动画
+function DragonTigerFightView:RefresAreaCoin()
+    if config.allXiaZhuData and #config.allXiaZhuData>0 then
+        for i=1,#config.allXiaZhuData do
+            coinFlyAnim:CreatCoinInArea(self.dizhuNode,config.allXiaZhuData[i].dizhuType,self.xiazhuStarAreas[config.allXiaZhuData[i].areaType])
         end
     end
 end
@@ -210,25 +234,25 @@ function DragonTigerFightView:PlayCompeleCoinFLy(datas,players,cards)
     ---测试
     local ratios = {0.3,0.2,0.5}
     local targetPos = {}
+    local p = Tools.RandomInt(1,6)
     targetPos[1] = self.selfPlayerRoot.transform.position
     targetPos[2] = self.btn_players.transform.position
-    targetPos[3] = self.AllOtherPlayerHeads[Tools.RandomInt(1,6)].transform.position
+    targetPos[3] = self.AllOtherPlayerHeads[p].transform.position
     coinFlyAnim:DestroyCoin(targetPos,ratios)
+    --奖励数值
+    self.selfPlayer:ShowResultCount(Tools.RandomInt(-100,1000))
+    self.AllOtherPlayerHeads[p]:ShowResultCount(Tools.RandomInt(-100,1000))
 end
 
 
 
 ---初始界面
 function DragonTigerFightView:InitUI()
-    for i=1,3 do
-        self.xiazhuSelfNumsLabels[i].transform.parent.gameObject:SetActive(false)
-        self.xiazhuNumLabels[i].transform.parent.gameObject:SetActive(false)
-    end
     ---续押
     self.btn_repeat.interactable = false;
     ---其他玩家信息
     for i=1,#self.AllOtherPlayerHeads do
-        self.AllOtherPlayerHeads[i]:updateGoldCount(i)
+        self.AllOtherPlayerHeads[i]:UpdateGoldCount(i)
     end
     
     ---路单数据
@@ -236,18 +260,45 @@ function DragonTigerFightView:InitUI()
     
     self.startTrs.gameObject:SetActive(false)
     self.resultTrs.gameObject:SetActive(false)
+    self.resultBgTrs.gameObject:SetActive(false)
     
-    self:StartEffect()
-    self:ResultEffect({
-        {Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
-        {Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
-    })
+    self.tmp_totalPlayerNum.text="0"
+    --等待开局提示
+    self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
+    self.colockStateTimeTrs.gameObject:SetActive(false)
+    self.tipsCenterTxt.gameObject:SetActive(true)
+    self.tipsStartXiaZhu:SetActive(false)
+    self.tipsTimeEnd:SetActive(false)
+    self.tipsTimeThree:SetActive(false)
+    self.three.gameObject:SetActive(false)
+    self:InitXiaZhuLabel()
     
 end
 ---初始化View数据
 function DragonTigerFightView:InitPanelData(args)
 	
 end
+
+function DragonTigerFightView:InitXiaZhuLabel()
+    for index=1,3 do
+        self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(false)
+    end
+    self.xiazhuNumLabels[1].text = LocalManager.GetStrById(200101014)
+    self.xiazhuNumLabels[2].text = LocalManager.GetStrById(200101014)
+    self.xiazhuNumLabels[3].text = LocalManager.GetStrById(200101015)
+end
+
+function DragonTigerFightView:UpdateXiaZhuLabel()
+    for index=1,3 do
+        self.xiazhuNumLabels[index].text = config.totalDiZhuNums[index]
+        if config.selfDiZhuNums[index]>0 then
+            self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(true)
+            self.xiazhuSelfNumsLabels[index].text = config.selfDiZhuNums[index]
+        end
+    end
+end
+---流程 当前牌局状态,1=等待押注,2=押注冻结，等待开牌,3=本局结束
+---当前状态剩余秒数
 
 ---设置菜单显示隐藏
 function DragonTigerFightView:SettingFade()
@@ -265,14 +316,17 @@ end
 
 ---显示牌面结果和播放动画
 ---@param cards 龙虎牌型 牌型,牌值
-function DragonTigerFightView:ResultEffect(cards)
-    self:StartEffect()
+function DragonTigerFightView:ResultEffect(cards,callFunc)
+    config.allow=false
+    config.currStatus=2
+    self:UpdateDiZhuBtnState()
     
     for i=1,3 do
         self.resultWinTrs:GetChild(i-1).gameObject:SetActive(false)
     end
     self.resultWinTrs.gameObject:SetActive(true)
     self.resultTrs.gameObject:SetActive(true)
+    self.resultBgTrs.gameObject:SetActive(true)
     self.resultCard1:LoadCard(cards[1][1],cards[1][2])
     self.resultCard2:LoadCard(cards[2][1],cards[2][2])
     local p1 = self.ctr_dot_p1.position
@@ -280,12 +334,13 @@ function DragonTigerFightView:ResultEffect(cards)
     
     --下注结束
     self.tipsCenterTxt.text = ""
+    self.tipsCenterTxt.gameObject:SetActive(true)
     self.tipsTimeEnd:SetActive(true)
     
-    --出牌
+    --等待开牌
     self.resultCard1:Approach(p2,p1)
     self.resultCard2:Approach(Vector3(-p2.x,p2.y),Vector3(-p1.x,p1.y))
-    TimerManager.StopAllTimer(self)
+    --TimerManager.StopAllTimer(self)
     TimerManager.StartTimer(self, function
     ()
         --正在結算
@@ -294,7 +349,8 @@ function DragonTigerFightView:ResultEffect(cards)
     TimerManager.StartTimer(self, function
     ()
         self.tipsTimeEnd:SetActive(false)
-        
+        --开牌
+        config.currStatus = 3
         self.resultCard1:ShowFront()
     end, 2, 0, true)
     TimerManager.StartTimer(self, function
@@ -304,14 +360,14 @@ function DragonTigerFightView:ResultEffect(cards)
     --结果
     TimerManager.StartTimer(self, function
     ()
-        local win = DRAGON_TIGER_FIGHT_WIN_SIDE.HE
         if cards[1][2]>cards[2][2] then
-            win = DRAGON_TIGER_FIGHT_WIN_SIDE.Long
+            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.Long
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
         elseif cards[1][2]<cards[2][2] then
-            win = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
+            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
             self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
         else
+            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HE
             self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
         end
         --结果动画
@@ -321,6 +377,7 @@ function DragonTigerFightView:ResultEffect(cards)
     TimerManager.StartTimer(self, function
     ()
         self.resultWinTrs.gameObject:SetActive(false)
+        self:InitXiaZhuLabel()
     end,6, 0, true)
     TimerManager.StartTimer(self, function
     ()
@@ -333,14 +390,17 @@ function DragonTigerFightView:ResultEffect(cards)
     TimerManager.StartTimer(self, function
     ()
         self.resultTrs.gameObject:SetActive(false)
-        --
-    end,8, 0, true)
+        self.resultBgTrs.gameObject:SetActive(false)
 
-    self:PlayDaoJiShiEffect()
+        if callFunc then
+            callFunc(config.side)
+        end
+    end,8, 0, true)
+    
 end
 
 ---开始动画播放
-function DragonTigerFightView:StartEffect()
+function DragonTigerFightView:StartEffect(callFunc)
     self.startTrs.gameObject:SetActive(true)
     
     self.startLeftTrs.localPosition = Vector3(-3000,self.startLeftTrs.localPosition.y,0)
@@ -359,39 +419,65 @@ function DragonTigerFightView:StartEffect()
     
     sequence:OnComplete(function()
         sequence:Kill(false)
+        self.tipsCenterTxt.gameObject:SetActive(false)
         --开始下注提示
         self.tipsStartXiaZhu:SetActive(true)
+        self:UpdateXiaZhuLabel()
         TimerManager.StartTimer(self,function()
             self.tipsStartXiaZhu:SetActive(false)
         end,1.5,0,false)
+        
+        --倒计时
+        config.lessSeconds = DRAGON_TIGER_FIGHT_GAME_TIME
+        self.colockStateTimeNum.text = config.lessSeconds
+        self.colockStateTimeTrs.gameObject:SetActive(true)
+        TimerManager.StartTimer(self, function
+        ()
+            config.lessSeconds = config.lessSeconds - 1
+            self.colockStateTimeNum.text = config.lessSeconds 
+            --倒计时3s
+            if config.lessSeconds==3 then
+                self:PlayDaoJiShiEffect()
+            end
+        end, 1, DRAGON_TIGER_FIGHT_GAME_TIME, true,function()
+            self.colockStateTimeTrs.gameObject:SetActive(false)
+        end)
+        
+        if callFunc then callFunc() end
     end)
     sequence:Play()
     
 end
 
----倒计时
+---倒计时3秒
 function DragonTigerFightView:PlayDaoJiShiEffect()
-    for i=0,2 do
+    for i=0,1 do
         self.three:GetChild(i).gameObject:SetActive(false)
     end
     self.three.gameObject:SetActive(true)
     self.tipsTimeThree:SetActive(true)
-
-    for i=0,3 do
+    
+    self.three:GetChild(2).gameObject:SetActive(true)
+    for i=1,3 do
         TimerManager.StartTimer(self,function()
             if i==3 then
                 self.three.gameObject:SetActive(false)
                 self.tipsTimeThree:SetActive(false)
                 return
             end
-            if i>0 then
-                self.three:GetChild(3-i).gameObject:SetActive(false)
-            end
+            self.three:GetChild(3-i).gameObject:SetActive(false)
             self.three:GetChild(2-i).gameObject:SetActive(true)
-        end,1+i,0,false)
+        end,i,0,false)
     end
 end
 
+---更新自己信息
+function DragonTigerFightView:UpdateSelf(player)
+    self.selfPlayer:UpdatePlayer(player)
+end
+function DragonTigerFightView:UpdateSelfGoldCount()
+    self.selfPlayer:UpdateGoldCount(config.goldRealNum)
+end
 ---其他玩家信息更新
 function DragonTigerFightView:UpdatePlayers(players)
     if players ~=nil and #players>0 then

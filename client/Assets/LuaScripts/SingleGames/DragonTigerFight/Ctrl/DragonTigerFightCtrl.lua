@@ -29,7 +29,7 @@ end
 
 ---初始化数据
 function DragonTigerFightCtrl:InitData()
-	
+
 end
 
 
@@ -75,11 +75,12 @@ function DragonTigerFightCtrl:AddUIEvent()
 
 	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
 		---测试
-		GlobalEvent.Notify("UPDATE_PLAYER",{})
-		TimerManager.StartTimer(self, function
-		()
-			GlobalEvent.Notify("XIAZHU",{})
-		end, 0.2, 30, true)
+		--GlobalEvent.Notify("UPDATE_PLAYER",{})
+		--TimerManager.StartTimer(self, function
+		--()
+		--	GlobalEvent.Notify("XIAZHU",{})
+		--end, 0.2, 30, true)
+		self:TestAreaCoin()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
 		CtrlManager.SingleShow(CtrlNames.DragonTigerFightPlayerRank)
@@ -87,10 +88,7 @@ function DragonTigerFightCtrl:AddUIEvent()
 		GlobalEvent.Notify("XIAZHU_END",{})
 	end)
 	self.uiEventListener:AddClick(self.view.btn_2,function()
-		self.view:ResultEffect({
-			{Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
-			{Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
-		})
+		self:Test()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_muen,function()
 		self.view:SettingFade()
@@ -98,37 +96,132 @@ function DragonTigerFightCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_touch,function()
 		self.view:SettingFade()
 	end)
+	self.uiEventListener:AddClick(self.view.btn_repeat,function()
+		if #config.lastXiaZhuInfo>0 and config.isRepeat == false then
+			config.isRepeat=true
+			for i=1,#config.lastXiaZhuInfo do
+				if config.allow == false or config.currStatus ~= 1 or config.dizhuNumArr[config.lastXiaZhuInfo[i].index]>config.goldRealNum then
+					break
+				end
+				self:XiaZhu(config.lastXiaZhuInfo[i])
+				self.view:PayXiaZhuCoinFly(config.lastXiaZhuInfo[i].side)
+			end
+			self.view.btn_repeat.interactable = false
+		end
+	end)
+
+end
+
+---测试显示区域底注
+function DragonTigerFightCtrl:TestAreaCoin()
+	for i=1,30 do
+		local data  = {id=Tools.RandomInt(1,30),dizhuType=Tools.RandomInt(1,5),areaType=Tools.RandomInt(1,3)}
+		config.allXiaZhuData[#config.allXiaZhuData+1] = data
+		config.totalDiZhuNums[data.areaType] = config.totalDiZhuNums[data.areaType]+config.dizhuNumArr[data.dizhuType]
+	end
+	self.view:RefresAreaCoin()
+end
+---模拟测试游戏流程
+function DragonTigerFightCtrl:Test()
+	self.view:InitUI()
 	
+	local areas = {self.view.longClickArea,self.view.huClickArea,self.view.heClickArea}
+	--进房间更新玩家信息
+	GlobalEvent.Notify("UPDATE_PLAYER",{})
+	
+	config.allow=true
+	config.currStatus=1
+	config.selfXiaZhuInfo = {}
+	config.isRepeat = false
+	self.view:UpdateDiZhuBtnState()
+	--复投功能
+	self.view.btn_repeat.interactable = #config.lastXiaZhuInfo>0
+	
+	--准备
+	self.view:StartEffect(function()
+		
+		--下注
+		local times= Tools.RandomInt(3,10)
+		TimerManager.StartTimer(self, function
+		()
+			config.dizhuIndex = Tools.RandomInt(1,3)
+			self.view:ChangeDiZhu(config.dizhuIndex)
+			self:OnClickCenterYaZhuSide(areas[Tools.RandomInt(1,3)])
+		end, 0.2, times, true)
+		--其他玩家下注消息
+		TimerManager.StartTimer(self, function
+		()
+			GlobalEvent.Notify("XIAZHU",{})
+		end, 0.1, times*2, true)
+		--下注结束结算
+		TimerManager.StartTimer(self, function
+		()
+			self.view:ResultEffect({
+				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
+				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
+			},function(side)
+				--显示路信息
+				GlobalEvent.Notify("UPDATE_HIS_ITEMS",side)
+			end)
+			
+			TimerManager.StartTimer(self, function
+			()
+				---回收
+				GlobalEvent.Notify("XIAZHU_END",{})	
+			end,6,0,false)
+
+			---复投功能
+			if config.isRepeat then
+				config.lastXiaZhuInfo={}
+			else
+				config.lastXiaZhuInfo = config.selfXiaZhuInfo
+			end
+			config.selfXiaZhuInfo = {}
+		end, DRAGON_TIGER_FIGHT_GAME_TIME+0.5, 0, true)
+		
+	end)
 end
 
 ---中心下注区域
 function DragonTigerFightCtrl:OnClickCenterYaZhuSide(obj)
 	look("点击了下注节点：",obj)
-
+	if config.allow == false or config.currStatus ~= 1 or config.dizhuNumArr[config.dizhuIndex]>config.goldRealNum then
+		return
+	end
+	local side = 0
 	if obj.name == self.view.longClickArea.name then
 		look("下注了龙:",config.dizhuNumArr[config.dizhuIndex])
-		self:XiaZhu(1)
-		self.view:PayXiaZhuCoinFly(1)
+		side = 1
 	end
 	if obj.name == self.view.huClickArea.name then
 		look("下注了虎:",config.dizhuNumArr[config.dizhuIndex])
-		self:XiaZhu(2)
-		self.view:PayXiaZhuCoinFly(2)
+		side = 2
 	end
 	if obj.name == self.view.heClickArea.name then
 		look("下注了和:",config.dizhuNumArr[config.dizhuIndex])
-		self:XiaZhu(3)
-		self.view:PayXiaZhuCoinFly(3)
+		side = 3
 	end
+
+	if side then
+		local data = {side=side,index=config.dizhuIndex}
+		self:XiaZhu(data)
+		self.view:PayXiaZhuCoinFly(side)
+	end
+	
+	self.view:UpdateDiZhuBtnState()
+	self.view:UpdateSelfGoldCount()
 end
 
-function DragonTigerFightCtrl:XiaZhu(index)
-	config.selfDiZhuNums[index] = config.selfDiZhuNums[index] + config.dizhuNumArr[config.dizhuIndex]
-	config.totalDiZhuNums[index] = config.totalDiZhuNums[index] + config.dizhuNumArr[config.dizhuIndex]
+function DragonTigerFightCtrl:XiaZhu(data)
+	config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + config.dizhuNumArr[data.index]
+	config.totalDiZhuNums[data.side] = config.totalDiZhuNums[data.side] + config.dizhuNumArr[data.index]
+	config.goldRealNum = config.goldRealNum - config.dizhuNumArr[data.index]
+	table.insert(config.selfXiaZhuInfo,data)
+	self.view:UpdateXiaZhuLabel()
 end
 ---
 function DragonTigerFightCtrl:InitChipINof()
-
+	
 end
 
 

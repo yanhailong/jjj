@@ -71,6 +71,34 @@ function PlayCoin:AnimateCoin(coin,coin_type,start_pos,target)
     sequence:Play()
 end
 
+---创建底注到区域
+function PlayCoin:CreatCoinInArea(coin,coin_type,target)
+    local coinObj = pool:Spawn(nil,coin)
+
+    -- 设置金币初始位置和激活状态
+    coinObj.transform:SetParent(target.transform,false)
+    coinObj.transform.localScale = Vector3.one
+    coins[#coins+1] = coinObj
+
+    local images = {}
+    for i = 1, 5 do
+        images[i] = ComponentUtilGet.GameObject(coinObj.transform, "img_" .. i)
+    end
+
+    for i = 1, 5 do
+        images[i]:SetActive(coin_type == i)
+    end
+
+    -- 获取目标区域的矩形顶点
+    local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)
+    target:GetWorldCorners(corners)
+
+    local endPos = Vector3(UnityEngine.Random.Range(corners[0].x,corners[2].x), UnityEngine.Random.Range(corners[0].y,corners[2].y), 0)
+
+    coinObj.transform.position = endPos
+    coinObj:SetActive(true)
+end
+
 ---
 ---targetPos 目标 {v3,v3,v3...}
 ---ratios 比例 {0.1,0.3,0.6}
