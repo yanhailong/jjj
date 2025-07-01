@@ -18,7 +18,7 @@ function BaccaratZhuPanItem:ctor(obj,ctrl)
     self.obj_Tie = ComponentUtilGet.GameObject(self.transform,"obj_Tie")
     self.obj_PlayerPoint = ComponentUtilGet.GameObject(self.transform,"obj_PlayerPoint")
     self.obj_BankerPoint = ComponentUtilGet.GameObject(self.transform,"obj_BankerPoint")
-    ---@type USDollarExpressCarCtrl
+    ---@type BaccaratGameCtrl
     self.ctrl=ctrl
 end
 ---初始化状态

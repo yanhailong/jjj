@@ -86,7 +86,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5500965183496582894}
   m_Layer: 5
-  m_Name: BaccaratZhuPanItem
+  m_Name: ZhuPanItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
