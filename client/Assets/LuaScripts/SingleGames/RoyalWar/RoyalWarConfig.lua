@@ -126,6 +126,23 @@ function this.GetCardTypeName(type)
     end
 end
 
+---获取牌型的真名字
+function this.GetCardTypeTrueName(type)
+    if(type == this.CardType.Leopard) then
+        return "豹子"
+    elseif(type == this.CardType.ShunJin) then
+        return "顺金"
+    elseif(type == this.CardType.JinHua) then
+        return "金花"
+    elseif(type == this.CardType.ShunZi) then
+        return "顺子"
+    elseif(type == this.CardType.DuiZi) then
+        return "对子"
+    elseif(type == this.CardType.DanZhang) then
+        return "单张"
+    end
+end
+
 ---获取对应筹码的预支名字
 function this.GetChipPoolName(chipStateName)
     if chipStateName == this.ChipState.One then

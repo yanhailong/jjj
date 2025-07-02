@@ -111,7 +111,7 @@ end
 
 ---初始化数据
 function BaccaratGameCtrl:InitData()
-	countDownTime = 12;
+	countDownTime = 2;
 	
 	BetBankerAllNum = 0;
 	BetPlayerAllNum = 0;

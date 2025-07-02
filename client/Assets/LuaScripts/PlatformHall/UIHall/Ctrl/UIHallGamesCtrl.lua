@@ -47,6 +47,12 @@ function UIHallGamesCtrl:OnClickGameItem(index)
 	if index==1 then
 		require("SingleGames/USDollarExpress/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.USDollarExpressMain)
+	elseif index == 2 then
+		require("SingleGames/Baccarat/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.BaccaratGame)
+	elseif index == 5 then
+		require("SingleGames/RoyalWar/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.RoyalWarGame)
 	end
 end
 

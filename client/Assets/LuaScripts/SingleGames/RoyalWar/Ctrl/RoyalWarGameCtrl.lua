@@ -11,6 +11,8 @@ local RoyalWarZhuPanItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarZhuPanItem"
 local RoyalWarDaLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarDaLuItem"
 ---@type RoyalWarAllChildLuItem
 local RoyalWarAllChildLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarAllChildLuItem"
+---@type RoyalWarCardTypeItem
+local RoyalWarCardTypeItem = require("SingleGames/RoyalWar/Ctrl/RoyalWarCardTypeItem")
 local CurWhoWin;
 local Vector2 = CS.UnityEngine.Vector2
 local Vector3 = CS.UnityEngine.Vector3
@@ -35,6 +37,11 @@ local BetBlackAllNum;
 local BetLuckyAllNum;
 ---筹码下注的集合表
 local ChipTable={};
+---牌型数据(用来显示在路下面前面7个出过什么牌)
+local CardTypeData={};
+local CardTypeTable={};
+---牌型Obj
+local CardTypeObjTable={};
 ---主盘表
 local ZhuPanTable = {};
 local ZhuPanObjTable = {};
@@ -80,6 +87,7 @@ function RoyalWarGameCtrl:CtrlInit(args)
 	config.InitIconPic();
 	CurSelectChip = 0;
 	self:InitZhuPanTable()
+	self:InitCardTypeData()
 	self:InitDaLuTable()
 	self:InitDaLuZiLuTable()
 	self:InitXiaoLuTable()
@@ -89,7 +97,7 @@ end
 
 ---初始化数据
 function RoyalWarGameCtrl:InitData()
-	countDownTime =12;
+	countDownTime =2;
 	curGameStage = config.GameSate.Start;
 	BetRedAllNum =0;
 	BetBlackAllNum =0;
@@ -216,6 +224,12 @@ function RoyalWarGameCtrl:EnterSettlement()
 		else
 			self.view.img_RedResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi1")
 		end
+
+		if(self.BlackCardType == config.CardType.DanZhang) then
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi2")
+		else
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi1")
+		end
 		coroutine.wait(1)
 		self.view.ator_CardRoot:Play("RoyalWarDealCard")
 		coroutine.wait(3)
@@ -223,6 +237,11 @@ function RoyalWarGameCtrl:EnterSettlement()
 		self:ShowWin(self.RedCardType > self.BlackCardType)
 		self.IsLucky = self.RedCardType~=config.CardType.DanZhang or self.BlackCardType~=config.CardType.DanZhang;
 		self:Flicker();
+		if(self.RedCardType>self.BlackCardType) then
+			self:RefreshCardTypeData(self.RedCardType)
+		else
+			self:RefreshCardTypeData(self.BlackCardType)
+		end
 		coroutine.wait(3)
 		for _, v in ipairs(ChipTable) do
 			self:PlayChipToPlayer(v)
@@ -322,6 +341,12 @@ function RoyalWarGameCtrl:CloseLuTable()
 	ZhuPanTable = {}
 	ZhuPanDataTable ={}
 
+	for _, v in ipairs(CardTypeObjTable) do
+		self.objPools:UnSpawnPrefab(v);
+	end
+	CardTypeTable = {}
+	CardTypeData = {}
+	
 	for _, v in ipairs(DaLuTable) do
 		v:InitState()
 	end
@@ -360,8 +385,28 @@ function RoyalWarGameCtrl:InitZhuPanTable()
 		self:RefreshZhuPanShow(v,false)
 	end
 end
+---初始化牌型数据显示
+function RoyalWarGameCtrl:InitCardTypeData()
+	for _, v in ipairs(CardTypeData) do
+		self:RefreshCardTypeData(v);
+	end
+end
 
-
+function RoyalWarGameCtrl:RefreshCardTypeData(type)
+	if(#CardTypeTable>=7)then
+		table.remove(CardTypeTable,1)
+		self.objPools:UnSpawnPrefab(CardTypeObjTable[1]);
+		table.remove(CardTypeObjTable,1)
+	end
+	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"CardTypeItem",self.view.obj_CardTypeContent.transform)
+	---@type RoyalWarCardTypeItem
+	local item = RoyalWarCardTypeItem.New(obj,self);
+	obj:SetActive(true);
+	obj.transform.localScale = Vector3.one;
+	item:RefreshShow(type);
+	table.insert(CardTypeObjTable,#CardTypeObjTable+1,obj);
+	table.insert(CardTypeTable,item);
+end
 
 ---初始化大路预制体表
 function RoyalWarGameCtrl:InitDaLuTable()
@@ -910,6 +955,15 @@ function RoyalWarGameCtrl:RealCloseDestroy()
 	DaLuObjTable ={};
 	DaLuTable ={}
 	DaLuDataTable ={}
+
+	for _, v in ipairs(CardTypeTable) do
+		---@type RoyalWarCardTypeItem
+		local item =v;
+		item:Destroy();
+	end
+	CardTypeObjTable ={};
+	CardTypeData ={}
+	CardTypeTable ={}
 
 
 	for _, v in ipairs(DaYanZaiLuTable) do
