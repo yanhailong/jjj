@@ -55,7 +55,6 @@ function DragonTigerFightCtrl:AddUIEvent()
 		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()
 			if config.allow then
 				self.view:ChangeDiZhu(i)
-				config.dizhuIndex = i
 				look("btn 抵住数值"..config.dizhuNumArr[config.dizhuIndex])
 				---测试数据生成 龙虎和 对应前三个币
 				GlobalEvent.Notify("UPDATE_HIS_ITEMS",i)
@@ -132,8 +131,9 @@ function DragonTigerFightCtrl:Test()
 	config.allow=true
 	config.currStatus=1
 	config.selfXiaZhuInfo = {}
-	config.isRepeat = false
+	--config.isRepeat = false
 	self.view:UpdateDiZhuBtnState()
+	self.view:SetRepeatState(config.isRepeat)
 	--复投功能
 	self.view.btn_repeat.interactable = #config.lastXiaZhuInfo>0
 	
@@ -144,8 +144,7 @@ function DragonTigerFightCtrl:Test()
 		local times= Tools.RandomInt(3,10)
 		TimerManager.StartTimer(self, function
 		()
-			config.dizhuIndex = Tools.RandomInt(1,3)
-			self.view:ChangeDiZhu(config.dizhuIndex)
+			self.view:ChangeDiZhu(Tools.RandomInt(1,3))
 			self:OnClickCenterYaZhuSide(areas[Tools.RandomInt(1,3)])
 		end, 0.2, times, true)
 		--其他玩家下注消息
@@ -159,9 +158,9 @@ function DragonTigerFightCtrl:Test()
 			self.view:ResultEffect({
 				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
 				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
-			},function(side)
+			},function()
 				--显示路信息
-				GlobalEvent.Notify("UPDATE_HIS_ITEMS",side)
+				GlobalEvent.Notify("UPDATE_HIS_ITEMS")
 			end)
 			
 			TimerManager.StartTimer(self, function

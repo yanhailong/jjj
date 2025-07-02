@@ -11,7 +11,6 @@ local ClockStateItem = require("SingleGames/DragonTigerFight/View/Item/ClockStat
 local RoadView = require("SingleGames/DragonTigerFight/View/RoadView")
 local CardItem = require("SingleGames/DragonTigerFight/View/Item/CardItem")
 local DOTween = CS.DG.Tweening.DOTween
-local Sequence = CS.DG.Tweening.Sequence
 local Ease = CS.DG.Tweening.Ease
 
 ---初始化panel
@@ -150,15 +149,48 @@ end
 
 ---切换当前选中的底注
 function DragonTigerFightView:ChangeDiZhu(index)
-    self.chipInfos[config.dizhuIndex].rectTrans:DOScale(1,0.1)
-    self.chipInfos[config.dizhuIndex].rectTrans:DOLocalMoveY(0,0.1)
-    self.chipInfos[config.dizhuIndex].effects:SetActive(false)
-    ---@type UnityEngine.RectTransform
-    local rect = self.chipInfos[index].rectTrans
-    --rect:DOScale(1.4,0.1)
-    rect:DOLocalMoveY(13.0,0.1)
-    self.chipInfos[index].effects:SetActive(true)
-
+    -- 参数验证
+    if not index or index < 1 or index > #self.chipInfos then
+        return
+    end
+    
+    -- 如果点击的是当前已选中的按钮，不做任何操作
+    if index == config.dizhuIndex and self.chipInfos[index].effects.activeSelf then
+        return
+    end
+    
+    local oldIndex = config.dizhuIndex
+    local oldChip = self.chipInfos[oldIndex]
+    local newChip = self.chipInfos[index]
+    
+    -- 停止之前按钮的所有动画
+    if oldChip and oldChip.rectTrans then
+        oldChip.rectTrans:DOKill() -- 停止所有DOTween动画
+    end
+    
+    -- 停止新按钮的所有动画
+    if newChip and newChip.rectTrans then
+        newChip.rectTrans:DOKill() -- 停止所有DOTween动画
+    end
+    
+    -- 重置旧按钮状态
+    if oldChip then
+        oldChip.rectTrans:DOScale(1, 0.1):SetEase(Ease.OutQuad)
+        oldChip.rectTrans:DOLocalMoveY(0, 0.1):SetEase(Ease.OutQuad)
+        oldChip.effects:SetActive(false)
+    end
+    
+    -- 设置新按钮状态
+    if newChip then
+        -- 先设置缩放动画
+        newChip.rectTrans:DOScale(1.1, 0.15):SetEase(Ease.OutBack)
+        -- 再设置位置动画
+        newChip.rectTrans:DOLocalMoveY(13.0, 0.15):SetEase(Ease.OutQuad)
+        newChip.effects:SetActive(true)
+    end
+    
+    -- 更新配置中的当前选中索引
+    config.dizhuIndex = index
 end
 
 ---启用/禁用下注按钮
@@ -393,7 +425,7 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
         self.resultBgTrs.gameObject:SetActive(false)
 
         if callFunc then
-            callFunc(config.side)
+            callFunc()
         end
     end,8, 0, true)
     
@@ -441,6 +473,7 @@ function DragonTigerFightView:StartEffect(callFunc)
             end
         end, 1, DRAGON_TIGER_FIGHT_GAME_TIME, true,function()
             self.colockStateTimeTrs.gameObject:SetActive(false)
+            self:SetRepeatState(false)
         end)
         
         if callFunc then callFunc() end

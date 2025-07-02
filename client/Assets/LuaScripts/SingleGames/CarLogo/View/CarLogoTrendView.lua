@@ -1,0 +1,115 @@
+---
+---Create by Administrator
+---DateTime: 2025-06-30 15:05:35
+---
+---@class CarLogoTrendView:BaseView
+local CarLogoTrendView=Class("CarLogoTrendView",BaseView)
+local CarLogoConfig =require("SingleGames/CarLogo/CarLogoConfig")
+local CarLogoGameModel =require("SingleGames/CarLogo/Model/CarLogoGameModel")
+local CarLogoHelper=require("SingleGames/CarLogo/CarLogoHelper")
+
+---初始化panel
+function CarLogoTrendView:InitView()
+	---@type CarLogoTrendCtrl
+    self.ctrl=self.ctrl
+	self:InitComponents()
+end
+
+---获取组件
+function CarLogoTrendView:InitComponents()
+    self.img_title=ComponentUtilGet.Image(self.transform,"content/background/img_title");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/background/btn_close");
+    self.resultsTrs=ComponentUtilGet.Transform(self.transform,"content/results")
+    self.rateTrs=ComponentUtilGet.Transform(self.transform,"content/rate")
+    self.rateTmps={}
+    for i=1,8 do
+        table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
+    end
+    self.resultsItems={}
+    table.insert(  self.resultsItems,self:InitResultItem(self.resultsTrs:GetChild(0)))
+    for i=1,49 do
+        table.insert(self.resultsItems, self:InitResultItem(Tools.Instance(self.resultsTrs:GetChild(0),self.resultsTrs)))
+    end
+end
+
+---清空组件
+function CarLogoTrendView:ClearComponents()
+    self.img_title=nil;
+    self.btn_close=nil;
+end
+
+---初始化View数据
+function CarLogoTrendView:InitPanelData(args)
+    self:InitRateUI()
+    self:UpdateHistory()
+end
+
+function CarLogoTrendView:InitRateUI()
+    for i=1,8 do
+        local img = ComponentUtilGet.Image(self.rateTrs:GetChild(i-1),"icon")
+        img.sprite = CarLogoHelper.LoadLogoSprite(i)
+    end
+end
+
+function CarLogoTrendView:InitResultItem(transform)
+    local table = {}
+    table.icon = ComponentUtilGet.Image(transform, "icon");
+    table.new = ComponentUtilGet.Image(transform,"new");
+    table.ShowLogo = function(logo_id)
+        if logo_id then
+            table.icon.sprite = CarLogoHelper.LoadLogoSprite(logo_id);
+            table.icon.gameObject:SetActive(true)
+        else
+            table.new.gameObject:SetActive(false)
+            table.icon.gameObject:SetActive(false)
+        end
+    end
+
+    table.ShowNew=function(show)
+        table.new.gameObject:SetActive(show)
+    end
+    
+    return table
+end
+
+function CarLogoTrendView:UpdateHistory()
+    ---测试
+    CarLogoGameModel.historyList = {}
+    for i=1,Tools.RandomInt(30,50) do
+        table.insert(CarLogoGameModel.historyList,{logo_index=1,logo_id=Tools.RandomInt(1,8)})
+    end
+    ---
+    local index = #CarLogoGameModel.historyList
+    for i=1,50 do
+        if index>0 then
+            self.resultsItems[i].ShowLogo(CarLogoGameModel.historyList[index].logo_id)
+            index = index - 1
+            if i==1 then self.resultsItems[1].ShowNew(true) end
+        else
+            self.resultsItems[i].ShowLogo()
+        end
+    end
+    
+    ---概率
+    self.rateData = {0,0,0,0,0,0,0,0}
+    local offset=math.max(#CarLogoGameModel.historyList-49,1)
+    local count = #CarLogoGameModel.historyList-offset+1
+    for i=#CarLogoGameModel.historyList,offset,-1 do
+        self.rateData[CarLogoGameModel.historyList[i].logo_id]=self.rateData[CarLogoGameModel.historyList[i].logo_id]+1
+    end
+
+    if count>0 then
+        for i=1,8 do
+            self.rateData[i]=math.floor(self.rateData[i]*1000/count)/10
+            self.rateTmps[i].text = self.rateData[i].."%"
+        end
+    end
+end
+
+---关闭界面
+function CarLogoTrendView:Close()   
+    self.super.Close(self);
+end
+
+return CarLogoTrendView
+

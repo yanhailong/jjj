@@ -75,7 +75,7 @@ function DragonTigerFightModel:OnXiaZhuComplete()
 end
 
 ---更新历史信息
-function DragonTigerFightModel:UpdateHistoryRecord(side)
+function DragonTigerFightModel:UpdateHistoryRecord()
 	--测试数据
 	--local game_his_items = {}
 	--if self.total then
@@ -111,6 +111,7 @@ function DragonTigerFightModel:UpdateHistoryRecord(side)
 	--	end
 	--	
 	--end
+	local side = config.side
 	if side == nil then
 		look("side数据为nil")
 		return

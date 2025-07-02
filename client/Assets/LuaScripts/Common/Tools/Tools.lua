@@ -1199,3 +1199,39 @@ function this.FadeParentAndChild(parent,fadeTime,fadeTimes,startAlpha,endAlpha)
 
     return allTweener
 end
+
+---DOTween
+function this.DoColor_Alpha(graphic, startAlpha, endAlpha, duration)
+    graphic:DOKill(false);
+    local color = graphic.color;
+    color.a = startAlpha;
+    graphic.color = color;
+    graphic:DOFade(endAlpha, duration);
+end
+
+function this.SetColorAlpha_Float(graphic, alpha)
+    local color = graphic.color;
+    color.a = alpha;
+    graphic.color = color;
+end
+
+function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, startAlpha, endAlpha, callFunc)
+    graphic:DOKill(false);
+    local _startAlpha = startAlpha or 1
+    local _endAlpha = endAlpha or 0
+    local allTweener = {}
+    local sequence = nil
+    
+    for i = 1,fadeTimes do
+        if sequence == nil then
+            sequence = DG.Tweening.DOTween.Sequence():Append(graphic:DOFade(_endAlpha, fadeTime)):Append(graphic:DOFade(_startAlpha, fadeTime))
+        else
+            sequence:Append(graphic:DOFade(_endAlpha, fadeTime)):Append(graphic:DOFade(_startAlpha, fadeTime))
+        end
+    end
+    sequence:OnComplete(function ()
+        graphic.color = Color.New(graphic.color.r, graphic.color.g, graphic.color.b, _startAlpha)
+        sequence:Kill(false)
+        if callFunc then callFunc() end
+    end)
+end
