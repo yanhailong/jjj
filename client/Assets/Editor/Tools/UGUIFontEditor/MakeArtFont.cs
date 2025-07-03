@@ -118,7 +118,6 @@ public class MakeArtFont
         ti.mipmapEnabled = false;
         ti.isReadable = true;
         ti.filterMode = FilterMode.Trilinear;
-        ti.textureFormat = TextureImporterFormat.AutomaticTruecolor;
         AssetDatabase.ImportAsset(subPngPath, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
     }
 
@@ -186,8 +185,11 @@ public class MakeArtFont
         }
 
         assetFont.characterInfo = characters;
-
-
+        EditorUtility.SetDirty(assetFont);
+        //保存资源
+        AssetDatabase.SaveAssets();
+        //更新asset修改的资源
+        AssetDatabase.Refresh();
 
     }
     private static string GetAssetPath(string path)

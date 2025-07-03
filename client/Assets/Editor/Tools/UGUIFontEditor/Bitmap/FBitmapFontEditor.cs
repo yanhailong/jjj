@@ -11,7 +11,7 @@ public class FBitmapFontEditor : FEditorWindow
 	private Texture2D mMainTex;
 	private CharacterInfo[] mChtInfos;
 
-	[MenuItem("Font/位图字体生成工具[Bitmap]", priority = 300)]
+	[MenuItem("Tools/FontMaker/位图字体生成工具[Bitmap]", priority = 300)]
 	public static void Open()
 	{
 		GetWindow<FBitmapFontEditor>();
