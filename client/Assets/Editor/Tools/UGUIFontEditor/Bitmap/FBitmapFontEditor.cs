@@ -92,7 +92,7 @@ public class FBitmapFontEditor : FEditorWindow
 		    mChtInfos[i] = new CharacterInfo();
             mChtInfos[i].glyphHeight = texH;
 		    mChtInfos[i].glyphWidth = texW;
-		    mChtInfos[i].index = Encoding.ASCII.GetBytes(tiles[i].name)[0];
+		    mChtInfos[i].index = Uncode(tiles[i].name);//Encoding.ASCII.GetBytes(tiles[i].name)[0];
 
             string unicodeID = null;
             byte[] buffer = Encoding.Unicode.GetBytes(tiles[i].name);
@@ -106,7 +106,7 @@ public class FBitmapFontEditor : FEditorWindow
             }
             if (!string.IsNullOrEmpty(unicodeID))
             {
-                mChtInfos[i].index = System.Convert.ToInt32(unicodeID, 16);
+	            mChtInfos[i].index = Uncode(tiles[i].name); //System.Convert.ToInt32(unicodeID, 16);
             }
 
             mChtInfos[i].uvTopLeft = r.position;
@@ -122,7 +122,24 @@ public class FBitmapFontEditor : FEditorWindow
 
 	}
 
+	public static int Uncode(string str)
+	{
+		int outStr = 0;
+		if (!string.IsNullOrEmpty(str))
+		{
 
+			if (str == "。")
+			{
+				outStr = (int)"."[0];
+			}
+			else
+			{
+				outStr = ((int)str[0]);
+			}
+		}
+
+		return outStr;
+	}
 	private void OnClickExport()
 	{
 		if (mMainTex == null)
