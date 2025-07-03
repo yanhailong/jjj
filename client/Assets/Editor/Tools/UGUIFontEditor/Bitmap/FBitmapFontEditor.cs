@@ -128,7 +128,7 @@ public class FBitmapFontEditor : FEditorWindow
 		if (!string.IsNullOrEmpty(str))
 		{
 
-			if (str == "。")
+			if (str == "d")
 			{
 				outStr = (int)"."[0];
 			}

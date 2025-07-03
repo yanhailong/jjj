@@ -204,7 +204,7 @@ public class MakeArtFont
         if (!string.IsNullOrEmpty(str))
         {
 
-            if (str == "。")
+            if (str == "d")
             {
                 outStr = (int)"."[0];
             }
