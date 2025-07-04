@@ -1215,10 +1215,10 @@ function this.SetColorAlpha_Float(graphic, alpha)
     graphic.color = color;
 end
 
-function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, startAlpha, endAlpha, callFunc)
+function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, delayTime, callFunc)
     graphic:DOKill(false);
-    local _startAlpha = startAlpha or 1
-    local _endAlpha = endAlpha or 0
+    local _startAlpha = 1
+    local _endAlpha = 0
     local allTweener = {}
     local sequence = nil
     
@@ -1227,6 +1227,9 @@ function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, startAlpha, endAlpha, c
             sequence = DG.Tweening.DOTween.Sequence():Append(graphic:DOFade(_endAlpha, fadeTime)):Append(graphic:DOFade(_startAlpha, fadeTime))
         else
             sequence:Append(graphic:DOFade(_endAlpha, fadeTime)):Append(graphic:DOFade(_startAlpha, fadeTime))
+        end
+        if delayTime and delayTime>0 then
+            sequence:AppendInterval(delayTime)
         end
     end
     sequence:OnComplete(function ()

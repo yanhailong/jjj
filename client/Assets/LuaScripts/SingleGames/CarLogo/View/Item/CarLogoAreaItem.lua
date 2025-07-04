@@ -24,11 +24,11 @@ end
 function CarLogoAreaItem:ShowWinFlashAnim(callFunc)
 	self.choose1.gameObject:SetActive(true);
 	self.choose2.gameObject:SetActive(true);
-	Tools.DOFade_Repeat(self.choose1,0.5,2,0,1,function()
+	Tools.DOFade_Repeat(self.choose1,0.5,2,0,function()
 		self.choose1.gameObject:SetActive(false);
 		if callFunc then callFunc() end
 	end)
-	Tools.DOFade_Repeat(self.choose2,0.5,2,0,1,function()
+	Tools.DOFade_Repeat(self.choose2,0.5,2,0,function()
 		self.choose2.gameObject:SetActive(false);
 	end)
 end
