@@ -395,13 +395,14 @@ end
 function RoyalWarGameCtrl:RefreshCardTypeData(type)
 	if(#CardTypeTable>=7)then
 		table.remove(CardTypeTable,1)
-		self.objPools:UnSpawnPrefab(CardTypeObjTable[1]);
+		self.objPools:UnSpawnPrefabByPoolName("CardTypeItem",CardTypeObjTable[1]);
 		table.remove(CardTypeObjTable,1)
 	end
-	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"CardTypeItem",self.view.obj_CardTypeContent.transform)
+	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"CardTypeItem")
 	---@type RoyalWarCardTypeItem
 	local item = RoyalWarCardTypeItem.New(obj,self);
 	obj:SetActive(true);
+	obj.transform:SetParent(self.view.obj_CardTypeContent.transform);
 	obj.transform.localScale = Vector3.one;
 	item:RefreshShow(type);
 	table.insert(CardTypeObjTable,#CardTypeObjTable+1,obj);
@@ -633,7 +634,6 @@ function RoyalWarGameCtrl:AddDaYanZiLuTableShow()
 				table.insert(DaYanZaiLuDataTable[ListCur],dataTable)
 			end
 		end
-
 	end
 end
 
