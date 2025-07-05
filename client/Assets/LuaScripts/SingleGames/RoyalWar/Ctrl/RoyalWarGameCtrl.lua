@@ -97,7 +97,7 @@ end
 
 ---初始化数据
 function RoyalWarGameCtrl:InitData()
-	countDownTime =2;
+	countDownTime =13;
 	curGameStage = config.GameSate.Start;
 	BetRedAllNum =0;
 	BetBlackAllNum =0;
