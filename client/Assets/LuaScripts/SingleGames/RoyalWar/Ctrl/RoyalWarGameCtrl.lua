@@ -97,7 +97,7 @@ end
 
 ---初始化数据
 function RoyalWarGameCtrl:InitData()
-	countDownTime =2;
+	countDownTime =13;
 	curGameStage = config.GameSate.Start;
 	BetRedAllNum =0;
 	BetBlackAllNum =0;
@@ -927,7 +927,10 @@ end
 function RoyalWarGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
 	TimerManager.StopAllTimer(self)
-
+	if self.SettlementCor then
+		coroutine.stop(self.SettlementCor)
+		self.SettlementCor=nil
+	end
 	if self.flickerSequence~=nil then
 		self.flickerSequence:Kill();
 	end
