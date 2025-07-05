@@ -67,7 +67,7 @@ function CarLogoGameCtrl:AddUIEvent()
 	---下注区域点击
 	for i=1,self.view.areasTrs.childCount do
 		self.uiEventListener:AddClick(self.view.areasTrs:GetChild(i-1),function(obj)
-			self:OnClickCenterYaZhuSide(obj)
+			self:OnClickCenterYaZhuSide(i)
 		end)	
 	end
 	
@@ -101,11 +101,7 @@ function CarLogoGameCtrl:RemoveEvent()
 end
 
 --region UI事件方法
-function CarLogoGameCtrl:OnClickCenterYaZhuSide(obj)
-	if not obj then
-		return
-	end
-	local side = tonumber(obj.name)
+function CarLogoGameCtrl:OnClickCenterYaZhuSide(side)
 	look("点击了区域："..side)
 	if side then
 		local data = {side=side,index=CarLogoConfig.dizhuIndex}
@@ -146,7 +142,7 @@ function CarLogoGameCtrl:Test()
 		TimerManager.StartTimer(self, function
 		()
 			self.view:ChangeDiZhu(Tools.RandomInt(1,5))
-			self:OnClickCenterYaZhuSide(self.view.areaViews[Tools.RandomInt(1,8)].gameObject)
+			self:OnClickCenterYaZhuSide(Tools.RandomInt(1,8))
 		end, 1, 3, true)
 		--其他玩家下注消息
 		TimerManager.StartTimer(self, function
