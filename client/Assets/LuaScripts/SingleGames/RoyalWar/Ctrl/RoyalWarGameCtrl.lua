@@ -927,7 +927,10 @@ end
 function RoyalWarGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
 	TimerManager.StopAllTimer(self)
-
+	if self.SettlementCor then
+		coroutine.stop(self.SettlementCor)
+		self.SettlementCor=nil
+	end
 	if self.flickerSequence~=nil then
 		self.flickerSequence:Kill();
 	end
