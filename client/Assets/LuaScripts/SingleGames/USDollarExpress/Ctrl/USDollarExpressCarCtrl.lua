@@ -109,16 +109,18 @@ end
 
 ---初始化火车车厢
 function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
-	self.WidthSpace=1280
 	self.allItems={}
 	for i = 1, #goldList do
 		self.objPools:SpawnPrefab(function
 		(card)
 			---@type USDollarExpressTrainItem
 			local item=USDollarExpressTrainItem.New(card,self)
+			local rectTrans=ComponentUtilGet.RectTransform(item.transform)
+			local wid=rectTrans.rect.width
+			local with= CS.UnityEngine.Screen.width
 			card:SetActive(true)
 			card.transform:SetParent(self.view.trans_root)
-			card.transform.localPosition = Vector3.New(i* -self.WidthSpace, 0, 0) -- 设置slotItem的位置
+			card.transform.localPosition = Vector3.New(i* -rectTrans.rect.width, 0, 0) -- 设置slotItem的位置
 			card.transform.localScale = Vector3.one
 			card.name = tostring(i)
 			item:SetText(goldList[i])
@@ -128,7 +130,7 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 
 	self.maxMoveIndex= #goldList
 	self.curMoveIndex=1
-	self:Move()
+	--self:Move()
 	
 end
 

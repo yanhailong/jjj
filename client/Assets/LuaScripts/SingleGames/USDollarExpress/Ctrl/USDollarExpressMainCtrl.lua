@@ -8,6 +8,7 @@ local USDollarExpressMainCtrl=Class("USDollarExpressMainCtrl",BaseCtrl)
 local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 ---@type USDollarExpressSlotItem
 local SlotItem=require"SingleGames/USDollarExpress/Ctrl/USDollarExpressSlotItem"
+require("Logic/Common/commonSlots/MVCHead")
 
 
 
@@ -42,14 +43,15 @@ function USDollarExpressMainCtrl:CtrlInit(args)
 		[9] = 2500,
 		[10] = 5000,
 	}
-	self:InitPlayerInfos(self.stakeList)
+	---@type UICommonSlotBtnsCtrl
+	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,self.stakeList)
+	---@type UICommonSlotTopCtrl
+	self.topCtrl=CtrlManager.SingleShow(CtrlNames.UICommonSlotTop)
 	
+	--require("SingleGames/USDollarExpress/test/MVCHead")
+	--CtrlManager.SingleShow(CtrlNames.USDollarExpressMapSelect)
 end
----设置玩家初始数据
-function USDollarExpressMainCtrl:InitPlayerInfos(stakeList)
-	config.stakeList=stakeList
-	self.view:SetChipText(self.stakeList[self.betIndex])--设置默认
-end
+
 
 ---初始化数据
 function USDollarExpressMainCtrl:InitData()
@@ -61,7 +63,7 @@ function USDollarExpressMainCtrl:InitData()
 	self.realCard={}
 	self.tweener={}
 	self.tweener1={}
-	self.betIndex=1--下注索引，默认为1
+
 	
 	self.freeState=false;
 	self.isAllRoate=false
@@ -79,12 +81,14 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 		self.childsList[i] = {}
 		local nCircels = config.rollItemNum
 		for j = 1, nCircels do
+			---@type UnityEngine.GameObject
 			local card = instantiate(self.view.cardPrefab)
 			card:SetActive(true)
 			card.transform:SetParent(go.transform)
 			card.transform.localPosition = Vector3.New(0, config.itemStartPosY+(j-2)* dis, 0) -- 设置slotItem的位置
 			card.transform.localScale = Vector3.one
 			card.name = tostring(j)
+			card.transform:SetAsFirstSibling()
 			local iconItem=SlotItem.New(card)
 			local texId = math.random(1,table.getCount(config.iocnPicName))
 			iconItem:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片       
@@ -143,7 +147,7 @@ function USDollarExpressMainCtrl:ReSetData()
 		--else
 		--	self.rollCircles[i] = 3+i
 		--end
-		self.rollCircles[i] = 3+i
+		self.rollCircles[i] = 1+i
 	end
 
 	if self.lineShowCor~=nil then
@@ -209,9 +213,7 @@ function USDollarExpressMainCtrl:RestWheelPos(wheelid,isEnd)
 			local item=self.childsList[wheelid][config.rollItemNum-num]
 			self.childsList[wheelid][j]:SetSprite(item:GetCurSprite(),item:GetIconIndex())
 		else
-			if not isEnd then
-				self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
-			end
+			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
 		end
 	end
 end
@@ -310,6 +312,7 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 	if self.model.specialType==1 then
 		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
 	end
+	--config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:EndSmallGame()
@@ -334,16 +337,13 @@ end
 
 ---添加UI事件
 function USDollarExpressMainCtrl:AddUIEvent()
-	self.uiEventListener:AddClick(self.view.btn_close,function()
-		self:Close()
-	end )
-	
-	self.uiEventListener:AddClick(self.view.btn_start,function()
-		--self:OnStartDoSpin()
-		self.model:ReqStartGame(self.stakeList[self.betIndex])
-	end )
-	
-	self:InitChipInfoUiEvent()
+
+end
+
+function USDollarExpressMainCtrl:BackHome()
+	self:Close()
+	self.buttomCtrl:Close()
+	self.topCtrl:Close()
 end
 
 ---移除UI事件
@@ -353,46 +353,7 @@ end
 
 --region UI事件方法
 
---下注相关--------------------
-function USDollarExpressMainCtrl:InitChipInfoUiEvent()
-	self.uiEventListener:AddClick(self.view.btn_add, function()
-		self:SetChipInfo("add")
-	end)
-	self.uiEventListener:AddClick(self.view.btn_reduce, function()
-		self:SetChipInfo("reduce")
-	end)
-	self.uiEventListener:AddClick(self.view.btn_max, function()
-		self:SetChipInfo("max")
-	end)
-end
-function USDollarExpressMainCtrl:SetChipInfo(str)
-	local chipMoney = self.stakeList[self.betIndex]
-	local playerMoney=1000000000000
-	if str == "max" then
-		if tonumber(chipMoney)> tonumber(playerMoney)   then
-			SuspensionTipsUtil.SuspensionTips("金币不足");
-			return
-		end
-		self.betIndex = #self.stakeList
-	elseif str == "add" then
-		if tonumber(chipMoney)> tonumber(playerMoney)  then
-			SuspensionTipsUtil.SuspensionTips("金币不足");
-			return
-		end
-		self.betIndex = self.betIndex%(#self.stakeList) + 1
-	elseif str == "reduce" then
-		if tonumber(chipMoney)> tonumber(playerMoney)   then
-			SuspensionTipsUtil.SuspensionTips("金币不足");
-			return
-		end
-		self.betIndex=self.betIndex-1;
-		if  self.betIndex<=0  then
-			self.betIndex=#self.stakeList
-		end
-	end
-	self.view:SetChipText(self.stakeList[self.betIndex])
-end
---下注相关--------------------
+
 
 
 

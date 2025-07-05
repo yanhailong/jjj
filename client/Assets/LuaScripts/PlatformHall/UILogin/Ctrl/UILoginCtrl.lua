@@ -28,6 +28,10 @@ end
 
 function UILoginCtrl:InitData()
 	self.serverInfo=nil
+	logError("获取屏幕宽度："..CS.UnityEngine.Screen.width)
+	
+	
+	
 end
 
 function UILoginCtrl:Close()
@@ -66,14 +70,27 @@ function UILoginCtrl:AddUIEvent()
 		
 		look("CS.UnityEngine.Screen.width",CS.UnityEngine.Screen.width)
 		local spawPos=CS.UnityEngine.Screen.width/2
+		
 		local rectTrans=ComponentUtilGet.RectTransform(self.view.obj_test.transform)
+		logError("rectTrans.rect.width:"..rectTrans.rect.width)
+		logError("CS.UnityEngine.Screen.width:"..CS.UnityEngine.Screen.width)
+		
 		local pos =rectTrans.rect.width/2+spawPos
+
+
+		local leftPos=ComponentUtilGet.RectTransform(self.transform,"content/leftpos")
+		look("leftPos",leftPos.anchoredPosition)
+		
 		logError("需要实例化的位"..pos)
 		---@type UnityEngine.GameObject
 		local obj= Tools.Instance(self.view.obj_test,self.view.obj_test.transform.parent)
 		obj:SetActive(true)
 		local rect=ComponentUtilGet.RectTransform(obj.transform)
-		rect.anchoredPosition=Vector2(-pos,0)
+		
+		local pos222=Vector3.New(leftPos.anchoredPosition.x-rectTrans.rect.width,leftPos.anchoredPosition.y,0)
+		look("pos222",pos222)
+		rect.anchoredPosition=Vector2(pos222,0)
+
 		
 		
 	end)

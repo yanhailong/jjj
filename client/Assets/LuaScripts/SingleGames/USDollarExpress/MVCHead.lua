@@ -4,8 +4,21 @@ CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressCar].ctrl =require "SingleG
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressCar].view=require "SingleGames/USDollarExpress/View/USDollarExpressCarView";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressCar].model=require "SingleGames/USDollarExpress/Model/USDollarExpressCarModel";
 
+CtrlNames.USDollarExpressGameSelect="USDollarExpressGameSelect";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressGameSelect]={};
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressGameSelect].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressGameSelectCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressGameSelect].view=require "SingleGames/USDollarExpress/View/USDollarExpressGameSelectView";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressGameSelect].model=require "SingleGames/USDollarExpress/Model/USDollarExpressGameSelectModel";
+
+CtrlNames.USDollarExpressHelp="USDollarExpressHelp";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp]={};
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressHelpCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].view=require "SingleGames/USDollarExpress/View/USDollarExpressHelpView";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].model=require "SingleGames/USDollarExpress/Model/USDollarExpressHelpModel";
+
 CtrlNames.USDollarExpressMain="USDollarExpressMain";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain]={};
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressMainCtrl";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].view=require "SingleGames/USDollarExpress/View/USDollarExpressMainView";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].model=require "SingleGames/USDollarExpress/Model/USDollarExpressMainModel";
+

@@ -3,8 +3,8 @@
 local USDollarExpressConfig=Class("USDollarExpressConfig")
 local  this = USDollarExpressConfig;
 
-this.itemSpace = 180 --行间距
-this.itemStartPosY  = -268
+this.itemSpace = 240 --行间距
+this.itemStartPosY  = -360
 this.lieNum = 5
 this.rollItemNum = 11
 this.rollItemNumTime=0.33
@@ -15,11 +15,6 @@ this.freeTotalNum = 0   --总免费次数
 this.curFreeNum=0       --当前剩余免费次数
 this.showStep=0
 this.freeState=false    --游戏状态
-this.isLinked=false     --link状态
-this.isFirestEnterLink=0--判断是否是第一次进入link
-
-this.stakeList={1,2,3,4}--下注列表从服务器获取
-
 
 ---游戏状态
 this.gameState={
@@ -79,7 +74,7 @@ this.rollTime={
 }
 
 this.ABNames={
-    icon="SingleGames/GameTemp1/alats/icons",--icon
+    icon="SingleGames/USDollarExpress/alats/icons",--icon
     train="SingleGames/USDollarExpress/prefabs/train"--火车
 }
 
@@ -87,16 +82,28 @@ this.ABNames={
 this.icon_Pics={}
 --iconName
 this.iocnPicName={
-    [1]="1053_symbol_000",
-    [2]="1053_symbol_001",
-    [3]="1053_symbol_002",
-    [4]="1053_symbol_003",
-    [5]="1053_symbol_004",
-    [6]="1053_symbol_005",
-    [7]="1053_symbol_103",
-    [8]="1053_symbol_007",
-    [9]="1053_symbol_008",
-    [10]="1053_symbol_009",
+    [1]="mykd_TB_0",
+    [2]="mykd_TB_1",
+    [3]="mykd_TB_2",
+    [4]="mykd_TB_3",
+    [5]="mykd_TB_4",
+    [6]="mykd_TB_5",
+    [7]="mykd_TB_6",
+    [8]="mykd_TB_7",
+    [9]="mykd_TB_8",
+    [10]="mykd_TB_9",
+    [11]="mykd_TB_10",
+    [12]="mykd_TB_11",
+    [13]="mykd_TB_12",
+    [14]="mykd_TB_13",
+    [15]="mykd_TB_14",
+    [16]="mykd_TB_15",
+    [17]="mykd_TB_16",
+    [18]="mykd_TB_17",
+    [19]="mykd_TB_18",
+    [20]="mykd_TB_19",
+    [21]="mykd_TB_20",
+    [22]="mykd_TB_21",
 }
 function this.InitIconPic()
     local pics=resMgr:LoadAllAssets(this.ABNames.icon,typeof(UnityEngine.Sprite))

@@ -6,14 +6,12 @@ function USDollarExpressSlotItem:ctor(go)
     ---@type UnityEngine.Transform
     self.transform=self.gameObject.transform
     self.img_icon=ComponentUtilGet.Image(self.transform,"img_icon");
-    self.tmp_name=ComponentUtilGet.TextMeshProUGUI(self.transform,"tmp_name");
 end
 
 function USDollarExpressSlotItem:SetSprite(icon,index)
     self.img_icon.sprite=icon
     self.img_icon:SetNativeSize()
     self.iconIndex=index
-    self.tmp_name.text=index
 end
 
 function USDollarExpressSlotItem:SetActive(active)

@@ -20,10 +20,22 @@ function USDollarExpressMainModel:AddEvent()
 	--WebNetEvent.AddListener(pb_USDollarExpress.ResStartGame,self.ResStartGame,self)
 	local str= resMgr:LoadTextAssetStr("SingleGames/USDollarExpress","slotData.txt")
 	self.slotData=jsonDecode(str)
+	
+	GlobalEvent.AddListener(SlotEvent.SlotEventName.StartSpin,self.ReqStartGame,self)
+	GlobalEvent.AddListener(SlotEvent.SlotEventName.BackHome,self.BackHome,self)
+	GlobalEvent.AddListener(SlotEvent.SlotEventName.OpenHelp,self.OpenHelp,self)
+end
+
+function USDollarExpressMainModel:BackHome()
+	self.ctrl:BackHome()
+end
+function USDollarExpressMainModel:OpenHelp()
+	CtrlManager.SingleShow(CtrlNames.USDollarExpressHelp)
 end
 
 function USDollarExpressMainModel:RemoveEvent()
 	WebNetEvent.RemoveAllTo(self)
+	GlobalEvent.RemoveAllTo(self)
 end
 
 function USDollarExpressMainModel:ReqStartGame(stakeVlue)

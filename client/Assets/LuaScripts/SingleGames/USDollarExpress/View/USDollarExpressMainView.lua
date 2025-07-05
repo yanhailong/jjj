@@ -11,25 +11,27 @@ function USDollarExpressMainView:InitView()
     self.ctrl=self.ctrl
 	self:InitComponents()
     self:InitWheelRoot()
-    self:InitChipInfo()
 end
 
 ---获取组件
 function USDollarExpressMainView:InitComponents()
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/top/btn_close");
     self.trans_slots=ComponentUtilGet.Transform(self.transform,"content/gameCenter/slotsMain/wheelRoot/trans_slots");
     self.img_icon=ComponentUtilGet.Image(self.transform,"content/gameCenter/item/img_icon");
-    self.tmp_name=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/gameCenter/item/tmp_name");
-    self.btn_start=ComponentUtilGet.Button(self.transform,"content/buttom/btn_start");
+    self.txt_grand=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/grand/txt_grand")
+    self.txt_mejor=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mejor/txt_mejor")
+    self.txt_minor=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/minor/txt_minor")
+    self.txt_mini=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mini/txt_mini")
 end
 
 ---清空组件
 function USDollarExpressMainView:ClearComponents()
-    self.btn_close=nil;
     self.trans_slots=nil;
     self.img_icon=nil;
-    self.tmp_name=nil;
     self.btn_start=nil;
+    self.txt_grand=nil
+    self.txt_mejor=nil
+    self.txt_minor=nil
+    self.txt_mini=nil
 end
 
 function USDollarExpressMainView:InitWheelRoot()
@@ -40,18 +42,6 @@ function USDollarExpressMainView:InitWheelRoot()
 
     self.cardPrefab=self.transform:Find("content/gameCenter/item").gameObject
     self.cardPrefab:SetActive(false)
-end
-
-
----:初始化ChipInfo
-function USDollarExpressMainView:InitChipInfo()
-    self.btn_add=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_add")
-    self.btn_reduce=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_reduce")
-    self.btn_max=ComponentUtilGet.Button(self.transform,"content/buttom/chipInfo/btn_max")
-    self.txt_chipInfo=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/chipInfo/txt_chipInfo")
-end
-function USDollarExpressMainView:SetChipText(num)
-    self.txt_chipInfo.text=num
 end
 
 ---初始化View数据

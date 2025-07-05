@@ -13,7 +13,7 @@ local function SetObjTips(content)
     else
         objInfo={};
         if isnull(obj_tips) then
-            local gameObject=PanelManager.CreatePanel("Common/UICommon","CommShowTips",5);
+            local gameObject=PanelManager.CreatePanel("Common/UICommon/prefabs/CommShowTips","CommShowTips",5);
             transRoot=gameObject.transform
             obj_tips=ComponentUtilGet.GameObject(gameObject.transform,"obj_tips");
         end
