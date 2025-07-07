@@ -22,50 +22,14 @@ CarLogoConfig.LOGO_TYPE = {
 
 ---车标图片
 CarLogoConfig.LOGO_IMAGES = {
-    [this.LOGO_TYPE.LOGO1] = "CarLogo5",
-    [this.LOGO_TYPE.LOGO2] = "CarLogo7",
-    [this.LOGO_TYPE.LOGO3] = "CarLogo1",
-    [this.LOGO_TYPE.LOGO4] = "CarLogo2",
-    [this.LOGO_TYPE.LOGO5] = "CarLogo3",
-    [this.LOGO_TYPE.LOGO6] = "CarLogo4",
-    [this.LOGO_TYPE.LOGO7] = "CarLogo8",
-    [this.LOGO_TYPE.LOGO8] = "CarLogo6"
-}
-
----车标背景图
-CarLogoConfig.LOGO_BG = {
-    [this.LOGO_TYPE.LOGO1] = "CarLogo_Floor_BIG",
-    [this.LOGO_TYPE.LOGO2] = "CarLogo_Floor_BIG",
-    [this.LOGO_TYPE.LOGO3] = "CarLogo_Floor_SMALL",
-    [this.LOGO_TYPE.LOGO4] = "CarLogo_Floor_SMALL",
-    [this.LOGO_TYPE.LOGO5] = "CarLogo_Floor_SMALL",
-    [this.LOGO_TYPE.LOGO6] = "CarLogo_Floor_BIG",
-    [this.LOGO_TYPE.LOGO7] = "CarLogo_Floor_SMALL",
-    [this.LOGO_TYPE.LOGO8] = "CarLogo_Floor_BIG"
-}
-
----车标打灯
-CarLogoConfig.LOGO_LIGHT = {
-    [this.LOGO_TYPE.LOGO1] = "CarLogo_lighting_03",
-    [this.LOGO_TYPE.LOGO2] = "CarLogo_lighting_03",
-    [this.LOGO_TYPE.LOGO3] = "CarLogo_lighting_02",
-    [this.LOGO_TYPE.LOGO4] = "CarLogo_lighting_02",
-    [this.LOGO_TYPE.LOGO5] = "CarLogo_lighting_02",
-    [this.LOGO_TYPE.LOGO6] = "CarLogo_lighting_03",
-    [this.LOGO_TYPE.LOGO7] = "CarLogo_lighting_02",
-    [this.LOGO_TYPE.LOGO8] = "CarLogo_lighting_03"
-}
-
----车标选中
-CarLogoConfig.LOGO_CHOOSE = {
-    [this.LOGO_TYPE.LOGO1] = "CarLogo_Choose_Violet_01",
-    [this.LOGO_TYPE.LOGO2] = "CarLogo_Choose_Violet_01",
-    [this.LOGO_TYPE.LOGO3] = "CarLogo_Choose_Green_01",
-    [this.LOGO_TYPE.LOGO4] = "CarLogo_Choose_Green_01",
-    [this.LOGO_TYPE.LOGO5] = "CarLogo_Choose_Green_01",
-    [this.LOGO_TYPE.LOGO6] = "CarLogo_Choose_Violet_01",
-    [this.LOGO_TYPE.LOGO7] = "CarLogo_Choose_Green_01",
-    [this.LOGO_TYPE.LOGO8] = "CarLogo_Choose_Violet_01"
+    [this.LOGO_TYPE.LOGO1] = "Car_cb_bjd",
+    [this.LOGO_TYPE.LOGO2] = "Car_cb_fll",
+    [this.LOGO_TYPE.LOGO3] = "Car_cb_lbjn",
+    [this.LOGO_TYPE.LOGO4] = "Car_cb_bsj",
+    [this.LOGO_TYPE.LOGO5] = "Car_cb_bc",
+    [this.LOGO_TYPE.LOGO6] = "Car_cb_bm",
+    [this.LOGO_TYPE.LOGO7] = "Car_cb_jb",
+    [this.LOGO_TYPE.LOGO8] = "Car_cb_kdlk"
 }
 
 ---车标赔率
@@ -94,14 +58,25 @@ CarLogoConfig.LOGO_IDX = {
 
 ---车标选中
 CarLogoConfig.LOGO_RESULT = {
-    [this.LOGO_TYPE.LOGO1] = "CarLogoResult1_FRL_",
-    [this.LOGO_TYPE.LOGO2] = "CarLogoResult1_PORSCHE_",
-    [this.LOGO_TYPE.LOGO3] = "CarLogoResult1_MSR_",
-    [this.LOGO_TYPE.LOGO4] = "CarLogoResult1_BENZ_",
-    [this.LOGO_TYPE.LOGO5] = "CarLogoResult1_BWM_",
-    [this.LOGO_TYPE.LOGO6] = "CarLogoResult1_CDL_",
-    [this.LOGO_TYPE.LOGO7] = "CarLogoResult1_Result_VW_",
-    [this.LOGO_TYPE.LOGO8] = "CarLogoResult1_MZD_"
+    [this.LOGO_TYPE.LOGO1] = "Car_bjd",
+    [this.LOGO_TYPE.LOGO2] = "Car_fll",
+    [this.LOGO_TYPE.LOGO3] = "Car_lbjn",
+    [this.LOGO_TYPE.LOGO4] = "Car_bsj",
+    [this.LOGO_TYPE.LOGO5] = "Car_bc",
+    [this.LOGO_TYPE.LOGO6] = "Car_bm",
+    [this.LOGO_TYPE.LOGO7] = "Car_jb",
+    [this.LOGO_TYPE.LOGO8] = "Car_kdlk"
+}
+
+---曲线关键帧
+CarLogoConfig.CURVE_KEYS = {
+    {0, 0},
+    {0.217001, 0.2185733},
+    {0.3953623, 0.6170632},
+    {0.5479923, 0.8335034},
+    {0.6578649, 0.9386156},
+    {0.7526295, 0.9679444},
+    {1, 1}
 }
 
 ---特殊效果类型，1=随机炸，2=跑火车，3=大四喜，4=小四喜，5=系统通杀

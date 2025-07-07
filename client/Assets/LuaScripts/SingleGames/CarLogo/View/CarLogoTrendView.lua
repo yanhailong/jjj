@@ -47,7 +47,7 @@ end
 function CarLogoTrendView:InitRateUI()
     for i=1,8 do
         local img = ComponentUtilGet.Image(self.rateTrs:GetChild(i-1),"icon")
-        img.sprite = CarLogoHelper.LoadSmallLogoSprite(i)
+        img.sprite = CarLogoHelper.LoadLogoSprite(i)
     end
 end
 
@@ -57,7 +57,7 @@ function CarLogoTrendView:InitResultItem(transform)
     table.new = ComponentUtilGet.Image(transform,"new");
     table.ShowLogo = function(logo_id)
         if logo_id then
-            table.icon.sprite = CarLogoHelper.LoadSmallLogoSprite(logo_id);
+            table.icon.sprite = CarLogoHelper.LoadLogoSprite(logo_id);
             table.new.gameObject:SetActive(false)
             table.icon.gameObject:SetActive(true)
         else

@@ -1234,7 +1234,7 @@ function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, delayTime, callFunc)
     end
     sequence:OnComplete(function ()
         graphic.color = Color.New(graphic.color.r, graphic.color.g, graphic.color.b, _startAlpha)
-        sequence:Kill(false)
         if callFunc then callFunc() end
     end)
+    sequence:Play()
 end

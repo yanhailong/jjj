@@ -154,10 +154,13 @@ function CarLogoGameCtrl:Test()
 		()
 			local logo_id=Tools.RandomInt(1,8)
 			local logo_index=CarLogoConfig.LOGO_IDX[logo_id][Tools.RandomInt(1,#CarLogoConfig.LOGO_IDX[logo_id])]
-			self.view:PlayResultAnimation({win_carlogo={logo_index=logo_index,logo_id=logo_id},last_carlogo={logo_index=4,logo_id=4}})
+			local result = {win_carlogo={logo_index=logo_index,logo_id=logo_id},last_carlogo={logo_index=4,logo_id=4}}
+			self.view:PlayResultAnimation(result)
 
 			TimerManager.StartTimer(self, function
 			()
+				-- 播放赢的区域闪动
+				self.view.areaViews[result.win_carlogo.logo_id]:ShowWinFlashAnim()
 				---回收
 				GlobalEvent.Notify(CarLogoConfig.EventBinner.XIAZHU_END,{})
 			end,7,0,false)

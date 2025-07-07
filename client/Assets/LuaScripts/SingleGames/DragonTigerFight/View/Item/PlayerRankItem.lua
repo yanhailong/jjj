@@ -14,7 +14,7 @@ function PlayerRankItem:ctor(go)
     self.vipIcon = ComponentUtilGet.Image(self.transform,"player/vip")
     self.nameTxt = ComponentUtilGet.TextMeshProUGUI(self.transform,"info/tmp_name")
     self.coinNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"info/coin/tmp_coin")
-    self.gameNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"info/tmp_game")
+    self.gameNum = ComponentUtilGet.Text(self.transform,"info/tmp_game")
     self.xiazhuNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"info/tmp_xiazhu")
     self.sucNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"info/tmp_sucnum")
 end

@@ -16,14 +16,14 @@ function CarLogoItem:ctor(trs)
     
     self.choose.gameObject:SetActive(true)
     self.huoChe.gameObject:SetActive(false)
-
+    self.image.transform.localScale = Vector3(0.55,0.55,1)
     self:ShowChoose(false)
 end
 
 function CarLogoItem:FlyLogoHistory(result,target)
     local gameObj = Tools.Instance(self.image.gameObject)
     gameObj.transform:SetParent(result)
-    gameObj.transform.localScale = Vector3(2,2,1);
+    gameObj.transform.localScale = Vector3(0.55,0.55,1);
     gameObj.transform.position = self.transform.position;
     gameObj.transform:DOMove(target,1):SetEase(Ease.InOutQuad):OnComplete(function ()
         Tools.Destroy(gameObj)
@@ -33,12 +33,6 @@ end
 ---
 function CarLogoItem:ShowLogo(logo_id)
     self.image.sprite = CarLogoHelper.LoadLogoSprite(logo_id);
-    -- 背景顯示
-    self.bg.sprite = CarLogoHelper.LoadLogoBgSprite(logo_id)
-    -- 燈光顯示
-    self.light.sprite = CarLogoHelper.LoadLogoLightSprite(logo_id)
-    -- 選中圓圈
-    self.choose.sprite = CarLogoHelper.LoadLogoChooseSprite(logo_id)
     
     self.logoId = logo_id;
 end
@@ -53,21 +47,19 @@ end
 function CarLogoItem:ShowChoose(state, doTween)
     if state then
         if doTween then
-            --Tools.DoColor_Alpha(self.choose, 1, 0, 1)
-            --Tools.DoColor_Alpha(self.light, 1, 0, 0.6)
             Tools.SetColorAlpha_Float(self.choose, 0)
-            Tools.SetColorAlpha_Float(self.light, 0)
+            --Tools.SetColorAlpha_Float(self.light, 0)
             -- 选中的图标由大变小效果
             self:DOFade(false)
         else
             Tools.SetColorAlpha_Float(self.choose, 1)
-            Tools.SetColorAlpha_Float(self.light, 1)
+            --Tools.SetColorAlpha_Float(self.light, 1)
             -- 选中的图标由大变小效果
             self:DOFade(true)
         end
     else
         Tools.SetColorAlpha_Float(self.choose, 0)
-        Tools.SetColorAlpha_Float(self.light, 1)
+        --Tools.SetColorAlpha_Float(self.light, 1)
         self:DOFade(false)
     end
 end
@@ -75,26 +67,20 @@ end
 ---閃燈
 function CarLogoItem:FlashLight(time,fadeTimes)
     self:ShowChoose(false)
-    Tools.DOFade_Repeat(self.light,time,fadeTimes)
+    Tools.DOFade_Repeat(self.choose,time,fadeTimes,0,function()
+        Tools.SetColorAlpha_Float(self.choose, 0)
+    end)
 end
 
 --- 选中的图标由大变小效果
 function CarLogoItem:DOFade(doTween)
     if doTween then
         -- 选中的图标由大变小效果
-        self.image.transform.localScale = Vector3(1.12,1.12,1)
-        DG.Tweening.DOTween.Sequence():Append(self.image.transform:DOScale(1, 0.4)):OnComplete(
-                function() self.image.transform.localScale = Vector3(1,1,1) end)
-        self.choose.transform.localScale = Vector3(1.12,1.12,1)
-        DG.Tweening.DOTween.Sequence():Append(self.choose.transform:DOScale(1, 0.4)):OnComplete(
-                function() self.choose.transform.localScale = Vector3(1,1,1) end)
-        self.bg.transform.localScale = Vector3(1.12,1.12,1)
-        DG.Tweening.DOTween.Sequence():Append(self.bg.transform:DOScale(1, 0.4)):OnComplete(
-                function() self.bg.transform.localScale = Vector3(1,1,1) end)
+        self.transform.localScale = Vector3(1.12,1.12,1)
+        DG.Tweening.DOTween.Sequence():Append(self.transform:DOScale(1, 0.4)):OnComplete(
+                function() self.transform.localScale = Vector3(1,1,1) end)
     else
-        self.image.transform.localScale = Vector3(1,1,1)
-        self.choose.transform.localScale = Vector3(1,1,1)
-        self.bg.transform.localScale = Vector3(1,1,1)
+        self.transform.localScale = Vector3(1,1,1)
     end
 end
 

@@ -30,10 +30,8 @@ function CarLogoGameView:InitComponents()
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat")
     self.tmp_playerNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_players/tmp_playerNum");
-    self.img_light=ComponentUtilGet.Image(self.transform,"content/center/result/Car/img_light");
     self.img_car=ComponentUtilGet.Image(self.transform,"content/center/result/Car/img_car");
     self.img_icon=ComponentUtilGet.Image(self.transform,"content/center/result/Car/img_icon");
-    self.tmp_time=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/center/timer/timer/tmp_time");
     self.muenRect=ComponentUtilGet.RectTransform(self.transform,"content/setting/mask/muen")
     self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch");
     self.btn_muen=ComponentUtilGet.Button(self.transform,"content/setting/btn_muen");
@@ -46,19 +44,19 @@ function CarLogoGameView:InitComponents()
     self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/center/tips")
     self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_end")
     self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_xiazhu")
-    self.tipsCenterTxt = ComponentUtilGet.TextMeshProUGUI(self.tipsTrs,"tips_center/tips_center_txt")
-    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
-    self.colockStateLeftText=ComponentUtilGet.TextMeshProUGUI(self.colockStateTimeTrs,"text") --倒计时
-    self.colockStateTimeNum=ComponentUtilGet.TextMeshProUGUI(self.colockStateTimeTrs,"time") --倒计时
+    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.transform,"content/center/timer")
+    self.colockStateLeftText1=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"tips1") --倒计时
+    self.colockStateLeftText2=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"tips2") --倒计时
+    self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"tmp_time") --倒计时
     self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
 
     --- 汽车灯
-    self.carLights = {}
-    self.carRoot = ComponentUtilGet.Transform(self.transform,"back/car")
-    self.carPos = ComponentUtilGet.Transform(self.transform,"back/node")
-    for i = 1, self.carRoot.childCount do
-        table.insert(self.carLights, ComponentUtilGet.Image(self.carRoot:GetChild(i - 1),"Light"))
-    end
+    --self.carLights = {}
+    --self.carRoot = ComponentUtilGet.Transform(self.transform,"back/car")
+    --self.carPos = ComponentUtilGet.Transform(self.transform,"back/node")
+    --for i = 1, self.carRoot.childCount do
+    --    table.insert(self.carLights, ComponentUtilGet.Image(self.carRoot:GetChild(i - 1),"Light"))
+    --end
     
     self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/center/result");
     self.resultCar=ComponentUtilGet.GameObject(self.resultTrs,"Car")
@@ -105,7 +103,6 @@ function CarLogoGameView:ClearComponents()
     self.btn_recharge=nil;
     self.btn_players=nil;
     self.tmp_playerNum=nil;
-    self.img_light=nil;
     self.img_car=nil;
     self.img_icon=nil;
     self.tmp_time=nil;
@@ -130,7 +127,6 @@ function CarLogoGameView:InitUI()
     self.btn_repeat.interactable = false;
     self.tmp_totalPlayerNum.text="0"
     --请下注提示
-    self.colockStateLeftText.text = LocalManager.GetStrById(200400008)
     self.colockStateTimeTrs.gameObject:SetActive(false)
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
@@ -155,21 +151,12 @@ function CarLogoGameView:FlashLight()
     for i=1,#self.logoViews do
         self.logoViews[i]:FlashLight(time,2)
     end
-    for i=1,#self.carLights do
-        Tools.DOFade_Repeat(self.carLights[i],time,2)
-    end
 end
 
 function CarLogoGameView:EnterLight()
     local time  = 0.2
-    for i = 1, self.carRoot.childCount do
-        self.carRoot:GetChild(i-1):DOMove(self.carPos:GetChild(i-1).position,0.8)
-    end
     for i=1,#self.logoViews do
         self.logoViews[i]:FlashLight(time,4)
-    end
-    for i=1,#self.carLights do
-        Tools.DOFade_Repeat(self.carLights[i],time,4)
     end
 end
 
@@ -181,89 +168,59 @@ end
 
 ------start Logo Marquee-----
 function CarLogoGameView:InitMarquee()
-    self.marqueeTimer = nil
-    self.marqueeIndex = 1
-    self.marqueeRunning = false
-    self.marqueeInterval = 0.2 -- 当前间隔
-    self.marqueeMinInterval = 0.04 -- 最快
-    self.marqueeMaxInterval = 0.08 -- 最慢
-    self.marqueeStep = 0.02 -- 步长
-    self.marqueeTarget = 1 -- 目标索引
-    self.marqueeState = "acc" -- "acc"加速 "const"匀速 "dec"减速
-    self.marqueeLoopCount = 0 -- 跑的圈数
-    self.marqueeTotalLoop = 2 -- 跑几圈后开始减速
-    self.decelerateSteps = 10 -- 期望减速步数
-end
-
-function CarLogoGameView.CalcStepsToTarget(currentIndex, targetIndex, total)
-    return (targetIndex - currentIndex + total) % total
-end
-
-function CarLogoGameView:StartMarquee(marqueeIndex,targetIndex)
-    self.marqueeRunning = true
-    self.marqueeIndex = marqueeIndex
-    self.marqueeTarget = targetIndex
-    
-    self.marqueeInterval = self.marqueeMaxInterval
-    self.marqueeState = "acc"
-    self.marqueeLoopCount = 0
-    
-    if self.marqueeTimer then
-        TimerManager.StopTimer(self, self.marqueeTimer)
-    end
-    self.marqueeTimer = TimerManager.StartTimer(self, function() self:MarqueeStep() end, self.marqueeInterval, -1)
-end
-
-function CarLogoGameView:MarqueeStep()
-    if not self.marqueeRunning then return end
-
-    self:LogoShowLinght(self.marqueeIndex)
-    self.marqueeIndex = self.marqueeIndex + 1
-    if self.marqueeIndex > #self.logoViews then
-        self.marqueeIndex = 1
-        self.marqueeLoopCount = self.marqueeLoopCount + 1
+    self.marqueeCallFunc = nil
+    if self.marqueeCor then
+        coroutine.stop(self.marqueeCor)
+        self.marqueeCor = nil
     end
     
-    -- 状态切换
-    if self.marqueeState == "acc" then
-        self.marqueeInterval = self.marqueeInterval - self.marqueeStep
-        if self.marqueeInterval <= self.marqueeMinInterval then
-            self.marqueeInterval = self.marqueeMinInterval
-            self.marqueeState = "const"
-        end
-    elseif self.marqueeState == "const" then
-        -- 判断是否需要减速
-        local stepsToTarget = self.CalcStepsToTarget(self.marqueeIndex-1, self.marqueeTarget, #self.logoViews)
-        if self.marqueeLoopCount >= self.marqueeTotalLoop and stepsToTarget == self.decelerateSteps then
-            self.marqueeState = "dec"
-        end
-    elseif self.marqueeState == "dec" then
-        self.marqueeInterval = self.marqueeInterval + self.marqueeStep
-        -- 判断是否到目标且足够慢
-        if self.marqueeInterval >= self.marqueeMaxInterval and self.marqueeIndex-1 == self.marqueeTarget then
-            self:StopMarquee()
-            return
-        end
+    self.curve = CS.UnityEngine.AnimationCurve()
+    for i=1,#CarLogoConfig.CURVE_KEYS do 
+        self.curve:AddKey(CarLogoConfig.CURVE_KEYS[i][1], CarLogoConfig.CURVE_KEYS[i][2])
     end
-
-    -- 重新设置定时器间隔
-    TimerManager.StopTimer(self, self.marqueeTimer)
-    self.marqueeTimer = TimerManager.StartTimer(self, function() self:MarqueeStep() end, self.marqueeInterval, 0)
 end
 
-function CarLogoGameView:StopMarquee()
-    self.marqueeRunning = false
-    if self.marqueeTimer then
-        TimerManager.StopTimer(self, self.marqueeTimer)
-        self.marqueeTimer = nil
-    end
-    self:LogoShowLinght(self.marqueeTarget)
+function CarLogoGameView:IntMove(from, to, leftTime, time)
+    time = time or 6
+    if leftTime > 0 then
+        leftTime =  leftTime > time and time or leftTime
+        to = to + CarLogoConfig.LOGO_MAX * 3
+        
+        local startTime = Time.realtimeSinceStartup - (time - leftTime);
+        local deltaTime = Time.realtimeSinceStartup - startTime;
+        local lastIndex = from + Mathf.FloorToInt(self.curve:Evaluate(deltaTime / time) * (to - from)) - 1
+        local newIndex = lastIndex
+        local runIndex = 0
+        
+        self.marqueeCor=coroutine.start( function()
+            while deltaTime<time and lastIndex<to do
+                deltaTime = Time.realtimeSinceStartup - startTime;
+                newIndex = from + Mathf.FloorToInt(self.curve:Evaluate(deltaTime / time) * (to - from))
+                for i = lastIndex + 1, newIndex do
+                    lastIndex = i;
 
-    if self.marqueeCallFunc then
-        self.marqueeCallFunc()
-        self.marqueeCallFunc = nil
+                    local index = i%CarLogoConfig.LOGO_MAX
+                    if index<=0 then
+                        index = index + CarLogoConfig.LOGO_MAX
+                    end
+
+                    self.logoViews[index]:ShowChoose(true)
+                    if runIndex>0 then
+                        self.logoViews[runIndex]:ShowChoose(true, true)
+                    end
+                    runIndex = index
+                end
+                coroutine.yield(CS.UnityEngine.WaitForEndOfFrame())
+            end
+            coroutine.stop(self.marqueeCor)
+            self.marqueeCor = nil
+            
+            if self.marqueeCallFunc then
+                self.marqueeCallFunc()
+                self.marqueeCallFunc = nil
+            end
+        end)
     end
-    --self.history:UpdateCarLogo()
 end
 ------end Logo Marquee-----
 
@@ -271,7 +228,7 @@ end
 function CarLogoGameView:SettingFade()
     if self.settingShow then
         self.settingShow = false
-        self.muenRect:DOLocalMoveY(self.muenRect.sizeDelta.y+30,0.5):SetEase(Ease.InBack)
+        self.muenRect:DOLocalMoveY(self.muenRect.sizeDelta.y+100,0.5):SetEase(Ease.InBack)
         self.btn_touch.gameObject:SetActive(false)
     else
         self.settingShow = true
@@ -301,7 +258,8 @@ function CarLogoGameView:PlayRuningAnimtion(result, isPlay, callFunc)
     table.insert(self.ctrl.model.historyList,result.win_carlogo)
     if isPlay then
         self.marqueeCallFunc = callFunc
-        self:StartMarquee(result.last_carlogo.logo_index, result.win_carlogo.logo_index)
+
+        self:IntMove(result.last_carlogo.logo_index, result.win_carlogo.logo_index, 6, 6)
     else
         self.LogoShowLinght(result.win_carlogo.logo_index)
         --self.history:UpdateCarLogo()
@@ -311,39 +269,19 @@ end
 
 function CarLogoGameView:PlayCarEffectView(logo_id,callFunc)
     self.resultCar:SetActive(true)
-    self.img_light.sprite=CarLogoHelper.LoadLogoResultSprite(logo_id,2)
-    self.img_icon.sprite=CarLogoHelper.LoadLogoResultSprite(logo_id,3)
+    self.areasTrs.gameObject:SetActive(false)
+    self.img_icon.sprite=CarLogoHelper.LoadLogoSprite(logo_id)
+    self.img_car.sprite=CarLogoHelper.LoadLogoResultSprite(logo_id)
     
-    local mat = self.img_car.material
-
-    -- 1. 替换图片
-    local tex = CarLogoHelper.LoadLogoResultTexture2D(logo_id)
-    mat:SetTexture("_MainTex", tex)
-    mat:SetFloat("_Progress", 0)
+    self.img_car.transform.localScale=Vector3.Zero()
+    self.img_car.transform:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.InBack)
     
-    
-    self.img_icon.transform.localScale=Vector3.Zero()
-    self.img_light.transform.localScale=Vector3.Zero()
-    self.img_icon.transform:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.InBack):OnComplete(function()
-        self.img_light.transform:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.InBack):OnComplete(function()
-
-            -- 2. 动画显示
-            local progress = 0
-            local speed = 1.5
-            self.playCarEffectTimer = TimerManager.StartTimer(self,function()
-                progress = progress + speed * 0.02
-                mat:SetFloat("_Progress", math.min(progress-0.5, 1))
-                if progress >= 3.2 then
-                    TimerManager.StopTimer(self,self.playCarEffectTimer)
-
-                    self.resultCar:SetActive(false)
-                    if callFunc then callFunc() end
-                end
-            end,0.02,-1,false)
-            
-        end)
-    end)
-    
+    TimerManager.StartTimer(self,function()
+        self.resultCar:SetActive(false)
+        self.areasTrs.gameObject:SetActive(true)
+      
+        if callFunc then callFunc() end
+    end,1.2)
 end
 
 
@@ -353,21 +291,17 @@ function CarLogoGameView:PlayResultAnimation(result)
     self:PlayRuningAnimtion(result, true,function()
         -- 播放车子特效
         self:PlayCarEffectView(result.win_carlogo.logo_id,function()
-
-            -- 播放赢的区域闪动
-            self.areaViews[result.win_carlogo.logo_id]:ShowWinFlashAnim(function()
-
-            end)
-
-            -- 播放筹码飞动效果
-            --self.PlayCollectNoteAnim(result)
-            --self.ShowResultCurrencyChange(result)
             
+            self:LogoFlyToHistory(result.win_carlogo.logo_index)
         end)
         
         TimerManager.StartTimer(self,function()
-            self:LogoFlyToHistory(result.win_carlogo.logo_index)
-        end,1.2)
+            -- 播放赢的区域闪动
+            --self.areaViews[result.win_carlogo.logo_id]:ShowWinFlashAnim()
+            --回收
+            --GlobalEvent.Notify(CarLogoConfig.EventBinner.XIAZHU_END,{})
+            
+        end,2)
     end)
     
 end
@@ -490,7 +424,8 @@ function CarLogoGameView:StartEffect(callFunc)
     --倒计时
     CarLogoConfig.lessSeconds = CAR_LOGO_GAME_TIME
     self.colockStateTimeNum.text = CarLogoConfig.lessSeconds
-    self.colockStateLeftText.text = LocalManager.GetStrById(200400008)
+    self.colockStateLeftText1:SetActive(true)
+    self.colockStateLeftText2:SetActive(false)
     self.colockStateTimeTrs.gameObject:SetActive(true)
     TimerManager.StartTimer(self, function
     ()
@@ -500,7 +435,7 @@ function CarLogoGameView:StartEffect(callFunc)
         if CarLogoConfig.lessSeconds==3 then
             self:PlayDaoJiShiEffect()
         end
-    end, 1, CAR_LOGO_GAME_TIME, true,function()
+    end, 1, CAR_LOGO_GAME_TIME+1, true,function()
         CarLogoConfig.allow=false
         self:UpdateDiZhuBtnState()
         self:SetRepeatState(false)
@@ -513,14 +448,16 @@ function CarLogoGameView:StartEffect(callFunc)
         
         --结算倒计时
         CarLogoConfig.lessSeconds = CAR_LOGO_GAME_TIME+3
-        self.colockStateLeftText.text = LocalManager.GetStrById(200500003)
         self.colockStateTimeNum.text = CarLogoConfig.lessSeconds
+        self.colockStateLeftText1:SetActive(false)
+        self.colockStateLeftText2:SetActive(true)
         TimerManager.StartTimer(self, function
         ()
             CarLogoConfig.lessSeconds = CarLogoConfig.lessSeconds - 1
             self.colockStateTimeNum.text = CarLogoConfig.lessSeconds
         end, 1, CAR_LOGO_GAME_TIME+3, true,function()
             --结算完成
+            self.colockStateTimeTrs.gameObject:SetActive(false)
         end)
         
     end)
