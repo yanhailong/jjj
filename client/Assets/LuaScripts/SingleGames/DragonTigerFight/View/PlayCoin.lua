@@ -15,6 +15,7 @@ local pool = ObjectPoolUtil:New("PlayCoin")
 ---桌面上的底注
 local coins = {}
 DOTween:SetTweensCapacity(1000, 250); 
+local scale = 0.5
 ---
 ---金币抛到桌面上
 ---@param coin 抛的硬币 gameObject
@@ -30,7 +31,7 @@ function PlayCoin:AnimateCoin(coin,coin_type,start_pos,target)
     
     -- 设置金币初始位置和激活状态
     coinObj.transform:SetParent(target.transform,false)
-    coinObj.transform.localScale = Vector3.one
+    coinObj.transform.localScale = Vector3(scale,scale,scale)
     coinObj.transform.position = start_pos
     coinObj:SetActive(true)
 
@@ -60,8 +61,8 @@ function PlayCoin:AnimateCoin(coin,coin_type,start_pos,target)
     sequence:Append(coinObj.transform:DOMove(endPos, 0.5):SetEase(Ease.OutQuad))
     --sequence:Join(coinObj.transform:DOJump(endPos, jumpHeight, 1, 0.8):SetEase(Ease.OutQuad))
     -- sequence:Join(coinObj.transform:DORotate(Vector3(0,0, Tools.Random(0, 360)), 0.8, RotateMode.FastBeyond360))
-    sequence:Join(coinObj.transform:DOScale(1.2, 0.5):SetEase(Ease.OutQuad))
-    sequence:Append(coinObj.transform:DOScale(1, 0.3):SetEase(Ease.OutQuad))
+    sequence:Join(coinObj.transform:DOScale(scale+0.2, 0.5):SetEase(Ease.OutQuad))
+    sequence:Append(coinObj.transform:DOScale(scale, 0.3):SetEase(Ease.OutQuad))
     -- 动画完成后保持金币在桌面上
     sequence:OnComplete(function()
         -- 可以在这里添加金币落地后的效果，如声音等
@@ -123,7 +124,7 @@ function PlayCoin:DestroyCoinFly(coinObj,endPos)
 
     -- 设置金币动画效果
     sequence:Append(coinObj.transform:DOMove(endPos, 0.8):SetEase(Ease.OutQuad))
-    sequence:Join(coinObj.transform:DOScale(0.9, 0.8):SetEase(Ease.OutQuad):SetDelay(1))
+    sequence:Join(coinObj.transform:DOScale(scale+0.3, 0.8):SetEase(Ease.OutQuad):SetDelay(1))
     -- 动画完成后保持金币在桌面上
     sequence:OnComplete(function()
         --coinObj:SetActive(false)
