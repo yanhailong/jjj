@@ -27,7 +27,7 @@ function DragonTigerFightView:InitComponents()
     self.btn_2=ComponentUtilGet.Button(self.transform,"content/top/btn_2")
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/buttom/btn_repeat");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/buttom/btn_players");
-    self.tmp_totalPlayerNum=ComponentUtilGet.TextMeshProUGUI(self.btn_players.transform,"tmp_total_player_num")
+    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_total_player_num")
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/buttom/dizhu");
     self.xiazhuArea = ComponentUtilGet.Transform(self.transform,"content/center/XiaZhu")
     self.longClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/longClick")
@@ -51,6 +51,7 @@ function DragonTigerFightView:InitComponents()
     self.xiazhuSelfNumsLabels[1] = ComponentUtilGet.TextMeshProUGUI(self.longClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[2] = ComponentUtilGet.TextMeshProUGUI(self.huClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[3] = ComponentUtilGet.TextMeshProUGUI(self.heClickArea,"yazhuNum/num")
+ 
     ---下注底注按钮
     self.chipInfos={}
     for i = 1, 5 do
@@ -82,9 +83,11 @@ function DragonTigerFightView:InitComponents()
     self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_xiazhu")
     self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
     
-    self.tipsCenterTxt = ComponentUtilGet.TextMeshProUGUI(self.tipsTrs,"tips_center/tips_center_txt")
+    self.tipsCenterTxt = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/tips_center_txt")
     self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
-    self.colockStateTimeNum=ComponentUtilGet.TextMeshProUGUI(self.colockStateTimeTrs,"time") --倒计时
+    self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
+    self.colockNumTrs=ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_num")
+    self.colockNumTime=ComponentUtilGet.Text(self.colockNumTrs,"time")
     
     self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
     
@@ -137,6 +140,7 @@ function DragonTigerFightView:ClearComponents()
     self.xiazhuSelfNumsLabels=nil;
     self.xiazhuStarAreas=nil;
     self.tmp_totalPlayerNum=nil
+    self.xiazhuLight=nil;
 end
 
 ---进入房间 对当前房间阶段数据进行初始
@@ -286,7 +290,7 @@ function DragonTigerFightView:InitUI()
     for i=1,#self.AllOtherPlayerHeads do
         self.AllOtherPlayerHeads[i]:UpdateGoldCount(i)
     end
-    
+
     ---路单数据
     self.RoadHistoryRecord = nil
     
@@ -295,10 +299,8 @@ function DragonTigerFightView:InitUI()
     self.resultBgTrs.gameObject:SetActive(false)
     
     self.tmp_totalPlayerNum.text="0"
-    --等待开局提示
-    self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
     self.colockStateTimeTrs.gameObject:SetActive(false)
-    self.tipsCenterTxt.gameObject:SetActive(true)
+    self.tipsCenterTxt.gameObject:SetActive(false)
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
     self.tipsTimeThree:SetActive(false)
@@ -315,9 +317,9 @@ function DragonTigerFightView:InitXiaZhuLabel()
     for index=1,3 do
         self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(false)
     end
-    self.xiazhuNumLabels[1].text = LocalManager.GetStrById(200101014)
-    self.xiazhuNumLabels[2].text = LocalManager.GetStrById(200101014)
-    self.xiazhuNumLabels[3].text = LocalManager.GetStrById(200101015)
+    self.xiazhuNumLabels[1].text = "0" --LocalManager.GetStrById(200101014)
+    self.xiazhuNumLabels[2].text = "0" --LocalManager.GetStrById(200101014)
+    self.xiazhuNumLabels[3].text = "0" --LocalManager.GetStrById(200101015)
 end
 
 function DragonTigerFightView:UpdateXiaZhuLabel()
@@ -365,8 +367,6 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
     local p2 = self.ctr_dot_p2.position
     
     --下注结束
-    self.tipsCenterTxt.text = ""
-    self.tipsCenterTxt.gameObject:SetActive(true)
     self.tipsTimeEnd:SetActive(true)
     
     --等待开牌
@@ -376,7 +376,7 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
     TimerManager.StartTimer(self, function
     ()
         --正在結算
-        self.tipsCenterTxt.text = LocalManager.GetStrById(200101010)
+        self.tipsCenterTxt.gameObject:SetActive(true)
     end, 1, 0, true)
     TimerManager.StartTimer(self, function
     ()
@@ -416,7 +416,8 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
         self.resultCard1:Hiden()
         self.resultCard2:Hiden()
         --等待开局提示
-        self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
+        self.tipsCenterTxt.gameObject:SetActive(false)
+        --self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
         
     end,7, 0, true)
     TimerManager.StartTimer(self, function
