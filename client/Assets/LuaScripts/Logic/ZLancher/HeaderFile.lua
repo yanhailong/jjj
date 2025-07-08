@@ -22,6 +22,7 @@ require("Logic/NetWork/WebSocket/WebNetworkManager")
 require("Logic/DataManager/DataConst")
 require("Logic/Common/SuspensionTipsUtil")
 require("Logic/Common/commonSlots/SlotEvent")
+require("Logic/CfgManager/ConfigManager")
 
 
 
