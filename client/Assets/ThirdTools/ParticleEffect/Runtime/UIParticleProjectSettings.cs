@@ -17,6 +17,18 @@ namespace Coffee.UIExtensions
             set => instance.m_EnableLinearToGamma = value;
         }
 
+
+        [Header("Editor")]
+        [Tooltip("Hide the automatically generated objects.\n" +
+                 "  - UIParticleRenderer\n" +
+                 "  - UIParticle BakingCamera")]
+        [SerializeField]
+        private bool m_HideGeneratedObjects = true;
+
+        public static HideFlags globalHideFlags => instance.m_HideGeneratedObjects
+            ? HideFlags.DontSave | HideFlags.NotEditable | HideFlags.HideInHierarchy | HideFlags.HideInInspector
+            : HideFlags.DontSave | HideFlags.NotEditable;
+
 #if UNITY_EDITOR
         [SettingsProvider]
         private static SettingsProvider CreateSettingsProvider()

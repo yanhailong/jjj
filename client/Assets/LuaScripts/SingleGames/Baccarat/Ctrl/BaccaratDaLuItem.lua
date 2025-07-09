@@ -11,15 +11,15 @@ function BaccaratDaLuItem:ctor(obj,ctrl)
     self.transform = obj.transform
     self.obj_Banker = ComponentUtilGet.GameObject(self.transform,"obj_Banker")
     self.obj_Player = ComponentUtilGet.GameObject(self.transform,"obj_Player")
-    self.tmp_HeNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"tmp_HeNum")
-    ---@type USDollarExpressCarCtrl
+    self.txt_HeNum = ComponentUtilGet.Text(self.transform,"txt_HeNum")
+    ---@type BaccaratGameCtrl
     self.ctrl=ctrl
 end
 ---初始化状态
 function BaccaratDaLuItem:InitState()
     self.obj_Banker:SetActive(false);
     self.obj_Player:SetActive(false);
-    self.tmp_HeNum.gameObject:SetActive(false);
+    self.txt_HeNum.gameObject:SetActive(false);
 end
 ---初始化索引
 function BaccaratDaLuItem:InitIndex(index)
@@ -27,7 +27,7 @@ function BaccaratDaLuItem:InitIndex(index)
 end
 ---自己是否显示了
 function BaccaratDaLuItem:IsActive()
-    return self.obj_Banker.activeSelf or self.obj_Player.activeSelf or self.tmp_HeNum.gameObject.activeSelf;
+    return self.obj_Banker.activeSelf or self.obj_Player.activeSelf or self.txt_HeNum.gameObject.activeSelf;
 end
 ---刷新显示
 function BaccaratDaLuItem:RefreshShow(dataTable)
@@ -36,8 +36,8 @@ function BaccaratDaLuItem:RefreshShow(dataTable)
 end
 ---刷新和的次数显示
 function BaccaratDaLuItem:RefreshTieNumShow(num)
-    self.tmp_HeNum.gameObject:SetActive(true)
-    self.tmp_HeNum.text = num;
+    self.txt_HeNum.gameObject:SetActive(true)
+    self.txt_HeNum.text = num;
 end
 ---获取索引
 function BaccaratDaLuItem:GetIndex()

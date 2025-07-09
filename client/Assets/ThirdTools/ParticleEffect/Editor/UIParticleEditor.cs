@@ -2,20 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.UI;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
-
+using Coffee.UIParticleInternal;
 #if UNITY_2021_2_OR_NEWER
 using UnityEditor.Overlays;
 #else
 using System;
 using System.Reflection;
-using Coffee.UIParticleInternal;
 using Object = UnityEngine.Object;
 #endif
-
 #if UNITY_2021_2_OR_NEWER
 using UnityEditor.SceneManagement;
 
@@ -27,8 +26,13 @@ namespace Coffee.UIExtensions
 {
     [CustomEditor(typeof(UIParticle))]
     [CanEditMultipleObjects]
-    internal class UIParticleEditor : Editor
+    internal class UIParticleEditor : GraphicEditor
     {
+        internal class State : ScriptableSingleton<State>
+        {
+            public bool is3DScaleMode;
+        }
+
         //################################
         // Constant or Static Members.
         //################################
@@ -47,7 +51,6 @@ namespace Coffee.UIExtensions
         private static readonly GUIContent s_ContentPrimary = new GUIContent("Primary");
         private static readonly Regex s_RegexBuiltInGuid = new Regex(@"^0{16}.0{15}$", RegexOptions.Compiled);
         private static readonly List<Material> s_TempMaterials = new List<Material>();
-        private static bool s_XYZMode;
 
         private SerializedProperty _maskable;
         private SerializedProperty _scale3D;
@@ -59,8 +62,10 @@ namespace Coffee.UIExtensions
         private SerializedProperty _autoScalingMode;
         private SerializedProperty _useCustomView;
         private SerializedProperty _customViewSize;
+        private SerializedProperty _timeScaleMultiplier;
         private ReorderableList _ro;
         private bool _showMax;
+        private bool _is3DScaleMode;
 
         private static readonly HashSet<Shader> s_Shaders = new HashSet<Shader>();
 #if UNITY_2018 || UNITY_2019
@@ -82,8 +87,10 @@ namespace Coffee.UIExtensions
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             _maskable = serializedObject.FindProperty("m_Maskable");
             _scale3D = serializedObject.FindProperty("m_Scale3D");
             _animatableProperties = serializedObject.FindProperty("m_AnimatableProperties");
@@ -94,6 +101,7 @@ namespace Coffee.UIExtensions
             _autoScalingMode = serializedObject.FindProperty("m_AutoScalingMode");
             _useCustomView = serializedObject.FindProperty("m_UseCustomView");
             _customViewSize = serializedObject.FindProperty("m_CustomViewSize");
+            _timeScaleMultiplier = serializedObject.FindProperty("m_TimeScaleMultiplier");
 
             var sp = serializedObject.FindProperty("m_Particles");
             _ro = new ReorderableList(sp.serializedObject, sp, true, true, true, true)
@@ -162,6 +170,19 @@ namespace Coffee.UIExtensions
                     uip.RefreshParticles(uip.particles);
                 }
             }
+
+            // Initialize 3D scale mode.
+            _is3DScaleMode = State.instance.is3DScaleMode;
+            if (!_is3DScaleMode)
+            {
+                var x = _scale3D.FindPropertyRelative("x");
+                var y = _scale3D.FindPropertyRelative("y");
+                var z = _scale3D.FindPropertyRelative("z");
+                _is3DScaleMode = !Mathf.Approximately(x.floatValue, y.floatValue) ||
+                                 !Mathf.Approximately(y.floatValue, z.floatValue) ||
+                                 y.hasMultipleDifferentValues ||
+                                 z.hasMultipleDifferentValues;
+            }
         }
 
         /// <summary>
@@ -180,7 +201,11 @@ namespace Coffee.UIExtensions
 
             // Scale
             EditorGUI.BeginDisabledGroup(!_meshSharing.hasMultipleDifferentValues && _meshSharing.intValue == 4);
-            s_XYZMode = DrawFloatOrVector3Field(_scale3D, s_XYZMode);
+            if (DrawFloatOrVector3Field(_scale3D, _is3DScaleMode) != _is3DScaleMode)
+            {
+                State.instance.is3DScaleMode = _is3DScaleMode = !_is3DScaleMode;
+            }
+
             EditorGUI.EndDisabledGroup();
 
             // AnimatableProperties
@@ -220,6 +245,9 @@ namespace Coffee.UIExtensions
             {
                 _customViewSize.floatValue = Mathf.Max(0.1f, _customViewSize.floatValue);
             }
+
+            // Time Scale Multiplier
+            EditorGUILayout.PropertyField(_timeScaleMultiplier);
 
             // Target ParticleSystems.
             EditorGUI.BeginChangeCheck();
@@ -317,7 +345,6 @@ namespace Coffee.UIExtensions
             }
 #endif
             Profiler.EndSample();
-            EditorApplication.delayCall += () => Profiler.enabled = false;
         }
 
         private static bool IsBuiltInObject(Object obj)
@@ -437,7 +464,9 @@ namespace Coffee.UIExtensions
         {
             if (!p || (ignoreCurrent && target == p)) return;
 
+            var cr = p.canvasRenderer;
             DestroyImmediate(p);
+            DestroyImmediate(cr);
 
 #if UNITY_2018_3_OR_NEWER
             var stage = PrefabStageUtility.GetCurrentPrefabStage();

@@ -43,6 +43,7 @@ function USDollarExpressCarCtrl:InitData()
 		self.CarQueue:Enqueue(self.trainInfoList[i])
 	end
 	self:InitCars()
+	self.isAllCarArrive=false
 end
 
 ---初始化火车厢
@@ -63,31 +64,36 @@ function USDollarExpressCarCtrl:InitCars()
 	end
 end
 
-function USDollarExpressCarCtrl:Move()
-	self.tweener=self.view.trans_root:DOLocalMoveX(self.WidthSpace*self.curMoveIndex, 2)
-	self.tweener:SetEase(DG.Tweening.Ease.Linear);
-	self.tweener.onComplete=function()
-		logError("移动完毕")
-		CorManager.StartCor(self, function
-		()
-			---@type USDollarExpressTrainItem
-			local item= self.allItems[self.curMoveIndex]
-			item:DOPlayerAni()
-			coroutine.wait(0.05)
-			self.curMoveIndex=self.curMoveIndex+1
-			if self.curMoveIndex<=self.maxMoveIndex then
-				self:Move()
-			else
-				logError("当前火车移动完毕！！")
-				coroutine.wait(2)
-				self:InitCars()
-
-			end
-		end)
-		
-
-	end
-end
+--function USDollarExpressCarCtrl:Move()
+--	self.WidthSpace=CS.UnityEngine.Screen.width/2
+--	logError("移动的间距："..self.WidthSpace)
+--	local posx=self.WidthSpace*self.curMoveIndex
+--	local endPos=Vector3.New(posx,0,0)
+--	self.tweener=self.view.trans_root:DOAnchorPos(endPos, 2)
+--	self.tweener:SetEase(DG.Tweening.Ease.Linear);
+--	self.tweener.onComplete=function()
+--		logError("移动完毕")
+--		CorManager.StartCor(self, function
+--		()
+--			---@type USDollarExpressTrainItem
+--			local item= self.allItems[self.curMoveIndex]
+--			item:DOPlayerAni()
+--			coroutine.wait(0.5)
+--			self.curMoveIndex=self.curMoveIndex+1
+--			if self.curMoveIndex<=self.maxMoveIndex then
+--				self:Move()
+--			else
+--				logError("当前火车移动完毕！！")
+--				coroutine.wait(2)
+--				self:InitCars()
+--
+--			end
+--		end)
+--		
+--
+--	end
+--	
+--end
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
 	if type==config.TrainColorType.GreenTrain then
@@ -110,29 +116,85 @@ end
 ---初始化火车车厢
 function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 	self.allItems={}
-	for i = 1, #goldList do
-		self.objPools:SpawnPrefab(function
-		(card)
-			---@type USDollarExpressTrainItem
-			local item=USDollarExpressTrainItem.New(card,self)
-			local rectTrans=ComponentUtilGet.RectTransform(item.transform)
-			local wid=rectTrans.rect.width
-			local with= CS.UnityEngine.Screen.width
-			card:SetActive(true)
-			card.transform:SetParent(self.view.trans_root)
-			card.transform.localPosition = Vector3.New(i* -rectTrans.rect.width, 0, 0) -- 设置slotItem的位置
-			card.transform.localScale = Vector3.one
-			card.name = tostring(i)
-			item:SetText(goldList[i])
-			self.allItems[i]=item
-		end, config.ABNames.train, config.GetTrainItemByType(carType), self.view.trans_root)
+	for i = 1, #goldList+1 do
+		local abName=""
+		local index= Tools.RandomInt(1,3)
+		if i==1 then
+			abName="chetou_group_chetou"--火车头
+		else
+			abName=config.trainAssetName[index]
+		end
+		local card= self.objPools:SpawnPrefab(nil, config.ABNames.train[carType],abName, self.view.trans_root)
+		---@type USDollarExpressTrainItem
+		local item=USDollarExpressTrainItem.New(card,self)
+		local rectTrans=ComponentUtilGet.RectTransform(item.transform)
+		local lastPosx=0
+		if i==1 then
+			lastPosx=0
+		end
+		if i==2 then
+			lastPosx=-1890
+		end
+		if i>2 then
+			local lastItem=self.allItems[i-1]
+			local lastItemRect=ComponentUtilGet.RectTransform(lastItem.transform)
+			lastPosx=lastItemRect.anchoredPosition.x-rectTrans.rect.width
+		end
+		
+		rectTrans.transform.rotation=Quaternion.Euler(0,180,0)
+		card:SetActive(true)
+		card.transform:SetParent(self.view.trans_root)
+		card.transform.localPosition = Vector3.New(lastPosx, 0, 0) -- 设置slotItem的位置
+		card.transform.localScale = Vector3.one
+		card.name = tostring(i)
+		item:SetText(goldList[i])
+		self.allItems[i]=item
 	end
 
 	self.maxMoveIndex= #goldList
 	self.curMoveIndex=1
-	--self:Move()
 	
+	self.centerPos=self.view.trans_centerPos.position
+	self.endPos= self.view.trans_endPos.position
+	self.isCanMove=false
+	UpdateManager.AddUpdate(self,self.Update)
 end
+
+function USDollarExpressCarCtrl:Update()
+	if self.isAllCarArrive==true then
+		return
+	end
+	for i = 1, #self.allItems do
+		---@type USDollarExpressTrainItem
+		local item = self.allItems[i]
+		item.transform:Translate(Vector3.New(-1,0,0)*Time.deltaTime*5)
+		--look("item.transform.position",item.transform.position)
+		if item.isArriveCenterPos==false then
+			if item.transform.position.x>=self.centerPos.x then
+				look("到达中心点了",item.gameObject.name)
+				item.isArriveCenterPos=true
+				item:DOPlayerAni()
+			end
+		end
+		if item.isArriveEndPos==false then
+			if item.transform.position.x>=self.endPos.x then
+				item.isArriveEndPos=true
+			end
+
+		end
+		if i==#self.allItems and item.isArriveEndPos==true then
+			logError("所有元素都已经到达终点了")
+			self.isAllCarArrive=true
+			CorManager.StartCor(self, function
+			()
+				coroutine.wait(5)
+				self:Close()
+			end)
+		end
+
+	end
+end
+
 
 function USDollarExpressCarCtrl:Settmp_value(num)
 	local curNum=tonumber(self.view.tmp_value.text)
@@ -146,6 +208,7 @@ function USDollarExpressCarCtrl:Close()
 		self.tweener:Kill()
 	end
 	self.objPools:DestroyAll()
+	UpdateManager.ReMoveAllUpdate(self)
 end
 
 ---添加UI事件

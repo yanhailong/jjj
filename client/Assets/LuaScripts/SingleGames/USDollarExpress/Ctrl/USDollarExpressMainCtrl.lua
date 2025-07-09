@@ -50,11 +50,27 @@ function USDollarExpressMainCtrl:CtrlInit(args)
 	
 	--require("SingleGames/USDollarExpress/test/MVCHead")
 	--CtrlManager.SingleShow(CtrlNames.USDollarExpressMapSelect)
+	
+end
+
+function USDollarExpressMainCtrl:InitRollData()
+	self.rollData={}
+	self.initAllGrid={}
+	for i = 1, 5 do
+		self.rollData[i]={}
+		self.initAllGrid[i]={}
+		local data=ConfigManager.CfgC_Roller[GameConfig[GameNames.USDollarExpress].gameType.."_"..i]
+		self.rollData[i]=jsonDecode(data.elements)
+		self.initAllGrid[i]=jsonDecode(data.initGrid)
+	end
+	self.curIndex=Tools.RandomInt(1,#self.initAllGrid[1])
+	look("self.initAllGrid",self.initAllGrid)
 end
 
 
 ---初始化数据
 function USDollarExpressMainCtrl:InitData()
+	self:InitRollData()
 	self.parentList={}
 	self.childsList = {}
 	self.showChildsList = {}---显示的card1-20
@@ -68,6 +84,13 @@ function USDollarExpressMainCtrl:InitData()
 	self.freeState=false;
 	self.isAllRoate=false
 	self.isAward=0---是否中奖（0,1,2）--未中奖，小奖，大奖
+	---
+	---旋转的数据替换索引
+	self.curRollData={}
+	for i = 1, 5 do
+		self.curRollData[i]=0	
+	end
+	
 end
 -- 初始化第一批展示用的SlotPics
 function USDollarExpressMainCtrl:InitFirstSlotPics()
@@ -80,6 +103,9 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 		table.insert(self.parentList, go.transform) -- 将创建的newobj插入parentList表中
 		self.childsList[i] = {}
 		local nCircels = config.rollItemNum
+		local curInitGrid=self.initAllGrid[i]
+		look("curInitGrid",curInitGrid)
+		
 		for j = 1, nCircels do
 			---@type UnityEngine.GameObject
 			local card = instantiate(self.view.cardPrefab)
@@ -89,21 +115,28 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			card.transform.localScale = Vector3.one
 			card.name = tostring(j)
 			card.transform:SetAsFirstSibling()
+			---@type USDollarExpressSlotItem
 			local iconItem=SlotItem.New(card)
+			iconItem:InitIndex(j-1)
 			local texId = math.random(1,table.getCount(config.iocnPicName))
-			iconItem:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片       
-			table.insert(self.childsList[i], iconItem)
-
 			local numFF=6;
 			if(j<=5 and j>1) then
 				numFF=numFF-j
 				local index = (numFF-1)*5 + i  -- 计算原始索引
 				self.showChildsList[index] = iconItem
+				texId=curInitGrid[self.curIndex][numFF]
 			end
+			if j>5 then
+				self.curRollData[i]=j-6
+				local rollIndex=#self.rollData[i]-self.curRollData[i]
+				texId=self.rollData[i][rollIndex]
+			end
+			
+			iconItem:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)--选取固定图片       
+			table.insert(self.childsList[i], iconItem)
+			
 		end
 	end
-	
-	look("self.showChildsList",self.showChildsList)
 end
 
 --开始抽奖旋转
@@ -147,7 +180,7 @@ function USDollarExpressMainCtrl:ReSetData()
 		--else
 		--	self.rollCircles[i] = 3+i
 		--end
-		self.rollCircles[i] = 1+i
+		self.rollCircles[i] = 3+i
 	end
 
 	if self.lineShowCor~=nil then
@@ -155,6 +188,11 @@ function USDollarExpressMainCtrl:ReSetData()
 	end
 	for i = 1, 20 do
 		self.showChildsList[i]:SetIsAward(false)
+	end
+
+	self.curRollData={}
+	for i = 1, 5 do
+		self.curRollData[i]=0
 	end
 	
 end
@@ -201,20 +239,27 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 		self.isAllRoate=true
 	end
 end
--- 重置滚动轴的位置
+
+---@param wheelId number 轴数
+---@param curCirle number 当前圈数
 function USDollarExpressMainCtrl:RestWheelPos(wheelid,isEnd)
+
 	local nCircels = #self.childsList[wheelid]
 	for j = 1,nCircels do
-		local index = math.random(1,#config.iocnPicName)
-		if(j > 1 and j <= 5) then
+		if(j >= 1 and j <= 6) then
 			local num=6
 			num=num-j
+
 			---@type SlotItem1
 			local item=self.childsList[wheelid][config.rollItemNum-num]
 			self.childsList[wheelid][j]:SetSprite(item:GetCurSprite(),item:GetIconIndex())
 		else
-			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[index]],index)
+			self.curRollData[wheelid]=self.curRollData[wheelid]+(j-6)
+			local rollIndex=#self.rollData[wheelid]-self.curRollData[wheelid]
+			local texId=self.rollData[wheelid][rollIndex]
+			self.childsList[wheelid][j]:SetSprite(config.icon_Pics[config.iocnPicName[texId]],texId)
 		end
+
 	end
 end
 

@@ -6,16 +6,25 @@ function USDollarExpressTrainItem:ctor(obj,ctrl)
     self.gameObject = obj
     ---@type UnityEngine.Transform
     self.transform = obj.transform
-    self.tmp_value = ComponentUtilGet.TextMeshProUGUI(self.transform,"tmp_value")
     ---@type USDollarExpressCarCtrl
     self.ctrl=ctrl
+    self:InitData()
+end
+
+
+function USDollarExpressTrainItem:InitData()
+    self.isArriveCenterPos = false
+    self.isArriveEndPos=false
 end
 
 function USDollarExpressTrainItem:SetText(value)
-    self.tmp_value.text = value
+    --self.tmp_value.text = value
 end
 
 function USDollarExpressTrainItem:DOPlayerAni()
+    if true then
+        return
+    end
     --self.transform:DOScale(1.1, 0.2)
     ---@type UnityEngine.GameObject
     local objText=Tools.Instance(self.tmp_value.gameObject,self.transform.parent.parent)
@@ -53,10 +62,10 @@ function USDollarExpressTrainItem:DOPlayerAni()
             objText:SetActive(false)
         end
     end)
-    
-    
-    
 
+
+    
+    
     ---- 创建动画序列
     --local sequence = DOTween.Sequence()
     --
@@ -96,13 +105,8 @@ end
 
 
 
-
-
-
-function Start()
-
-
-    
+function USDollarExpressTrainItem:MoveToPos(pos)
+    self.transform:DOLocalMove(pos, 0.3)
 end
 
 return USDollarExpressTrainItem

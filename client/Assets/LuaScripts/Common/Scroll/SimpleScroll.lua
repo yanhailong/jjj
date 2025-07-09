@@ -28,4 +28,8 @@ function SimpleScroll:UpdateItem(go, index)
     end
 end
 
+function SimpleScroll:ScrollToIndex(index,time,ease)
+    self.uiDynamic:JumpToIndex(index,time,ease)
+end
+
 return SimpleScroll

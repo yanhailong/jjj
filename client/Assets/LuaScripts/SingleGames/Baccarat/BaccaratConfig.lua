@@ -25,21 +25,50 @@ this.WhoWin = {
     TieWin = 3,
 }
 this.ABNames={
-    icons="SingleGames/Baccarat/alats/icons",--icon
+    Main="SingleGames/Baccarat/atlas/Main",
+    Card="SingleGames/Baccarat/atlas/Card",
     chipPool="SingleGames/Baccarat/prefabs/Pool",--筹码
     prefabsItem = "SingleGames/Baccarat/prefabs" ,--预支item路径
 }
+---Main里面的图片
 this.icon_Pics={}
 function this.InitIconPic()
-    local pics=resMgr:LoadAllAssets(this.ABNames.icons,typeof(UnityEngine.Sprite))
+    local pics=resMgr:LoadAllAssets(this.ABNames.Main,typeof(UnityEngine.Sprite))
     for i = 0, pics.Length-1 do
         local pic=pics[i];
         this.icon_Pics[pic.name]=pic;
     end
 end
 
+---扑克牌的图片
+this.card_Pics={}
+function this.InitCardPic()
+    local pics=resMgr:LoadAllAssets(this.ABNames.Card,typeof(UnityEngine.Sprite))
+    for i = 0, pics.Length-1 do
+        local pic=pics[i];
+        this.card_Pics[pic.name]=pic;
+    end
+end
+---通过资源名获取Sprite
 function this.GetIconPic(iconName)
     return this.icon_Pics[iconName];
+end
+
+function this.GetCardPic(cardName)
+    return this.card_Pics[cardName];
+end
+---随机获取一个牌型
+function this.GetPaiXing()
+   local num = math.random(1,4);
+    if(num==1) then
+        return "fk_"
+    elseif(num == 2) then
+        return "hm_"
+    elseif(num == 3) then
+        return "hx_"
+    elseif(num == 4) then
+        return "heix_"
+    end
 end
 ---获取对应筹码的预支名字
 function this.GetChipPoolName(chipStateName)

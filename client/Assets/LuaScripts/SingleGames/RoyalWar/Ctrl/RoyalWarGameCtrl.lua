@@ -170,11 +170,11 @@ end
 
 ---设置按钮的显示状态
 function RoyalWarGameCtrl:SetBetButtonInteractable(state)
-	self.view.btn_One:IsInteractable(state);
-	self.view.btn_Ten:IsInteractable(state);
-	self.view.btn_Fifty:IsInteractable(state);
-	self.view.btn_OneHundred:IsInteractable(state);
-	self.view.btn_FiveHundred:IsInteractable(state);
+	self.view.btn_One.interactable = state;
+	self.view.btn_Ten.interactable = state;
+	self.view.btn_Fifty.interactable = state;
+	self.view.btn_OneHundred.interactable = state;
+	self.view.btn_FiveHundred.interactable = state;
 end
 
 

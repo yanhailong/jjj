@@ -31,18 +31,11 @@ end
 ---初始化数据
 function UITestScrollCtrl:InitData()
 	local data={
-		{name="10"},
-		{name="20"},
-		{name="30"},
-		{name="1"},
-		{name="5"},
-		{name="6"},
-		{name="7"},
-		{name="8"},
-		{name="9"},
-		{name="10"},
-		{name="11"},
 	}
+	for i = 1, 100 do
+		local data1={name=i .. ""}
+		data[i]=data1
+	end
 	---@type SimpleScroll
 	self.udy_awardmeri=SimpleScroll.New()
 	self.udy_awardmeri:Init(self.view.udy_test,Handler(self,self.InitItem))
@@ -61,7 +54,16 @@ end
 
 ---添加UI事件
 function UITestScrollCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.test, function
+	()
+		
+		CorManager.StartCor(self, function
+		()
+			self.udy_awardmeri:ScrollToIndex(4,3,DG.Tweening.Ease.Linear)---111
+			coroutine.wait(3)
+			self.udy_awardmeri:ScrollToIndex(0,1,DG.Tweening.Ease.OutQuart)
+		end)
+	end)
 end
 
 ---移除UI事件

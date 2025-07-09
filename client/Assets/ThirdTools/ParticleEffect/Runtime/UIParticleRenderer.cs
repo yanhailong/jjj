@@ -4,7 +4,6 @@
 #elif UNITY_2022_3_OR_NEWER
 #define PS_BAKE_API_V2
 #endif
-
 using System;
 using System.Collections.Generic;
 using Coffee.UIParticleInternal;
@@ -16,6 +15,7 @@ using UnityEngine.UI;
 
 namespace Coffee.UIExtensions
 {
+    [Icon("Packages/com.coffee.ui-particle/Icons/UIParticleIcon.png")]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
     [RequireComponent(typeof(CanvasRenderer))]
@@ -41,6 +41,7 @@ namespace Coffee.UIExtensions
         private Vector2Int _prevScreenSize;
         private bool _preWarm;
         private ParticleSystemRenderer _renderer;
+        private ParticleSystem _mainEmitter;
 
         public override Texture mainTexture => _isTrail ? null : _particleSystem.GetTextureForSprite();
 
@@ -113,6 +114,7 @@ namespace Coffee.UIExtensions
             _parent = null;
             _particleSystem = null;
             _renderer = null;
+            _mainEmitter = null;
             if (0 <= index)
             {
                 _index = index;
@@ -137,6 +139,7 @@ namespace Coffee.UIExtensions
         {
             base.OnEnable();
 
+            hideFlags = UIParticleProjectSettings.globalHideFlags;
             if (!s_CombineInstances[0].mesh)
             {
                 s_CombineInstances[0].mesh = new Mesh
@@ -161,7 +164,7 @@ namespace Coffee.UIExtensions
             // Create renderer object.
             var go = new GameObject("[generated] UIParticleRenderer", typeof(UIParticleRenderer))
             {
-                hideFlags = HideFlags.HideAndDontSave,
+                hideFlags = UIParticleProjectSettings.globalHideFlags,
                 layer = parent.gameObject.layer
             };
 
@@ -201,7 +204,6 @@ namespace Coffee.UIExtensions
                 return modifiedMaterial;
             }
 
-            //
             var hash = new Hash128(
                 modifiedMaterial ? (uint)modifiedMaterial.GetInstanceID() : 0,
                 texture ? (uint)texture.GetInstanceID() : 0,
@@ -224,7 +226,7 @@ namespace Coffee.UIExtensions
             return _modifiedMaterial;
         }
 
-        public void Set(UIParticle parent, ParticleSystem ps, bool isTrail)
+        public void Set(UIParticle parent, ParticleSystem ps, bool isTrail, ParticleSystem mainEmitter)
         {
             _parent = parent;
             maskable = parent.maskable;
@@ -247,10 +249,7 @@ namespace Coffee.UIExtensions
 
             ps.TryGetComponent(out _renderer);
             _renderer.enabled = false;
-
-            //_emitter = emitter;
             _isTrail = isTrail;
-
             _renderer.GetSharedMaterials(s_Materials);
             material = s_Materials[isTrail ? 1 : 0];
             s_Materials.Clear();
@@ -267,6 +266,7 @@ namespace Coffee.UIExtensions
             _prevScreenSize = new Vector2Int(Screen.width, Screen.height);
             _prevCanvasScale = canvas ? canvas.scaleFactor : 1f;
             _delay = true;
+            _mainEmitter = mainEmitter;
 
             canvasRenderer.SetTexture(null);
 
@@ -304,7 +304,7 @@ namespace Coffee.UIExtensions
 
             // Simulate particles.
             Profiler.BeginSample("[UIParticle] Bake Mesh > Simulate Particles");
-            if (!_isTrail && _parent.canSimulate)
+            if (!_isTrail && _parent.canSimulate && !_mainEmitter)
             {
 #if UNITY_EDITOR
                 if (!Application.isPlaying)
@@ -422,17 +422,16 @@ namespace Coffee.UIExtensions
                     workerMesh.LinearToGamma();
                 }
 
-                var components = ListPool<Component>.Rent();
+                var components = InternalListPool<Component>.Rent();
                 GetComponents(typeof(IMeshModifier), components);
-
-#pragma warning disable CS0618 // Type or member is obsolete
                 for (var i = 0; i < components.Count; i++)
                 {
+#pragma warning disable CS0618 // Type or member is obsolete
                     ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
-                }
 #pragma warning restore CS0618 // Type or member is obsolete
+                }
 
-                ListPool<Component>.Return(ref components);
+                InternalListPool<Component>.Return(ref components);
             }
 
             Profiler.EndSample();
@@ -444,7 +443,7 @@ namespace Coffee.UIExtensions
 
             // Get grouped renderers.
             Profiler.BeginSample("[UIParticleRenderer] Set Mesh");
-            var renderers = ListPool<UIParticleRenderer>.Rent();
+            var renderers = InternalListPool<UIParticleRenderer>.Rent();
             if (_parent.useMeshSharing)
             {
                 UIParticleUpdater.GetGroupedRenderers(_parent.groupId, _index, renderers);
@@ -461,7 +460,7 @@ namespace Coffee.UIExtensions
                 r.canvasRenderer.SetMaterial(materialForRendering, 0);
             }
 
-            ListPool<UIParticleRenderer>.Return(ref renderers);
+            InternalListPool<UIParticleRenderer>.Return(ref renderers);
 
             if (_parent.canRender)
             {
@@ -544,6 +543,30 @@ namespace Coffee.UIExtensions
                     return Matrix4x4.Translate(psPos)
                            * Matrix4x4.Scale(scale);
                 case ParticleSystemSimulationSpace.World:
+                    if (_isTrail)
+                    {
+                        return Matrix4x4.Translate(psPos)
+                               * Matrix4x4.Scale(scale)
+                               * Matrix4x4.Translate(-psPos);
+                    }
+
+                    if (_mainEmitter)
+                    {
+                        if (_mainEmitter.IsLocalSpace())
+                        {
+                            return Matrix4x4.Translate(psPos)
+                                   * Matrix4x4.Scale(scale)
+                                   * Matrix4x4.Translate(-psPos);
+                        }
+                        else
+                        {
+                            psPos = _particleSystem.transform.position - _mainEmitter.transform.position;
+                            return Matrix4x4.Translate(psPos)
+                                   * Matrix4x4.Scale(scale)
+                                   * Matrix4x4.Translate(-psPos);
+                        }
+                    }
+
                     return Matrix4x4.Scale(scale);
                 case ParticleSystemSimulationSpace.Custom:
                     return Matrix4x4.Translate(_particleSystem.main.customSimulationSpace.position.GetScaled(scale))
@@ -606,6 +629,7 @@ namespace Coffee.UIExtensions
                 : main.useUnscaledTime
                     ? Time.unscaledDeltaTime
                     : Time.deltaTime;
+            deltaTime *= _parent.timeScaleMultiplier;
 
             // Pre-warm:
             if (0 < deltaTime && _preWarm)
