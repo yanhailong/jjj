@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Coffee.UIParticleInternal;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 [assembly: InternalsVisibleTo("Coffee.UIParticle.Editor")]
+[assembly: InternalsVisibleTo("Coffee.UIParticle.PerformanceDemo")]
+[assembly: InternalsVisibleTo("Coffee.UIParticle.Demo")]
 
 namespace Coffee.UIExtensions
 {
     /// <summary>
     /// Render maskable and sortable particle effect ,without Camera, RenderTexture or Canvas.
     /// </summary>
+    [Icon("Packages/com.coffee.ui-particle/Icons/UIParticleIcon.png")]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
     [RequireComponent(typeof(CanvasRenderer))]
-    public class UIParticle : UIBehaviour, ISerializationCallbackReceiver
+    public class UIParticle : MaskableGraphic, ISerializationCallbackReceiver
     {
         public enum AutoScalingMode
         {
@@ -60,7 +63,7 @@ namespace Coffee.UIExtensions
 
         [Tooltip("Scale the rendering particles. When the `3D` toggle is enabled, 3D scale (x, y, z) is supported.")]
         [SerializeField]
-        private Vector3 m_Scale3D = new Vector3(1, 1, 1);
+        private Vector3 m_Scale3D = new Vector3(10, 10, 10);
 
         [Tooltip("If you want to update material properties (e.g. _MainTex_ST, _Color) in AnimationClip, " +
                  "use this to mark as animatable.")]
@@ -118,47 +121,23 @@ namespace Coffee.UIExtensions
         private float m_CustomViewSize = 10;
 
         [SerializeField]
-        private bool m_Maskable = true;
+        [Tooltip("Time scale multiplier.")]
+        private float m_TimeScaleMultiplier = 1;
 
         private readonly List<UIParticleRenderer> _renderers = new List<UIParticleRenderer>();
         private Camera _bakeCamera;
-        private Canvas _canvas;
         private int _groupId;
         private bool _isScaleStored;
         private Vector3 _storedScale;
         private DrivenRectTransformTracker _tracker;
 
-        public RectTransform rectTransform => transform as RectTransform;
-
-        public Canvas canvas
-        {
-            get
-            {
-                if (_canvas) return _canvas;
-
-                var tr = transform;
-                while (tr && !_canvas)
-                {
-                    if (tr.TryGetComponent(out _canvas)) return _canvas;
-                    tr = tr.parent;
-                }
-
-                return null;
-            }
-        }
-
         /// <summary>
-        /// Does this graphic allow masking.
+        /// Should this graphic be considered a target for ray-casting?
         /// </summary>
-        public bool maskable
+        public override bool raycastTarget
         {
-            get => m_Maskable;
-            set
-            {
-                if (value == m_Maskable) return;
-                m_Maskable = value;
-                UpdateRendererMaterial();
-            }
+            get => false;
+            set { }
         }
 
         /// <summary>
@@ -283,6 +262,15 @@ namespace Coffee.UIExtensions
             set => m_CustomViewSize = Mathf.Max(0.1f, value);
         }
 
+        /// <summary>
+        /// Time scale multiplier.
+        /// </summary>
+        public float timeScaleMultiplier
+        {
+            get => m_TimeScaleMultiplier;
+            set => m_TimeScaleMultiplier = value;
+        }
+
         internal bool useMeshSharing => m_MeshSharing != MeshSharing.None;
 
         internal bool isPrimary =>
@@ -335,15 +323,15 @@ namespace Coffee.UIExtensions
 
         public Vector3 parentScale { get; private set; }
 
-        private Vector3 canvasScale { get; set; }
+        public Vector3 canvasScale { get; private set; }
 
         protected override void OnEnable()
         {
             _isScaleStored = false;
             ResetGroupId();
             UIParticleUpdater.Register(this);
+            RegisterDirtyMaterialCallback(UpdateRendererMaterial);
 
-            //
             if (0 < particles.Count)
             {
                 RefreshParticles(particles);
@@ -353,7 +341,7 @@ namespace Coffee.UIExtensions
                 RefreshParticles();
             }
 
-            UpdateRendererMaterial();
+            base.OnEnable();
         }
 
         /// <summary>
@@ -370,15 +358,9 @@ namespace Coffee.UIExtensions
             _isScaleStored = false;
             UIParticleUpdater.Unregister(this);
             _renderers.ForEach(r => r.Reset());
-            _canvas = null;
-        }
+            UnregisterDirtyMaterialCallback(UpdateRendererMaterial);
 
-        /// <summary>
-        /// Called when the state of the parent Canvas is changed.
-        /// </summary>
-        protected override void OnCanvasHierarchyChanged()
-        {
-            _canvas = null;
+            base.OnDisable();
         }
 
         /// <summary>
@@ -386,14 +368,6 @@ namespace Coffee.UIExtensions
         /// </summary>
         protected override void OnDidApplyAnimationProperties()
         {
-        }
-
-        /// <summary>
-        /// This function is called when a direct or indirect parent of the transform of the GameObject has changed.
-        /// </summary>
-        protected override void OnTransformParentChanged()
-        {
-            _canvas = null;
         }
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
@@ -617,12 +591,14 @@ namespace Coffee.UIExtensions
             {
                 var ps = particleSystems[i];
                 if (!ps) continue;
-                GetRenderer(j++).Set(this, ps, false);
+
+                var mainEmitter = ps.GetMainEmitter(particleSystems);
+                GetRenderer(j++).Set(this, ps, false, mainEmitter);
 
                 // If the trail is enabled, set it additionally.
                 if (ps.trails.enabled)
                 {
-                    GetRenderer(j++).Set(this, ps, true);
+                    GetRenderer(j++).Set(this, ps, true, mainEmitter);
                 }
             }
         }
@@ -686,6 +662,17 @@ namespace Coffee.UIExtensions
             _groupId = m_GroupId == m_GroupMaxId
                 ? m_GroupId
                 : Random.Range(m_GroupId, m_GroupMaxId + 1);
+        }
+
+        protected override void UpdateMaterial()
+        {
+        }
+
+        /// <summary>
+        /// Call to update the geometry of the Graphic onto the CanvasRenderer.
+        /// </summary>
+        protected override void UpdateGeometry()
+        {
         }
 
         private void UpdateRendererMaterial()
@@ -763,7 +750,7 @@ namespace Coffee.UIExtensions
             _bakeCamera.useOcclusionCulling = false;
 
             _bakeCamera.gameObject.SetActive(false);
-            _bakeCamera.gameObject.hideFlags = HideFlags.HideAndDontSave;
+            _bakeCamera.gameObject.hideFlags = UIParticleProjectSettings.globalHideFlags;
 
             return _bakeCamera;
         }

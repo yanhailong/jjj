@@ -171,5 +171,32 @@ namespace Coffee.UIParticleInternal
                 action.Invoke(p);
             }
         }
+
+        public static ParticleSystem GetMainEmitter(this ParticleSystem self, List<ParticleSystem> list)
+        {
+            if (!self || list == null || list.Count == 0) return null;
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                var parent = list[i];
+                if (parent != self && IsSubEmitterOf(self, parent)) return parent;
+            }
+
+            return null;
+        }
+
+        public static bool IsSubEmitterOf(this ParticleSystem self, ParticleSystem parent)
+        {
+            if (!self || !parent) return false;
+
+            var subEmitters = parent.subEmitters;
+            var count = subEmitters.subEmittersCount;
+            for (var i = 0; i < count; i++)
+            {
+                if (subEmitters.GetSubEmitterSystem(i) == self) return true;
+            }
+
+            return false;
+        }
     }
 }

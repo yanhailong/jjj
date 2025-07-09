@@ -15,6 +15,8 @@ end
 ---获取组件
 function UITestScrollView:InitComponents()
     self.udy_test=ComponentUtilGet.SimpleScroll(self.transform,"content/udy_test");
+    
+    self.test=ComponentUtilGet.Button(self.transform,"content/test")
 end
 
 ---清空组件

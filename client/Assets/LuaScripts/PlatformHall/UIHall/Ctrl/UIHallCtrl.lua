@@ -34,7 +34,11 @@ end
 
 ---添加UI事件
 function UIHallCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.btn_shop, function
+	()
+		require("PlatformHall/UITestScroll/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.UITestScroll)
+	end)
 end
 
 ---移除UI事件

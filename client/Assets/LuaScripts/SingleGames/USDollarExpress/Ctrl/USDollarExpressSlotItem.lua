@@ -9,9 +9,16 @@ function USDollarExpressSlotItem:ctor(go)
 end
 
 function USDollarExpressSlotItem:SetSprite(icon,index)
+    if icon=="" or icon==nil then
+        logError("11111111111111")
+    end
     self.img_icon.sprite=icon
     self.img_icon:SetNativeSize()
     self.iconIndex=index
+end
+
+function USDollarExpressSlotItem:InitIndex(index)
+    self.index=index
 end
 
 function USDollarExpressSlotItem:SetActive(active)

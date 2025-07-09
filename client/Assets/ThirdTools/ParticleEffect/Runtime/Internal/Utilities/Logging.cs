@@ -42,7 +42,6 @@ namespace Coffee.UIParticleInternal
 #endif
         }
 
-
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
 #endif
@@ -52,7 +51,6 @@ namespace Coffee.UIParticleInternal
             Log_Internal(LogType.Log, tag, message, context ? context : tag as Object);
         }
 
-
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
 #endif
@@ -60,7 +58,6 @@ namespace Coffee.UIParticleInternal
         {
             Log_Internal(LogType.Log, tag, message, context ? context : tag as Object);
         }
-
 
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
@@ -78,7 +75,6 @@ namespace Coffee.UIParticleInternal
             Debug.LogError($"{tag}: {message}", context);
 #endif
         }
-
 
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
@@ -123,7 +119,6 @@ namespace Coffee.UIParticleInternal
 #endif
         }
 
-
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
 #endif
@@ -140,6 +135,9 @@ namespace Coffee.UIParticleInternal
 
                 switch (tag)
                 {
+                    case string name:
+                        sb.Append(name);
+                        break;
                     case Type type:
                         AppendType(sb, type);
                         break;
@@ -165,7 +163,6 @@ namespace Coffee.UIParticleInternal
             }
 #endif
         }
-
 
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
@@ -204,7 +201,6 @@ namespace Coffee.UIParticleInternal
             s_TypeNameCache.Add(type, sb.ToString(start, sb.Length - start));
 #endif
         }
-
 
 #if !ENABLE_COFFEE_LOGGER
         [Conditional(k_DisableSymbol)]
