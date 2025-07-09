@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-06-30 17:02:49
+---DateTime: 2025-07-09 16:24:40
 ---
 ---@class RoyalWarGameView:BaseView
 local RoyalWarGameView=Class("RoyalWarGameView",BaseView)
@@ -14,13 +14,12 @@ end
 
 ---获取组件
 function RoyalWarGameView:InitComponents()
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
     self.obj_BlackWinIcon=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BlackRoot/obj_BlackWinIcon");
     self.tmp_BlackBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BlackRoot/bg/tmp_BlackBetNum");
     self.obj_SelfBetBlack=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BlackRoot/obj_SelfBetBlack");
     self.tmp_SelfBetBlackNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BlackRoot/obj_SelfBetBlack/tmp_SelfBetBlackNum");
     self.btn_BetBlackOne=ComponentUtilGet.Button(self.transform,"content/BetBg/BlackRoot/btn_BetBlackOne");
-    self.btn_BetBlackTwo = ComponentUtilGet.Button(self.transform,"content/BetBg/BlackRoot/btn_BetBlackTwo")
+    self.btn_BetBlackTwo=ComponentUtilGet.Button(self.transform,"content/BetBg/BlackRoot/btn_BetBlackTwo");
     self.obj_RedWinIcon=ComponentUtilGet.GameObject(self.transform,"content/BetBg/RedRoot/obj_RedWinIcon");
     self.tmp_RedBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/RedRoot/bg/tmp_RedBetNum");
     self.obj_SelfBetRed=ComponentUtilGet.GameObject(self.transform,"content/BetBg/RedRoot/obj_SelfBetRed");
@@ -84,11 +83,16 @@ function RoyalWarGameView:InitComponents()
     self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_StopBet");
     self.obj_Settlement=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_Settlement");
     self.rect_ChipParent=ComponentUtilGet.RectTransform(self.transform,"content/rect_ChipParent");
+    self.btn_touch=ComponentUtilGet.Button(self.transform,"content/btn_touch");
+    self.btn_Menu=ComponentUtilGet.Button(self.transform,"content/btn_Menu");
+    self.obj_Menu=ComponentUtilGet.GameObject(self.transform,"content/mask/obj_Menu");
+    self.btn_setting=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_setting");
+    self.btn_help=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_help");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_close");
 end
 
 ---清空组件
 function RoyalWarGameView:ClearComponents()
-    self.btn_close=nil;
     self.obj_BlackWinIcon=nil;
     self.tmp_BlackBetNum=nil;
     self.obj_SelfBetBlack=nil;
@@ -158,6 +162,12 @@ function RoyalWarGameView:ClearComponents()
     self.obj_StopBet=nil;
     self.obj_Settlement=nil;
     self.rect_ChipParent=nil;
+    self.btn_touch=nil;
+    self.btn_Menu=nil;
+    self.obj_Menu=nil;
+    self.btn_setting=nil;
+    self.btn_help=nil;
+    self.btn_close=nil;
 end
 
 ---初始化View数据

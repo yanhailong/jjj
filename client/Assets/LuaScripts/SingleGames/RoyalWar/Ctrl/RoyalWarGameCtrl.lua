@@ -806,7 +806,17 @@ function RoyalWarGameCtrl:AddYueYouLuTableShow()
 	end
 end
 
+---刷新菜单显示隐藏
+function RoyalWarGameCtrl:RefreshMenuShow()
+	if self.view.btn_touch.gameObject.activeSelf then
+		self.view.obj_Menu.transform:DOLocalMoveY(483,0.5):SetEase(Ease.InBack)
+		self.view.btn_touch.gameObject:SetActive(false)
+	else
+		self.view.obj_Menu.transform:DOLocalMoveY(0,0.5):SetEase(Ease.OutBack)
+		self.view.btn_touch.gameObject:SetActive(true)
+	end
 
+end
 
 function RoyalWarGameCtrl:Close()
     self.super.Close(self);
@@ -814,6 +824,16 @@ end
 
 ---添加UI事件
 function RoyalWarGameCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_Menu,function()
+		self:RefreshMenuShow()
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_touch,function()
+		self:RefreshMenuShow()
+	end)
+	self.uiEventListener:AddClick(self.view.btn_help,function()
+		--CtrlManager.SingleShow(CtrlNames.BaccaratRule)--还没加这个帮助面板
+	end)
 	self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close();
 	end)
