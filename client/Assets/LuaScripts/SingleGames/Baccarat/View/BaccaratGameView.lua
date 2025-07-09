@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-08 11:09:13
+---DateTime: 2025-07-09 15:56:13
 ---
 ---@class BaccaratGameView:BaseView
 local BaccaratGameView=Class("BaccaratGameView",BaseView)
@@ -14,7 +14,11 @@ end
 
 ---获取组件
 function BaccaratGameView:InitComponents()
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
+    self.btn_Menu=ComponentUtilGet.Button(self.transform,"content/btn_Menu");
+    self.obj_Menu=ComponentUtilGet.GameObject(self.transform,"content/mask/obj_Menu");
+    self.btn_setting=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_setting");
+    self.btn_help=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_help");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_close");
     self.obj_ZhuPanContent=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratRoad/ZhuPanScroll/Viewport/obj_ZhuPanContent");
     self.obj_DaLuContent=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratRoad/DaLuScroll/Viewport/obj_DaLuContent");
     self.obj_DaluZiluContent=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/BaccaratRoad/DaluZiluScroll/Viewport/obj_DaluZiluContent");
@@ -77,21 +81,28 @@ function BaccaratGameView:InitComponents()
     self.tmp_SelfBetBPairNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BPairRoot/obj_SelfBetBPair/tmp_SelfBetBPairNum");
     self.obj_BetBPairRegion=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BPairRoot/obj_BetBPairRegion");
     self.btn_BetBPair=ComponentUtilGet.Button(self.transform,"content/BetBg/BPairRoot/btn_BetBPair");
+    self.obj_Countdown=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_Countdown");
+    self.tmp_Countdown=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/Process/obj_Countdown/tmp_Countdown");
+    self.obj_VS=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_VS");
+    self.obj_BeginBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_BeginBet");
+    self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_StopBet");
+    self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
+    self.rect_ChipParent=ComponentUtilGet.RectTransform(self.transform,"content/rect_ChipParent");
     self.btn_One=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_One");
     self.obj_checkedOne=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_One/obj_checkedOne");
-    self.txt_One=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/BottomNote/btn_One/txt_One");
+    self.txt_One=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_One/txt_One");
     self.btn_Ten=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Ten");
     self.obj_checkedTen=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Ten/obj_checkedTen");
-    self.txt_Ten=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/BottomNote/btn_Ten/txt_Ten");
+    self.txt_Ten=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Ten/txt_Ten");
     self.btn_Fifty=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Fifty");
     self.obj_checkedFifty=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Fifty/obj_checkedFifty");
-    self.txt_Fifty=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/BottomNote/btn_Fifty/txt_Fifty");
+    self.txt_Fifty=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Fifty/txt_Fifty");
     self.btn_OneHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_OneHundred");
     self.obj_checkedOneHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/obj_checkedOneHundred");
-    self.txt_OneHundred=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/txt_OneHundred");
+    self.txt_OneHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/txt_OneHundred");
     self.btn_FiveHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred");
     self.obj_checkedFiveHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/obj_checkedFiveHundred");
-    self.txt_FiveHundred=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/txt_FiveHundred");
+    self.txt_FiveHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/txt_FiveHundred");
     self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_AllOther");
     self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/btn_AllOther/tmp_AllOtherNumber");
     self.btn_Repeat=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_Repeat");
@@ -100,17 +111,15 @@ function BaccaratGameView:InitComponents()
     self.img_SelfHead=ComponentUtilGet.Image(self.transform,"content/DownRoot/obj_Player/SelfHead/img_SelfHeadPic/img_SelfHead");
     self.tmp_SelfGoldNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/Money/tmp_SelfGoldNumber");
     self.tmp_SelfName=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/tmp_SelfName");
-    self.obj_Countdown=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_Countdown");
-    self.tmp_Countdown=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/Process/obj_Countdown/tmp_Countdown");
-    self.obj_VS=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_VS");
-    self.obj_BeginBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_BeginBet");
-    self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_StopBet");
-    self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
-    self.rect_ChipParent=ComponentUtilGet.RectTransform(self.transform,"content/rect_ChipParent");
+    self.btn_touch=ComponentUtilGet.Button(self.transform,"content/btn_touch");
 end
 
 ---清空组件
 function BaccaratGameView:ClearComponents()
+    self.btn_Menu=nil;
+    self.obj_Menu=nil;
+    self.btn_setting=nil;
+    self.btn_help=nil;
     self.btn_close=nil;
     self.obj_ZhuPanContent=nil;
     self.obj_DaLuContent=nil;
@@ -174,6 +183,13 @@ function BaccaratGameView:ClearComponents()
     self.tmp_SelfBetBPairNum=nil;
     self.obj_BetBPairRegion=nil;
     self.btn_BetBPair=nil;
+    self.obj_Countdown=nil;
+    self.tmp_Countdown=nil;
+    self.obj_VS=nil;
+    self.obj_BeginBet=nil;
+    self.obj_StopBet=nil;
+    self.obj_PlayerRoot=nil;
+    self.rect_ChipParent=nil;
     self.btn_One=nil;
     self.obj_checkedOne=nil;
     self.txt_One=nil;
@@ -197,13 +213,7 @@ function BaccaratGameView:ClearComponents()
     self.img_SelfHead=nil;
     self.tmp_SelfGoldNumber=nil;
     self.tmp_SelfName=nil;
-    self.obj_Countdown=nil;
-    self.tmp_Countdown=nil;
-    self.obj_VS=nil;
-    self.obj_BeginBet=nil;
-    self.obj_StopBet=nil;
-    self.obj_PlayerRoot=nil;
-    self.rect_ChipParent=nil;
+    self.btn_touch=nil;
 end
 
 ---初始化View数据

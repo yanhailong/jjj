@@ -5,14 +5,14 @@
 ---@class BaccaratGameCtrl:BaseCtrl
 local BaccaratGameCtrl=Class("BaccaratGameCtrl",BaseCtrl)
 ---@type BaccaratConfig
-local config=require("SingleGames/Baccarat/Main/BaccaratConfig")
+local config=require("SingleGames/Baccarat/BaccaratConfig")
 
 ---@type BaccaratZhuPanItem
-local BaccaratZhuPanItem = require"SingleGames/Baccarat/Main/Ctrl/BaccaratZhuPanItem"
+local BaccaratZhuPanItem = require"SingleGames/Baccarat/Ctrl/BaccaratZhuPanItem"
 ---@type BaccaratDaLuItem
-local BaccaratDaLuItem = require"SingleGames/Baccarat/Main/Ctrl/BaccaratDaLuItem"
+local BaccaratDaLuItem = require"SingleGames/Baccarat/Ctrl/BaccaratDaLuItem"
 ---@type BaccaratAllChildLuItem
-local BaccaratAllChildLuItem = require"SingleGames/Baccarat/Main/Ctrl/BaccaratAllChildLuItem"
+local BaccaratAllChildLuItem = require"SingleGames/Baccarat/Ctrl/BaccaratAllChildLuItem"
 
 ---游戏阶段
 local  gameStage ={
@@ -900,7 +900,17 @@ function BaccaratGameCtrl:GetCardEndPoint(point)
 		return point
 	end
 end
+---刷新菜单显示隐藏
+function BaccaratGameCtrl:RefreshMenuShow()
+	if self.view.btn_touch.gameObject.activeSelf then
+		self.view.obj_Menu.transform:DOLocalMoveY(483,0.5):SetEase(Ease.InBack)
+		self.view.btn_touch.gameObject:SetActive(false)
+	else
+		self.view.obj_Menu.transform:DOLocalMoveY(0,0.5):SetEase(Ease.OutBack)
+		self.view.btn_touch.gameObject:SetActive(true)
+	end
 
+end
 
 function BaccaratGameCtrl:Close()
     self.super.Close(self);
@@ -908,6 +918,16 @@ end
 
 ---添加UI事件
 function BaccaratGameCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_Menu,function()
+		self:RefreshMenuShow()
+	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_touch,function()
+		self:RefreshMenuShow()
+	end)
+	self.uiEventListener:AddClick(self.view.btn_help,function()
+		CtrlManager.SingleShow(CtrlNames.BaccaratRule)
+	end)
     self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close();
 	end)

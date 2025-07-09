@@ -2,7 +2,7 @@
 ---@class BaccaratZhuPanItem
 local BaccaratZhuPanItem=Class("BaccaratZhuPanItem")
 ---@type BaccaratConfig
-local config=require("SingleGames/Baccarat/Main/BaccaratConfig")
+local config=require("SingleGames/Baccarat/BaccaratConfig")
 local DOTween = CS.DG.Tweening.DOTween
 local loopType =  CS.DG.Tweening.LoopType;
 

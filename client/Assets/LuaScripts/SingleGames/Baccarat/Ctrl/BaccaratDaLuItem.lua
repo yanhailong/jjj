@@ -1,7 +1,7 @@
 ---@class BaccaratDaLuItem
 local BaccaratDaLuItem=Class("BaccaratAllLuItem")
 ---@type BaccaratConfig
-local config=require("SingleGames/Baccarat/Main/BaccaratConfig")
+local config=require("SingleGames/Baccarat/BaccaratConfig")
 function BaccaratDaLuItem:ctor(obj,ctrl)
     ---@type ObjectPoolUtil
     self.objPools=ObjectPoolUtil.New()

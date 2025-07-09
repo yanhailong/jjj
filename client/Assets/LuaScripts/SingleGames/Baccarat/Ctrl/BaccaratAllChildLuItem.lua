@@ -1,7 +1,7 @@
 ---@class BaccaratAllChildLuItem
 local BaccaratAllChildLuItem = Class("BaccaratAllChildLuItem")
 ---@type BaccaratConfig
-local config=require("SingleGames/Baccarat/Main/BaccaratConfig")
+local config=require("SingleGames/Baccarat/BaccaratConfig")
 function BaccaratAllChildLuItem:ctor(obj,ctrl)
     ---@type UnityEngine.GameObject
     self.gameObject = obj

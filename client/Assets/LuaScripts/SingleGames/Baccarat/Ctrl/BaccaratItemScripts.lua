@@ -20,7 +20,7 @@ function BaccaratItemScripts:ctor(obj,ctrl)
     self.tmp_RemainingNumber = ComponentUtilGet.TextMeshProUGUI(self.transform,"TopRoot/Remaining/tmp_RemainingNumber")
     self.slider_CountdownTime = ComponentUtilGet.Slider(self.transform,"TopRoot/slider_CountdownTime")
     self.ctrl.uiEventListener:AddClick(self.btn_EnterGame,function()
-        require("SingleGames/Baccarat/Main/MVCHead")
+        require("SingleGames/Baccarat/MVCHead")
         CtrlManager.SingleShow(CtrlNames.BaccaratGame)
     end)
 end

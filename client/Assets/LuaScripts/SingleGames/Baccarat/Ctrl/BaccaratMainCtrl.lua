@@ -5,9 +5,9 @@
 ---@class BaccaratMainCtrl:BaseCtrl
 local BaccaratMainCtrl=Class("BaccaratMainCtrl",BaseCtrl)
 ---@type BaccaratConfig
-local config=require("SingleGames/Baccarat/Main/BaccaratConfig")
+local config=require("SingleGames/Baccarat/BaccaratConfig")
 ---@type BaccaratItemScripts
-local BaccaratItemScripts = require("SingleGames/Baccarat/SelectPanel/Ctrl/BaccaratItemScripts")
+local BaccaratItemScripts = require("SingleGames/Baccarat/Ctrl/BaccaratItemScripts")
 local Vector3 = CS.UnityEngine.Vector3
 ---构造函数
 function BaccaratMainCtrl:ctor(ctrlName,param)
@@ -53,6 +53,10 @@ end
 function BaccaratMainCtrl:AddUIEvent()
     self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close()
+	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_Help,function()
+		CtrlManager.SingleShow(CtrlNames.BaccaratRule)
 	end)
 end
 
