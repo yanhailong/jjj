@@ -361,8 +361,8 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
     self.resultWinTrs.gameObject:SetActive(true)
     self.resultTrs.gameObject:SetActive(true)
     self.resultBgTrs.gameObject:SetActive(true)
-    self.resultCard1:LoadCard(cards[1][1],cards[1][2])
-    self.resultCard2:LoadCard(cards[2][1],cards[2][2])
+    self.resultCard1:LoadCard(cards[1])
+    self.resultCard2:LoadCard(cards[2])
     local p1 = self.ctr_dot_p1.position
     local p2 = self.ctr_dot_p2.position
     
@@ -392,10 +392,12 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
     --结果
     TimerManager.StartTimer(self, function
     ()
-        if cards[1][2]>cards[2][2] then
+        local longCar = cards[1]%13
+        local huCar = cards[2]%13
+        if longCar>huCar then
             config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.Long
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
-        elseif cards[1][2]<cards[2][2] then
+        elseif longCar<huCar then
             config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
             self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
         else
@@ -444,7 +446,7 @@ function DragonTigerFightView:StartEffect(callFunc)
     sequence:Insert(0,self.startRightTrs:DOLocalMoveX(540, 0.8):SetEase(Ease.InOutBounce))
     sequence:Append(self.startVsTrs:DOScale(Vector3(0.5,0.5,1),0.4))
     sequence:Join(self.startVsImg:DOFade(1,0.3))
-    sequence:Append(self.startVsTrs:DOScale(Vector3(1.5,1.5,1),0.2))
+    sequence:Append(self.startVsTrs:DOScale(Vector3(1,1,1),0.2))
     sequence:AppendInterval(1.2)
     sequence:Append(self.startLeftTrs:DOLocalMoveX(-3000, 0.6))
     sequence:Join(self.startRightTrs:DOLocalMoveX(3000, 0.6))

@@ -28,7 +28,6 @@ function BirdsAnimalsGameView:InitComponents()
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
     self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
-    self.tmp_playerNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_players/tmp_playerNum");
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
     self.muenRect=ComponentUtilGet.RectTransform(self.transform,"content/setting/mask/muen")
     self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch");
@@ -37,7 +36,7 @@ function BirdsAnimalsGameView:InitComponents()
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/setting/mask/muen/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/setting/mask/muen/btn_close");
 
-    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_playerNum")
+    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_total_player_num")
     ---提示信息
     self.txt_mybets=ComponentUtilGet.Text(self.transform,"content/center/tips/tips_center/mybets/txt_mybets");
     self.tmp_totalnote=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/center/tips/tips_center/totalnote/tmp_totalnote");
@@ -107,7 +106,7 @@ function BirdsAnimalsGameView:ClearComponents()
     self.btn_recharge=nil;
     self.btn_1=nil;
     self.btn_players=nil;
-    self.tmp_playerNum=nil;
+    self.tmp_totalPlayerNum=nil;
     self.btn_repeat=nil;
     self.txt_mybets=nil;
     self.tmp_totalnote=nil;

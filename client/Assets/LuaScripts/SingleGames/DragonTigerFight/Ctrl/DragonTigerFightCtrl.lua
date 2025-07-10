@@ -6,7 +6,6 @@
 local DragonTigerFightCtrl=Class("DragonTigerFightCtrl",BaseCtrl)
 ---@type DragonTigerFightConfig
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
-require("SingleGames/DragonTigerFight/PokerConfig")
 
 ---构造函数
 function DragonTigerFightCtrl:ctor(ctrlName,param)
@@ -156,8 +155,8 @@ function DragonTigerFightCtrl:Test()
 		TimerManager.StartTimer(self, function
 		()
 			self.view:ResultEffect({
-				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)},
-				{Tools.RandomInt(1,4),Tools.RandomInt(1,13)}
+				Tools.RandomInt(0,3)*13+Tools.RandomInt(1,13),
+				Tools.RandomInt(0,3)*13+Tools.RandomInt(1,13)
 			},function()
 				--显示路信息
 				GlobalEvent.Notify("UPDATE_HIS_ITEMS")

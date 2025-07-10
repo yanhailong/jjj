@@ -19,21 +19,16 @@ function CardItem:ctor(go)
     self.img_back=ComponentUtilGet.Image(self.transform,"back")
 end
 
-function CardItem:LoadCard(typeid, number,cardsType)
+function CardItem:LoadCard(carIndex)
     
-    if cardsType==nil then cardsType = 2 end
-    if number<1 or number>13 then return end
-    if typeid <1 or typeid>4 then return end
+    if carIndex<1 or carIndex>52 then return end
+    
+    local assetName =  "card_"..carIndex
+    local cardsPath = "Common/GameArtsCommon/GameFight/alats/card"
 
-    local numberType = POKER_CARDS_SUIT_NAME[typeid];
-    local cardPrefix =  "card"..cardsType.."_"
-    local assetName = cardPrefix .. numberType .."_"..tostring(number);
-    local cardsPath = "SingleGames/DragonTigerFight/alats/CardsAtlas/CardsTwo/".. string.upper(string.sub(numberType, 1, 1)) .. string.sub(numberType, 2).."s"
-    local backPath = "SingleGames/DragonTigerFight/alats/CardsAtlas/CardsTwo/Joker"
-    local backAssetName = cardPrefix .."back"
     self.img_front.sprite = resMgr:LoadSprite(cardsPath,assetName)
     --self.img_front:SetNativeSize()
-    self.img_back.sprite = resMgr:LoadSprite(backPath,backAssetName)
+    self.img_back.sprite = resMgr:LoadSprite(cardsPath,"pai_beim")
     --self.img_back:SetNativeSize()
     
     self:Hiden()
