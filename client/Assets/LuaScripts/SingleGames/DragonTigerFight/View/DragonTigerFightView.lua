@@ -338,7 +338,7 @@ end
 function DragonTigerFightView:SettingFade()
     if self.settingShow then
         self.settingShow = false
-        self.muenRect:DOLocalMoveY(self.muenRect.sizeDelta.y+30,0.5):SetEase(Ease.InBack)
+        self.muenRect:DOLocalMoveY(self.muenRect.sizeDelta.y+100,0.5):SetEase(Ease.InBack)
         self.btn_touch.gameObject:SetActive(false)
     else
         self.settingShow = true

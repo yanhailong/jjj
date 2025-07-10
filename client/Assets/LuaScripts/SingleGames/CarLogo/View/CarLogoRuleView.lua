@@ -17,7 +17,7 @@ end
 function CarLogoRuleView:InitComponents()
     self.img_title=ComponentUtilGet.Image(self.transform,"content/BackGround/img_title");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/BackGround/btn_close");
-    self.tmp_desc=ComponentUtilGet.Text(self.transform,"content/Scroll View/Viewport/Content/tmp_desc")
+    self.tmp_desc=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/Scroll View/Viewport/Content/tmp_desc")
     self.gridTrs=ComponentUtilGet.Transform(self.transform,"content/Scroll View/Viewport/Content/grid")
     self.LineItems={}
     for i=1,self.gridTrs.childCount do
