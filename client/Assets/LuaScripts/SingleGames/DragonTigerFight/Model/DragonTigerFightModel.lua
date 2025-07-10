@@ -77,40 +77,7 @@ end
 ---更新历史信息
 function DragonTigerFightModel:UpdateHistoryRecord()
 	--测试数据
-	--local game_his_items = {}
-	--if self.total then
-	--	self.total=self.total+1
-	--	if self.total>100 then
-	--		self.total = 60
-	--		self.game_his_items = {}
-	--		for i=1,self.total do
-	--			table.insert(self.game_his_items,{seri_id=i,win_side=Tools.RandomInt(1,3)})
-	--		end
-	--	else
-	--		local sade = Tools.RandomInt(1,2)
-	--		for i=self.total,self.total+7 do
-	--			table.insert(self.game_his_items,{seri_id=i,win_side=sade})
-	--		end
-	--		self.total = self.total + 7
-	--	end
-	--else
-	--	self.total = 60
-	--	self.game_his_items = {
-	--		{seri_id=1,win_side=1},
-	--		{seri_id=2,win_side=1},
-	--		{seri_id=3,win_side=1},
-	--		{seri_id=4,win_side=1},
-	--		{seri_id=5,win_side=1},
-	--		{seri_id=6,win_side=1},
-	--		{seri_id=7,win_side=1},
-	--		{seri_id=8,win_side=1},
-	--		
-	--	}
-	--	for i=9,self.total do
-	--		table.insert(self.game_his_items,{seri_id=i,win_side=Tools.RandomInt(1,3)})
-	--	end
-	--	
-	--end
+
 	local side = config.side
 	if side == nil then
 		look("side数据为nil")

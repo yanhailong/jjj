@@ -395,7 +395,7 @@ function DragonTigerFightView:ResultEffect(cards,callFunc)
         local longCar = cards[1]%13
         local huCar = cards[2]%13
         if longCar>huCar then
-            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.Long
+            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.LONG
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
         elseif longCar<huCar then
             config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
@@ -472,10 +472,10 @@ function DragonTigerFightView:StartEffect(callFunc)
             self.colockStateTimeNum.text = config.lessSeconds 
             --倒计时3s
             if config.lessSeconds==3 then
+                self.colockStateTimeTrs.gameObject:SetActive(false)
                 self:PlayDaoJiShiEffect()
             end
         end, 1, DRAGON_TIGER_FIGHT_GAME_TIME, true,function()
-            self.colockStateTimeTrs.gameObject:SetActive(false)
             self:SetRepeatState(false)
         end)
         

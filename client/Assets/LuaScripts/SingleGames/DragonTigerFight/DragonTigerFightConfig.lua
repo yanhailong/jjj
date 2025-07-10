@@ -5,7 +5,7 @@
 --
 ---@class DragonTigerFightConfig
 local DragonTigerFightConfig=Class("DragonTigerFightConfig")
-local  this = DragonTigerFightConfig;
+local this = DragonTigerFightConfig;
 
 ---当前选中的底注
 this.dizhuIndex = 1

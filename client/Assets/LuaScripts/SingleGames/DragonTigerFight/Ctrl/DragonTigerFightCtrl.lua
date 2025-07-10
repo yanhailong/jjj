@@ -160,6 +160,8 @@ function DragonTigerFightCtrl:Test()
 			},function()
 				--显示路信息
 				GlobalEvent.Notify("UPDATE_HIS_ITEMS")
+
+				self:Test()
 			end)
 			
 			TimerManager.StartTimer(self, function
