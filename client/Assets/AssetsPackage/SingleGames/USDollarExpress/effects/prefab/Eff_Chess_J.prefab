@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 842047027534735945}
   - component: {fileID: 842047027534735942}
   m_Layer: 0
-  m_Name: Spine_Chess_J
+  m_Name: Spine_Chess
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
