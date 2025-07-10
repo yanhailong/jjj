@@ -64,36 +64,6 @@ function USDollarExpressCarCtrl:InitCars()
 	end
 end
 
---function USDollarExpressCarCtrl:Move()
---	self.WidthSpace=CS.UnityEngine.Screen.width/2
---	logError("移动的间距："..self.WidthSpace)
---	local posx=self.WidthSpace*self.curMoveIndex
---	local endPos=Vector3.New(posx,0,0)
---	self.tweener=self.view.trans_root:DOAnchorPos(endPos, 2)
---	self.tweener:SetEase(DG.Tweening.Ease.Linear);
---	self.tweener.onComplete=function()
---		logError("移动完毕")
---		CorManager.StartCor(self, function
---		()
---			---@type USDollarExpressTrainItem
---			local item= self.allItems[self.curMoveIndex]
---			item:DOPlayerAni()
---			coroutine.wait(0.5)
---			self.curMoveIndex=self.curMoveIndex+1
---			if self.curMoveIndex<=self.maxMoveIndex then
---				self:Move()
---			else
---				logError("当前火车移动完毕！！")
---				coroutine.wait(2)
---				self:InitCars()
---
---			end
---		end)
---		
---
---	end
---	
---end
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
 	if type==config.TrainColorType.GreenTrain then
@@ -150,7 +120,7 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 		item:SetText(goldList[i])
 		self.allItems[i]=item
 	end
-
+	
 	self.maxMoveIndex= #goldList
 	self.curMoveIndex=1
 	
@@ -188,6 +158,8 @@ function USDollarExpressCarCtrl:Update()
 			CorManager.StartCor(self, function
 			()
 				coroutine.wait(5)
+				local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+				ctrl:EndSmallGame()
 				self:Close()
 			end)
 		end
@@ -197,9 +169,9 @@ end
 
 
 function USDollarExpressCarCtrl:Settmp_value(num)
-	local curNum=tonumber(self.view.tmp_value.text)
+	local curNum=tonumber(self.view.txt_value.text)
 	local nextNum=curNum+num
-	self.view.tmp_value.text=tostring(nextNum)
+	self.view.txt_value.text=tostring(nextNum)
 end
 
 function USDollarExpressCarCtrl:Close()

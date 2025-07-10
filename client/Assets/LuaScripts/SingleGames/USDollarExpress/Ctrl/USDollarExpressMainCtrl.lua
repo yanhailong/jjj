@@ -70,6 +70,9 @@ end
 
 ---初始化数据
 function USDollarExpressMainCtrl:InitData()
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
+	
 	self:InitRollData()
 	self.parentList={}
 	self.childsList = {}
@@ -116,7 +119,7 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			card.name = tostring(j)
 			card.transform:SetAsFirstSibling()
 			---@type USDollarExpressSlotItem
-			local iconItem=SlotItem.New(card)
+			local iconItem=SlotItem.New(card,self)
 			iconItem:InitIndex(j-1)
 			local texId = math.random(1,table.getCount(config.iocnPicName))
 			local numFF=6;
@@ -292,7 +295,14 @@ function USDollarExpressMainCtrl:ShowResoult()
 	end)
 end
 
+function USDollarExpressMainCtrl:TestEffect()
+	for i = 1, 20 do
+		self.showChildsList[i]:SetIsAward(true)
+	end
+end
+
 function USDollarExpressMainCtrl:ShowAwardEffect()
+	self:TestEffect()
 	local allWinGold=self.model.allWinGold
 	local resultLineInfoList=self.model.resultLineInfoList
 	local specialType=self.model.specialType
@@ -355,9 +365,9 @@ end
 function USDollarExpressMainCtrl:EnterSmallGame()
 	logError("进入拉火车小游戏")
 	if self.model.specialType==1 then
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+		--CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
 	end
-	--config.showStep=config.showStep+1
+	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:EndSmallGame()

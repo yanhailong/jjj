@@ -19,17 +19,20 @@ end
 
 function USDollarExpressTrainItem:SetText(value)
     --self.tmp_value.text = value
+    local obj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/prefabs/txt_TrainValue","txt_TrainValue",self.transform)
+    self.txt_value= ComponentUtilGet.Text(obj)
+    self.txt_value.transform.position=self.transform.position
+    self.txt_value.transform.localRotation=Quaternion.Euler(0,180,0)
+    self.txt_value.text = value
+    
 end
 
 function USDollarExpressTrainItem:DOPlayerAni()
-    if true then
-        return
-    end
     --self.transform:DOScale(1.1, 0.2)
     ---@type UnityEngine.GameObject
-    local objText=Tools.Instance(self.tmp_value.gameObject,self.transform.parent.parent)
-    local tempText=ComponentUtilGet.TextMeshProUGUI(objText.transform)
-    tempText.text = self.tmp_value.text
+    local objText=Tools.Instance(self.txt_value.gameObject,self.transform.parent.parent)
+    local tempText=ComponentUtilGet.Text(objText.transform)
+    tempText.text = self.txt_value.text
     tempText.transform:DOScale(1.1, 0.2)
 
     -- 创建动画序列
@@ -37,7 +40,7 @@ function USDollarExpressTrainItem:DOPlayerAni()
 
 
     local midPos = -300
-    local endPos =-502
+    local endPos =-650
 
     -- 最大放大比例
     local maxScale = 1.5
@@ -86,7 +89,7 @@ function USDollarExpressTrainItem:DOPlayerAni()
     --)
     --sequence:Join(
     --        tempText.transform:DOScale(minScale, 0.3)
-    --                :SetEase(DG.Tweening.Ease.InQuad)
+    --                :SetEase(DG.Tweening.Ease.InQuad
     --)
     --
     --sequence:OnComplete(function()
@@ -97,7 +100,7 @@ function USDollarExpressTrainItem:DOPlayerAni()
     --end)
 
     sequence:Play()
-    self.tmp_value.gameObject:SetActive(false)
+    self.txt_value.gameObject:SetActive(false)
     
     
     
