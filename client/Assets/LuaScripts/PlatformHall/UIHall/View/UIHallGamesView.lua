@@ -4,6 +4,7 @@
 ---
 ---@class UIHallGamesView:BaseView
 local UIHallGamesView=Class("UIHallGamesView",BaseView)
+local UIHallConfig=require("PlatformHall/UIHall/UIHallConfig")
 local iconViewPos=0;
 ---初始化panel
 function UIHallGamesView:InitView()
@@ -26,6 +27,8 @@ function UIHallGamesView:InitComponents()
         info.transform=t;
         info.t_point=ComponentUtilGet.Transform(t,"updateState");
         info.icon=ComponentUtilGet.Image(t);
+        info.name=ComponentUtilGet.TextMeshProUGUI(t,"Text (TMP)");
+        info.name.text=UIHallConfig.GAME_NAME[i]
         self.itemInfos[i]=info;
     end
 
