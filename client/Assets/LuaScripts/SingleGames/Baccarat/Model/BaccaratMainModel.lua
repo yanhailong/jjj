@@ -23,6 +23,11 @@ function BaccaratMainModel:RemoveEvent()
 
 end
 
+---请求进入到百家乐大厅
+function BaccaratMainModel:ReqBaccaratTableSummaryList(wareId)
+	
+end
+
 --region 事件方法
 
 --endregion

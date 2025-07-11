@@ -101,6 +101,8 @@ local BetRecord={};
 ---当前下注
 local CurBet={};
 local vsSpine;
+local BeginBetSpine;
+local StopBetSpine;
 
 ---构造函数
 function BaccaratGameCtrl:ctor(ctrlName,param)
@@ -141,6 +143,8 @@ function BaccaratGameCtrl:InitDataShow()
 	RoundNumber=1;
 	self:RefreshDataShow()
 	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform);
+	BeginBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BeginBet.transform);
+	StopBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_StopBet.transform);
 end
 
 ---初始化数据
@@ -191,13 +195,18 @@ function BaccaratGameCtrl:InitData()
 
 	self.view.btn_Repeat.interactable =#BetRecord>0;
 	
-	self.beginTimer = TimerManager.CreateTimer(self,function()
+	self.VsSpineActionTimer = TimerManager.CreateTimer(self,function()
+		Tools.PlayerSpineAniByName(vsSpine,"end",false)
+		self.VsSpineEndTimer:Start();
+	end,1,1,true);
+	
+	self.VsSpineEndTimer =  TimerManager.CreateTimer(self,function()
 		self.view.obj_VS:SetActive(false);
 		curGameStage = gameStage.Bet;
 		self:RefreshGameStage();
 	end,1,1,true);
 	
-	self.beginTimer2 = TimerManager.CreateTimer(self,function()
+	self.beginTimer = TimerManager.CreateTimer(self,function()
 		self.view.obj_BeginBet:SetActive(false);
 	end,1,1,true);
 
@@ -352,7 +361,9 @@ function BaccaratGameCtrl:EnterBegin()
 	self.view.obj_Countdown:SetActive(false);
 	self.view.obj_VS:SetActive(true);
 	Tools.PlayerSpineAniByName(vsSpine,"action",false)
-	self.beginTimer:Start();
+	self.VsSpineActionTimer:Start()
+	
+	
 end
 ---进入下注阶段
 function BaccaratGameCtrl:EnterBetGame()
@@ -360,13 +371,11 @@ function BaccaratGameCtrl:EnterBetGame()
 	self:SetBetButtonInteractable(true);
 	self.view.obj_Countdown:SetActive(true);
 	self.view.obj_BeginBet:SetActive(true);
-	self.beginTimer2:Start();
-	self:ShowCountDown();
-end
----显示下注倒计时
-function BaccaratGameCtrl:ShowCountDown()
+	Tools.PlayerSpineAniByName(BeginBetSpine,"action",false)
+	self.beginTimer:Start();
 	self.betCountDownTimer:Start();
 end
+
 ---设置按钮的显示状态
 function BaccaratGameCtrl:SetBetButtonInteractable(state)
 	self.view.btn_One.interactable = state;
@@ -377,12 +386,13 @@ function BaccaratGameCtrl:SetBetButtonInteractable(state)
 end
 
 function BaccaratGameCtrl:GetCardNum()
-	return math.random(1,13);
+	return math.random(1,52);
 end
 
 ---进入结算阶段
 function BaccaratGameCtrl:EnterSettlement()
 	self.view.obj_StopBet:SetActive(true);
+	Tools.PlayerSpineAniByName(StopBetSpine,"action",false)
 	self:SetBetButtonInteractable(false);
 	self.view.btn_Repeat.interactable = false;
 	self.view.obj_Countdown:SetActive(false);
@@ -394,15 +404,15 @@ function BaccaratGameCtrl:EnterSettlement()
 		self.SettlementCor=nil
 	end
 	self.SettlementCor=	CorManager:StartCor(function()--翻牌
-		coroutine.wait(0.5)
+		coroutine.wait(1)
 		self.view.obj_StopBet:SetActive(false);
 		coroutine.wait(1)
 		local playerCard1 = self:GetCardNum();
-		ComponentUtilGet.Image(self.view.ator_PlayerCard1.transform,"CardImage").sprite = config.GetCardPic("pai_"..config.GetPaiXing()..playerCard1);
+		ComponentUtilGet.Image(self.view.ator_PlayerCard1.transform,"CardImage").sprite = config.GetCardPic("card_"..playerCard1);
 		self.view.ator_PlayerCard1:Play("FlipCards");
 		coroutine.wait(0.5)
 		local playerCard2 = self:GetCardNum();
-		ComponentUtilGet.Image(self.view.ator_PlayerCard2.transform,"CardImage").sprite = config.GetCardPic("pai_"..config.GetPaiXing()..playerCard2);
+		ComponentUtilGet.Image(self.view.ator_PlayerCard2.transform,"CardImage").sprite = config.GetCardPic("card_"..playerCard2);
 		self.view.ator_PlayerCard2:Play("FlipCards");
 		playerIsPairing = playerCard1 == playerCard2;
 		playerCard1 = self:GetCardPoint(playerCard1);
@@ -412,11 +422,11 @@ function BaccaratGameCtrl:EnterSettlement()
 		self.view.obj_PlayerKing:SetActive(playerIsKing)
 		coroutine.wait(0.75)
 		local BankerCard1 =  self:GetCardNum();
-		ComponentUtilGet.Image(self.view.ator_BankerCard1.transform,"CardImage").sprite = config.GetCardPic("pai_"..config.GetPaiXing()..BankerCard1);
+		ComponentUtilGet.Image(self.view.ator_BankerCard1.transform,"CardImage").sprite = config.GetCardPic("card_"..BankerCard1);
 		self.view.ator_BankerCard1:Play("FlipCards");
 		coroutine.wait(0.5)
 		local BankerCard2 = self:GetCardNum();
-		ComponentUtilGet.Image(self.view.ator_BankerCard2.transform,"CardImage").sprite = config.GetCardPic("pai_"..config.GetPaiXing()..BankerCard2);
+		ComponentUtilGet.Image(self.view.ator_BankerCard2.transform,"CardImage").sprite = config.GetCardPic("card_"..BankerCard2);
 		self.view.ator_BankerCard2:Play("FlipCards");
 		BankerIsPairing = BankerCard1 ==BankerCard2;
 		BankerCard1 = self:GetCardPoint(BankerCard1);
@@ -545,7 +555,28 @@ function BaccaratGameCtrl:RefreshZhuPanShow(data,isFlicker)
 	table.insert(ZhuPanTable,item);
 	self:AddDaLuTableShow(data);
 end
+---获取真正的点数
+function BaccaratGameCtrl:GetCardPoint(point)
+	local num =  (point - 1) / 13+1;
 
+	if(num >=10) then
+		return 0
+	else
+		return num
+	end
+end
+
+---获取相加后显示的点数
+function BaccaratGameCtrl:GetCardEndPoint(point)
+	if(point >=10) then
+		point = point-10;
+		return point
+	else
+		return point
+	end
+end
+
+--region 路单显示
 ---大路新增显示
 function BaccaratGameCtrl:AddDaLuTableShow(data)
 	local curIndex = 0; --当前的索引
@@ -884,25 +915,8 @@ function BaccaratGameCtrl:AddYueYouLuTableShow()
 		
 	end
 end
+--endregion
 
----获取真正的点数
-function BaccaratGameCtrl:GetCardPoint(point)
-	if(point >=10) then
-		return 0
-	else
-		return point 
-	end
-end
-
----获取相加后显示的点数
-function BaccaratGameCtrl:GetCardEndPoint(point)
-	if(point >=10) then
-		point = point-10;
-		return point 
-	else
-		return point
-	end
-end
 ---刷新菜单显示隐藏
 function BaccaratGameCtrl:RefreshMenuShow()
 	if self.view.btn_touch.gameObject.activeSelf then
@@ -1034,7 +1048,7 @@ function BaccaratGameCtrl:PlayChip(selectBet,selectChip)
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,config.GetChipPoolName(selectChip))
 	chip:SetActive(true)
 	chip.transform:SetParent(targetRect.transform,false)
-	chip.transform.localScale =  Vector3.one*0.8
+	chip.transform.localScale =  Vector3.one*0.6
 	chip.transform.position = self.view.obj_Player.transform.position;
 	table.insert(ChipTable,chip);
 	-- 获取目标区域的矩形顶点
@@ -1049,7 +1063,7 @@ function BaccaratGameCtrl:PlayChip(selectBet,selectChip)
 	--self.PlayChipSequence:Append(chip.transform:DOScale(1, 0.4):SetEase(Ease.Linear))
 	-- 动画完成后保持金币在桌面上
 	self.PlayChipSequence:OnComplete(function()
-		--self.PlayChipSequence:Kill();
+    --self.PlayChipSequence:Kill();
 	end)
 
 	self.PlayChipSequence:Play()

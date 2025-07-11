@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-10 15:25:07
+---DateTime: 2025-07-11 10:27:15
 ---
 ---@class RoyalWarGameView:BaseView
 local RoyalWarGameView=Class("RoyalWarGameView",BaseView)
@@ -16,16 +16,19 @@ end
 function RoyalWarGameView:InitComponents()
     self.obj_BlackWinIcon=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BlackRoot/obj_BlackWinIcon");
     self.tmp_BlackBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BlackRoot/bg/tmp_BlackBetNum");
+    self.rect_BlackBetRegion=ComponentUtilGet.RectTransform(self.transform,"content/BetBg/BlackRoot/rect_BlackBetRegion");
     self.obj_SelfBetBlack=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BlackRoot/obj_SelfBetBlack");
     self.tmp_SelfBetBlackNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BlackRoot/obj_SelfBetBlack/tmp_SelfBetBlackNum");
     self.btn_BetBlack=ComponentUtilGet.Button(self.transform,"content/BetBg/BlackRoot/btn_BetBlack");
     self.obj_RedWinIcon=ComponentUtilGet.GameObject(self.transform,"content/BetBg/RedRoot/obj_RedWinIcon");
     self.tmp_RedBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/RedRoot/bg/tmp_RedBetNum");
+    self.rect_RedBetRegion=ComponentUtilGet.RectTransform(self.transform,"content/BetBg/RedRoot/rect_RedBetRegion");
     self.obj_SelfBetRed=ComponentUtilGet.GameObject(self.transform,"content/BetBg/RedRoot/obj_SelfBetRed");
     self.tmp_SelfBetRedNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/RedRoot/obj_SelfBetRed/tmp_SelfBetRedNum");
     self.btn_BetRed=ComponentUtilGet.Button(self.transform,"content/BetBg/RedRoot/btn_BetRed");
     self.obj_LuckyWinIcon=ComponentUtilGet.GameObject(self.transform,"content/BetBg/LuckyRoot/obj_LuckyWinIcon");
     self.tmp_LuckyBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/LuckyRoot/bg/tmp_LuckyBetNum");
+    self.rect_LuckyBetRegion=ComponentUtilGet.RectTransform(self.transform,"content/BetBg/LuckyRoot/rect_LuckyBetRegion");
     self.obj_SelfBetLucky=ComponentUtilGet.GameObject(self.transform,"content/BetBg/LuckyRoot/obj_SelfBetLucky");
     self.tmp_SelfBetLuckyNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/LuckyRoot/obj_SelfBetLucky/tmp_SelfBetLuckyNum");
     self.btn_BetLucky=ComponentUtilGet.Button(self.transform,"content/BetBg/LuckyRoot/btn_BetLucky");
@@ -100,16 +103,19 @@ end
 function RoyalWarGameView:ClearComponents()
     self.obj_BlackWinIcon=nil;
     self.tmp_BlackBetNum=nil;
+    self.rect_BlackBetRegion=nil;
     self.obj_SelfBetBlack=nil;
     self.tmp_SelfBetBlackNum=nil;
     self.btn_BetBlack=nil;
     self.obj_RedWinIcon=nil;
     self.tmp_RedBetNum=nil;
+    self.rect_RedBetRegion=nil;
     self.obj_SelfBetRed=nil;
     self.tmp_SelfBetRedNum=nil;
     self.btn_BetRed=nil;
     self.obj_LuckyWinIcon=nil;
     self.tmp_LuckyBetNum=nil;
+    self.rect_LuckyBetRegion=nil;
     self.obj_SelfBetLucky=nil;
     self.tmp_SelfBetLuckyNum=nil;
     self.btn_BetLucky=nil;

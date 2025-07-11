@@ -134,7 +134,7 @@ function RoyalWarGameCtrl:InitData()
 
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
-		self.view.tmp_Countdown.text = countDownTime;
+		self.view.txt_Countdown.text = countDownTime;
 		if(countDownTime <= 3) then
 			self.view.obj_Countdown:SetActive(false);
 			self.view.obj_AboutEnd:SetActive(true);
@@ -168,7 +168,7 @@ function RoyalWarGameCtrl:EnterBegin()
 end
 ---进入下注阶段
 function RoyalWarGameCtrl:EnterBetGame()
-	self.view.tmp_Countdown.text = countDownTime;
+	self.view.txt_Countdown.text = countDownTime;
 	self:SetBetButtonInteractable(true);
 	self.view.obj_Countdown:SetActive(true);
 	self.view.obj_BeginBet:SetActive(true);
@@ -872,23 +872,13 @@ function RoyalWarGameCtrl:AddUIEvent()
 	end)
 	
 
-	self.uiEventListener:AddClick(self.view.btn_BetBlackOne,function()
+	self.uiEventListener:AddClick(self.view.btn_BetBlack,function()
 		--下注庄家区域
 		self:PlayChip(config.BetState.Black,CurSelectChip)
 	end)
 
-	self.uiEventListener:AddClick(self.view.btn_BetBlackTwo,function()
-		--下注闲家区域
-		self:PlayChip(config.BetState.Black,CurSelectChip)
-	end)
-
-	self.uiEventListener:AddClick(self.view.btn_BetRedOne,function()
+	self.uiEventListener:AddClick(self.view.btn_BetRed,function()
 		--下注和区域
-		self:PlayChip(config.BetState.Red,CurSelectChip)
-	end)
-
-	self.uiEventListener:AddClick(self.view.btn_BetRedTwo,function()
-		--下注庄对区域
 		self:PlayChip(config.BetState.Red,CurSelectChip)
 	end)
 
@@ -908,15 +898,15 @@ function RoyalWarGameCtrl:PlayChip(selectBet,selectChip)
 	end
 	local targetRect;
 	if(selectBet == config.BetState.Black) then -- 下注的黑方
-		targetRect = self.view.btn_BetBlackTwo.transform:GetComponent("RectTransform");
+		targetRect = self.view.rect_BlackBetRegion;
 		BetBlackAllNum = BetBlackAllNum+config.GetChipMoneyNum(selectChip);
 		self.view.tmp_BlackBetNum.text = BetBlackAllNum;
 	elseif 	selectBet == config.BetState.Red then -- 下注的红方
-		targetRect = self.view.btn_BetRedOne.transform:GetComponent("RectTransform")
+		targetRect = self.view.rect_RedBetRegion
 		BetRedAllNum = BetRedAllNum + config.GetChipMoneyNum(selectChip);
 		self.view.tmp_RedBetNum.text = BetRedAllNum;
 	elseif 	selectBet == config.BetState.Lucky then -- 下注的幸运一击
-		targetRect = self.view.btn_BetLucky.transform:GetComponent("RectTransform")
+		targetRect = self.view.rect_LuckyBetRegion
 		BetLuckyAllNum = BetLuckyAllNum+config.GetChipMoneyNum(selectChip);
 		self.view.tmp_LuckyBetNum.text = BetLuckyAllNum;
 	end
@@ -924,7 +914,7 @@ function RoyalWarGameCtrl:PlayChip(selectBet,selectChip)
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,config.GetChipPoolName(selectChip),targetRect.transform)
 	chip:SetActive(true)
 	--chip.transform:SetParent(targetRect.transform,false)
-	chip.transform.localScale =  Vector3.one*1.3
+	chip.transform.localScale =  Vector3.one*0.6
 	chip.transform.position = self.view.obj_Player.transform.position;
 	table.insert(ChipTable,chip);
 	-- 获取目标区域的矩形顶点
@@ -935,7 +925,7 @@ function RoyalWarGameCtrl:PlayChip(selectBet,selectChip)
 	self.PlayChipSequence = DOTween.Sequence()
 	-- 设置金币动画效果
 	self.PlayChipSequence:Append(chip.transform:DOMove(endPos, 0.5):SetEase(Ease.Linear))
-	self.PlayChipSequence:Append(chip.transform:DOScale(1, 0.3):SetEase(Ease.Linear))
+	self.PlayChipSequence:Append(chip.transform:DOScale(0.5, 0.3):SetEase(Ease.Linear))
 	--self.PlayChipSequence:Append(chip.transform:DOScale(1, 0.4):SetEase(Ease.Linear))
 	-- 动画完成后保持金币在桌面上
 	self.PlayChipSequence:OnComplete(function()
