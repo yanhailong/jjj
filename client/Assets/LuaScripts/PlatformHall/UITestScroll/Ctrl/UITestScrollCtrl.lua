@@ -56,9 +56,10 @@ end
 function UITestScrollCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.test, function
 	()
-		
+		self.udy_awardmeri:ScrollToIndex(50,0,DG.Tweening.Ease.Linear)
 		CorManager.StartCor(self, function
 		()
+			coroutine.wait(0.5)
 			self.udy_awardmeri:ScrollToIndex(4,3,DG.Tweening.Ease.Linear)---111
 			coroutine.wait(3)
 			self.udy_awardmeri:ScrollToIndex(0,1,DG.Tweening.Ease.OutQuart)

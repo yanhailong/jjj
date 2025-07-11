@@ -4,6 +4,9 @@
 ---
 ---@class USDollarExpressMainModel:BaseModel
 local USDollarExpressMainModel=Class("USDollarExpressMainModel",BaseModel)
+---@type USDollarExpressConfig
+local config=require("SingleGames/USDollarExpress/USDollarExpressConfig")
+
 
 function USDollarExpressMainModel:Awake()
 	self.super.Awake(self);
@@ -21,9 +24,11 @@ function USDollarExpressMainModel:AddEvent()
 	local str= resMgr:LoadTextAssetStr("SingleGames/USDollarExpress","slotData.txt")
 	self.slotData=jsonDecode(str)
 	
-	GlobalEvent.AddListener(SlotEvent.SlotEventName.StartSpin,self.ReqStartGame,self)
-	GlobalEvent.AddListener(SlotEvent.SlotEventName.BackHome,self.BackHome,self)
-	GlobalEvent.AddListener(SlotEvent.SlotEventName.OpenHelp,self.OpenHelp,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.StartSpin,self.ReqStartGame,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.BackHome,self.BackHome,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.OpenHelp,self.OpenHelp,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto,self.NoticeStopAuto,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.RollStop,self.RollStop,self)
 end
 
 function USDollarExpressMainModel:BackHome()
@@ -38,12 +43,32 @@ function USDollarExpressMainModel:RemoveEvent()
 	GlobalEvent.RemoveAllTo(self)
 end
 
-function USDollarExpressMainModel:ReqStartGame(stakeVlue)
+function USDollarExpressMainModel:ReqStartGame(dataSpin)
 	--local data={}
 	--data.stakeVlue=stakeVlue
 	--WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
+	
+	
+	local data=dataSpin
+	if data then
+		look("点击按钮传入事件",data)
+		if data.isAuto==true then
+			config.selfMotionNum=data.autoNum
+		end
+	end
+
+	
 	self:ResStartGame(self.slotData)
 	
+end
+
+function USDollarExpressMainModel:RollStop()
+	logError("快速停止转动...")
+	self.ctrl:StopRollState()
+end
+
+function USDollarExpressMainModel:NoticeStopAuto()
+	config.selfMotionNum=0
 end
 
 function USDollarExpressMainModel:ResStartGame(msg)

@@ -15,16 +15,7 @@ this.freeTotalNum = 0   --总免费次数
 this.curFreeNum=0       --当前剩余免费次数
 this.showStep=0
 this.freeState=false    --游戏状态
-
----游戏状态
-this.gameState={
-    Normal=1,--闲置状态
-    RollState=2,--转动状态
-    AutoState=3,--自动状态
-    FreeState=4,--免费
-    SmallGame=5,--小游戏
-}
-this.curGameState=this.gameState.Normal;
+this.selfMotionNum=0  ---自动旋转次数
 
 ---@火车颜色
 this.TrainColorType={
