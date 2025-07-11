@@ -6,7 +6,7 @@
 local VietnamChessGameView=Class("VietnamChessGameView",BaseView)
 local VietnamChessConfig=require("SingleGames/VietnamChess/VietnamChessConfig")
 local VietnamChessPlayCoin = require("SingleGames/VietnamChess/View/Item/VietnamChessPlayCoin")
-local PlayerItem = require("SingleGames/DragonTigerFight/View/Item/PlayerItem")
+local VietnamChessPlayerItem = require("SingleGames/VietnamChess/View/Item/VietnamChessPlayerItem")
 local VietnamChessRoadView = require("SingleGames/VietnamChess/View/Item/VietnamChessRoadView")
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
@@ -30,7 +30,7 @@ function VietnamChessGameView:InitComponents()
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/buttom/dizhu");
     self.xiazhuArea = ComponentUtilGet.Transform(self.transform,"content/center/XiaZhu")
     self.clickRect = ComponentUtilGet.Transform(self.transform,"content/clickRect")
-    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/buttom/selfPlayerRoot")
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/buttom/SelfHead")
     ---下注数量
     ---@type  TMPro.TextMeshProUGUI[]
     self.xiazhuNumLabels = {}
@@ -70,17 +70,13 @@ function VietnamChessGameView:InitComponents()
     ---底注节点
     self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/buttom/nodes")
     ---其他玩家信息 left right
-    ---@type PlayerItem[]
+    ---@type VietnamChessPlayerItem[]
     self.AllOtherPlayerHeads = {}
-    local leftPath = "content/LeftRoot/playerRoot"
-    for i = 1, 3 do
-        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(ComponentUtilGet.GameObject(self.transform,leftPath..i))
+    local otherPlayerTrs = ComponentUtilGet.Transform(self.transform,"content/obj_PlayerRoot")
+    for i = 1, 6 do
+        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = VietnamChessPlayerItem.New(otherPlayerTrs:GetChild(i-1))
     end
-    local rightPath = "content/RightRoot/playerRoot"
-    for i = 1, 3 do
-        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(ComponentUtilGet.GameObject(self.transform,rightPath..i))
-    end
-    self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
+    self.selfPlayer = VietnamChessPlayerItem.New(self.selfPlayerRoot)
     ---提示信息
     self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
     self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_end")
@@ -269,7 +265,6 @@ function VietnamChessGameView:PlayCompeleCoinFLy(datas,players,cards)
 end
 
 
-
 ---初始界面
 function VietnamChessGameView:InitUI()
     ---续押
@@ -282,8 +277,6 @@ function VietnamChessGameView:InitUI()
     for i=1,#self.xiazhuRateLabels do
         self.xiazhuLights[i].gameObject:SetActive(false)
         self.xiazhuRateLabels[i].text = "1:"..VietnamChessConfig.CHESS_ODS[i]
-        self.xiazhuSelfNumsLabels[i].text = "0"
-        self.xiazhuNumLabels[i].text = "0"
     end
     
     ---路单数据
@@ -296,6 +289,14 @@ function VietnamChessGameView:InitUI()
     self.tipsTimeThree:SetActive(false)
     self.three.gameObject:SetActive(false)
     self.resultGaiZhi.gameObject:SetActive(true)
+    self:InitXiaZhuLabel()
+end
+
+function VietnamChessGameView:InitXiaZhuLabel()
+    for i=1,#self.xiazhuRateLabels do
+        self.xiazhuSelfNumsLabels[i].text = "0"
+        self.xiazhuNumLabels[i].text = "0"
+    end
 end
 
 function VietnamChessGameView:UpdateXiaZhuLabel()

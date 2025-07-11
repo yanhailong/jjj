@@ -16,7 +16,7 @@ function BaccaratMainModel:Close()
 end
 
 function BaccaratMainModel:AddEvent()
-
+	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummaryList, self.RespBaccaratTableSummaryList, self)
 end
 
 function BaccaratMainModel:RemoveEvent()
@@ -25,7 +25,11 @@ end
 
 ---请求进入到百家乐大厅
 function BaccaratMainModel:ReqBaccaratTableSummaryList(wareId)
-	
+	pb_Baccarat.ReqBaccaratTableSummaryList(wareId);
+end
+---返回百家乐场次界面的数据
+function BaccaratMainModel:RespBaccaratTableSummaryList(msg)
+	self.ctrl:RefreshSelectModel(msg)
 end
 
 --region 事件方法

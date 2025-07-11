@@ -3,13 +3,13 @@
 --{paramdesc} 
 --@desc 
 --
----@class PlayerItem
-local PlayerItem=Class("PlayerItem")
+---@class CarLogoPlayerItem
+local CarLogoPlayerItem=Class("CarLogoPlayerItem")
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 local Vector3 = CS.UnityEngine.Vector3
 
-function PlayerItem:ctor(go)
+function CarLogoPlayerItem:ctor(go)
     self.gameObject = go
     self.transform=self.gameObject.transform
     self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
@@ -22,11 +22,11 @@ end
 ---
 ---更新玩家金币数量
 ---@param num int
-function PlayerItem:UpdateGoldCount(num)
+function CarLogoPlayerItem:UpdateGoldCount(num)
     self.goldCount.text = num
 end
 
-function PlayerItem:ShowResultCount(num)
+function CarLogoPlayerItem:ShowResultCount(num)
     local symbol = ""
     if num>0 then
         symbol = "+"
@@ -50,10 +50,10 @@ function PlayerItem:ShowResultCount(num)
 end
 
 
-function PlayerItem:UpdatePlayer(player)
+function CarLogoPlayerItem:UpdatePlayer(player)
     self.goldCount.text = player.coin
     self.player = player
     self.id = player.id
 end
 
-return PlayerItem
+return CarLogoPlayerItem

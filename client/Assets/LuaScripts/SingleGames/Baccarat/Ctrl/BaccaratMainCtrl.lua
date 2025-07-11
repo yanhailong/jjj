@@ -31,17 +31,18 @@ end
 
 ---初始化数据
 function BaccaratMainCtrl:InitData()
-	self:RefreshSelectModel();
+	self.model:ReqBaccaratTableSummaryList(1);
 end
 
-function BaccaratMainCtrl:RefreshSelectModel()
-	for i = 1, 4 do
+---拿到服务器数据刷新界面显示
+function BaccaratMainCtrl:RefreshSelectModel(msg)
+	for _, v in ipairs(msg.tableSummaryList ) do
 		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"BaccaratItem",self.view.obj_Content.transform)
 		obj:SetActive(true)
 		obj.transform.localScale =  Vector3.one
 		---@type BaccaratItemScripts
 		local item = BaccaratItemScripts.New(obj,self)
-		item:RefreshDataShow();--等服务器那边传数据过来
+		item:RefreshDataShow(v);
 	end
 end
 

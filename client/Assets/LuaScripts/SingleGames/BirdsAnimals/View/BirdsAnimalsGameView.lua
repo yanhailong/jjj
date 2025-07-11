@@ -10,7 +10,7 @@ local BirdsAnimalsAreaItem=require("SingleGames/BirdsAnimals/View/Item/BirdsAnim
 local BirdsAnimalsConfig=require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
 local BirdsAnimalsHelper=require("SingleGames/BirdsAnimals/BirdsAnimalsHelper")
 local BirdsAnimalsPlayCoinView=require("SingleGames/BirdsAnimals/View/BirdsAnimalsPlayCoinView")
-local PlayerItem = require("SingleGames/DragonTigerFight/View/Item/PlayerItem")
+local BirdsAnimalsPlayerItem = require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsPlayerItem")
 
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
@@ -94,8 +94,8 @@ function BirdsAnimalsGameView:InitComponents()
         self.chipInfos[i]=chipItem
     end
     ---玩家
-    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/selfPlayerRoot")
-    self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
+    self.selfPlayer = BirdsAnimalsPlayerItem.New(self.selfPlayerRoot)
     ---底注节点prefab
     self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/bottom/nodes")
 end
@@ -189,7 +189,7 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
     time = time or 6
     if leftTime > 0 then
         leftTime =  leftTime > time and time or leftTime
-        to = to + BirdsAnimalsConfig.LOGO_MAX * 3
+        to = to + BirdsAnimalsConfig.ANIMAL_MAX * 3
 
         local startTime = Time.realtimeSinceStartup - (time - leftTime);
         local deltaTime = Time.realtimeSinceStartup - startTime;
@@ -204,9 +204,9 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
                 for i = lastIndex + 1, newIndex do
                     lastIndex = i;
 
-                    local index = i%BirdsAnimalsConfig.LOGO_MAX
+                    local index = i%BirdsAnimalsConfig.ANIMAL_MAX
                     if index<=0 then
-                        index = index + BirdsAnimalsConfig.LOGO_MAX
+                        index = index + BirdsAnimalsConfig.ANIMAL_MAX
                     end
 
                     self.logoViews[index]:ShowChoose(true)

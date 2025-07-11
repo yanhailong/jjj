@@ -33,7 +33,7 @@ function DragonTigerFightView:InitComponents()
     self.longClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/longClick")
     self.huClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/huClick")
     self.heClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/heClick")
-    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/buttom/selfPlayerRoot")
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/buttom/SelfHead")
     ---下注数量
     ---@type  TMPro.TextMeshProUGUI[]
     self.xiazhuNumLabels = {}
@@ -68,13 +68,9 @@ function DragonTigerFightView:InitComponents()
     ---其他玩家信息 left right
     ---@type PlayerItem[]
     self.AllOtherPlayerHeads = {}
-    local leftPath = "content/LeftRoot/playerRoot"
-    for i = 1, 3 do
-        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(ComponentUtilGet.GameObject(self.transform,leftPath..i))
-    end
-    local rightPath = "content/RightRoot/playerRoot"
-    for i = 1, 3 do
-        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(ComponentUtilGet.GameObject(self.transform,rightPath..i))
+    local otherPlayerTrs = ComponentUtilGet.Transform(self.transform,"content/obj_PlayerRoot")
+    for i = 1, 6 do
+        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(otherPlayerTrs:GetChild(i-1))
     end
     self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
     ---提示信息
