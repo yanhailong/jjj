@@ -38,9 +38,9 @@ end
 
 ---添加UI事件
 function UICommonSlotBtnsCtrl:AddUIEvent()
-	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAuto, Handler(self,self.NoticeAuto))
-	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto, Handler(self,self.NoticeStopAuto))
-	GlobalEvent.AddListener(SlotGlobal.gameEventName.GameStateChange,Handler(self,self.GameStateChange))
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAuto, self.NoticeAuto,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto, self.NoticeStopAuto,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.GameStateChange,self.GameStateChange,self)
 	
 	self.uiEventListener:AddClick(self.view.btn_start, function()
 		if self.isLongPress==true then
