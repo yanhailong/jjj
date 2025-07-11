@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 187906216855318545}
   m_Layer: 5
-  m_Name: BirdsAnimalsPlayersPanel
+  m_Name: VietnamChessPlayersPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -264,7 +264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9154597675115042587
 RectTransform:
   m_ObjectHideFlags: 0
@@ -437,7 +437,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 60.4, y: 1.2}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 148.71, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &3052971698347424981
 CanvasRenderer:
@@ -664,7 +664,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: -180.8, y: -78.1}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 258.94, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3890721241987158622
 CanvasRenderer:
@@ -1105,7 +1105,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -309.5, y: -85}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 246.62, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8340657653454024311
 CanvasRenderer:
@@ -1754,7 +1754,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -174.2, y: -19.9}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 387, y: 61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &749345503752467379
 CanvasRenderer:
@@ -1903,7 +1903,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -306.8, y: -144.8}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 257.16, y: 50}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &5698819159608498692
 CanvasRenderer:

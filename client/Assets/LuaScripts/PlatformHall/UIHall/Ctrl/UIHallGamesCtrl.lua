@@ -62,6 +62,9 @@ function UIHallGamesCtrl:OnClickGameItem(index)
 	elseif index == 6 then
 		require("SingleGames/DragonTigerFight/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.DragonTigerFight)
+	elseif index == 7 then
+		require("SingleGames/VietnamChess/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.VietnamChessGame)
 	end
 end
 
