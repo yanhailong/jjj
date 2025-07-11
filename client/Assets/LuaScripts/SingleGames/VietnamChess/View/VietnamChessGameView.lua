@@ -135,7 +135,7 @@ end
 
 ---初始化View数据
 function VietnamChessGameView:InitPanelData(args)
-	
+	self:InitUI()
 end
 
 
@@ -278,9 +278,12 @@ function VietnamChessGameView:InitUI()
     for i=1,#self.AllOtherPlayerHeads do
         self.AllOtherPlayerHeads[i]:UpdateGoldCount(i)
     end
-
-    for i=1,#self.xiazhuLights do
+    
+    for i=1,#self.xiazhuRateLabels do
         self.xiazhuLights[i].gameObject:SetActive(false)
+        self.xiazhuRateLabels[i].text = "1:"..VietnamChessConfig.CHESS_ODS[i]
+        self.xiazhuSelfNumsLabels[i].text = "0"
+        self.xiazhuNumLabels[i].text = "0"
     end
     
     ---路单数据
@@ -293,24 +296,12 @@ function VietnamChessGameView:InitUI()
     self.tipsTimeThree:SetActive(false)
     self.three.gameObject:SetActive(false)
     self.resultGaiZhi.gameObject:SetActive(true)
-    self:InitXiaZhuLabel()
-
-end
-
-function VietnamChessGameView:InitXiaZhuLabel()
-    for index=1,3 do
-        self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(false)
-    end
-    self.xiazhuNumLabels[1].text = "0" --LocalManager.GetStrById(200101014)
-    self.xiazhuNumLabels[2].text = "0" --LocalManager.GetStrById(200101014)
-    self.xiazhuNumLabels[3].text = "0" --LocalManager.GetStrById(200101015)
 end
 
 function VietnamChessGameView:UpdateXiaZhuLabel()
-    for index=1,3 do
+    for index=1,6 do
         self.xiazhuNumLabels[index].text = VietnamChessConfig.totalDiZhuNums[index]
         if VietnamChessConfig.selfDiZhuNums[index]>0 then
-            self.xiazhuSelfNumsLabels[index].transform.parent.gameObject:SetActive(true)
             self.xiazhuSelfNumsLabels[index].text = VietnamChessConfig.selfDiZhuNums[index]
         end
     end

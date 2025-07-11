@@ -126,7 +126,7 @@ function VietnamChessGameCtrl:Test()
 		TimerManager.StartTimer(self, function
 		()
 			self.view:ChangeDiZhu(Tools.RandomInt(1,3))
-			self:OnClickCenterYaZhuSide(Tools.RandomInt(1,3))
+			self:OnClickCenterYaZhuSide(Tools.RandomInt(1,6))
 		end, 0.2, times, true)
 		--其他玩家下注消息
 		TimerManager.StartTimer(self, function
@@ -136,6 +136,7 @@ function VietnamChessGameCtrl:Test()
 		--下注结束结算
 		TimerManager.StartTimer(self, function
 		()
+			--测试数据
 			VietnamChessConfig.sideColor = {Tools.RandomInt(0,1),Tools.RandomInt(0,1),Tools.RandomInt(0,1),Tools.RandomInt(0,1)}
 			--结果展示
 			self.view:ResultEffect()
