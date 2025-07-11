@@ -39,7 +39,6 @@ end
 
 ---添加UI事件
 function DragonTigerFightCtrl:AddUIEvent()
-	--ObjectPoolUtil:SpawnPrefab()
 	self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close()
 	end)

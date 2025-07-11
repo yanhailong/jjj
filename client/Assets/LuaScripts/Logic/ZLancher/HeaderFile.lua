@@ -6,6 +6,7 @@ require "Common/Tools/CommpontUtilGet"
 UIEventListener = require "Common/Utils/UIEventListener"
 require "Common/CtrlManager/CtrlManager"
 require "Common/Tools/Tools"
+require "Common/Utils/ArrayUtil"
 require "Common/Tools/UnityEngine/define"
 ObjectPoolUtil=require("Common/Pool/ObjectPoolUtil")
 GlobalEvent = require "Common/Utils/GlobalEvent"

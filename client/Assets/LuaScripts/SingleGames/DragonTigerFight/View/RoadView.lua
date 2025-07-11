@@ -217,9 +217,6 @@ function RoadView:UpdateDaLuInfo()
     if self.daLuRecods then
         self:UpdateRightGridView(self.daLuItems,self.daLuRecods)
     end
-    if true then
-        return
-    end
 end
 
 ---规则

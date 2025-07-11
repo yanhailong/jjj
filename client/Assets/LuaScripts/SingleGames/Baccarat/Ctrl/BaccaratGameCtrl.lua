@@ -100,6 +100,7 @@ local RoundNumber;
 local BetRecord={};
 ---当前下注
 local CurBet={};
+local vsSpine;
 
 ---构造函数
 function BaccaratGameCtrl:ctor(ctrlName,param)
@@ -139,6 +140,7 @@ function BaccaratGameCtrl:InitDataShow()
 	KingNumber=0;
 	RoundNumber=1;
 	self:RefreshDataShow()
+	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform);
 end
 
 ---初始化数据
@@ -349,6 +351,7 @@ end
 function BaccaratGameCtrl:EnterBegin()
 	self.view.obj_Countdown:SetActive(false);
 	self.view.obj_VS:SetActive(true);
+	Tools.PlayerSpineAniByName(vsSpine,"action",false)
 	self.beginTimer:Start();
 end
 ---进入下注阶段
