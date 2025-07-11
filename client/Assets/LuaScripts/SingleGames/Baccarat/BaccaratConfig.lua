@@ -26,7 +26,7 @@ this.WhoWin = {
 }
 this.ABNames={
     Main="SingleGames/Baccarat/atlas/Main",
-    Card="SingleGames/Baccarat/atlas/Card",
+    Card="Common/GameArtsCommon/GameFight/alats/card",--牌
     chipPool="SingleGames/Baccarat/prefabs/Pool",--筹码
     prefabsItem = "SingleGames/Baccarat/prefabs" ,--预支item路径
 }

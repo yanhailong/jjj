@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:client/Assets/LuaScripts/Logic/Common/commonSlots/Ctrl/UICommonSlotBtnsCtrl.lua.meta
 guid: c079650b12808c54d98935d2c5d13a1d
-=======
-guid: 154c90854cdaa7f40b5f73b1ef733fe3
->>>>>>> 23d59454b3bedccd67cfadc463ea2cf01d2f67d6:client/Assets/LuaScripts/SingleGames/BirdsAnimals/BirdsAnimalsConfig.lua.meta
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}

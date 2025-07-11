@@ -36,10 +36,10 @@ end
 function UICommonSlotTopCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_home, function
 	()
-		GlobalEvent.Notify(SlotEvent.SlotEventName.BackHome)
+		GlobalEvent.Notify(SlotGlobal.gameEventName.BackHome)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_set, function()  
-		GlobalEvent.Notify(SlotEvent.SlotEventName.OpenHelp)
+		GlobalEvent.Notify(SlotGlobal.gameEventName.OpenHelp)
 	end)
 end
 

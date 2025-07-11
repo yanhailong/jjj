@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-02 10:57:36
+---DateTime: 2025-07-11 14:23:07
 ---
 ---@class UICommonSlotBtnsView:BaseView
 local UICommonSlotBtnsView=Class("UICommonSlotBtnsView",BaseView)
@@ -23,24 +23,26 @@ function UICommonSlotBtnsView:InitComponents()
     self.txt_win=ComponentUtilGet.Text(self.transform,"content/buttom/win/txt_win");
     self.btn_max=ComponentUtilGet.Button(self.transform,"content/buttom/btn_max");
     self.btn_closeFreeMask=ComponentUtilGet.Button(self.transform,"content/buttom/btn_closeFreeMask");
-    self.obj_free=ComponentUtilGet.GameObject(self.transform,"content/buttom/obj_free");
-    self.btn_wx=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_wx");
-    self.tmp_value=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_wx/tmp_value");
-    self.btn_500=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_500");
-    self.tmp_value_btn_500=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_500/tmp_value");
-    self.btn_200=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_200");
-    self.tmp_value_btn_200=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_200/tmp_value");
-    self.btn_100=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_100");
-    self.tmp_value_btn_100=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_100/tmp_value");
-    self.btn_50=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_50");
-    self.tmp_value_btn_50=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_50/tmp_value");
-    self.btn_25=ComponentUtilGet.Button(self.transform,"content/buttom/obj_free/di_bg/btn_25");
-    self.tmp_value_btn_25=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_free/di_bg/btn_25/tmp_value");
+    self.obj_auto=ComponentUtilGet.GameObject(self.transform,"content/buttom/obj_auto");
+    self.btn_wx=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_wx");
+    self.tmp_value=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_wx/tmp_value");
+    self.btn_500=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_500");
+    self.tmp_value_btn_500=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_500/tmp_value");
+    self.btn_200=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_200");
+    self.tmp_value_btn_200=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_200/tmp_value");
+    self.btn_100=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_100");
+    self.tmp_value_btn_100=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_100/tmp_value");
+    self.btn_50=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_50");
+    self.tmp_value_btn_50=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_50/tmp_value");
+    self.btn_25=ComponentUtilGet.Button(self.transform,"content/buttom/obj_auto/di_bg/btn_25");
+    self.tmp_value_btn_25=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/buttom/obj_auto/di_bg/btn_25/tmp_value");
     self.btn_start=ComponentUtilGet.Button(self.transform,"content/buttom/btn_start");
     self.btn_stop=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stop");
-    self.btn_stopEnable=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stopEnable");
-    self.btn_stopFree=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stopFree");
-    self.txt_freeNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_stopFree/txt_freeNum");
+    self.btn_auto=ComponentUtilGet.Button(self.transform,"content/buttom/btn_auto");
+    self.txt_StopNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_auto/txt_StopNum");
+    self.btn_stop_buttom=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stop");
+    self.btn_free=ComponentUtilGet.Button(self.transform,"content/buttom/btn_free");
+    self.txt_freeNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_free/txt_freeNum");
 end
 
 ---清空组件
@@ -54,7 +56,7 @@ function UICommonSlotBtnsView:ClearComponents()
     self.txt_win=nil;
     self.btn_max=nil;
     self.btn_closeFreeMask=nil;
-    self.obj_free=nil;
+    self.obj_auto=nil;
     self.btn_wx=nil;
     self.tmp_value=nil;
     self.btn_500=nil;
@@ -69,8 +71,10 @@ function UICommonSlotBtnsView:ClearComponents()
     self.tmp_value_btn_25=nil;
     self.btn_start=nil;
     self.btn_stop=nil;
-    self.btn_stopEnable=nil;
-    self.btn_stopFree=nil;
+    self.btn_auto=nil;
+    self.txt_StopNum=nil;
+    self.btn_stop_buttom=nil;
+    self.btn_free=nil;
     self.txt_freeNum=nil;
 end
 

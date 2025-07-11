@@ -6,6 +6,7 @@ require "Common/Tools/CommpontUtilGet"
 UIEventListener = require "Common/Utils/UIEventListener"
 require "Common/CtrlManager/CtrlManager"
 require "Common/Tools/Tools"
+require "Common/Utils/ArrayUtil"
 require "Common/Tools/UnityEngine/define"
 ObjectPoolUtil=require("Common/Pool/ObjectPoolUtil")
 GlobalEvent = require "Common/Utils/GlobalEvent"
@@ -21,7 +22,7 @@ require("Logic/NetWork/HttpManager")
 require("Logic/NetWork/WebSocket/WebNetworkManager")
 require("Logic/DataManager/DataConst")
 require("Logic/Common/SuspensionTipsUtil")
-require("Logic/Common/commonSlots/SlotEvent")
+require("Logic/Common/commonSlots/SlotGlobal")
 require("Logic/CfgManager/ConfigManager")
 
 

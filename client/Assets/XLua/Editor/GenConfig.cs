@@ -146,6 +146,7 @@ public static class GenConfig
         typeof(System.Collections.IEnumerator),
         typeof(UnityEngine.Events.UnityAction<Vector2>),
         typeof(DG.Tweening.Core.DOSetter<float>),
+        typeof(DG.Tweening.Core.DOGetter<float>),
         typeof(Action<int, string>),
         typeof(Action<int, int>),
         typeof(Action<string>),

@@ -85,6 +85,8 @@ function RoyalWarGameCtrl:CtrlInit(args)
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
 	config.InitIconPic();
+	config.InitCardTypePic();
+	config.InitCardPic();
 	CurSelectChip = 0;
 	self:InitZhuPanTable()
 	self:InitCardTypeData()
@@ -110,6 +112,7 @@ function RoyalWarGameCtrl:InitData()
 	self.view.obj_SelfBetBlack:SetActive(false)
 	self.view.obj_SelfBetRed:SetActive(false)
 	self.view.obj_SelfBetLucky:SetActive(false)
+	self.view.obj_Settlement:SetActive(false);
 	
 	self.view.tmp_RedBetNum.text="0.00"
 	self.view.tmp_BlackBetNum.text="0.00"
@@ -132,6 +135,11 @@ function RoyalWarGameCtrl:InitData()
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.tmp_Countdown.text = countDownTime;
+		if(countDownTime <= 3) then
+			self.view.obj_Countdown:SetActive(false);
+			self.view.obj_AboutEnd:SetActive(true);
+			self.view.txt_AboutEnd.text = countDownTime;
+		end
 		if(countDownTime<=0) then
 			curGameStage =config.GameSate.Settlement;
 			self:RefreshGameStage();
@@ -182,7 +190,8 @@ end
 function RoyalWarGameCtrl:EnterSettlement()
 	self.view.obj_StopBet:SetActive(true);
 	self:SetBetButtonInteractable(false);
-	self.view.obj_Countdown:SetActive(false);
+	
+	self.view.obj_AboutEnd:SetActive(false);
 	self.view.obj_CardBg:SetActive(true);
 	self.view.obj_RoadRoot:SetActive(false)
 	if self.SettlementCor then
@@ -192,43 +201,46 @@ function RoyalWarGameCtrl:EnterSettlement()
 	self.SettlementCor=	CorManager:StartCor(function()--翻牌
 		coroutine.wait(0.5)
 		self.view.obj_StopBet:SetActive(false);
+		self.view.obj_Settlement:SetActive(true);
 		local redCardNumOne = self:GetCardNum();
 		local redCardNumTwo = self:GetCardNum();
 		local redCardNumThree = self:GetCardNum();
-		local redCardColourOne = self:GetRandomColour();
-		local redCardColourTwo = self:GetRandomColour();
-		local redCardColourThree = self:GetRandomColour();
+		
+		local redCardColourOne =  (redCardNumOne - 1) / 13+1;
+		local redCardColourTwo =  (redCardNumTwo - 1) / 13+1;
+		local redCardColourThree =  (redCardNumThree - 1) / 13+1;
 
 		local blackCardNumOne = self:GetCardNum();
 		local blackCardNumTwo = self:GetCardNum();
 		local blackCardNumThree = self:GetCardNum();
-		local blackCardColourOne = self:GetRandomColour();
-		local blackCardColourTwo = self:GetRandomColour();
-		local blackCardColourThree = self:GetRandomColour();
 		
-		self.view.img_RedCardOne.sprite = config.GetIconPic("card2_"..config.GetColourName(redCardColourOne).."_"..redCardNumOne);
-		self.view.img_RedCardTwo.sprite = config.GetIconPic("card2_"..config.GetColourName(redCardColourTwo).."_"..redCardNumTwo);
-		self.view.img_RedCardThree.sprite = config.GetIconPic("card2_"..config.GetColourName(redCardColourThree).."_"..redCardNumThree);
+		local blackCardColourOne = (blackCardNumOne - 1) / 13+1;
+		local blackCardColourTwo = (blackCardNumTwo - 1) / 13+1;
+		local blackCardColourThree =  (blackCardNumThree - 1) / 13+1;
 		
-		self.view.img_BlackCardOne.sprite = config.GetIconPic("card2_"..config.GetColourName(blackCardColourOne).."_"..blackCardNumOne);
-		self.view.img_BlackCardTwo.sprite = config.GetIconPic("card2_"..config.GetColourName(blackCardColourTwo).."_"..blackCardNumTwo);
-		self.view.img_BlackCardThree.sprite = config.GetIconPic("card2_"..config.GetColourName(blackCardColourThree).."_"..blackCardNumThree);
+		self.view.img_RedCardOne.sprite = config.GetCardPic("card_"..redCardNumOne);
+		self.view.img_RedCardTwo.sprite = config.GetCardPic("card_"..redCardNumTwo);
+		self.view.img_RedCardThree.sprite = config.GetCardPic("card_"..redCardNumThree);
+		
+		self.view.img_BlackCardOne.sprite = config.GetCardPic("card_"..blackCardNumOne);
+		self.view.img_BlackCardTwo.sprite = config.GetCardPic("card_"..blackCardNumTwo);
+		self.view.img_BlackCardThree.sprite = config.GetCardPic("card_"..blackCardNumThree);
 		
 		self.RedCardType = config.GetCardType(redCardNumOne,redCardNumTwo,redCardNumThree,redCardColourOne,redCardColourTwo,redCardColourThree);
 		self.BlackCardType = config.GetCardType(blackCardNumOne,blackCardNumTwo,blackCardNumThree,blackCardColourOne,blackCardColourTwo,blackCardColourThree);
 		
-		self.view.img_RedResultNumber.sprite =  config.GetIconPic(config.GetCardTypeName(self.RedCardType))
-		self.view.img_BlackResultNumber.sprite =  config.GetIconPic(config.GetCardTypeName(self.BlackCardType))
+		self.view.img_RedResultNumber.sprite =  config.GetIconCardTypePic(config.GetRedCardTypeName(self.RedCardType))
+		self.view.img_BlackResultNumber.sprite =  config.GetIconCardTypePic(config.GetBlackCardTypeName(self.BlackCardType))
 		if(self.RedCardType == config.CardType.DanZhang) then
-			self.view.img_RedResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi2")
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_7")
 		else
-			self.view.img_RedResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi1")
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_8")
 		end
 
 		if(self.BlackCardType == config.CardType.DanZhang) then
-			self.view.img_BlackResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi2")
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_7")
 		else
-			self.view.img_BlackResultBg.sprite = config.GetIconPic("rwn_PBgDaiZi1")
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_8")
 		end
 		coroutine.wait(1)
 		self.view.ator_CardRoot:Play("RoyalWarDealCard")
@@ -319,7 +331,7 @@ end
 
 ---随机牌
 function RoyalWarGameCtrl:GetCardNum()
-	return math.random(1,13);
+	return math.random(1,52);
 end
 ---随机花色
 function RoyalWarGameCtrl:GetRandomColour()

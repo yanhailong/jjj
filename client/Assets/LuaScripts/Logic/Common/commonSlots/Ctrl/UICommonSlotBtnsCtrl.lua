@@ -29,6 +29,7 @@ end
 function UICommonSlotBtnsCtrl:InitData()
 	self.betIndex=1--下注索引，默认为1
 	self.isLongPress=false
+	self.spinArgs={}
 end
 
 function UICommonSlotBtnsCtrl:Close()
@@ -37,13 +38,20 @@ end
 
 ---添加UI事件
 function UICommonSlotBtnsCtrl:AddUIEvent()
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAuto, self.NoticeAuto,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto, self.NoticeStopAuto,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.GameStateChange,self.GameStateChange,self)
+	
 	self.uiEventListener:AddClick(self.view.btn_start, function()
 		if self.isLongPress==true then
 			self.isLongPress=false
 			return
 		end
 		self:SetObjFreeShow(false)
-		GlobalEvent.Notify(SlotEvent.SlotEventName.StartSpin,self.stakeList[self.betIndex])
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=false
+		self.spinArgs.autoNum=0
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,args)
 	end)
 	self.uiEventListener:AddLongPress(self.view.btn_start.gameObject, function()
 		self.isLongPress=true
@@ -53,17 +61,88 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 	()
 		self:SetObjFreeShow(false)
 	end)
+	self.uiEventListener:AddClick(self.view.btn_25, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=25
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_50, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=25
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_100, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=100
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_200, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=200
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_500, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=500
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_wx, function
+	()
+		self:SetObjFreeShow(false)
+		self.spinArgs.betInfo=self.stakeList[self.betIndex]
+		self.spinArgs.isAuto=true
+		self.spinArgs.autoNum=99999999
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_auto, function
+	()
+		self.spinArgs={}
+		GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_stop, function
+	()
+		GlobalEvent.Notify(SlotGlobal.gameEventName.RollStop)
+	end)
+	
+	
+end
+---自动次数显示刷新
+function UICommonSlotBtnsCtrl:NoticeAuto(autoNum)
+	self.view.txt_StopNum.text=autoNum
 end
 
 function UICommonSlotBtnsCtrl:SetObjFreeShow(bl)
 	self.view.btn_closeFreeMask.gameObject:SetActive(bl)
-	self.view.obj_free:SetActive(bl)
+	self.view.obj_auto:SetActive(bl)
+end
+
+---被通知停止自动
+function UICommonSlotBtnsCtrl:NoticeStopAuto()
+	self.spinArgs={}
 end
 
 
 ---移除UI事件
 function UICommonSlotBtnsCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
+	GlobalEvent.RemoveAllTo(self)
 end
 
 ---设置玩家初始数据
@@ -75,6 +154,13 @@ end
 function UICommonSlotBtnsCtrl:SetChipText(value)
 	self.view.tmp_chip.text=value
 end
+
+---游戏状态改变
+function UICommonSlotBtnsCtrl:GameStateChange(gameState)
+	logError("gameState:"..gameState)
+	self:SetGameState(gameState)
+end
+
 
 --region UI事件方法
 --下注相关--------------------
@@ -118,6 +204,26 @@ function UICommonSlotBtnsCtrl:SetChipInfo(str)
 end
 --下注相关--------------------
 --endregion
+
+
+---设置游戏状态
+function UICommonSlotBtnsCtrl:SetGameState(gameState)
+	self.view.btn_start.gameObject:SetActive(gameState==SlotGlobal.gameState.Normal)
+	self.view.btn_stop.gameObject:SetActive(gameState==SlotGlobal.gameState.RollState)
+	self.view.btn_auto.gameObject:SetActive(gameState==SlotGlobal.gameState.AutoState)
+	self.view.btn_free.gameObject:SetActive(gameState==SlotGlobal.gameState.FreeState)
+	if gameState==SlotGlobal.gameState.Normal then
+		self:SetChipState(true)
+	else
+		self:SetChipState(false)
+	end
+end
+
+function UICommonSlotBtnsCtrl:SetChipState(bl)
+	self.view.btn_add.interactable=bl
+	self.view.btn_reduce.interactable=bl
+	self.view.btn_max.interactable=bl
+end
 
 
 ---销毁UI

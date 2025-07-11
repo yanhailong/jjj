@@ -1,0 +1,6 @@
+quan.png
+size:512,512
+filter:Linear,Linear
+pma:true
+quan
+bounds:2,2,335,293

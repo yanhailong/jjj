@@ -16,9 +16,9 @@ end
 
 function RoyalWarCardTypeItem:RefreshShow(type)
     if(type~=config.CardType.DanZhang) then
-        self.img_Type.sprite = config.GetIconPic("royaWarBack_D03")
+        self.img_Type.sprite = config.GetIconPic("hhdz_dk_6")
     else
-        self.img_Type.sprite = config.GetIconPic("rwn_lanBg")
+        self.img_Type.sprite = config.GetIconPic("hhdz_dk_5")
     end
     
     self.tmp_Type.text = config.GetCardTypeTrueName(type);

@@ -55,13 +55,9 @@
 		<type fullname="Tutorial.DerivedClass+TestEnumInner" preserve="all"/>
 		<type fullname="AssetManager" preserve="all"/>
 		<type fullname="LocalData" preserve="all"/>
-		<type fullname="JiuJiuPrincess.Util" preserve="all"/>
-		<type fullname="JiuJiuPrincess.UIEventListener" preserve="all"/>
 		<type fullname="LanguageManager" preserve="all"/>
 		<type fullname="Language.LanguageText" preserve="all"/>
 		<type fullname="Language.LanguageExtendTextMeshPro" preserve="all"/>
-		<type fullname="JiuJiuPrincess.UpdateAssets" preserve="all"/>
-		<type fullname="JiuJiuPrincess.CoroutineManager" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModuleAudio" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModulePhysics" preserve="all"/>
 		<type fullname="DG.Tweening.DOTweenModulePhysics2D" preserve="all"/>
@@ -143,6 +139,14 @@
 
 	<assembly fullname="UnityEngine.Physics2DModule">
 	    <type fullname="UnityEngine.Rigidbody2D" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="JiuJiuPrincess">
+	    <type fullname="JiuJiuPrincess.Util" preserve="all"/>
+		<type fullname="JiuJiuPrincess.UIEventListener" preserve="all"/>
+		<type fullname="JiuJiuPrincess.UpdateAssets" preserve="all"/>
+		<type fullname="JiuJiuPrincess.CoroutineManager" preserve="all"/>
 		
 	</assembly>
 

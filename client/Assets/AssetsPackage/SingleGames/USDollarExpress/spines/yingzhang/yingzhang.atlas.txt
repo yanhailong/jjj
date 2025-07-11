@@ -1,0 +1,7 @@
+yingzhang.png
+size:512,512
+filter:Linear,Linear
+pma:true
+yingzhang
+bounds:2,2,362,480
+offsets:0,8,362,488

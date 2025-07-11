@@ -70,6 +70,9 @@ end
 
 ---初始化数据
 function USDollarExpressMainCtrl:InitData()
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
+	
 	self:InitRollData()
 	self.parentList={}
 	self.childsList = {}
@@ -116,7 +119,7 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			card.name = tostring(j)
 			card.transform:SetAsFirstSibling()
 			---@type USDollarExpressSlotItem
-			local iconItem=SlotItem.New(card)
+			local iconItem=SlotItem.New(card,self)
 			iconItem:InitIndex(j-1)
 			local texId = math.random(1,table.getCount(config.iocnPicName))
 			local numFF=6;
@@ -145,6 +148,7 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 		return
 	end
 	self.isOnclickStart = true
+	GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange, SlotGlobal.gameState.RollState)
 	self:ReSetData()
 	self.realCard=self.model.CardPos
 	CorManager.StartCor(self,function()
@@ -194,6 +198,7 @@ function USDollarExpressMainCtrl:ReSetData()
 	for i = 1, 5 do
 		self.curRollData[i]=0
 	end
+	self.fastStop=false
 	
 end
 
@@ -216,6 +221,9 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 	self.tweener[wheelId]=parent_newObj.transform:DOLocalMove(stopPos, config.rollItemNumTime)
 	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.Linear);
 	self.tweener[wheelId].onComplete=function()
+		if self.fastStop==true then
+			return
+		end
 		if self.rollCircles[wheelId]==0 then
 			self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
 			self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
@@ -239,6 +247,47 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 		self.isAllRoate=true
 	end
 end
+
+---快速停止
+function USDollarExpressMainCtrl:StopRollState()
+	self.fastStop=true
+	for i = 1, 5 do
+		---@type DG.Tweening.Tween
+		local tw=self.tweener[i]
+		if self.rollCircles[i]>=1 then
+			self:SetRealIndex(i)
+			self.rollCircles[i]=0
+		end
+		tw:Goto(config.rollItemNumTime, true)
+		self:StartCirleStop(i)
+	end
+end
+
+function USDollarExpressMainCtrl:StartCirleStop(wheelId)
+	local parent_newObj = self.parentList[wheelId]-- parentList 就是newobj列表
+	-- self.childsList就是icon图标列表
+	local dis = #self.childsList[wheelId]-6
+	local to = -dis * (config.itemSpace)--最终位置
+	local endpos = Vector3.New(parent_newObj.transform.localPosition.x, to, parent_newObj.transform.localPosition.z)
+
+	--停止时候超出为止
+	local to1 = to - config.itemSpace * 0.5--超出位置   
+	local endpos1 = Vector3.New(parent_newObj.transform.localPosition.x, to1 ,parent_newObj.transform.localPosition.z)
+	
+	if self.rollCircles[wheelId]==0 then
+		self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
+		self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
+		self.tweener1[wheelId].onComplete=function()
+			self:RestWheelPos(wheelId,true)
+			parent_newObj.transform.localPosition =Vector3.New(
+					parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
+			if (wheelId == 5) then
+				self:ShowResoult()-- 旋转结束处理服务器数据表现
+			end
+		end
+	end
+end
+
 
 ---@param wheelId number 轴数
 ---@param curCirle number 当前圈数
@@ -292,7 +341,14 @@ function USDollarExpressMainCtrl:ShowResoult()
 	end)
 end
 
+function USDollarExpressMainCtrl:TestEffect()
+	for i = 1, 20 do
+		self.showChildsList[i]:SetIsAward(true)
+	end
+end
+
 function USDollarExpressMainCtrl:ShowAwardEffect()
+	self:TestEffect()
 	local allWinGold=self.model.allWinGold
 	local resultLineInfoList=self.model.resultLineInfoList
 	local specialType=self.model.specialType
@@ -330,7 +386,7 @@ function USDollarExpressMainCtrl:ShowCirculationLinesAnim()
 				local lineInfo=lineList[showXianindex]
 				self:SetIconEffect(lineInfo)
 			end
-			coroutine.wait(1)
+			coroutine.wait(1) 
 			showXianindex=showXianindex+1
 		end
 	end)
@@ -355,9 +411,9 @@ end
 function USDollarExpressMainCtrl:EnterSmallGame()
 	logError("进入拉火车小游戏")
 	if self.model.specialType==1 then
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+		--CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
 	end
-	--config.showStep=config.showStep+1
+	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:EndSmallGame()
@@ -373,6 +429,38 @@ end
 function USDollarExpressMainCtrl:SetStateLast()
 	logError("结束=====》")
 	self.isOnclickStart=false
+	local freeCount=0
+
+	if freeCount>0 then
+		logError("进入免费模式")
+	elseif config.selfMotionNum>0 then
+		logError("自动旋转模式")
+		config.selfMotionNum=config.selfMotionNum-1
+		GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
+		if config.selfMotionNum==0 then
+			logError("自动旋转停止")
+			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+		end
+		self.model:ReqStartGame()
+		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
+	else
+		---正常模式
+		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+	end
+	
+	--CorManager.StartCor(self,function()
+	--	if config.curGameState==SlotGlobal.gameState.AutoState and config.selfMotionNum>0 then
+	--		config.selfMotionNum=config.selfMotionNum-1
+	--		GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
+	--		if config.selfMotionNum==0 then
+	--			logError("自动旋转停止")
+	--			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+	--		end
+	--		self.model:ReqStartGame()
+	--	end
+	--end)
+
+	
 end
 
 
