@@ -235,6 +235,11 @@ public class MessageIdMapEditor
     
     static string ParseProto(string content, string name)
     {
+        if (!name.EndsWith(".proto"))
+        {
+            name=name+".proto";
+        }
+        
         var luaEnv = XLuaManager.Instance.InitEditorLuaEnv();
         string luacode = "json = require 'xLua/json/json' function load(content,name) return json.encode(require('Logic/Protoc/protoc'):parse(content,name)) end";
         luaEnv.DoString(luacode);

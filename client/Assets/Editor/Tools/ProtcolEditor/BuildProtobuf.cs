@@ -66,7 +66,6 @@ public class BuildProtobuf : EditorWindow
         {
             index++;
             string name = Path.GetFileName(f);
-            Debug.LogError("name:"+name);
             string ext = Path.GetExtension(f);
             if (!ext.Equals(".proto")) continue;
             FileInfo fi = new FileInfo(f);
@@ -98,7 +97,7 @@ public class BuildProtobuf : EditorWindow
         
         for (int i = 0; i < allSubDirectories.Count; i++)
         {
-            Debug.LogError("allSubDirectories:"+allSubDirectories[i]);
+            // Debug.LogError("allSubDirectories:"+allSubDirectories[i]);
             MessageIdMapEditor.Create(allSubDirectories[i]);
         }
     }
