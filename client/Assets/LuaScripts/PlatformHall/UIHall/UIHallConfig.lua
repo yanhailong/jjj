@@ -13,7 +13,8 @@ this.GAME_NAME={
     "CarLogo",
     "BirdsAnimals",
     "RoyalWar",
-    "DragonTigerFight"
+    "DragonTigerFight",
+    "FishPrawnCrab"
 }
 	
 return this
