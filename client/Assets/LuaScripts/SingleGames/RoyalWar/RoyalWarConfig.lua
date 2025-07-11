@@ -67,8 +67,10 @@ end
 
 this.ABNames = {
     icons="SingleGames/RoyalWar/atlas",--icon
+    cardType_Pics="SingleGames/RoyalWar/atlas/cardType",--牌型资源名
     prefabsItem = "SingleGames/RoyalWar/prefabs" ,--预支item路径
     chipPool = "SingleGames/RoyalWar/prefabs/Pool",--筹码
+    Card="Common/GameArtsCommon/GameFight/alats/card",--牌
 }
 this.icon_Pics={}
 function this.InitIconPic()
@@ -79,6 +81,31 @@ function this.InitIconPic()
     end
 end
 
+---扑克牌的图片
+this.cardType_Pics={}
+function this.InitCardTypePic()
+    local pics=resMgr:LoadAllAssets(this.ABNames.cardType_Pics,typeof(UnityEngine.Sprite))
+    for i = 0, pics.Length-1 do
+        local pic=pics[i];
+        this.cardType_Pics[pic.name]=pic;
+    end
+end
+---获取牌型资源名
+function this.GetIconCardTypePic(iconName)
+    return this.cardType_Pics[iconName];
+end
+---扑克牌的图片
+this.card_Pics={}
+function this.InitCardPic()
+    local pics=resMgr:LoadAllAssets(this.ABNames.Card,typeof(UnityEngine.Sprite))
+    for i = 0, pics.Length-1 do
+        local pic=pics[i];
+        this.card_Pics[pic.name]=pic;
+    end
+end
+function this.GetCardPic(cardName)
+    return this.card_Pics[cardName];
+end
 function this.GetIconPic(iconName)
     return this.icon_Pics[iconName];
 end
@@ -110,19 +137,35 @@ function this.GetColourName(num)
     end
 end
 ---获取牌型的资源名字
-function this.GetCardTypeName(type)
+function this.GetRedCardTypeName(type)
     if(type == this.CardType.Leopard) then
-        return "rwn_PBaoZi"
+        return "hhdz_bz_1"
     elseif(type == this.CardType.ShunJin) then
-        return "rwn_PtongHuaShun"
+        return "hhdz_sj_1"
     elseif(type == this.CardType.JinHua) then
-        return "rwn_PtongHua"
+        return "hhdz_jh_1"
     elseif(type == this.CardType.ShunZi) then
-        return "rwn_PShunZi"
+        return "hhdz_sz_1"
     elseif(type == this.CardType.DuiZi) then
-        return "rwn_PDuiZi"
+        return "hhdz_dzi_1"
     elseif(type == this.CardType.DanZhang) then
-        return "rwn_PdanZhang"
+        return "hhdz_dz_1"
+    end
+end
+---获取牌型的资源名字
+function this.GetBlackCardTypeName(type)
+    if(type == this.CardType.Leopard) then
+        return "hhdz_bz_2"
+    elseif(type == this.CardType.ShunJin) then
+        return "hhdz_sj_2"
+    elseif(type == this.CardType.JinHua) then
+        return "hhdz_jh_2"
+    elseif(type == this.CardType.ShunZi) then
+        return "hhdz_sz_2"
+    elseif(type == this.CardType.DuiZi) then
+        return "hhdz_dzi_2"
+    elseif(type == this.CardType.DanZhang) then
+        return "hhdz_dz_2"
     end
 end
 
