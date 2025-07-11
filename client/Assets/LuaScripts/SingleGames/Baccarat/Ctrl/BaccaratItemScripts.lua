@@ -1,5 +1,7 @@
 ---@class BaccaratItemScripts
 local BaccaratItemScripts = Class("BaccaratItemScripts")
+---当前房间数据
+local BaccaratTableSummary;
 function BaccaratItemScripts:ctor(obj,ctrl)
     ---@type UnityEngine.GameObject
     self.gameObject = obj
@@ -26,9 +28,11 @@ function BaccaratItemScripts:ctor(obj,ctrl)
 end
 
 ---刷新数据显示
-function BaccaratItemScripts:RefreshDataShow()
-    
+function BaccaratItemScripts:RefreshDataShow(data)
+    BaccaratTableSummary = data;
 end
+
+
 
 function BaccaratItemScripts:Destroy()
    
