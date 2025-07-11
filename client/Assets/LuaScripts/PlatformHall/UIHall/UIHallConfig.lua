@@ -14,7 +14,7 @@ this.GAME_NAME={
     "BirdsAnimals",
     "RoyalWar",
     "DragonTigerFight",
-    "VietnamChessRule",
+    "VietnamChess",
     "FishPrawnCrab"
 }
 	

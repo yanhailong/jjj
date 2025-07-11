@@ -12,8 +12,9 @@ local Vector3 = CS.UnityEngine.Vector3
 function PlayerItem:ctor(go)
     self.gameObject = go
     self.transform=self.gameObject.transform
-    self.headIcon = ComponentUtilGet.Image(self.transform,"Image")
-    self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"GoldRoot/Count")
+    self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
+    self.headIcon = ComponentUtilGet.Image(self.transform,"HeadPic/Head")
+    self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"Money/GoldNumber")
     self.resultNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"result")
     self.resultNum.gameObject:SetActive(false)
 end

@@ -10,7 +10,7 @@ local CarLogoAreaItem=require("SingleGames/CarLogo/View/Item/CarLogoAreaItem")
 local CarLogoConfig=require("SingleGames/CarLogo/CarLogoConfig")
 local CarLogoHelper=require("SingleGames/CarLogo/CarLogoHelper")
 local CarLogoPlayCoinView=require("SingleGames/CarLogo/View/CarLogoPlayCoinView")
-local PlayerItem = require("SingleGames/DragonTigerFight/View/Item/PlayerItem")
+local CarLogoPlayerItem = require("SingleGames/CarLogo/View/Item/CarLogoPlayerItem")
 
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
@@ -91,8 +91,8 @@ function CarLogoGameView:InitComponents()
         self.chipInfos[i]=chipItem
     end
     ---玩家
-    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/selfPlayerRoot")
-    self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
+    self.selfPlayer = CarLogoPlayerItem.New(self.selfPlayerRoot)
     ---底注节点prefab
     self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/bottom/nodes")
 end
