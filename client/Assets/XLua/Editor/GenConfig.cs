@@ -5,6 +5,7 @@ using XLua;
 using System.Reflection;
 using JiuJiuPrincess;
 using Language;
+using TMPro;
 
 public static class GenConfig
 {
@@ -150,6 +151,7 @@ public static class GenConfig
         typeof(Action<int, string>),
         typeof(Action<int, int>),
         typeof(Action<string>),
+        typeof(Action<TMP_Text>),
         
     };
     // 避免在IL2CPP下被裁剪

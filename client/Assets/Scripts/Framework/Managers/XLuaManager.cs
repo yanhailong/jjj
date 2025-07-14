@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using XLua;
 using JiuJiuPrincess;
+using UnityEngine.UI;
+using TMPro;
+
 [CSharpCallLua]
 public class XLuaManager : SingletonMono<XLuaManager>
 {
@@ -16,6 +19,7 @@ public class XLuaManager : SingletonMono<XLuaManager>
     private Action update;
     private Action fixedUpdate;
     private Action lateUpdate;
+    private Action<TMP_Text> tmpTipsCall;
     private void Awake()
     {
         this.InitLuaEnv();
@@ -64,8 +68,13 @@ public class XLuaManager : SingletonMono<XLuaManager>
         update = this.env.Global.Get<Action>("Update");
         fixedUpdate= this.env.Global.Get<Action>("FixedUpdate");
         lateUpdate=this.env.Global.Get<Action>("LateUpdate");
-        
+        tmpTipsCall=this.env.Global.Get<Action<TMP_Text>>("OnClickTMPTips");
         this.isGameStarted = true; // 游戏正式开始了，
+    }
+
+    public void OnClickTMPTips(TMP_Text txt)
+    {
+        this.tmpTipsCall?.Invoke(txt);
     }
     
     /// <summary>

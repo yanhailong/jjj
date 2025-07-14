@@ -45,7 +45,8 @@ end
 function UIHallGamesCtrl:OnClickGameItem(index)
 	logError("点击了Item: "..index)
 	if index==1 then
-		require("SingleGames/USDollarExpress/MVCHead")
+		require("SingleGames/TestGame/MVCHead")
+		--require("SingleGames/USDollarExpress/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.USDollarExpressMain)
 	elseif index == 2 then
 		require("SingleGames/Baccarat/MVCHead")

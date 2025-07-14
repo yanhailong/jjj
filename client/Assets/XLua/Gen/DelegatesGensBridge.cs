@@ -349,7 +349,29 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp15(object p0)
+		public void __Gen_Delegate_Imp15(TMPro.TMP_Text p0)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.rawL;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                ObjectTranslator translator = luaEnv.translator;
+                translator.Push(L, p0);
+                
+                PCall(L, 1, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
+		public void __Gen_Delegate_Imp16(object p0)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -371,7 +393,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp16(object p0, object p1)
+		public void __Gen_Delegate_Imp17(object p0, object p1)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -394,7 +416,7 @@ namespace XLua
 #endif
 		}
         
-		public System.Collections.IEnumerator __Gen_Delegate_Imp17(object p0)
+		public System.Collections.IEnumerator __Gen_Delegate_Imp18(object p0)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -503,6 +525,11 @@ namespace XLua
 		    if (type == typeof(System.Action<string>))
 			{
 			    return new System.Action<string>(__Gen_Delegate_Imp14);
+			}
+		
+		    if (type == typeof(System.Action<TMPro.TMP_Text>))
+			{
+			    return new System.Action<TMPro.TMP_Text>(__Gen_Delegate_Imp15);
 			}
 		
 		    return null;
