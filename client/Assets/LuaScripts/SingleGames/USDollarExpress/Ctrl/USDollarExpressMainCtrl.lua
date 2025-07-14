@@ -82,7 +82,11 @@ function USDollarExpressMainCtrl:InitData()
 	self.realCard={}
 	self.tweener={}
 	self.tweener1={}
-
+	self.tweener2={}
+	self.tweener3={}
+	self.fastStop={}
+	self.allendPos={}
+	self.isArrpos=true
 	
 	self.freeState=false;
 	self.isAllRoate=false
@@ -197,8 +201,10 @@ function USDollarExpressMainCtrl:ReSetData()
 	self.curRollData={}
 	for i = 1, 5 do
 		self.curRollData[i]=0
+		self.fastStop[i]=false
+		self.allendPos[i]=false
 	end
-	self.fastStop=false
+	self.isArrpos=true
 	
 end
 
@@ -221,13 +227,14 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 	self.tweener[wheelId]=parent_newObj.transform:DOLocalMove(stopPos, config.rollItemNumTime)
 	self.tweener[wheelId]:SetEase(DG.Tweening.Ease.Linear);
 	self.tweener[wheelId].onComplete=function()
-		if self.fastStop==true then
+		if self.fastStop[wheelId]==true then
 			return
 		end
 		if self.rollCircles[wheelId]==0 then
 			self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
 			self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
 			self.tweener1[wheelId].onComplete=function()
+				self.allendPos[wheelId]=true
 				self:RestWheelPos(wheelId,true)
 				parent_newObj.transform.localPosition =Vector3.New(
 						parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
@@ -250,20 +257,25 @@ end
 
 ---快速停止
 function USDollarExpressMainCtrl:StopRollState()
-	self.fastStop=true
 	for i = 1, 5 do
+		if self.rollCircles[i]>=1 then
+			self.fastStop[i]=true
+		end
 		---@type DG.Tweening.Tween
 		local tw=self.tweener[i]
+		look("self.rollCircles[i]",i,self.rollCircles[i])
 		if self.rollCircles[i]>=1 then
 			self:SetRealIndex(i)
 			self.rollCircles[i]=0
+			--tw:Goto(config.rollItemNumTime, false)
+			tw:Kill()
+			self:FastStopCirle(i,false)
 		end
-		tw:Goto(config.rollItemNumTime, true)
-		self:StartCirleStop(i)
+
 	end
 end
 
-function USDollarExpressMainCtrl:StartCirleStop(wheelId)
+function USDollarExpressMainCtrl:FastStopCirle(wheelId,blgoEnd)
 	local parent_newObj = self.parentList[wheelId]-- parentList 就是newobj列表
 	-- self.childsList就是icon图标列表
 	local dis = #self.childsList[wheelId]-6
@@ -273,19 +285,56 @@ function USDollarExpressMainCtrl:StartCirleStop(wheelId)
 	--停止时候超出为止
 	local to1 = to - config.itemSpace * 0.5--超出位置   
 	local endpos1 = Vector3.New(parent_newObj.transform.localPosition.x, to1 ,parent_newObj.transform.localPosition.z)
+	if blgoEnd==true then
+		self:StartCirleStop2(parent_newObj,wheelId,endpos)
+	else
+		self:StartCirleStop1(parent_newObj,wheelId,endpos,endpos1)
+	end
+
+	
+end
+
+function USDollarExpressMainCtrl:StartCirleStop1(parent_newObj,wheelId,endpos,endpos1)
 	
 	if self.rollCircles[wheelId]==0 then
-		self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
-		self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
-		self.tweener1[wheelId].onComplete=function()
-			self:RestWheelPos(wheelId,true)
-			parent_newObj.transform.localPosition =Vector3.New(
-					parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
-			if (wheelId == 5) then
-				self:ShowResoult()-- 旋转结束处理服务器数据表现
-			end
+		self.tweener2[wheelId]=parent_newObj.transform:DOLocalMove(endpos1, config.rollTime.rebackTime[wheelId])
+		self.tweener2[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
+		self.tweener2[wheelId].onComplete=function()
+			self:StartCirleStop2(parent_newObj,wheelId,endpos)
 		end
 	end
+end
+
+function USDollarExpressMainCtrl:StartCirleStop2(parent_newObj,wheelId,endpos)
+	self.tweener3[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
+	self.tweener3[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
+	self.tweener3[wheelId].onComplete=function()
+		self:RestWheelPos(wheelId,true)
+		parent_newObj.transform.localPosition =Vector3.New(
+				parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
+		self.allendPos[wheelId]=true
+		if (wheelId == 5) then
+			
+			CorManager.StartCor(self, function
+			()
+				while self:IsAllArrivePos()==false do
+					coroutine.yield(1)
+				end
+				self:ShowResoult()-- 旋转结束处理服务器数据表现
+			end)
+
+		end
+	end
+end
+
+function USDollarExpressMainCtrl:IsAllArrivePos()
+	self.isArrpos=true
+	for i = 1, 5 do
+		if self.allendPos[i]==false then
+			self.isArrpos=false
+		end
+	end
+	return self.isArrpos
 end
 
 
