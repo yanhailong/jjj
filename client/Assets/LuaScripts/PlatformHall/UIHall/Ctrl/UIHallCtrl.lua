@@ -39,6 +39,30 @@ function UIHallCtrl:AddUIEvent()
 		require("PlatformHall/UITestScroll/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.UITestScroll)
 	end)
+	
+	self.isShowAll=false
+	self.uiEventListener:AddClick(self.view.btn_arrow, function
+	()
+		self.isShowAll=not self.isShowAll
+		self:SetButtomShowAll(self.isShowAll)
+	end)
+	
+end
+
+function UIHallCtrl:SetButtomShowAll(bl)
+	if not bl then
+		self.view.obj_two:SetActive(false)
+		self.view.btn_arrow.transform.localScale=Vector3.New(1,1,1)
+		ComponentUtilGet.RectTransform(self.view.img_buttom_di.transform):DOLocalMoveY(-178,0.3)
+	else
+		---@type DG.Tweening.Tween
+		local tw= ComponentUtilGet.RectTransform(self.view.img_buttom_di.transform):DOLocalMoveY(100,0.3)
+		tw:OnComplete(function
+		()
+			self.view.obj_two:SetActive(true)
+			self.view.btn_arrow.transform.localScale=Vector3.New(1,-1,1)
+		end)
+	end
 end
 
 ---移除UI事件

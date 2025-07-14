@@ -56,7 +56,7 @@ function USDollarExpressMainView:InitJackPot()
 end
 
 function USDollarExpressMainView:SetJackPot()
-    Tools.NumJump(1,100000,60, function
+    self.numTween= Tools.NumJump(1,100000,60, function
     (v)
         self.jackPotTexts[1].text=tonumber(v)
     end, function
@@ -73,6 +73,7 @@ end
 ---关闭界面
 function USDollarExpressMainView:Close()   
     self.super.Close(self);
+    self.numTween:Kill()
 end
 
 return USDollarExpressMainView

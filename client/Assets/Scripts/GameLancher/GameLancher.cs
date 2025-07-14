@@ -36,8 +36,7 @@ public class GameLancher : MonoBehaviour
         Application.targetFrameRate = 60;
         InitGameState();
     }
-
-    // Start is called before the first frame update
+    
     void Start()
     {
 #if UNITY_EDITOR

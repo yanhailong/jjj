@@ -965,7 +965,7 @@ function this.PlayerSpineAniByName(SkeletonGraphic, aniName, isLoop, needClearTr
     return SkeletonGraphic.AnimationState:GetCurrent().Animation.Duration
 end
 function this.NumJump(form, to, time, func1, func2)
-    DOTween.To(
+    return DOTween.To(
         function()
             return form
         end,
