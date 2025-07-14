@@ -53,7 +53,7 @@ function USDollarExpressSlotItem:SetIsAward(isred)
     --end
     if isred==true then
         local effectName=config.iconEffect[self.iconIndex]
-        logError("effectName"..effectName)
+        --logError("effectName"..effectName)
         ---@type UnityEngine.GameObject
         self.iconEffect= self.ctrl.objPools:SpawnPrefab(nil, config.ABNames.iconEffect,effectName, self.ctrl.view.rootEffects)
         self.iconEffect.transform.position=self.transform.position

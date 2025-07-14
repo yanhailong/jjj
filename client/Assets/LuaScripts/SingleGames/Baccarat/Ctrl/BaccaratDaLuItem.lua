@@ -31,8 +31,8 @@ function BaccaratDaLuItem:IsActive()
 end
 ---刷新显示
 function BaccaratDaLuItem:RefreshShow(dataTable)
-    self.obj_Banker:SetActive(dataTable == config.WhoWin.BankerWin);
-    self.obj_Player:SetActive(dataTable == config.WhoWin.PlayerWin);
+    self.obj_Banker:SetActive(dataTable == 1);
+    self.obj_Player:SetActive(dataTable == 2);
 end
 ---刷新和的次数显示
 function BaccaratDaLuItem:RefreshTieNumShow(num)

@@ -3375,6 +3375,7 @@ GameObject:
   - component: {fileID: 1418396246122741877}
   - component: {fileID: 1844800392793095728}
   - component: {fileID: 3969258435557735035}
+  - component: {fileID: 7373438395280476157}
   m_Layer: 5
   m_Name: tmp_name
   m_TagString: Untagged
@@ -3430,7 +3431,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: name
+  m_text: namenamessssss
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5cc5a7a669949684bbf68b96181ad1b6, type: 2}
   m_sharedMaterial: {fileID: -6911498551228378754, guid: 5cc5a7a669949684bbf68b96181ad1b6, type: 2}
@@ -3475,7 +3476,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
@@ -3499,6 +3500,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7373438395280476157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4016038250236817916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e08781e1fb95d9469488e49f531a6da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4043128803565914706
 GameObject:
   m_ObjectHideFlags: 0

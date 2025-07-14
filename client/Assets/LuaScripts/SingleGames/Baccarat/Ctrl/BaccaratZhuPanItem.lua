@@ -32,11 +32,11 @@ end
 
 ---刷新显示
 function BaccaratZhuPanItem:RefreshShow(data,isFlicker)
-    self.obj_Banker:SetActive(data[1]  == config.WhoWin.BankerWin);
-    self.obj_Player:SetActive(data[1]  == config.WhoWin.PlayerWin);
-    self.obj_Tie:SetActive(data[1]  == config.WhoWin.TieWin);
-    self.obj_BankerPoint:SetActive(data[2]);
-    self.obj_PlayerPoint:SetActive(data[3]);
+    self.obj_Banker:SetActive(data[1]  ==1);
+    self.obj_Player:SetActive(data[1]  ==2);
+    self.obj_Tie:SetActive(data[1]  == 3);
+    self.obj_BankerPoint:SetActive(data[2]==1 or data[2]==3);
+    self.obj_PlayerPoint:SetActive(data[2]==2 or data[2]==3);
     if(isFlicker) then
         local image;
         if(data[1] == config.WhoWin.BankerWin) then
