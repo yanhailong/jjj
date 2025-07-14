@@ -3034,7 +3034,7 @@ GameObject:
   - component: {fileID: 5995717946778603641}
   - component: {fileID: 273335692690284476}
   m_Layer: 5
-  m_Name: Betting
+  m_Name: tmp_Stage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

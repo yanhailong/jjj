@@ -9,6 +9,8 @@ local config=require("SingleGames/Baccarat/BaccaratConfig")
 ---@type BaccaratItemScripts
 local BaccaratItemScripts = require("SingleGames/Baccarat/Ctrl/BaccaratItemScripts")
 local Vector3 = CS.UnityEngine.Vector3
+---每个路单Item的集合
+local BaccaratItem = {};
 ---构造函数
 function BaccaratMainCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -34,15 +36,26 @@ function BaccaratMainCtrl:InitData()
 	self.model:ReqBaccaratTableSummaryList(1);
 end
 
----拿到服务器数据刷新界面显示
-function BaccaratMainCtrl:RefreshSelectModel(msg)
-	for _, v in ipairs(msg.tableSummaryList ) do
+---拿到服务器数据初始化刷新界面显示
+function BaccaratMainCtrl:InitSelectModel(data)
+	for i, v in ipairs(data.tableSummaryList ) do
 		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"BaccaratItem",self.view.obj_Content.transform)
 		obj:SetActive(true)
 		obj.transform.localScale =  Vector3.one
 		---@type BaccaratItemScripts
 		local item = BaccaratItemScripts.New(obj,self)
-		item:RefreshDataShow(v);
+		item:InitDataShow(i,v);
+		table.insert(BaccaratItem[v.roomId],item)
+	end
+end
+---刷新单个显示
+function BaccaratMainCtrl:RefreshSelectModel(data)
+	for i, v in pairs(BaccaratItem) do
+		if(i == data.roomId) then
+			---@type BaccaratItemScripts
+			local item = v;
+			item:RefreshDataShow(data)
+		end
 	end
 end
 
@@ -74,6 +87,13 @@ end
 ---销毁UI
 function BaccaratMainCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	for i, v in ipairs(BaccaratItem) do
+		---@type BaccaratItemScripts
+		local item =v;
+		item:Destroy();
+	end
+	BaccaratItem = {}
+	self.objPools:DestroyAll();
 end
 
 return BaccaratMainCtrl

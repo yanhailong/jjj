@@ -548,7 +548,6 @@ function BaccaratGameCtrl:RefreshZhuPanShow(data,isFlicker)
 	---@type BaccaratZhuPanItem
 	local item = BaccaratZhuPanItem.New(obj,self);
 	obj:SetActive(true);
-	--obj.transform:SetParent(self.view.obj_ZhuPanContent.transform);
 	obj.transform.localScale = Vector3.one;
 	table.insert(ZhuPanObjTable,obj);
 	item:RefreshShow(data,isFlicker)

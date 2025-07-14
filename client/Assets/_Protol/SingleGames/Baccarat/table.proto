@@ -1,8 +1,4 @@
-syntax = "proto3";
-
-import "room.proto";
-
-//百家乐玩家信息
+syntax = "proto3";import "room.proto";//百家乐玩家信息
 message BaccaratPlayerInfo {
   int64 playerId = 1;  //玩家ID
   string playerName = 2;  //玩家名
@@ -34,6 +30,20 @@ message BaccaratTableAreaInfo {
 }
 
 //百家乐房间摘要
+message BaccaratTableSingleRes {
+  int64 roomId = 1;  //房间ID,房间唯一ID
+  int32 wareId = 2;  //场次ID
+  int32 restCardNum = 3;  //剩余牌数量
+  int32 totalCardNum = 4;  //总的牌数量
+  EGamePhase eGamePhase = 5;  //游戏阶段信息
+  int32 phaseTotalTime = 6;  //阶段总时间
+  int64 phaseRemainingTime = 7;  //阶段剩余时间
+  uint32 winState = 8;  //输赢状态, 1：庄赢，2：闲赢，3：和
+  uint32 cardTypeWinState = 9;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
+  int32 roundId = 10;  //对局ID
+}
+
+//百家乐房间摘要
 message BaccaratTableSummary {
   int64 roomId = 1;  //房间ID,房间唯一ID
   int32 wareId = 2;  //场次ID
@@ -41,7 +51,7 @@ message BaccaratTableSummary {
   int32 totalCardNum = 4;  //总的牌数量
   EGamePhase eGamePhase = 5;  //游戏阶段信息
   int32 phaseTotalTime = 6;  //阶段总时间
-  int64 phaseEndTime = 7;  //阶段结束时间戳
+  int32 phaseRemainingTime = 7;  //阶段剩余时间
   repeated uint32 winStateList = 8;  //输赢状态, 1：庄赢，2：闲赢，3：和
   repeated uint32 cardTypeWinStateList = 9;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
 }
@@ -57,11 +67,13 @@ message NotifyRoomReadyWait {
 message ReqBaccaratTableSummary {
   enum E_MsgID {def = 0; msgID = 98305;};
   int64 roomId = 1;  //房间ID
+  int32 roundId = 2;  //对局ID
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
 message ReqBaccaratTableSummaryList {
-  enum E_MsgID {def = 0; msgID = 983051;};
+  enum E_MsgID {def = 0; msgID = 98305;};
+  int32 wareId = 1;  //游戏场次
 }
 
 //请求,msgID=0x18081,desc=通知百家乐桌上信息
@@ -83,7 +95,7 @@ message RespBaccaratTableSummaryList {
 //请求,msgID=0x18083,desc=返回房间单条摘要信息
 message RespBaccaratTableSummary {
   enum E_MsgID {def = 0; msgID = 98435;};
-  BaccaratTableSummary tableSummary = 1;  //房间单条摘要信息
+  BaccaratTableSingleRes tableSummary = 1;  //房间单条摘要信息
   int32 code = 2;  //状态码 状态码:200-消息正常 异常状态码202-房间已销毁
 }
 
