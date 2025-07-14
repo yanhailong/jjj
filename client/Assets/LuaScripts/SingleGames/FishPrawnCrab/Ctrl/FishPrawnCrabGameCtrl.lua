@@ -4,7 +4,7 @@
 ---
 ---@class FishPrawnCrabGameCtrl:BaseCtrl
 local FishPrawnCrabGameCtrl=Class("FishPrawnCrabGameCtrl",BaseCtrl)
-
+local FishPrawnCrabGameConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabGameConfig")
 local Ease = CS.DG.Tweening.Ease
 
 ---构造函数
@@ -33,10 +33,10 @@ end
 ---刷新菜单显示隐藏
 function FishPrawnCrabGameCtrl:RefreshMenuShow()
 	if self.view.btn_touch.gameObject.activeSelf then
-		self.view.obj_Menu.transform:DOLocalMoveY(483,0.5):SetEase(Ease.InBack)
+		self.view.trans_menu_panel:DOLocalMoveY(self.view.trans_menu_panel.sizeDelta.y+100,0.5):SetEase(Ease.InBack)
 		self.view.btn_touch.gameObject:SetActive(false)
 	else
-		self.view.obj_Menu.transform:DOLocalMoveY(0,0.5):SetEase(Ease.OutBack)
+		self.view.trans_menu_panel:DOLocalMoveY(0,0.5):SetEase(Ease.OutBack)
 		self.view.btn_touch.gameObject:SetActive(true)
 	end
 
@@ -48,10 +48,9 @@ end
 
 ---添加UI事件
 function FishPrawnCrabGameCtrl:AddUIEvent()
-	self.uiEventListener:AddClick(self.view.btn_Menu,function()
+	self.uiEventListener:AddClick(self.view.btn_muen,function()
 		self:RefreshMenuShow()
 	end)
-
 	self.uiEventListener:AddClick(self.view.btn_touch,function()
 		self:RefreshMenuShow()
 	end)
@@ -59,9 +58,27 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		--CtrlManager.SingleShow(CtrlNames)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_close,function()
-		logError("点击FishPrawnCrabGameCtrl Close")
 		self:Close();
 	end)
+	self.uiEventListener:AddClick(self.view.btn_setting,function()
+		look("打开设置界面")
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
+		--CtrlManager.SingleShow(CtrlNames)
+	end)
+
+	---压注按钮
+	for i=1,#self.view.chipInfos do
+		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()
+			if FishPrawnCrabGameConfig.allowBet then
+				self.view:ChangeAnte(i)
+				--look("btn 抵住数值"..FishPrawnCrabGameConfig.dizhuNumArr[FishPrawnCrabGameConfig.anteIndex])
+				---测试数据生成 龙虎和 对应前三个币
+				--GlobalEvent.Notify("UPDATE_HIS_ITEMS",i)
+			end
+		end)
+	end
 end
 
 ---移除UI事件

@@ -1,9 +1,12 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-11 17:40:01
+---DateTime: 2025-07-14 18:34:27
 ---
 ---@class FishPrawnCrabGameView:BaseView
 local FishPrawnCrabGameView=Class("FishPrawnCrabGameView",BaseView)
+local FishPrawnCrabGameConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabGameConfig")
+local DOTween = CS.DG.Tweening.DOTween
+local Ease = CS.DG.Tweening.Ease
 
 ---初始化panel
 function FishPrawnCrabGameView:InitView()
@@ -14,74 +17,56 @@ end
 
 ---获取组件
 function FishPrawnCrabGameView:InitComponents()
+    self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
+    self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
+    self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
+    self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
+    self.tmp_total_player_num=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_players/tmp_total_player_num");
+    self.img_1=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_1");
+    self.img_2=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_2");
+    self.img_3=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_3");
+    self.img_4=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_4");
+    self.img_5=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_5");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
-    self.img_GameRoundIndex=ComponentUtilGet.Image(self.transform,"content/TopRoot/img_GameRoundIndex");
-    self.tmp_RoundIndex=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/TopRoot/img_GameRoundIndex/tmp_RoundIndex");
-    self.btn_Menu=ComponentUtilGet.Button(self.transform,"content/TopRoot/btn_Menu");
-    self.btn_touch=ComponentUtilGet.Button(self.transform,"content/TopRoot/btn_touch");
-    self.obj_Menu=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/mask/obj_Menu");
-    self.btn_setting=ComponentUtilGet.Button(self.transform,"content/TopRoot/mask/obj_Menu/btn_setting");
-    self.btn_help=ComponentUtilGet.Button(self.transform,"content/TopRoot/mask/obj_Menu/btn_help");
-    self.btn_close=ComponentUtilGet.Button(self.transform,"content/TopRoot/mask/obj_Menu/btn_close");
-    self.btn_One=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_One");
-    self.obj_checkedOne=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_One/obj_checkedOne");
-    self.txt_One=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_One/txt_One");
-    self.btn_Ten=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Ten");
-    self.obj_checkedTen=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Ten/obj_checkedTen");
-    self.txt_Ten=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Ten/txt_Ten");
-    self.btn_Fifty=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Fifty");
-    self.obj_checkedFifty=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Fifty/obj_checkedFifty");
-    self.txt_Fifty=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Fifty/txt_Fifty");
-    self.btn_OneHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_OneHundred");
-    self.obj_checkedOneHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/obj_checkedOneHundred");
-    self.txt_OneHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/txt_OneHundred");
-    self.btn_FiveHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred");
-    self.obj_checkedFiveHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/obj_checkedFiveHundred");
-    self.txt_FiveHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/txt_FiveHundred");
-    self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_AllOther");
-    self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/btn_AllOther/tmp_AllOtherNumber");
-    self.btn_Repeat=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_Repeat");
-    self.obj_Player=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/obj_Player");
-    self.img_SelfHeadPic=ComponentUtilGet.Image(self.transform,"content/DownRoot/obj_Player/SelfHead/img_SelfHeadPic");
-    self.img_SelfHead=ComponentUtilGet.Image(self.transform,"content/DownRoot/obj_Player/SelfHead/img_SelfHeadPic/img_SelfHead");
-    self.tmp_SelfGoldNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/Money/tmp_SelfGoldNumber");
-    self.tmp_SelfName=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/tmp_SelfName");
+    self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch");
+    self.btn_muen=ComponentUtilGet.Button(self.transform,"content/setting/btn_muen");
+    self.trans_menu_panel=ComponentUtilGet.Transform(self.transform,"content/setting/mask/trans_menu_panel");
+    self.btn_setting=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_setting");
+    self.btn_help=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_help");
+    self.btn_close=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_close");
+
+    ---下注底注按钮
+    self.chipInfos={}
+    for i = 1, 5 do
+        local chipItem={}
+        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/antes/"..i)
+        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/antes/"..i)
+        chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
+        chipItem.effects=ComponentUtilGet.GameObject(chipItem.rectTrans,"checkd")
+        chipItem.effects:SetActive(false)
+        self.chipInfos[i]=chipItem
+    end
 end
 
 ---清空组件
 function FishPrawnCrabGameView:ClearComponents()
+    self.btn_1=nil;
+    self.btn_recharge=nil;
+    self.btn_repeat=nil;
+    self.btn_players=nil;
+    self.tmp_total_player_num=nil;
+    self.img_1=nil;
+    self.img_2=nil;
+    self.img_3=nil;
+    self.img_4=nil;
+    self.img_5=nil;
     self.obj_PlayerRoot=nil;
-    self.img_GameRoundIndex=nil;
-    self.tmp_RoundIndex=nil;
-    self.btn_Menu=nil;
     self.btn_touch=nil;
-    self.obj_Menu=nil;
+    self.btn_muen=nil;
+    self.trans_menu_panel=nil;
     self.btn_setting=nil;
     self.btn_help=nil;
     self.btn_close=nil;
-    self.btn_One=nil;
-    self.obj_checkedOne=nil;
-    self.txt_One=nil;
-    self.btn_Ten=nil;
-    self.obj_checkedTen=nil;
-    self.txt_Ten=nil;
-    self.btn_Fifty=nil;
-    self.obj_checkedFifty=nil;
-    self.txt_Fifty=nil;
-    self.btn_OneHundred=nil;
-    self.obj_checkedOneHundred=nil;
-    self.txt_OneHundred=nil;
-    self.btn_FiveHundred=nil;
-    self.obj_checkedFiveHundred=nil;
-    self.txt_FiveHundred=nil;
-    self.btn_AllOther=nil;
-    self.tmp_AllOtherNumber=nil;
-    self.btn_Repeat=nil;
-    self.obj_Player=nil;
-    self.img_SelfHeadPic=nil;
-    self.img_SelfHead=nil;
-    self.tmp_SelfGoldNumber=nil;
-    self.tmp_SelfName=nil;
 end
 
 ---初始化View数据
@@ -92,6 +77,52 @@ end
 ---关闭界面
 function FishPrawnCrabGameView:Close()   
     self.super.Close(self);
+end
+
+---切换当前选中的底注
+function FishPrawnCrabGameView:ChangeAnte(index)
+    -- 参数验证
+    if not index or index < 1 or index > #self.chipInfos then
+        return
+    end
+
+    -- 如果点击的是当前已选中的按钮，不做任何操作
+    if index == FishPrawnCrabGameConfig.anteIndex and self.chipInfos[index].effects.activeSelf then
+        return
+    end
+
+    local oldIndex = FishPrawnCrabGameConfig.anteIndex
+    local oldChip = self.chipInfos[oldIndex]
+    local newChip = self.chipInfos[index]
+
+    -- 停止之前按钮的所有动画
+    if oldChip and oldChip.rectTrans then
+        oldChip.rectTrans:DOKill() -- 停止所有DOTween动画
+    end
+
+    -- 停止新按钮的所有动画
+    if newChip and newChip.rectTrans then
+        newChip.rectTrans:DOKill() -- 停止所有DOTween动画
+    end
+
+    -- 重置旧按钮状态
+    if oldChip then
+        oldChip.rectTrans:DOScale(1, 0.1):SetEase(Ease.OutQuad)
+        oldChip.rectTrans:DOLocalMoveY(0, 0.1):SetEase(Ease.OutQuad)
+        oldChip.effects:SetActive(false)
+    end
+
+    -- 设置新按钮状态
+    if newChip then
+        -- 先设置缩放动画
+        newChip.rectTrans:DOScale(1.1, 0.15):SetEase(Ease.OutBack)
+        -- 再设置位置动画
+        newChip.rectTrans:DOLocalMoveY(13.0, 0.15):SetEase(Ease.OutQuad)
+        newChip.effects:SetActive(true)
+    end
+
+    -- 更新配置中的当前选中索引
+    FishPrawnCrabGameConfig.anteIndex = index
 end
 
 return FishPrawnCrabGameView
