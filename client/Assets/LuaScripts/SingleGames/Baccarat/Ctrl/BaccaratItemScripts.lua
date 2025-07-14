@@ -56,7 +56,7 @@ function BaccaratItemScripts:RefreshDataShow(data)
     self:RefreshUIShow(data)
     table.insert( self.BaccaratTableSummary.winStateList,data.winState)
     table.insert( self.BaccaratTableSummary.cardTypeWinStateList,data.cardTypeWinState)
-    self.BaccaratRoadScripts:RefreshData(data)
+    self.BaccaratRoadScripts:RefreshData(data,false)
 end
 ---刷新UI显示显示
 function BaccaratItemScripts:RefreshUIShow(data)
@@ -88,8 +88,6 @@ function BaccaratItemScripts:Update()
         end
     end
 end
-
-
 
 function BaccaratItemScripts:Destroy()
    UpdateManager.ReMoveAllUpdate(self)

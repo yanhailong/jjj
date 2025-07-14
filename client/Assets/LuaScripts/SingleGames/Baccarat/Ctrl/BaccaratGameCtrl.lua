@@ -13,7 +13,8 @@ local BaccaratZhuPanItem = require"SingleGames/Baccarat/Ctrl/BaccaratZhuPanItem"
 local BaccaratDaLuItem = require"SingleGames/Baccarat/Ctrl/BaccaratDaLuItem"
 ---@type BaccaratAllChildLuItem
 local BaccaratAllChildLuItem = require"SingleGames/Baccarat/Ctrl/BaccaratAllChildLuItem"
-
+---@type BaccaratRoad
+local BaccaratRoad = require("SingleGames/Baccarat/Ctrl/BaccaratRoad")
 ---游戏阶段
 local  gameStage ={
 	Begin = 1,--开始阶段
@@ -56,32 +57,6 @@ local BetPPairAllNum;
 local BetBPairAllNum;
 ---筹码下注的集合表
 local ChipTable={};
-
----主盘表
-local ZhuPanTable = {};
-local ZhuPanObjTable = {};
----主盘数据表(进入游戏向服务器拿到数据后打开界面刷新主盘数据显示)
-local ZhuPanDataTable = {};
----大路表
-local DaLuTable = {};
-local DaLuObjTable = {};
----大路数据表
-local DaLuDataTable = {};
----大路大眼路表
-local DaYanZaiLuTable ={};
-local DaYanZaiLuObjTable ={};
----大路大眼路数据表
-local DaYanZaiLuDataTable ={};
----小路表
-local xiaoLuTable ={};
-local xiaoLuObjTable ={};
----小路数据表
-local xiaoLuDataTable ={};
----曱甴路表
-local YueYouLuTable = {};
-local YueYouLuObjTable = {};
----曱甴路数据表
-local YueYouLuDataTable = {};
 ---庄家总共赢了多少局
 local BankerWinNumber;
 ---闲家总共赢了多少局
@@ -126,10 +101,6 @@ function BaccaratGameCtrl:CtrlInit(args)
 	CurSelectChip = 0;
 	self:InitDataShow()
 	self:InitZhuPanTable()
-	self:InitDaLuTable()
-	self:InitDaLuZiLuTable()
-	self:InitXiaoLuTable()
-	self:InitYueYouLuTable()
 	self:InitData()
 end
 ---初始化要显示的数据（接入服务器数据要，要赋值服务器那边的数据显示）
@@ -145,6 +116,9 @@ function BaccaratGameCtrl:InitDataShow()
 	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform);
 	BeginBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BeginBet.transform);
 	StopBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_StopBet.transform);
+	---@type BaccaratRoad
+	self.BaccaratRoadScripts =BaccaratRoad.New()
+	self.BaccaratRoadScripts:Init(self.view.obj_ZhuPanContent,self.view.obj_DaLuContent,self.view.obj_DaluZiluContent,self.view.obj_XiaoLuContent,self.view.obj_YueYouLuContent);
 end
 
 ---初始化数据
@@ -235,116 +209,11 @@ function BaccaratGameCtrl:RefreshDataShow()
 	self.view.tmp_ScoreNum.text = KingNumber;
 	self.view.tmp_RoundsNum.text = RoundNumber;
 end
----清空所有路表
-function BaccaratGameCtrl:CloseLuTable()
-	for _, v in ipairs(ZhuPanObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
-	ZhuPanTable = {}
-	ZhuPanDataTable ={}
 
-	for _, v in ipairs(DaLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(DaLuObjTable) do
-		v:SetActive(true)
-	end
-	DaLuDataTable = {}
-	
-	for _, v in ipairs(DaYanZaiLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(DaYanZaiLuObjTable) do
-		v:SetActive(true)
-	end
-	DaYanZaiLuDataTable = {}
-	
-	for _, v in ipairs(xiaoLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(xiaoLuObjTable) do
-		v:SetActive(true)
-	end
-	xiaoLuDataTable = {}
-	
-	for _, v in ipairs(YueYouLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(YueYouLuObjTable) do
-		v:SetActive(true)
-	end
-	YueYouLuDataTable = {}
+---初始化主盘预制体(需要服务器数据)
+function BaccaratGameCtrl:InitZhuPanTable(data)
+	self.BaccaratRoadScripts:InitData(data);
 end
----初始化主盘预制体
-function BaccaratGameCtrl:InitZhuPanTable()
-	for _, v in ipairs(ZhuPanDataTable) do
-		self:RefreshZhuPanShow(v,false)
-	end
-end
----初始化大路预制体表
-function BaccaratGameCtrl:InitDaLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem",self.view.obj_DaLuContent.transform)
-		---@type BaccaratDaLuItem
-		local item = BaccaratDaLuItem.New(obj,self);
-		obj:SetActive(true);
-		--obj.transform:SetParent(self.view.obj_DaLuContent.transform);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(DaLuObjTable,obj);
-		table.insert(DaLuTable,item);
-	end
-end
----初始化大路大眼路预制体表
-function BaccaratGameCtrl:InitDaLuZiLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem",self.view.obj_DaluZiluContent.transform)
-		---@type BaccaratAllChildLuItem
-		local item = BaccaratAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		--obj.transform:SetParent(self.view.obj_DaluZiluContent.transform);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(DaYanZaiLuObjTable,obj);
-		table.insert(DaYanZaiLuTable,item);
-	end
-	
-end
----初始化大路大眼路预制体表
-function BaccaratGameCtrl:InitXiaoLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem",self.view.obj_XiaoLuContent.transform)
-		---@type BaccaratAllChildLuItem
-		local item = BaccaratAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		--obj.transform:SetParent(self.view.obj_XiaoLuContent.transform);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(xiaoLuObjTable,obj);
-		table.insert(xiaoLuTable,item);
-	end
-	
-end
----初始化曱甴路预制体表
-function BaccaratGameCtrl:InitYueYouLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem",self.view.obj_YueYouLuContent.transform)
-		---@type BaccaratAllChildLuItem
-		local item = BaccaratAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		--obj.transform:SetParent(self.view.obj_YueYouLuContent.transform);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(YueYouLuObjTable,obj);
-		table.insert(YueYouLuTable,item);
-	end
-	
-end
-
 ---同步游戏当前在哪个阶段
 function BaccaratGameCtrl:RefreshGameStage()
 	if curGameStage == gameStage.Begin then
@@ -483,15 +352,10 @@ function BaccaratGameCtrl:SettleAccounts(playerCardNum,BankerCardNum)
 	self:InitData();
 	RoundNumber = RoundNumber+1;
 	self:RefreshDataShow()
-	if(#ZhuPanDataTable>=50) then
-		self:CloseLuTable()
-	end
 	local data = {};
 	data[1] = CurWhoWin
 	data[2] = BankerIsPairing
-	data[3] = playerIsPairing;
-	self:RefreshZhuPanShow(data,true)
-	table.insert(ZhuPanDataTable,data);
+	self.BaccaratRoadScripts:RefreshData(data,true)
 end
 ---飞筹码到对应玩家头像上
 function BaccaratGameCtrl:PlayChipToPlayer(chip)
@@ -536,24 +400,6 @@ function BaccaratGameCtrl:PlayFlicker(image)
 	self.flickerSequence:SetLoops(8,loopType.Yoyo)
 	self.flickerSequence:Play();
 end
-
----刷新主盘显示
-function BaccaratGameCtrl:RefreshZhuPanShow(data,isFlicker)
-	if(#ZhuPanTable==48) then
-		for i = 1, 6 do
-			ZhuPanObjTable[i]:SetActive(false);
-		end
-	end
-	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"ZhuPanItem",self.view.obj_ZhuPanContent.transform)
-	---@type BaccaratZhuPanItem
-	local item = BaccaratZhuPanItem.New(obj,self);
-	obj:SetActive(true);
-	obj.transform.localScale = Vector3.one;
-	table.insert(ZhuPanObjTable,obj);
-	item:RefreshShow(data,isFlicker)
-	table.insert(ZhuPanTable,item);
-	self:AddDaLuTableShow(data);
-end
 ---获取真正的点数
 function BaccaratGameCtrl:GetCardPoint(point)
 	local num =  (point - 1) / 13+1;
@@ -574,347 +420,6 @@ function BaccaratGameCtrl:GetCardEndPoint(point)
 		return point
 	end
 end
-
---region 路单显示
----大路新增显示
-function BaccaratGameCtrl:AddDaLuTableShow(data)
-	local curIndex = 0; --当前的索引
-	local curList = 0;--当前是第几列
-	local tieNum = 0;--和的数字
-	local whoWin;--谁赢
-	local dataTable = {};--缓存的需要加入到数据结构里面的表
-	local IsGoL; --是否走了L型了
-	if(#DaLuDataTable==0) then--刚开始
-		---@type BaccaratDaLuItem
-		local item = DaLuTable[1];
-		if(data[1] == config.WhoWin.TieWin) then
-			tieNum=tieNum+1;
-			item:RefreshTieNumShow(tieNum);
-		else
-			whoWin = data[1];
-			item:RefreshShow(whoWin);
-		end
-		curList = 1;
-		DaLuDataTable[curList] ={};
-		dataTable[1] = whoWin;
-		dataTable[2] = tieNum;
-		dataTable[3] = item;
-		dataTable[4] = false;
-		table.insert(DaLuDataTable[curList],dataTable)
-	else
-		curList = #DaLuDataTable;
-		local lastPiece= DaLuDataTable[curList]
-		if data[1] == config.WhoWin.TieWin then --如果是和就不往下面加，而是显示数字
-			tieNum = lastPiece[#lastPiece][2];
-			tieNum = tieNum+1;
-			lastPiece[#lastPiece][2] = tieNum;
-			---@type BaccaratDaLuItem
-			local lastItem = lastPiece[#lastPiece][3];
-			lastItem:RefreshTieNumShow(tieNum);
-		elseif(lastPiece[#lastPiece][1] == data[1]) then --如果和上一次的一样就往后面加
-			IsGoL = lastPiece[#lastPiece][4];
-			local lastItem = lastPiece[#lastPiece][3];
-			if(IsGoL) then -- 已经开始走L型了
-				curIndex = lastItem:GetIndex()+6;
-			else
-				curIndex = lastItem:GetIndex()+1;
-				---@type BaccaratDaLuItem
-				local item = DaLuTable[curIndex];
-				if(item:IsActive()or (curIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-					curIndex = lastItem:GetIndex()+6;
-					IsGoL = true;
-				end
-			end
-			---@type BaccaratDaLuItem
-			local item = DaLuTable[curIndex];
-			dataTable[1] = data[1];
-			dataTable[2] = tieNum;
-			dataTable[3] = item;
-			dataTable[4] = IsGoL;
-			item:RefreshShow(data[1])
-			table.insert(DaLuDataTable[curList],dataTable)
-			self:AddDaYanZiLuTableShow();
-			self:AddXiaoLuTableShow();
-			self:AddYueYouLuTableShow();
-		elseif(lastPiece[#lastPiece][1] ~= data[1]) then --如果和上一次的不一样就往另外开一列
-			if(#DaLuDataTable>=24) then--超出列表了，需要隐藏前面
-				for i = 1, (#DaLuDataTable-23)*6 do
-					DaLuObjTable[i]:SetActive(false);
-				end
-			end
-			curList = #DaLuDataTable+1;
-			curIndex = #DaLuDataTable*6+1;
-			---@type BaccaratDaLuItem
-			local item = DaLuTable[curIndex];
-			dataTable[1] =  data[1];
-			dataTable[2] = tieNum;
-			dataTable[3] = item;
-			dataTable[4] = IsGoL;
-			item:RefreshShow(data[1])
-			DaLuDataTable[curList] ={};
-			table.insert(DaLuDataTable[curList],dataTable)
-			self:AddDaYanZiLuTableShow();
-			self:AddXiaoLuTableShow();
-			self:AddYueYouLuTableShow();
-	    end
-	end
-	
-end
-
----大眼路刷新显示
-function BaccaratGameCtrl:AddDaYanZiLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type BaccaratDaLuItem
-	local lastItem = lastPiece[#lastPiece][3];
-	local index = lastItem:GetIndex();
-	if(index>=8) then--开始演化大眼路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-2;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-6;
-			local index2 = index-7;
-			---@type BaccaratDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-		
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#DaYanZaiLuDataTable==0) then--刚开始走
-			---@type BaccaratAllChildLuItem
-			local item = DaYanZaiLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			DaYanZaiLuDataTable[1] = {}
-			table.insert(DaYanZaiLuDataTable[1],dataTable);
-		else
-			local ListCur = #DaYanZaiLuDataTable;
-			local childList = DaYanZaiLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type BaccaratAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type BaccaratAllChildLuItem
-					local item = DaYanZaiLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type BaccaratAllChildLuItem
-				local item = DaYanZaiLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(DaYanZaiLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#DaYanZaiLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#DaYanZaiLuDataTable-23)*6 do
-						DaYanZaiLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #DaYanZaiLuDataTable+1
-				CurIndex = #DaYanZaiLuDataTable*6+1;
-				---@type BaccaratAllChildLuItem
-				local item = DaYanZaiLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				DaYanZaiLuDataTable[ListCur] ={};
-				table.insert(DaYanZaiLuDataTable[ListCur],dataTable)
-			end
-		end
-		
-	end
-end
-
----小路刷新显示
-function BaccaratGameCtrl:AddXiaoLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type BaccaratDaLuItem
-	local lastItem = lastPiece[#lastPiece][3];
-	local index = lastItem:GetIndex();
-	if(index>=14) then--开始演化小路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-3;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-12;
-			local index2 = index-13;
-			---@type BaccaratDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-		
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#xiaoLuDataTable==0) then--刚开始走iao
-			---@type BaccaratAllChildLuItem
-			local item = xiaoLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			xiaoLuDataTable[1] = {}
-			table.insert(xiaoLuDataTable[1],dataTable);
-		else
-			local ListCur = #xiaoLuDataTable;
-			local childList = xiaoLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type BaccaratAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type BaccaratAllChildLuItem
-					local item = xiaoLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type BaccaratAllChildLuItem
-				local item = xiaoLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(xiaoLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#xiaoLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#xiaoLuDataTable-23)*6 do
-						xiaoLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #xiaoLuDataTable+1
-				CurIndex = #xiaoLuDataTable*6+1;
-				---@type BaccaratAllChildLuItem
-				local item = xiaoLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				xiaoLuDataTable[ListCur] ={};
-				table.insert(xiaoLuDataTable[ListCur],dataTable)
-			end
-		end
-		
-	end
-end
----曱甴刷新显示
-function BaccaratGameCtrl:AddYueYouLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type BaccaratDaLuItem
-	local lastItem = lastPiece[#lastPiece][3];
-	local index = lastItem:GetIndex();
-	if(index>=20) then--开始演化小路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-4;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-18;
-			local index2 = index-19;
-			---@type BaccaratDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-		
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#YueYouLuDataTable==0) then--刚开始走iao
-			---@type BaccaratAllChildLuItem
-			local item = YueYouLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			YueYouLuDataTable[1] = {}
-			table.insert(YueYouLuDataTable[1],dataTable);
-		else
-			local ListCur = #YueYouLuDataTable;
-			local childList = YueYouLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type BaccaratAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type BaccaratAllChildLuItem
-					local item = YueYouLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type BaccaratAllChildLuItem
-				local item = YueYouLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(YueYouLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#YueYouLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#YueYouLuDataTable-23)*6 do
-						YueYouLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #YueYouLuDataTable+1
-				CurIndex = #YueYouLuDataTable*6+1;
-				---@type BaccaratAllChildLuItem
-				local item = YueYouLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				YueYouLuDataTable[ListCur] ={};
-				table.insert(YueYouLuDataTable[ListCur],dataTable)
-			end
-		end
-		
-	end
-end
---endregion
 
 ---刷新菜单显示隐藏
 function BaccaratGameCtrl:RefreshMenuShow()
@@ -1097,54 +602,7 @@ function BaccaratGameCtrl:RealCloseDestroy()
 	if self.PlayChipToPlayerSequence~=nil then
 		self.PlayChipToPlayerSequence:Kill();
 	end
-	for _, v in ipairs(ZhuPanTable) do
-		---@type BaccaratZhuPanItem
-		local item =v;
-		item:Destroy();
-	end
 	self.objPools:DestroyAll();
-	ZhuPanObjTable = {}
-	ZhuPanTable ={}
-	ZhuPanDataTable ={}
-    
-	for _, v in ipairs(DaLuTable) do
-		---@type BaccaratDaLuItem
-		local item =v;
-		item:Destroy();
-	end
-	DaLuObjTable ={};
-	DaLuTable ={}
-	DaLuDataTable ={}
-
-
-	for _, v in ipairs(DaYanZaiLuTable) do
-		---@type BaccaratAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-	DaYanZaiLuObjTable = {}
-	DaYanZaiLuTable = {}
-	DaYanZaiLuDataTable = {}
-	
-	for _, v in ipairs(xiaoLuTable) do
-		---@type BaccaratAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-
-	xiaoLuObjTable ={}
-	xiaoLuTable = {}
-	xiaoLuDataTable ={}
-	
-	for _, v in ipairs(YueYouLuTable) do
-		---@type BaccaratAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-	
-	YueYouLuObjTable = {}
-	YueYouLuTable ={}
-	YueYouLuDataTable ={}
 end
 
 return BaccaratGameCtrl

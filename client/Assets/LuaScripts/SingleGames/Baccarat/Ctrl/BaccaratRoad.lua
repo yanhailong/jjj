@@ -67,14 +67,14 @@ function BaccaratRoad:InitData(data)
     end
 end
 ---刷新数据显示
-function BaccaratRoad:RefreshData(data)
+function BaccaratRoad:RefreshData(data,isFlicker)
     if(#self.ZhuPanDataTable>=50) then
         self:CloseLuTable()
     end
     local data = {};
     data[1] = data.winState;
     data[2] = data.cardTypeWinState
-    self:RefreshZhuPanShow(data)
+    self:RefreshZhuPanShow(data,isFlicker)
     table.insert(self.ZhuPanDataTable,data);
 end
 
@@ -138,7 +138,7 @@ function BaccaratRoad:InitYueYouLuTable()
 end
 
 ---刷新主盘路显示
-function BaccaratRoad:RefreshZhuPanShow(data)
+function BaccaratRoad:RefreshZhuPanShow(data,isFlicker)
     if(#self.ZhuPanTable==48) then
         for i = 1, 6 do
             self.ZhuPanObjTable[i]:SetActive(false);
@@ -150,7 +150,7 @@ function BaccaratRoad:RefreshZhuPanShow(data)
     obj:SetActive(true);
     obj.transform.localScale = Vector3.one;
     table.insert(self.ZhuPanObjTable,obj);
-    item:RefreshShow(data,false)
+    item:RefreshShow(data,isFlicker)
     table.insert(self.ZhuPanTable,item);
     self:AddDaLuTableShow(data);
 end
