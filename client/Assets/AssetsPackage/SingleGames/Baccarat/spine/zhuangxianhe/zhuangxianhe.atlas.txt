@@ -1,0 +1,19 @@
+zhuangxianhe.png
+size:1024,512
+filter:Linear,Linear
+pma:true
+Banker Wins
+bounds:2,2,247,149
+offsets:2,1,251,151
+Player Wins
+bounds:251,2,218,149
+offsets:2,1,222,151
+Tie
+bounds:471,89,128,62
+offsets:1,2,131,66
+hong
+bounds:656,153,324,331
+lan
+bounds:2,153,325,331
+lv
+bounds:329,153,325,331

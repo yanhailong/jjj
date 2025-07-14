@@ -1,0 +1,10 @@
+tianwang.png
+size:512,128
+filter:Linear,Linear
+pma:true
+King
+bounds:287,35,156,63
+offsets:2,1,159,66
+dk
+bounds:2,2,283,96
+offsets:1,1,285,98
