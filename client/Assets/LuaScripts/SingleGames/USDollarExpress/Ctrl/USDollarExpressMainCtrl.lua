@@ -523,9 +523,8 @@ function USDollarExpressMainCtrl:AddUIEvent()
 end
 
 function USDollarExpressMainCtrl:BackHome()
-	self:Close()
-	self.buttomCtrl:Close()
-	self.topCtrl:Close()
+	GameCenter.LeaveGame();
+
 end
 
 ---移除UI事件
@@ -550,6 +549,8 @@ end
 ---销毁UI
 function USDollarExpressMainCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	self.buttomCtrl:Close()
+	self.topCtrl:Close()
 end
 
 return USDollarExpressMainCtrl

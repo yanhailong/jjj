@@ -44,32 +44,39 @@ end
 ---点击游戏按钮
 function UIHallGamesCtrl:OnClickGameItem(index)
 	logError("点击了Item: "..index)
-	if index==1 then
-		require("SingleGames/TestGame/MVCHead")
-		--require("SingleGames/USDollarExpress/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressMain)
-	elseif index == 2 then
-		require("SingleGames/Baccarat/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.BaccaratMain)
-	elseif index == 3 then
-		require("SingleGames/CarLogo/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.CarLogoGame)
-	elseif index == 4 then
-		require("SingleGames/BirdsAnimals/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.BirdsAnimalsGame)
-	elseif index == 5 then
-		require("SingleGames/RoyalWar/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.RoyalWarGame)
-	elseif index == 6 then
-		require("SingleGames/DragonTigerFight/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.DragonTigerFight)
-	elseif index == 7 then
-		require("SingleGames/VietnamChess/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.VietnamChessGame)
-	elseif index == 8 then
-		require("SingleGames/FishPrawnCrab/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.FishPrawnCrabGame)
+	local gameName=GameSortID[index];
+	if gameName==nil then
+		SuspensionTipsUtil.SuspensionTips("游戏未开放!")
+	else
+		GameCenter.EnterGame(gameName);
 	end
+	--if index==1 then
+	--	--require("SingleGames/TestGame/MVCHead")
+	--	require("SingleGames/USDollarExpress/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.USDollarExpressMain)
+	--	
+	--elseif index == 2 then
+	--	require("SingleGames/Baccarat/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.BaccaratMain)
+	--elseif index == 3 then
+	--	require("SingleGames/CarLogo/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.CarLogoGame)
+	--elseif index == 4 then
+	--	require("SingleGames/BirdsAnimals/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.BirdsAnimalsGame)
+	--elseif index == 5 then
+	--	require("SingleGames/RoyalWar/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.RoyalWarGame)
+	--elseif index == 6 then
+	--	require("SingleGames/DragonTigerFight/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.DragonTigerFight)
+	--elseif index == 7 then
+	--	require("SingleGames/VietnamChess/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.VietnamChessGame)
+	--elseif index == 8 then
+	--	require("SingleGames/FishPrawnCrab/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.FishPrawnCrabGame)
+	--end
 end
 
 ---移除UI事件

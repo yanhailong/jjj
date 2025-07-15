@@ -76,6 +76,7 @@ public class ButtonMultiTarget : Button
     }
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(ButtonMultiTarget))]
 public class ButtonMultiTargetEditor : UnityEditor.UI.ButtonEditor
 {
@@ -94,3 +95,4 @@ public class ButtonMultiTargetEditor : UnityEditor.UI.ButtonEditor
         serializedObject.ApplyModifiedProperties();
     }
 }
+#endif

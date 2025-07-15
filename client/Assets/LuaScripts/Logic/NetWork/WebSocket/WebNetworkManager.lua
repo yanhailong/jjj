@@ -1,4 +1,5 @@
 require("Logic/Protoc/PBHelper")
+require("Logic/NetWork/ErrorCode")
 
 ---@class WebNetworkManager
 WebNetworkManager = {}
@@ -108,7 +109,15 @@ function this:OnReceive(bytes)
         return
     end
     this.MsgLog(true, msgId, msgTab)
-    WebNetEvent.Notify(msgId, msgTab)
+    if msgId == pb_PlatformHall.ResHeartBeat then
+        WebNetEvent.Notify(msgId, msgTab)
+    else
+        if msgTab.code==200 then
+            WebNetEvent.Notify(msgId, msgTab)
+        else
+            SuspensionTipsUtil.SuspensionTips(LocalManager.GetStrById(msgTab.code))
+        end
+    end
 end
 
 ---@param 是否连接

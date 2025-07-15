@@ -4,7 +4,7 @@ require "Logic/SubGame/UpdateGameAssets"
 require "Logic/SubGame/UpdateGameEvent"
 require "Logic/SubGame/GameLoading"
 -----@type GameConnect
---GameConnect= require ("Logic/SubGame/GameConnect").New()
+GameConnect= require ("Logic/SubGame/GameConnect").New()
 
 ---游戏控制中心
 ---@class GameCenter
@@ -12,6 +12,7 @@ GameCenter=Class("GameCenter")
 local this=GameCenter
 local game;
 ---当前运行游戏
+---@type SubGame
 local curGame;
 ---游戏对象创建函数
 local gameCreatorFunc;
@@ -55,7 +56,12 @@ function this.EnterGame(gameName,param,enterPreFunc)
         this.EnterGameErrorTips("进入游戏错误!")
         return GameState.Error;
     end
-
+    
+    if curGame then
+        curGame:Close(true)
+        curGame=nil
+    end
+    
     gameCreatorFunc=function()
         curGame=game.New(gameName,param);
         if enterPreFunc~=nil then
@@ -69,11 +75,11 @@ function this.EnterGame(gameName,param,enterPreFunc)
         end
         MainStateCtrl.EnterGame();
     end
-    local data={}
-    data.gameType=gameConfig.gameType
-    WebNetworkManager.SendMsg(pb_PlatformHall.ReqChooseGame,data)
+    GameConnect:ReqChooseGame(gameConfig.gameType)
     return GameState.Normal;
 end
+
+
 
 
 ---收到服务器返回场次信息
@@ -187,6 +193,9 @@ function this.LeaveGame()
     curGame:SendLeaveGame();
 end
 
+function this.LeaveGameResultMsg(msg)
+    curGame:LeaveRoomResultMsg(msg)
+end
 
 ---是否在游戏内
 function this.IsInGame()
