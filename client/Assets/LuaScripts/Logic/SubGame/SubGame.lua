@@ -159,8 +159,7 @@ end
 
 ---发送离开房间消息
 function SubGame:SendLeaveGame()
-    logError("发送至服务器退出游戏，服务器暂未有借口后期修改")
-    self:LeaveGame()
+    GameConnect:ReqExitGame()
 end
 
 
@@ -175,6 +174,11 @@ function SubGame:LeaveGame()
         GameCenter.CloseCurGame();
     end)
 end
+
+function SubGame:LeaveRoomResultMsg(msg)
+    self:LeaveGame();
+end
+
 
 ---关闭游戏
 ---@param isRelease boolean 是否释放资源

@@ -23,7 +23,7 @@ end
 function UICommonSelectionCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	---@type SubGame
-	self.subGame=args
+	self.subGame=args.subGame
 	look("self.subGame",self.subGame)
 	self:InitData()
 end
@@ -32,14 +32,26 @@ end
 function UICommonSelectionCtrl:InitData()
 	self.objselects={}
 	for i = 1, 4 do
-		self.objselects[i]=ComponentUtilGet.GameObject(self.view.transform,"content/obj/select"..i)
+		local go =ComponentUtilGet.GameObject(self.view.transform,"content/obj/select"..i)
+		local item=UICommonSelectionItem.New(go,self)
+		item:SetActive(false)
+		self.objselects[i]=item
 	end
-	self:InitSelcets()
+
+	local wareHouseList=self.subGame.wareHouseList
+	for i = 1, #wareHouseList do
+		local item=self.objselects[i]
+		if item then
+			item:SetActive(true)
+			item:InitData(wareHouseList[i])
+			self.uiEventListener:AddClick(item.gameObject,function ()
+				self:OnClickItem(i);
+			end);
+		end
+	end
 end
 
-function UICommonSelectionCtrl:InitSelcets()
-	
-end
+
 
 
 
@@ -53,12 +65,7 @@ function UICommonSelectionCtrl:AddUIEvent()
 	()
 		self:Close()
 	end)
-
-	for i = 1, #self.objselects do
-		self.uiEventListener:AddClick(self.objselects,function ()
-			self:OnClickItem(i);
-		end);
-	end
+	
 end
 
 

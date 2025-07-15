@@ -36,10 +36,22 @@ message NoticeMoneyChange {
   int64 diamond = 2;  //钻石
 }
 
-//请求,msgID=0x4001,desc=gm请求
+//请求,msgID=0x4003,desc=退出游戏请求
+message ReqExitGame {
+  enum E_MsgID {def = 0; msgID = 16387;};
+}
+
+//响应,msgID=0x4001,desc=gm请求
 message ReqGm {
   enum E_MsgID {def = 0; msgID = 16385;};
   string order = 1;  //命令参数
+  int64 playerId = 2;  //玩家id
+}
+
+//响应,msgID=0x4004,desc=退出游戏
+message ResExitGame {
+  enum E_MsgID {def = 0; msgID = 16388;};
+  int32 code = 1;  //状态码
 }
 
 //响应,msgID=0x4002,desc=gm返回

@@ -11,10 +11,14 @@ pb_PlatformHall.NoticeServerStatus = 4099
 pb_PlatformHall.ReqLogin = 12289
 --- 响应,msgID=0x3002,desc=登录返回
 pb_PlatformHall.ResLogin = 12290
---- 请求,msgID=0x4001,desc=gm请求
+--- 响应,msgID=0x4001,desc=gm请求
 pb_PlatformHall.ReqGm = 16385
 --- 响应,msgID=0x4002,desc=gm返回
 pb_PlatformHall.ResGm = 16386
+--- 请求,msgID=0x4003,desc=退出游戏请求
+pb_PlatformHall.ReqExitGame = 16387
+--- 响应,msgID=0x4004,desc=退出游戏
+pb_PlatformHall.ResExitGame = 16388
 --- 响应,msgID=0x4099,desc=推送金钱变化
 pb_PlatformHall.NoticeMoneyChange = 16537
 --- 请求,msgID=0x6003,desc=请求进入游戏
@@ -34,6 +38,8 @@ PbMsg[12289] = 'ReqLogin'
 PbMsg[12290] = 'ResLogin'
 PbMsg[16385] = 'ReqGm'
 PbMsg[16386] = 'ResGm'
+PbMsg[16387] = 'ReqExitGame'
+PbMsg[16388] = 'ResExitGame'
 PbMsg[16537] = 'NoticeMoneyChange'
 PbMsg[24579] = 'ReqChooseGame'
 PbMsg[24580] = 'ResChooseGame'

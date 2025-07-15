@@ -523,7 +523,7 @@ function USDollarExpressMainCtrl:AddUIEvent()
 end
 
 function USDollarExpressMainCtrl:BackHome()
-	self:Close()
+	GameCenter.LeaveGame();
 	self.buttomCtrl:Close()
 	self.topCtrl:Close()
 end
