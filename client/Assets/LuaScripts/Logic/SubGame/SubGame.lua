@@ -154,7 +154,7 @@ function SubGame:LoadGameFinishedResultMsg(info)
         self.initGameTimer:Stop();
         self.initGameTimer=nil;
     end
-    GlobalEvent.Notify(SubGame.EventName.LoadFinished);
+    --GlobalEvent.Notify(SubGame.EventName.LoadFinished);
 end
 
 ---发送离开房间消息

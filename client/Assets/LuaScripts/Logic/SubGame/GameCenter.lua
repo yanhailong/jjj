@@ -56,7 +56,12 @@ function this.EnterGame(gameName,param,enterPreFunc)
         this.EnterGameErrorTips("进入游戏错误!")
         return GameState.Error;
     end
-
+    
+    if curGame then
+        curGame:Close(true)
+        curGame=nil
+    end
+    
     gameCreatorFunc=function()
         curGame=game.New(gameName,param);
         if enterPreFunc~=nil then
