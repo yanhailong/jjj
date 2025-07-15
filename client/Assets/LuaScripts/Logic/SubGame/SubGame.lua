@@ -1,7 +1,7 @@
 local loadGameAssets=require "Logic/SubGame/LoadGameAssets"
 
 ---游戏子游戏基类
----@class subGame
+---@class SubGame
 SubGame=Class("SubGame")
 
 SubGame.EventName={

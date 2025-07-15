@@ -4,7 +4,7 @@ require "Logic/SubGame/UpdateGameAssets"
 require "Logic/SubGame/UpdateGameEvent"
 require "Logic/SubGame/GameLoading"
 -----@type GameConnect
---GameConnect= require ("Logic/SubGame/GameConnect").New()
+GameConnect= require ("Logic/SubGame/GameConnect").New()
 
 ---游戏控制中心
 ---@class GameCenter
@@ -69,11 +69,14 @@ function this.EnterGame(gameName,param,enterPreFunc)
         end
         MainStateCtrl.EnterGame();
     end
-    local data={}
-    data.gameType=gameConfig.gameType
-    WebNetworkManager.SendMsg(pb_PlatformHall.ReqChooseGame,data)
+    --local data={}
+    --data.gameType=gameConfig.gameType
+    --WebNetworkManager.SendMsg(pb_PlatformHall.ReqChooseGame,data)
+    GameConnect:ReqChooseGame(gameConfig.gameType)
     return GameState.Normal;
 end
+
+
 
 
 ---收到服务器返回场次信息

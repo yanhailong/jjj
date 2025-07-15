@@ -4,6 +4,8 @@
 ---
 ---@class UICommonSelectionCtrl:BaseCtrl
 local UICommonSelectionCtrl=Class("UICommonSelectionCtrl",BaseCtrl)
+---@class UICommonSelectionItem 
+local UICommonSelectionItem=require("PlatformHall/UICommonSelection/Ctrl/UICommonSelectionItem")
 
 ---构造函数
 function UICommonSelectionCtrl:ctor(ctrlName,param)
@@ -20,13 +22,26 @@ end
 ---初始化
 function UICommonSelectionCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	---@type SubGame
+	self.subGame=args
+	look("self.subGame",self.subGame)
 	self:InitData()
 end
 
 ---初始化数据
 function UICommonSelectionCtrl:InitData()
+	self.objselects={}
+	for i = 1, 4 do
+		self.objselects[i]=ComponentUtilGet.GameObject(self.view.transform,"content/obj/select"..i)
+	end
+	self:InitSelcets()
+end
+
+function UICommonSelectionCtrl:InitSelcets()
 	
 end
+
+
 
 function UICommonSelectionCtrl:Close()
     self.super.Close(self);
@@ -34,7 +49,27 @@ end
 
 ---添加UI事件
 function UICommonSelectionCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_close, function
+	()
+		self:Close()
+	end)
 
+	for i = 1, #self.objselects do
+		self.uiEventListener:AddClick(self.objselects,function ()
+			self:OnClickItem(i);
+		end);
+	end
+end
+
+
+---返回大厅
+function UICommonSelectionCtrl:OnClickReturn(_)
+	local ctrl=CtrlManager.GetCtrl(CtrlNames.UIHallGames);
+	if ctrl then
+		self:Close();
+	else
+		GameCenter.CloseCurGame(true);
+	end
 end
 
 ---移除UI事件
@@ -42,9 +77,9 @@ function UICommonSelectionCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
---region UI事件方法
-
---endregion
+function UICommonSelectionCtrl:OnClickItem(index)
+	self.subGame:SendEnterRoom(index);
+end
 
 
 ---销毁UI

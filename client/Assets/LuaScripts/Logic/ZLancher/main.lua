@@ -4,7 +4,8 @@ require "Logic/ZLancher/HeaderFile"
 require("PlatformHall/MsgPro/pb_PlatformHall")
 require("Logic/Config/HallConfig")
 require("Logic/SubGame/GameCenter")
---require "Debug/EmmyLuaDebugger"
+require("Logic/MainState/MainStateCtrl")
+require "Debug/EmmyLuaDebugger"
 
 main = {}
 

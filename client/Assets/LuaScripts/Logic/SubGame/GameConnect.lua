@@ -20,8 +20,7 @@ end
 
 ---连接验证成功
 function GameConnect:ResChooseGame(msg)
-    
-    --GameCenter.GameServerValidateFinished(reconnected);
+    GameCenter.ResChooseGame(msg);
 end
 
 return GameConnect;
