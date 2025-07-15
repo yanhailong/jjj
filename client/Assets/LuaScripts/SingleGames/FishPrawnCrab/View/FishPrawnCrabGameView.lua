@@ -4,7 +4,8 @@
 ---
 ---@class FishPrawnCrabGameView:BaseView
 local FishPrawnCrabGameView=Class("FishPrawnCrabGameView",BaseView)
-local FishPrawnCrabGameConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabGameConfig")
+local FishPrawnCrabConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabConfig")
+local FishPrawnCrabPlayerItem = require("SingleGames/FishPrawnCrab/View/Item/FishPrawnCrabPlayerItem")
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
@@ -13,6 +14,17 @@ function FishPrawnCrabGameView:InitView()
 	---@type FishPrawnCrabGameCtrl
     self.ctrl=self.ctrl
 	self:InitComponents()
+
+    ---下注底注按钮
+    self:InitChipInfos()
+    ---提示信息
+    self:InitTips()
+    ---结果信息
+    self:InitGameResult()
+    ---所有玩家
+    self:InitPalyers()
+    ---下注区域
+    self:InitBetArea()
 end
 
 ---获取组件
@@ -34,18 +46,83 @@ function FishPrawnCrabGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_close");
+end
 
-    ---下注底注按钮
+---下注底注按钮
+function FishPrawnCrabGameView:InitChipInfos()
     self.chipInfos={}
     for i = 1, 5 do
         local chipItem={}
-        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/antes/"..i)
-        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/antes/"..i)
+        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/stakes/"..i)
+        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/stakes/"..i)
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
         chipItem.effects=ComponentUtilGet.GameObject(chipItem.rectTrans,"checkd")
         chipItem.effects:SetActive(false)
         self.chipInfos[i]=chipItem
     end
+end
+
+---提示信息
+function FishPrawnCrabGameView:InitTips()
+    self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
+    self.tipsStopBetting = ComponentUtilGet.GameObject(self.tipsTrs,"tips_stop_betting")
+    self.tipsStartToBet = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_to_bet")
+    self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
+
+    self.tipsCenterTxt = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/tips_center_txt")
+    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
+    self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
+    self.colockStateTimePrepare=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"prepare") --准备倒计时文字
+    self.colockStateTimeBet=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"bet") --下注倒计时文字
+    self.colockNumTrs=ComponentUtilGet.Transform(self.tipsTrs,"tips_center/count_down")
+    self.colockNumTime=ComponentUtilGet.Text(self.colockNumTrs,"time")
+
+    self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
+end
+
+---所有玩家
+function FishPrawnCrabGameView:InitPalyers()
+    self.AllOtherPlayerHeads = {}
+    local otherPlayerTrs = ComponentUtilGet.Transform(self.transform,"content/obj_PlayerRoot")
+    for i = 1, 6 do
+        self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = FishPrawnCrabPlayerItem.New(otherPlayerTrs:GetChild(i-1))
+    end
+    
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
+    self.selfPlayer = FishPrawnCrabPlayerItem.New(self.selfPlayerRoot)
+end
+
+---下注区域
+function FishPrawnCrabGameView:InitBetArea()
+    self.betAreaRoot = ComponentUtilGet.Transform(self.transform,"content/center/bet")
+    self.clickRect = ComponentUtilGet.Transform(self.transform,"content/clickRect")
+    
+    ---下注金币落点
+    ---@type  TMPro.TextMeshProUGUI[]
+    self.betAreas = {}
+    ---个人下注数量
+    ---@type  TMPro.TextMeshProUGUI[]
+    self.betSelfNumLabels = {}
+    ---所有人总下注数量
+    ---@type  TMPro.TextMeshProUGUI[]
+    self.betTotalNumLabels = {}
+    for i=1,self.clickRect.childCount do
+        self.betAreas[i] = ComponentUtilGet.Transform(self.clickRect:GetChild(i-1),"chips")
+        self.betSelfNumLabels[i] = ComponentUtilGet.TextMeshProUGUI(self.clickRect:GetChild(i-1),"selfBet/num")
+        self.betTotalNumLabels[i] = ComponentUtilGet.TextMeshProUGUI(self.clickRect:GetChild(i-1),"totalBet/num")
+    end
+
+    ---押中高亮
+    self.winHighLights = {}
+    for i=1,self.betAreaRoot.childCount do
+        local trs = self.betAreaRoot:GetChild(i-1)
+        self.winHighLights[i] = ComponentUtilGet.Image(trs,"bg")
+    end
+end
+
+---结果信息
+function FishPrawnCrabGameView:InitGameResult()
+    
 end
 
 ---清空组件
@@ -87,11 +164,11 @@ function FishPrawnCrabGameView:ChangeAnte(index)
     end
 
     -- 如果点击的是当前已选中的按钮，不做任何操作
-    if index == FishPrawnCrabGameConfig.anteIndex and self.chipInfos[index].effects.activeSelf then
+    if index == self.ctrl.betIndex and self.chipInfos[index].effects.activeSelf then
         return
     end
 
-    local oldIndex = FishPrawnCrabGameConfig.anteIndex
+    local oldIndex = self.ctrl.betIndex
     local oldChip = self.chipInfos[oldIndex]
     local newChip = self.chipInfos[index]
 
@@ -122,7 +199,45 @@ function FishPrawnCrabGameView:ChangeAnte(index)
     end
 
     -- 更新配置中的当前选中索引
-    FishPrawnCrabGameConfig.anteIndex = index
+    self.ctrl.betIndex = index
+end
+
+---更新自己信息
+function FishPrawnCrabGameView:UpdateSelf(player)
+    self.selfPlayer:UpdatePlayer(player)
+end
+
+function FishPrawnCrabGameView:UpdateSelfGoldCount()
+    self.selfPlayer:UpdateGoldCount(self.ctrl.goldRealNum)
+end
+
+function FishPrawnCrabGameView:UpdateBetAreaInfo(index)
+    if index > 0 and index <= #self.betSelfNumLabels then
+        self.betSelfNumLabels[index].text = tostring(self.ctrl.selfBets[index])
+        self.betTotalNumLabels[index].text = tostring(self.ctrl.totalBets[index])
+    else
+        for tmpIndex = 1, #self.betSelfNumLabels do
+            self.betSelfNumLabels[tmpIndex].text = tostring(self.ctrl.selfBets[tmpIndex])
+            self.betTotalNumLabels[tmpIndex].text = tostring(self.ctrl.totalBets[tmpIndex])
+        end
+    end
+end
+
+---其他玩家信息更新
+function FishPrawnCrabGameView:UpdatePlayers(players)
+    if players ~=nil and #players>0 then
+        ---玩家排序
+        table.sort(players, function(a, b)
+            return a.coin < b.coin
+        end)
+
+        for i=1,#players do
+            self.AllOtherPlayerHeads[i]:UpdatePlayer(players[i])
+            if i>=#self.AllOtherPlayerHeads then
+                break
+            end
+        end
+    end
 end
 
 return FishPrawnCrabGameView

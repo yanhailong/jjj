@@ -5333,7 +5333,7 @@ GameObject:
   - component: {fileID: 4912656022433234260}
   - component: {fileID: 7561799407319566857}
   m_Layer: 5
-  m_Name: antes
+  m_Name: stakes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

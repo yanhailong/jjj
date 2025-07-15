@@ -4,7 +4,7 @@
 ---
 ---@class FishPrawnCrabGameCtrl:BaseCtrl
 local FishPrawnCrabGameCtrl=Class("FishPrawnCrabGameCtrl",BaseCtrl)
-local FishPrawnCrabGameConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabGameConfig")
+local FishPrawnCrabConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabConfig")
 local Ease = CS.DG.Tweening.Ease
 
 ---构造函数
@@ -27,7 +27,35 @@ end
 
 ---初始化数据
 function FishPrawnCrabGameCtrl:InitData()
-	
+	---当前选中的底注
+	self.betIndex = 1;
+	---当前是否可以下注
+	self.allowBet = true
+	---本局结果
+	self.side = 0
+	self.isouNum = true
+	self.sideArea = {}
+	---本局骰子结果
+	self.resultDices = {0,0,0}
+	---当前总底注
+	self.totalBets = {0,0,0,0,0,0}
+	---当前个人底注
+	self.selfBets = {0,0,0,0,0,0}
+	self.selfBetInfo = {}
+	---玩家真实金币数量
+	self.goldRealNum = 1000000000
+	self.curStatus = FishPrawnCrabConfig.GameState.Bet
+	---当前状态剩余秒数 13
+	self.statusRemainingSeconds = 3
+	---房间总人数
+	self.totalPlayerNum = 66
+
+	---复投
+	self.lastBetInfo = {}
+	---本局是否使用了复投
+	self.isRepeatBet = false
+	---本局下注数据
+	self.allBetData = {}
 end
 
 ---刷新菜单显示隐藏
@@ -71,12 +99,18 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 	---压注按钮
 	for i=1,#self.view.chipInfos do
 		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()
-			if FishPrawnCrabGameConfig.allowBet then
+			if self.allowBet then
 				self.view:ChangeAnte(i)
 				--look("btn 抵住数值"..FishPrawnCrabGameConfig.dizhuNumArr[FishPrawnCrabGameConfig.anteIndex])
 				---测试数据生成 龙虎和 对应前三个币
 				--GlobalEvent.Notify("UPDATE_HIS_ITEMS",i)
 			end
+		end)
+	end
+	---下注区域
+	for i=1,self.view.clickRect.childCount do
+		self.uiEventListener:AddClick(self.view.clickRect:GetChild(i-1),function()
+			self:OnClickCenterBetArea(i)
 		end)
 	end
 end
@@ -94,6 +128,34 @@ end
 ---销毁UI
 function FishPrawnCrabGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+end
+
+---中心下注区域
+function FishPrawnCrabGameCtrl:OnClickCenterBetArea(areaIndex)
+	look("点击了下注区域：" .. areaIndex)
+	if self.allowBet == false or self.curStatus ~= FishPrawnCrabConfig.GameState.Bet 
+			or FishPrawnCrabConfig.betValuesArr[self.betIndex] > self.goldRealNum then
+		return
+	end
+
+	local data = {area = areaIndex, 
+				  chip = self.betIndex}
+	self:OnSelfBet(data)
+	--self.view:PayXiaZhuCoinFly(side)
+
+	--self.view:UpdateDiZhuBtnState()
+	self.view:UpdateSelfGoldCount()
+end
+
+function FishPrawnCrabGameCtrl:OnSelfBet(data)
+	local areaIndex = data.area
+	local betMoney = FishPrawnCrabConfig.betValuesArr[data.chip]
+	self.selfBets[areaIndex] = self.selfBets[areaIndex] + betMoney
+	self.totalBets[areaIndex] = self.totalBets[areaIndex] + betMoney
+	self.goldRealNum = self.goldRealNum - betMoney
+	table.insert(self.selfBetInfo, data)
+	
+	self.view:UpdateBetAreaInfo(data.area)
 end
 
 return FishPrawnCrabGameCtrl
