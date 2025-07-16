@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
+  m_Name: chezhengmian_Atlas
+  m_EditorClassIdentifier: 
+  textureLoadingMode: 0
+  onDemandTextureLoader: {fileID: 0}
+  atlasFile: {fileID: 4900000, guid: 7e27491b20b94d145930513de1ee4f95, type: 3}
+  materials:
+  - {fileID: 2100000, guid: 4c1c110a715f15b4990a6c1012705b98, type: 2}
+  - {fileID: 2100000, guid: 17740b275494fdf4b82cb6f138583cb5, type: 2}
+  - {fileID: 2100000, guid: 4dca0224192c397428abddc674f4a904, type: 2}
+  - {fileID: 2100000, guid: a4b7bc8e02204e94ca0935ef35da9c77, type: 2}
+  - {fileID: 2100000, guid: b37527f1688afec4a80451b9d329bb18, type: 2}
+  - {fileID: 2100000, guid: 96e4153168d56c043b2497912e3411ed, type: 2}
