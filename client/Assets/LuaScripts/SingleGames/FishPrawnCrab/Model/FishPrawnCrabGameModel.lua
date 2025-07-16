@@ -4,10 +4,7 @@
 ---
 ---@class FishPrawnCrabGameModel:BaseModel
 local FishPrawnCrabGameModel=Class("FishPrawnCrabGameModel",BaseModel)
-
-local GameEventName = {
-	UPDATE_PLAYER = "UPDATE_PLAYER",
-}
+local FishPrawnCrabConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabConfig")
 
 function FishPrawnCrabGameModel:Awake()
 	self.super.Awake(self);
@@ -20,7 +17,8 @@ function FishPrawnCrabGameModel:Close()
 end
 
 function FishPrawnCrabGameModel:AddEvent()
-	GlobalEvent.AddListener(GameEventName.UPDATE_PLAYER,self.OnPlayerMsg,self)
+	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.UPDATE_PLAYER,self.OnPlayerMsg,self)
+	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.UPDATE_GAME_STATUS,self.OnGameStatusMsg,self)
 end
 
 function FishPrawnCrabGameModel:RemoveEvent()
@@ -35,6 +33,18 @@ function FishPrawnCrabGameModel:OnPlayerMsg()
 		self.players[i] = {id=i,name="role"..i,coin=Tools.RandomInt(1,100000000)}
 	end
 	self.ctrl.view:UpdatePlayers(self.players)
+end
+
+---更新游戏状态
+function FishPrawnCrabGameModel:OnGameStatusMsg(message)
+	look("FishPrawnCrabGameModel:UpdateGameStatus" .. message.status)
+	if message.status == FishPrawnCrabConfig.GameState.Prepare then
+		self.ctrl:SwitchToPrepareState(message)
+	elseif message.status == FishPrawnCrabConfig.GameState.Bet then
+		self.ctrl:SwitchToBetState(message)
+	elseif message.status == FishPrawnCrabConfig.GameState.Settlement then
+		self.ctrl:SwitchToSettlementState(message)
+	end
 end
 
 --region 事件方法

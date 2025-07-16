@@ -7,6 +7,19 @@
 local FishPrawnCrabConfig = Class("FishPrawnCrabConfig")
 local this = FishPrawnCrabConfig;
 
+---游戏事件名
+this.GameEventName = {
+    UPDATE_PLAYER = "UPDATE_PLAYER",
+    UPDATE_GAME_STATUS = "UPDATE_GAME_STATUS",
+    REQUEST_BET = "REQUEST_BET",
+    RES_BET_RESULT = "RES_BET_RESULT",
+    UPDATE_GAME_INFO = "UPDATE_GAME_INFO",
+    GAME_SETTLEMENT = "GAME_SETTLEMENT",
+    SELF_SETTLEMENT = "SELF_SETTLEMENT",
+    START_SIMULATION_SERVER = "START_SIMULATION_SERVER",
+    STOP_SIMULATION_SERVER = "STOP_SIMULATION_SERVER",
+}
+
 ---游戏阶段
 this.GameState = {
     Prepare = 1,    --准备阶段

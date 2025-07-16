@@ -11,7 +11,7 @@ local Vector3 = CS.UnityEngine.Vector3
 
 function FishPrawnCrabPlayerItem:ctor(go)
     self.gameObject = go
-    self.transform=self.gameObject.transform
+    self.transform = self.gameObject.transform
     self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
     self.headIcon = ComponentUtilGet.Image(self.transform,"HeadPic/Head")
     self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"Money/GoldNumber")
@@ -54,6 +54,12 @@ function FishPrawnCrabPlayerItem:UpdatePlayer(player)
     self.goldCount.text = player.coin
     self.player = player
     self.id = player.id
+end
+
+function FishPrawnCrabPlayerItem:SetActive(active)
+    if self.gameObject ~= nil then
+        self.gameObject:SetActive(active)
+    end
 end
 
 return FishPrawnCrabPlayerItem
