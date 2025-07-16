@@ -4,7 +4,7 @@
 ---
 ---@class USDollarExpressMainCtrl:BaseCtrl
 local USDollarExpressMainCtrl=Class("USDollarExpressMainCtrl",BaseCtrl)
----@type GameTemp1Config
+---@type USDollarExpressConfig
 local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 ---@type USDollarExpressSlotItem
 local SlotItem=require"SingleGames/USDollarExpress/Ctrl/USDollarExpressSlotItem"
@@ -86,6 +86,7 @@ function USDollarExpressMainCtrl:InitData()
 		self.curRollData[i]=0	
 	end
 	
+	
 end
 -- 初始化第一批展示用的SlotPics
 function USDollarExpressMainCtrl:InitFirstSlotPics()
@@ -117,7 +118,7 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			local numFF=6;
 			if(j<=5 and j>1) then
 				numFF=numFF-j
-				local index = (numFF-1)*5 + i  -- 计算原始索引
+				local index = (i-1)*4+numFF  -- 计算原始索引
 				self.showChildsList[index] = iconItem
 				texId=curInitGrid[self.curIndex][numFF]
 			end
@@ -131,6 +132,41 @@ function USDollarExpressMainCtrl:InitFirstSlotPics()
 			table.insert(self.childsList[i], iconItem)
 			
 		end
+	end
+	look("self.showChildsList",#self.showChildsList)
+	CorManager.StartCor(self, function
+	()
+		coroutine.wait(0.1)
+		self:InitSmallKuang()
+		self:InitBigKuang()
+	end)
+end
+
+function USDollarExpressMainCtrl:InitSmallKuang()
+	self.awardSmallKuangEffects={}
+	for i = 1, #self.showChildsList do
+		local iconEffect= self.objPools:SpawnPrefab(nil, config.ABNames.smallKuang,"effect_biankuang_small_liuguang", self.view.rootEffects)
+		iconEffect.transform.position=self.showChildsList[i]:GetPosition()
+		self.awardSmallKuangEffects[i]=iconEffect
+		Tools.SetActive(self.awardSmallKuangEffects[i],false)
+	end
+end
+
+function USDollarExpressMainCtrl:InitBigKuang()
+	self.bigKuangEffects={}
+	for i = 1, 5 do
+		self.bigKuangEffects[i]=ComponentUtilGet.GameObject(self.view.transform,"content/effects/effect_biankuang_su_liuguang"..i)
+	end
+end
+---特殊模式展示大框
+function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
+	for i = 1, 5 do
+		if wheelId==i then
+			Tools.SetActive(self.bigKuangEffects[i],true)
+		else
+			Tools.SetActive(self.bigKuangEffects[i],false)
+		end
+		
 	end
 end
 
@@ -185,6 +221,7 @@ function USDollarExpressMainCtrl:ReSetData()
 	for i = 1, 20 do
 		self.showChildsList[i]:SetIsAward(false)
 	end
+	self:HideAllAwardSmallKuangEffects()
 
 	self.curRollData={}
 	for i = 1, 5 do
@@ -378,12 +415,6 @@ function USDollarExpressMainCtrl:ShowResoult()
 	end)
 end
 
-function USDollarExpressMainCtrl:TestEffect()
-	for i = 1, 20 do
-		self.showChildsList[i]:SetIsAward(true)
-	end
-end
-
 function USDollarExpressMainCtrl:ShowAwardEffect()
 	local allWinGold=self.model.allWinGold
 	local resultLineInfoList=self.model.resultLineInfoList
@@ -417,6 +448,7 @@ function USDollarExpressMainCtrl:ShowCirculationLinesAnim()
 					self:SetIconEffect(lineInfo)
 				end
 			else
+				self:HideAllAwardSmallKuangEffects()
 				local lineInfo=lineList[showXianindex]
 				self:SetIconEffect(lineInfo)
 			end
@@ -428,19 +460,26 @@ end
 
 
 function USDollarExpressMainCtrl:SetIconEffect(lineInfo)
-	local awardPos=lineInfo.indexList
+	local awardPos=lineInfo.iconIndexs
+	look("awardPos",awardPos)
 	for i=1,#awardPos do
 		---@type USDollarExpressSlotItem
-		local item=self.showChildsList[awardPos[i]+1]
+		local item=self.showChildsList[awardPos[i]]
 		if item then
 			item:SetIsAward(true)
+			Tools.SetActive(self.awardSmallKuangEffects[awardPos[i]],true)
 		else
-			logError("图标不存在"..awardPos[i]+1)
+			logError("图标不存在"..awardPos[i])
 		end
 	end
-	
 end
 
+function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
+	local nums=#self.awardSmallKuangEffects
+	for i = 1, nums do
+		Tools.SetActive(self.awardSmallKuangEffects[i],false)
+	end
+end
 
 function USDollarExpressMainCtrl:EnterSmallGame()
 	logError("进入拉火车小游戏")

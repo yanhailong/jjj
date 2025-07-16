@@ -167,7 +167,6 @@ end
 
 ---游戏状态改变
 function UICommonSlotBtnsCtrl:GameStateChange(gameState)
-	logError("gameState:"..gameState)
 	self:SetGameState(gameState)
 end
 

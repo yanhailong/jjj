@@ -66,12 +66,13 @@ message ResStartGame {
   repeated TrainInfo trainInfoList = 6;  //火车信息
   DollarsInfo dollarsInfo = 7;  //美元信息
   int32 totalDollars = 8;  //累计的美元数量，进度条
+  int32 remainFreeCount = 9;  //剩余免费次数
 }
 
 //每条中奖线信息
 message ResultLineInfo {
   int32 id = 1;  //中奖线id
-  int32 sameCount = 2;  //这条线上中奖图标的坐标
+  repeated int32 iconIndexs = 2;  //这条线上中奖图标的坐标
   int32 times = 3;  //倍率
   int64 winGold = 4;  //中奖金币
 }
