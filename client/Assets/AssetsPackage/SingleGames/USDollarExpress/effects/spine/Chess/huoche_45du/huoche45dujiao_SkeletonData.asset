@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
+  m_Name: huoche45dujiao_SkeletonData
+  m_EditorClassIdentifier: 
+  atlasAssets:
+  - {fileID: 11400000, guid: 6d205ec04e9566045ba1fd8382df5900, type: 2}
+  scale: 0.01
+  skeletonJSON: {fileID: 4900000, guid: e8ddf7c8df2cf934a9d11c62f7cd9af1, type: 3}
+  isUpgradingBlendModeMaterials: 0
+  blendModeMaterials:
+    requiresBlendModeMaterials: 1
+    applyAdditiveMaterial: 1
+    additiveMaterials:
+    - pageName: huoche45dujiao.png
+      material: {fileID: 2100000, guid: b81a4be03415cf14ea2e79f816102503, type: 2}
+    - pageName: huoche45dujiao_2.png
+      material: {fileID: 2100000, guid: a31ee42f361e9fc49ade94865cd83cbe, type: 2}
+    multiplyMaterials: []
+    screenMaterials: []
+  skeletonDataModifiers: []
+  fromAnimation: []
+  toAnimation: []
+  duration: []
+  defaultMix: 0.2
+  controller: {fileID: 9100000, guid: 3eb4b7f5626dd6b408ac78322276143d, type: 2}

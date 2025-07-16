@@ -25,6 +25,7 @@ this.TrainColorType={
     RedTrain=13,--红车
     GoldTrain=14,--金车
 }
+this.gameTypeState=0--游戏玩法状态
 
 this.trainAssetName={
     [1]="chexiang_group_01",
@@ -59,7 +60,9 @@ this.ABNames={
         [this.TrainColorType.RedTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/red",
         [this.TrainColorType.GoldTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/yellow",
     },
-    iconEffect="SingleGames/USDollarExpress/effects/prefab"
+    iconEffect="SingleGames/USDollarExpress/effects/prefab",
+    smallKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_small_liuguang",
+    bigKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_su_liuguang",
 }
 
 
@@ -97,22 +100,22 @@ this.iconEffect={
     [4]="Eff_Chess_Q",
     [5]="Eff_Chess_K",
     [6]="Eff_Chess_A",
-    [7]="Eff_Chess_9",
-    [8]="Eff_Chess_9",
-    [9]="Eff_Chess_9",
-    [10]="Eff_Chess_9",
-    [11]="Eff_Chess_9",
-    [12]="Eff_Chess_9",
-    [13]="Eff_Chess_9",
-    [14]="Eff_Chess_9",
-    [15]="Eff_Chess_9",
+    [7]="Eff_Chess_toukui",
+    [8]="Eff_Chess_chuizi",
+    [9]="Eff_Chess_dog",
+    [10]="Eff_Chess_woman",
+    [11]="Eff_Chess_man",
+    [12]="Eff_Chess_huoche_zhengmian_red",
+    [13]="Eff_Chess_huoche_zhengmian_violet",
+    [14]="Eff_Chess_huoche_zhengmian_blue",
+    [15]="Eff_Chess_huoche_zhengmian_green",
     [16]="Eff_Chess_wild",
     [17]="Eff_Chess_wild2x",
     [18]="Eff_Chess_wild5x",
-    [19]="Eff_Chess_jinbi_$",
+    [19]="Eff_Chess_glod",
     [20]="Eff_Chess_jinbi_$",
-    [21]="Eff_Chess_9",
-    [22]="Eff_Chess_9",
+    [21]="Eff_Chess_huoche_45du",
+    [22]="Eff_Chess_kuangche",
 }
 
 

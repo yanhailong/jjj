@@ -47,15 +47,31 @@ function BaccaratItemScripts:InitDataShow(index,data)
     self.BaccaratTableSummary = data;
     self.CurGamePhase = data.eGamePhase;
     self.txt_ClassicNumber.text = string.format("%02d",index);
+    for _, v in ipairs(data.winStateList) do
+        if(v == 1) then 
+            self.BankerWinNum = self.BankerWinNum+1
+        elseif(v==2) then
+            self.PlayerWinNum = self.PlayerWinNum+1
+        elseif(v==3) then
+            self.TieWinNum = self.TieWinNum+1
+        end
+    end
     self:RefreshUIShow(data)
     self.BaccaratRoadScripts:InitData(data);
 end
 ---刷新单个数据显示
 function BaccaratItemScripts:RefreshDataShow(data)
     self.CurGamePhase = data.eGamePhase;
-    self:RefreshUIShow(data)
     table.insert( self.BaccaratTableSummary.winStateList,data.winState)
     table.insert( self.BaccaratTableSummary.cardTypeWinStateList,data.cardTypeWinState)
+    if(data.winState== 1) then
+        self.BankerWinNum = self.BankerWinNum+1
+    elseif(data.winState==2) then
+        self.PlayerWinNum = self.PlayerWinNum+1
+    elseif(data.winState==3) then
+        self.TieWinNum = self.TieWinNum+1
+    end
+    self:RefreshUIShow(data)
     self.BaccaratRoadScripts:RefreshData(data,false)
 end
 ---刷新UI显示显示
@@ -66,6 +82,9 @@ function BaccaratItemScripts:RefreshUIShow(data)
     elseif data.eGamePhase == 4 then -- 结算中
         self.tmp_Stage.text = LocalManager.GetStrById(200500003)
     end
+    self.tmp_ZNum.text = self.BankerWinNum;
+    self.tmp_XNum.text = self.PlayerWinNum;
+    self.tmp_HNum.text = self.TieWinNum;
     self.slider_CountdownTime.maxValue = data.phaseTotalTime
     self.CountdownTime = data.phaseRemainingTime;
     self.slider_CountdownTime.value = self.CountdownTime;
@@ -90,7 +109,7 @@ function BaccaratItemScripts:Update()
 end
 
 function BaccaratItemScripts:Destroy()
-   UpdateManager.ReMoveAllUpdate(self)
+    UpdateManager.ReMoveAllUpdate(self) 
     self.BaccaratRoadScripts:Destroy()
 end
 

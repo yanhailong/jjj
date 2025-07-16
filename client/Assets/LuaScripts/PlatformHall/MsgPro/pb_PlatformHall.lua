@@ -17,10 +17,12 @@ pb_PlatformHall.ReqGm = 16385
 pb_PlatformHall.ResGm = 16386
 --- 响应,msgID=0x4099,desc=推送金钱变化
 pb_PlatformHall.NoticeMoneyChange = 16537
---- 请求,msgID=0x5001,desc=退出游戏请求
-pb_PlatformHall.ReqExitGame = 20481
---- 响应,msgID=0x5002,desc=退出游戏
-pb_PlatformHall.ResExitGame = 20482
+--- 请求,msgID=0x5001,desc=gm请求刷新服务器状态
+pb_PlatformHall.ReqRefreshGameStatus = 20481
+--- 请求,msgID=0x5002,desc=退出游戏请求
+pb_PlatformHall.ReqExitGame = 20482
+--- 响应,msgID=0x5003,desc=退出游戏
+pb_PlatformHall.ResExitGame = 20483
 --- 请求,msgID=0x6003,desc=请求进入游戏
 pb_PlatformHall.ReqChooseGame = 24579
 --- 响应,msgID=0x6004,desc=进入游戏返回
@@ -39,8 +41,9 @@ PbMsg[12290] = 'ResLogin'
 PbMsg[16385] = 'ReqGm'
 PbMsg[16386] = 'ResGm'
 PbMsg[16537] = 'NoticeMoneyChange'
-PbMsg[20481] = 'ReqExitGame'
-PbMsg[20482] = 'ResExitGame'
+PbMsg[20481] = 'ReqRefreshGameStatus'
+PbMsg[20482] = 'ReqExitGame'
+PbMsg[20483] = 'ResExitGame'
 PbMsg[24579] = 'ReqChooseGame'
 PbMsg[24580] = 'ResChooseGame'
 PbMsg[24581] = 'ReqChooseWare'

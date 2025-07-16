@@ -49,6 +49,14 @@ function this.InitCardPic()
         this.card_Pics[pic.name]=pic;
     end
 end
+
+function this.InitUIImageGray()
+    this.material = resMgr:LoadAsset("Common/Material/UIImageGray",typeof(UnityEngine.Material))
+end
+
+function this.GetUIImageGray()
+    return this.material;
+end
 ---通过资源名获取Sprite
 function this.GetIconPic(iconName)
     return this.icon_Pics[iconName];

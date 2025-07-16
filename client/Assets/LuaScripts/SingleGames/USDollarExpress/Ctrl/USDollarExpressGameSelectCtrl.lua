@@ -34,7 +34,14 @@ end
 
 ---添加UI事件
 function USDollarExpressGameSelectCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.btn_SelectTrain, function
+	()
+		self.model:ReqChooseFreeModel(3)
+	end)
+	self.uiEventListener:AddClick(self.view.btn_SelectFree, function
+	()
+		self.model:ReqChooseFreeModel(5)
+	end)
 end
 
 ---移除UI事件
