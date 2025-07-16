@@ -21,8 +21,18 @@ end
 function UICommonSlotBtnsCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	self.stakeList=args
+	self.defaultBet=args.defaultBet
+	self.stakeList=args.stakeList
+	self:GetChipIndexByValue(self.defaultBet)
 	self:InitPlayerInfos(self.stakeList)
+end
+
+function UICommonSlotBtnsCtrl:GetChipIndexByValue(value)
+	for i = 1, #self.stakeList do
+		if value==self.stakeList[i] then
+			self.betIndex=i
+		end
+	end
 end
 
 ---初始化数据
@@ -51,7 +61,7 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 		self.spinArgs.betInfo=self.stakeList[self.betIndex]
 		self.spinArgs.isAuto=false
 		self.spinArgs.autoNum=0
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,args)
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
 	end)
 	self.uiEventListener:AddLongPress(self.view.btn_start.gameObject, function()
 		self.isLongPress=true

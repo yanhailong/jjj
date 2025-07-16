@@ -50,14 +50,20 @@ message ResGm {
   string result = 2;
 }
 
-//请求,msgID=0x5001,desc=退出游戏请求
-message ReqExitGame {
+//请求,msgID=0x5001,desc=gm请求刷新服务器状态
+message ReqRefreshGameStatus {
   enum E_MsgID {def = 0; msgID = 20481;};
+  string cmdParam = 1;  //请求参数（存日志）
 }
 
-//响应,msgID=0x5002,desc=退出游戏
-message ResExitGame {
+//请求,msgID=0x5002,desc=退出游戏请求
+message ReqExitGame {
   enum E_MsgID {def = 0; msgID = 20482;};
+}
+
+//响应,msgID=0x5003,desc=退出游戏
+message ResExitGame {
+  enum E_MsgID {def = 0; msgID = 20483;};
   int32 code = 1;  //状态码
 }
 

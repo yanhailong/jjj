@@ -9,7 +9,6 @@ function USDollarExpress:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function USDollarExpress:Init()
-    logError("初始化PB")
     require("SingleGames/USDollarExpress/MsgPro/pb_USDollarExpress")
 end
 

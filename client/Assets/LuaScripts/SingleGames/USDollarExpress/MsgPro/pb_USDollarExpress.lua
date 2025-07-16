@@ -13,8 +13,10 @@ pb_USDollarExpress.ResInvestArea = 28676
 pb_USDollarExpress.ReqStartGame = 28677
 --- 响应,msgID=0x7006,desc=开始游戏结果返回
 pb_USDollarExpress.ResStartGame = 28678
---- NoticeConfigInfo
-pb_USDollarExpress.NoticeConfigInfo = 28825
+--- 请求,msgID=0x7007,desc=请求配置信息
+pb_USDollarExpress.ReqConfigInfo = 28679
+--- 响应,msgID=0x7008,desc=请求配置信息
+pb_USDollarExpress.ResConfigInfo = 28680
 
 
 PbMsg[28673] = 'ReqChooseFreeModel'
@@ -23,6 +25,7 @@ PbMsg[28675] = 'ReqInvestArea'
 PbMsg[28676] = 'ResInvestArea'
 PbMsg[28677] = 'ReqStartGame'
 PbMsg[28678] = 'ResStartGame'
-PbMsg[28825] = 'NoticeConfigInfo'
+PbMsg[28679] = 'ReqConfigInfo'
+PbMsg[28680] = 'ResConfigInfo'
 
 PBHelper.LoadPB('SingleGames/USDollarExpress/Protol','dollarexpress')

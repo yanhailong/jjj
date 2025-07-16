@@ -27,31 +27,19 @@ end
 ---初始化
 function USDollarExpressMainCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self.model:ReqConfigInfo()
 	self:InitData()
 	config.InitIconPic()--初始化icon图片
 	self:InitFirstSlotPics()
-	self.stakeList =
-	{
-		[1] = 100,
-		[2] = 200,
-		[3] = 300,
-		[4] = 400,
-		[5] = 500,
-		[6] = 1000,
-		[7] = 1500,
-		[8] = 2000,
-		[9] = 2500,
-		[10] = 5000,
-	}
+end
+
+function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 	---@type UICommonSlotBtnsCtrl
-	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,self.stakeList)
+	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,betInfos)
 	---@type UICommonSlotTopCtrl
 	self.topCtrl=CtrlManager.SingleShow(CtrlNames.UICommonSlotTop)
-	
-	--require("SingleGames/USDollarExpress/test/MVCHead")
-	--CtrlManager.SingleShow(CtrlNames.USDollarExpressMapSelect)
-	
 end
+
 
 function USDollarExpressMainCtrl:InitRollData()
 	self.rollData={}
@@ -397,14 +385,11 @@ function USDollarExpressMainCtrl:TestEffect()
 end
 
 function USDollarExpressMainCtrl:ShowAwardEffect()
-	self:TestEffect()
 	local allWinGold=self.model.allWinGold
 	local resultLineInfoList=self.model.resultLineInfoList
 	local specialType=self.model.specialType
-	local totalAwardLineCount=0 --中奖总线
-
-	if allWinGold>=0 then
-		totalAwardLineCount=#resultLineInfoList--总中奖线
+	local totalAwardLineCount=#resultLineInfoList --中奖总线
+	if totalAwardLineCount>=0 then
 		self:ShowCirculationLinesAnim()
 		config.showStep=config.showStep+1
 	else

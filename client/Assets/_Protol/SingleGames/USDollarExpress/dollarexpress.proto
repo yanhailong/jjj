@@ -1,13 +1,20 @@
-syntax = "proto3";//响应,msgID=0x7099,desc=推送配置信息
-message NoticeConfigInfo {
-  enum E_MsgID {def = 0; msgID = 28825;};
-  repeated int32 stakeList = 1;
+syntax = "proto3";//美元信息
+message DollarsInfo {
+  int32 coinIndexId = 1;  //美元符号图标坐标，如果有正确坐标，则说明触发了美元现金奖励
+  repeated int32 dollarIndexIds = 2;  //钞票坐标
+  repeated int64 dollarValueList = 3;  //钞票金额
+  int32 goldTrainCount = 4;  //黄金列车车厢节数
 }
 
 //请求,msgID=0x7001,desc=请求选择免费模式的游戏
 message ReqChooseFreeModel {
   enum E_MsgID {def = 0; msgID = 28673;};
-  int32 type = 1;  //选择类型 1.火车   2.免费游戏
+  int32 status = 1;  //选择类型  3.普通火车  4.黄金火车   5.免费游戏
+}
+
+//请求,msgID=0x7007,desc=请求配置信息
+message ReqConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28679;};
 }
 
 //请求,msgID=0x7003,desc=选择投资地区
@@ -28,7 +35,14 @@ message ReqStartGame {
 message ResChooseFreeModel {
   enum E_MsgID {def = 0; msgID = 28674;};
   int32 code = 1;  //状态码
-  TrainInfo trainInfo = 2;  //火车模式
+}
+
+//响应,msgID=0x7008,desc=请求配置信息
+message ResConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28680;};
+  int32 code = 1;  //状态码
+  repeated int32 stakeList = 2;  //押注列表
+  int32 defaultBet = 3;  //默认押注
 }
 
 //响应,msgID=0x7004,desc=选择投资地区返回
@@ -48,23 +62,24 @@ message ResStartGame {
   repeated int32 iconList = 2;  //图标id列表
   repeated ResultLineInfo resultLineInfoList = 3;  //中奖信息
   int64 allWinGold = 4;  //累计中奖金币
-  int32 specialType = 5;  //特殊游戏id
-  int32 freeCount = 6;  //免费次数
-  bool goldTrainInFree = 7;  //免费游戏中是否触发了金火车
-  repeated TrainInfo trainInfoList = 8;  //火车模式
+  int32 status = 5;  //当前状态 0.正常  1.普通二选一  2.黄金列车二选一  3.二选一之拉普通火车  4.二选一之拉黄金火车  5.二选一之免费模式
+  repeated TrainInfo trainInfoList = 6;  //火车信息
+  DollarsInfo dollarsInfo = 7;  //美元信息
+  int32 totalDollars = 8;  //累计的美元数量，进度条
 }
 
 //每条中奖线信息
 message ResultLineInfo {
   int32 id = 1;  //中奖线id
-  repeated int32 indexList = 2;  //这条线上中奖图标的坐标
+  int32 sameCount = 2;  //这条线上中奖图标的坐标
   int32 times = 3;  //倍率
   int64 winGold = 4;  //中奖金币
 }
 
 //火车信息
 message TrainInfo {
-  int32 type = 1;  //火车类型
+  int32 type = 1;  //火车类型(iconId)  19.绿火车 20.蓝火车  21.紫火车  22.红火车
   repeated int64 goldList = 2;  //中奖金额列表
+  bool pool = 3;  //奖池
 }
 
