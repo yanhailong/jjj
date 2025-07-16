@@ -75,9 +75,18 @@ local RoundNumber;
 local BetRecord={};
 ---当前下注
 local CurBet={};
+--region spine动画
 local vsSpine;
 local BeginBetSpine;
 local StopBetSpine;
+local ResultTieSpine;
+local ResultBankerSpine;
+local ResultPlayerSpine;
+local PlayerKingSpine;
+local BankerKingSpine;
+--endregion
+---筹码按钮所有子物体的Image集合
+local BottomNoteChildImages={};
 
 ---构造函数
 function BaccaratGameCtrl:ctor(ctrlName,param)
@@ -98,6 +107,7 @@ function BaccaratGameCtrl:CtrlInit(args)
 	self.objPools=ObjectPoolUtil.New()
 	config.InitIconPic();
 	config.InitCardPic();
+	config.InitUIImageGray();
 	CurSelectChip = 0;
 	self:InitDataShow()
 	self:InitZhuPanTable()
@@ -116,9 +126,17 @@ function BaccaratGameCtrl:InitDataShow()
 	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform);
 	BeginBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BeginBet.transform);
 	StopBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_StopBet.transform);
+	ResultTieSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_HeWin.transform);
+	ResultBankerSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_ZWin.transform);
+	ResultPlayerSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_XWin.transform);
+	PlayerKingSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_PlayerKing.transform);
+	BankerKingSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BankerKing.transform);
+	BottomNoteChildImages = self.view.obj_BottomNote:GetComponentsInChildren(UnityEngine.UI.Image,true)
+	
 	---@type BaccaratRoad
 	self.BaccaratRoadScripts =BaccaratRoad.New()
-	self.BaccaratRoadScripts:Init(self.view.obj_ZhuPanContent,self.view.obj_DaLuContent,self.view.obj_DaluZiluContent,self.view.obj_XiaoLuContent,self.view.obj_YueYouLuContent);
+	self.BaccaratRoadScripts:Init(self.view.obj_ZhuPanContent,self.view.obj_DaLuContent,
+			self.view.obj_DaluZiluContent,self.view.obj_XiaoLuContent,self.view.obj_YueYouLuContent);
 end
 
 ---初始化数据
@@ -182,11 +200,14 @@ function BaccaratGameCtrl:InitData()
 	
 	self.beginTimer = TimerManager.CreateTimer(self,function()
 		self.view.obj_BeginBet:SetActive(false);
+		self.view.obj_Countdown:SetActive(true);
+		self.betCountDownTimer:Start();
+		self:SetBetButtonInteractable(true);
 	end,1,1,true);
 
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
-		self.view.tmp_Countdown.text = countDownTime;
+		self.view.txt_Countdown.text = countDownTime;
 		if(countDownTime<=0) then
 			curGameStage =gameStage.Settlement;
 			self:RefreshGameStage();
@@ -236,22 +257,40 @@ function BaccaratGameCtrl:EnterBegin()
 end
 ---进入下注阶段
 function BaccaratGameCtrl:EnterBetGame()
-	self.view.tmp_Countdown.text = countDownTime;
-	self:SetBetButtonInteractable(true);
-	self.view.obj_Countdown:SetActive(true);
+	self.view.txt_Countdown.text = countDownTime;
 	self.view.obj_BeginBet:SetActive(true);
 	Tools.PlayerSpineAniByName(BeginBetSpine,"action",false)
 	self.beginTimer:Start();
-	self.betCountDownTimer:Start();
+
 end
 
 ---设置按钮的显示状态
 function BaccaratGameCtrl:SetBetButtonInteractable(state)
-	self.view.btn_One.interactable = state;
-	self.view.btn_Ten.interactable = state;
-	self.view.btn_Fifty.interactable = state;
-	self.view.btn_OneHundred.interactable = state;
-	self.view.btn_FiveHundred.interactable = state;
+	self.view.btn_One.enabled = state;
+	self.view.btn_Ten.enabled = state;
+	self.view.btn_Fifty.enabled = state;
+	self.view.btn_OneHundred.enabled = state;
+	self.view.btn_FiveHundred.enabled = state;
+	for _, v in pairs(BottomNoteChildImages) do
+		if state then
+			v.material = nil;
+		else
+			v.material = config.GetUIImageGray();
+		end
+	end
+	--if state then
+	--	self.view.btn_One.image.material = nil;
+	--	self.view.btn_Ten.image.material = nil;
+	--	self.view.btn_Fifty.image.material = nil;
+	--	self.view.btn_OneHundred.image.material = nil;
+	--	self.view.btn_FiveHundred.image.material = nil;
+	--else
+	--	self.view.btn_One.image.material = config.GetUIImageGray();
+	--	self.view.btn_Ten.image.material = config.GetUIImageGray();
+	--	self.view.btn_Fifty.image.material = config.GetUIImageGray();
+	--	self.view.btn_OneHundred.image.material = config.GetUIImageGray();
+	--	self.view.btn_FiveHundred.image.material = config.GetUIImageGray();
+	--end
 end
 
 function BaccaratGameCtrl:GetCardNum()
@@ -289,6 +328,9 @@ function BaccaratGameCtrl:EnterSettlement()
 		local playerCardNum = self:GetCardEndPoint(playerCard1 + playerCard2);
 		local playerIsKing =playerCardNum == 8 or playerCardNum == 9;
 		self.view.obj_PlayerKing:SetActive(playerIsKing)
+		if(playerIsKing) then
+			tools.PlayerSpineAniByName(PlayerKingSpine,"action",false);
+		end
 		coroutine.wait(0.75)
 		local BankerCard1 =  self:GetCardNum();
 		ComponentUtilGet.Image(self.view.ator_BankerCard1.transform,"CardImage").sprite = config.GetCardPic("card_"..BankerCard1);
@@ -303,6 +345,9 @@ function BaccaratGameCtrl:EnterSettlement()
 		local BankerCardNum = self:GetCardEndPoint(BankerCard1 + BankerCard2);
 		local BankerIsKing = BankerCardNum == 8 or BankerCardNum == 9;
 		self.view.obj_BankerKing:SetActive(BankerIsKing)
+		if(BankerIsKing) then
+			tools.PlayerSpineAniByName(BankerKingSpine,"action",false);
+		end
 		if(playerIsKing or BankerIsKing) then
 			KingNumber=KingNumber+1;
 		end
@@ -342,6 +387,13 @@ function BaccaratGameCtrl:SettleAccounts(playerCardNum,BankerCardNum)
 	self.view.obj_HeWin:SetActive(playerCardNum == BankerCardNum);
 	self.view.obj_ZWin:SetActive(BankerCardNum>playerCardNum);
 	self.view.obj_XWin:SetActive(playerCardNum>BankerCardNum);
+	if(playerCardNum == BankerCardNum) then
+		Tools.PlayerSpineAniByName(ResultTieSpine,"action",false)
+	elseif(BankerCardNum>playerCardNum) then
+		Tools.PlayerSpineAniByName(ResultBankerSpine,"action",false)
+	elseif(playerCardNum>BankerCardNum) then
+		Tools.PlayerSpineAniByName(ResultPlayerSpine,"action",false)
+	end
 	self:Flicker(playerCardNum,BankerCardNum);
 	coroutine.wait(3);
 	for _, v in ipairs(ChipTable)  do
@@ -603,6 +655,7 @@ function BaccaratGameCtrl:RealCloseDestroy()
 		self.PlayChipToPlayerSequence:Kill();
 	end
 	self.objPools:DestroyAll();
+	self.BaccaratRoadScripts:Destroy()
 end
 
 return BaccaratGameCtrl
