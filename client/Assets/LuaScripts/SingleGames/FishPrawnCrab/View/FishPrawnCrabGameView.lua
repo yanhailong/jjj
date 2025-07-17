@@ -33,12 +33,7 @@ function FishPrawnCrabGameView:InitComponents()
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
-    self.tmp_total_player_num=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_players/tmp_total_player_num");
-    self.img_1=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_1");
-    self.img_2=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_2");
-    self.img_3=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_3");
-    self.img_4=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_4");
-    self.img_5=ComponentUtilGet.Image(self.transform,"content/bottom/nodes/img_5");
+    self.tmp_total_player_num=ComponentUtilGet.Text(self.transform,"content/bottom/btn_players/tmp_total_player_num");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
     self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch");
     self.btn_muen=ComponentUtilGet.Button(self.transform,"content/setting/btn_muen");
@@ -46,6 +41,9 @@ function FishPrawnCrabGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_close");
+
+    ---荷官
+    self.btn_dealer = ComponentUtilGet.Button(self.transform,"content/Dealer")
 end
 
 ---下注底注按钮
@@ -90,9 +88,6 @@ function FishPrawnCrabGameView:InitPalyers()
     
     self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
     self.selfPlayer = FishPrawnCrabPlayerItem.New(self.selfPlayerRoot)
-    
-    ---荷官
-    self.btn_dealer = ComponentUtilGet.Button(self.transform,"content/obj_PlayerRoot/Dealer")
 end
 
 ---下注区域
@@ -125,7 +120,14 @@ end
 
 ---结果信息
 function FishPrawnCrabGameView:InitGameResult()
-    
+    self.dicePlate = ComponentUtilGet.GameObject(self.transform, "Background/resoult/plate")
+    self.diceBowl = ComponentUtilGet.GameObject(self.transform, "Background/resoult/bowl")
+    self.diceImages = {}
+    self.diceTexts = {}
+    for i = 1, FishPrawnCrabConfig.diceCount do
+        self.diceImages[i] = ComponentUtilGet.Image(self.transform, "Background/resoult/dices/dice" .. i)
+        self.diceTexts[i] = ComponentUtilGet.TextMeshProUGUI(self.transform, "Background/resoult/dices/dice" .. i .."/Text (TMP)")
+    end
 end
 
 ---清空组件
@@ -248,16 +250,34 @@ function FishPrawnCrabGameView:UpdatePlayers(players)
     if players ~=nil and #players>0 then
         ---玩家排序
         table.sort(players, function(a, b)
-            return a.coin < b.coin
+            return a.coin > b.coin
         end)
 
-        for i=1,#players do
-            self.AllOtherPlayerHeads[i]:UpdatePlayer(players[i])
-            if i>=#self.AllOtherPlayerHeads then
-                break
+        for i=1,#self.AllOtherPlayerHeads do
+            if i <= #players then
+                self.AllOtherPlayerHeads[i]:UpdatePlayer(players[i])
+                self.AllOtherPlayerHeads[i]:SetActive(true)
+            else
+                self.AllOtherPlayerHeads[i]:SetActive(false)
+                self.AllOtherPlayerHeads[i]:UpdatePlayer(nil)
             end
         end
     end
+end
+
+function FishPrawnCrabGameView:FindPlayer(playerid)
+    local target = nil
+    if self.selfPlayer.id == playerid then
+        target = self.selfPlayer
+    else
+        for i = 1, #self.AllOtherPlayerHeads do
+            if self.AllOtherPlayerHeads[i].id == playerid then
+                target = slef.AllOtherPlayerHeads[i]
+            end
+        end
+    end
+    
+    return target
 end
 
 return FishPrawnCrabGameView

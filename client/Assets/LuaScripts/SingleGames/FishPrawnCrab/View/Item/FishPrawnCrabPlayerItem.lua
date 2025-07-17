@@ -15,13 +15,15 @@ function FishPrawnCrabPlayerItem:ctor(go)
     self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
     self.headIcon = ComponentUtilGet.Image(self.transform,"HeadPic/Head")
     self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"Money/GoldNumber")
+    self.nicknameTxt = ComponentUtilGet.TextMeshProUGUI(self.transform, "PlayerName")
     self.resultNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"result")
     self.resultNum.gameObject:SetActive(false)
+    self.chipInfo = {{}, {}, {}, {}, {}, {}}
 end
 
 ---
 ---更新玩家金币数量
----@param num int
+---@param num number
 function FishPrawnCrabPlayerItem:UpdateGoldCount(num)
     self.goldCount.text = num
 end
@@ -51,14 +53,29 @@ end
 
 
 function FishPrawnCrabPlayerItem:UpdatePlayer(player)
-    self.goldCount.text = player.coin
     self.player = player
-    self.id = player.id
+    if player ~= nil then
+        self.goldCount.text = player.coin
+        self.nicknameTxt.text = player.nickname
+        self.id = player.id
+    else
+        self.id = nil
+    end
 end
 
 function FishPrawnCrabPlayerItem:SetActive(active)
     if self.gameObject ~= nil then
         self.gameObject:SetActive(active)
+    end
+end
+
+function FishPrawnCrabPlayerItem:ResetBetData()
+    self.chipInfo = {{}, {}, {}, {}, {}, {}}
+end
+
+function FishPrawnCrabPlayerItem:AddChip(area, chipObj)
+    if area > 0 and area <= #self.chipInfo and chipObj ~= nil then
+        table.insert(self.chipInfo[area], chipObj)
     end
 end
 

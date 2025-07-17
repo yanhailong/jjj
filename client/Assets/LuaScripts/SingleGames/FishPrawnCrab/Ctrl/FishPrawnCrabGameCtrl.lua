@@ -57,9 +57,10 @@ function FishPrawnCrabGameCtrl:InitData()
 	---本局是否使用了复投
 	self.isRepeatBet = false
 	---本局下注数据
-	self.allBetData = {}
+	self.allBetData = {{}, {}, {}, {}, {}, {}}
+	self.lookOnBetData = {{}, {}, {}, {}, {}, {}}
 	
-	self.view.selfPlayer:UpdatePlayer({ id = 1314, coin = self.goldRealNum})
+	self.view.selfPlayer:UpdatePlayer({ id = FishPrawnCrabConfig.selfTestPlayerId, coin = self.goldRealNum})
 	
 	--刷新底注界面
 	self.view:UpdateBetBtnStatus()
@@ -105,7 +106,7 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		--CtrlManager.SingleShow(CtrlNames)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
-		SimulationServer.StartServer()
+		SimulationServer:StartServer()
 	end)
 
 	---压注按钮
@@ -157,6 +158,8 @@ end
 function FishPrawnCrabGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
 	FishPrawnCrabChipManager:Destroy()
+	TimerManager.StopAllTimer(self)
+	CorManager.StopAll(self)
 end
 
 ---进入到准备阶段
@@ -167,7 +170,20 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	self.selfBets = {0,0,0,0,0,0}
 	self.selfBetInfo = {}
 	self.allowBet = false
+	self.allBetData = {{}, {}, {}, {}, {}, {}}
+	self.lookOnBetData = {{}, {}, {}, {}, {}, {}}
 	self.curStatus = FishPrawnCrabConfig.GameState.Prepare
+	--重置筹码数据
+	self.view.selfPlayer:ResetBetData()
+	for i = 1, #self.view.AllOtherPlayerHeads do
+		self.view.AllOtherPlayerHeads[i]:ResetBetData()
+	end
+	--筹码是否回收完
+	local chipsArr = FishPrawnCrabChipManager:GetChipArr()
+	if #chipsArr > 0 then
+		logError("筹码未回收完")
+		FishPrawnCrabChipManager:CleanChip()
+	end
 	
 	self.view:UpdateBetAreaInfo()
 	self.view.btn_repeat.interactable = self.allowBet
@@ -176,17 +192,20 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	--tip
 	self.view.tipsStartToBet:SetActive(false)
 	self.view.tipsStopBetting:SetActive(false)
+
+	--骰子
+	self.view.diceBowl:SetActive(true)
 	
 	--倒计时
 	self.view.colockStateTimePrepare:SetActive(true)
 	self.view.colockStateTimeBet:SetActive(false)
 	self.view.colockStateTimeSettlement:SetActive(false)
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
-	self.statusRemainingSeconds = FishPrawnCrabConfig.prepareStateDuration
+	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.floor(self.statusRemainingSeconds + 0.1)
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
 
@@ -211,11 +230,11 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 	self.view.colockStateTimeBet:SetActive(true)
 	self.view.colockStateTimeSettlement:SetActive(false)
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
-	self.statusRemainingSeconds = FishPrawnCrabConfig.betStateDuration
+	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.floor(self.statusRemainingSeconds + 0.1)
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
 		--倒计时3s
 		if math.abs(self.statusRemainingSeconds - 3) <= 0.1 then
 			self.view.colockStateTimeTrs.gameObject:SetActive(false)
@@ -245,18 +264,145 @@ function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
 	self.view.colockStateTimePrepare:SetActive(false)
 	self.view.colockStateTimeBet:SetActive(false)
 	self.view.colockStateTimeSettlement:SetActive(true)
-	self.statusRemainingSeconds = FishPrawnCrabConfig.settlementStateDuration
+	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.floor(self.statusRemainingSeconds + 0.1)
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+end
+
+---游戏结算数据
+function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
+	--{"dices":[2,4,6],
+	--"dice_result":[{"odd":1,"anim_index":2},{"odd":1,"anim_index":4},{"odd":1,"anim_index":6}],
+	--"win_info":[{"winAmount":6000,"win_info":[{"anim_index":2,"betAmount":1000,"oddAmount":1000},{"anim_index":4,"betAmount":1000,"oddAmount":1000},{"anim_index":6,"betAmount":1000,"oddAmount":1000}],"playerid":1314}]}
+	if message == nil then
+		return
+	end 
 	
-	--回收筹码到荷官处
-	local chipsArr = FishPrawnCrabChipManager:GetChipArr()
-	while #chipsArr > 0 do
-		FishPrawnCrabChipManager:DestroyChipFly(chipsArr[#chipsArr], self.view.btn_dealer.transform.position)
+	function isAreaWin(index)
+		local isWin = false
+		for i = 1, #message.dice_result do
+			if index == message.dice_result[i].anim_index then
+				isWin = true
+				break
+			end
+		end
+		
+		return isWin
 	end
+	
+	CorManager.StartCor(self, function()
+		coroutine.wait(1.5)
+		--播放骰子动画
+		self.view.diceBowl:SetActive(true)
+		coroutine.wait(1.5)
+		--设置结果
+		for i = 1, FishPrawnCrabConfig.diceCount do 
+			local diceSideIndex = message.dices[i]
+			self.view.diceTexts[i].text = FishPrawnCrabConfig.animalShowData[diceSideIndex].name
+			local diceColor = FishPrawnCrabConfig.animalShowData[diceSideIndex].color
+			self.view.diceTexts[i].color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
+		end
+		self.view.diceBowl:SetActive(false)
+		coroutine.wait(1.5)
+		--回收筹码到荷官处
+		for areaIndex = 1, FishPrawnCrabConfig.diceSideCount do
+			if not isAreaWin(areaIndex) then
+				local chipsArr = self.allBetData[areaIndex]
+				--while #chipsArr > 0 do
+				--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[#chipsArr], self.view.btn_dealer.transform.position)
+				--	table.remove(chipsArr,#chipsArr)
+				--end
+				for chipIndex = 1, #chipsArr do
+					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.btn_dealer.transform.position)
+				end
+				chipsArr = {}
+			end
+		end
+		
+		coroutine.wait(2)
+		--荷官赔下中的筹码到桌面上
+		for playerIndex = 1, #message.win_info do
+			local playerWinInfo = message.win_info[playerIndex]
+			local targetChipArr = nil
+			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
+			if targetPlayer ~= nil then
+				targetChipArr = targetPlayer.chipInfo
+				look("targetChipArr:" .. #targetChipArr)
+			else
+				targetChipArr = self.lookOnBetData
+			end
+			
+			for winIndex = 1, #playerWinInfo.win_info do
+				local oddAmount = playerWinInfo.win_info[winIndex].oddAmount
+				local winAreaIndex = playerWinInfo.win_info[winIndex].anim_index
+				local chipList = self:GetChilIndexArrByAmount(oddAmount)
+				for chipIndex = 1, #chipList do
+					--飞筹码
+					local newChipObj = FishPrawnCrabChipManager:AnimateChip(chipList[chipIndex], self.view.btn_dealer.transform.position, self.view.betAreas[winAreaIndex])
+					table.insert(targetChipArr[winAreaIndex], newChipObj)
+				end
+			end
+		end
+
+		coroutine.wait(2)
+		--把桌面上的筹码分到对应的人身上
+		for areaIndex = 1, #message.dice_result do
+			--自己
+			local chipsArr = self.view.selfPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
+			for chipIndex = 1, #chipsArr do
+				FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
+			end
+			chipsArr = {}
+			--旁观的人
+			local lookOnChipsArr = self.lookOnBetData[message.dice_result[areaIndex].anim_index]
+			for chipIndex = 1, #chipsArr do
+				FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
+			end
+			lookOnChipsArr = {}
+			
+			--座位上的人
+			for playerIndex = 1, #self.view.AllOtherPlayerHeads do
+				local otherPlayer = self.view.AllOtherPlayerHeads[playerIndex]
+				local chipsArr = otherPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
+				for chipIndex = 1, #chipsArr do
+					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
+				end
+				chipsArr = {}
+			end
+		end
+		
+		coroutine.wait(2)
+		--显示结果
+		for playerIndex = 1, #message.win_info do
+			local playerWinInfo = message.win_info[playerIndex]
+			local targetChipArr = nil
+			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
+			if targetPlayer ~= nil then
+				targetPlayer:ShowResultCount(playerWinInfo.winAmount)
+			end
+		end
+	end)
+end
+
+function FishPrawnCrabGameCtrl:GetChilIndexArrByAmount(goldAmount)
+	local chipList = {}
+	local tmpGold = goldAmount
+	for i = 1, #FishPrawnCrabConfig.betValuesArr do
+		local index = #FishPrawnCrabConfig.betValuesArr - i + 1
+		local curChipValue = FishPrawnCrabConfig.betValuesArr[index]
+		while tmpGold >= curChipValue do
+			tmpGold = tmpGold - curChipValue
+			table.insert(chipList, index)
+		end
+	end
+	if tmpGold ~= 0 then
+		logError("GetChilIndexArrByAmount err!! goldAmount:" .. goldAmount .. " >>Remaining:" .. tmpGold)
+	end
+	
+	return chipList
 end
 
 ---中心下注区域
@@ -266,31 +412,45 @@ function FishPrawnCrabGameCtrl:OnClickCenterBetArea(areaIndex)
 			or FishPrawnCrabConfig.betValuesArr[self.betIndex] > self.goldRealNum then
 		return
 	end
-	
-	local betMsg = { playerid = self.view.selfPlayer.id,
-					 area = areaIndex,
-					 chip = self.betIndex }
-	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
 
-	local data = {area = areaIndex, 
-				  chip = self.betIndex}
-	self:OnSelfBet(data)
-	--飞筹码
-	FishPrawnCrabChipManager:AnimateChip(self.betIndex, self.view.selfPlayer.transform.position, self.view.betAreas[areaIndex])
-
-	self.view:UpdateBetBtnStatus()
-	self.view:UpdateSelfGoldCount()
 	--高亮点击的区域
 	local targetAreaHighLight = self.view.winHighLights[areaIndex]
 	targetAreaHighLight.gameObject:SetActive(true)
 	Tools.DoColor_Alpha(targetAreaHighLight,1,0,0.1)
+	
+	--发送消息
+	local betMsg = { playerid = self.view.selfPlayer.id,
+					 area = areaIndex,
+					 chip = self.betIndex }
+	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
+end
+
+function FishPrawnCrabGameCtrl:OnBetRusultMsg(data)
+	--local data = {area = areaIndex,
+	--			  chip = self.betIndex,
+	--              remaining_coin = 0,
+	--				result = 0}
+	if data ~= nil and data.result == 0 then
+		self:OnSelfBet(data)
+		--飞筹码
+		local newChipObj = FishPrawnCrabChipManager:AnimateChip(data.chip, self.view.selfPlayer.transform.position, self.view.betAreas[data.area])
+		table.insert(self.allBetData[data.area], newChipObj)
+		self.view.selfPlayer:AddChip(data.area, newChipObj)
+		--更新自身金币
+		self.goldRealNum = data.remaining_coin
+
+		self.view:UpdateBetBtnStatus()
+		self.view:UpdateSelfGoldCount()
+	else
+		logError("下注失败:" .. data.result)
+	end
 end
 
 function FishPrawnCrabGameCtrl:OnSelfBet(data)
 	local areaIndex = data.area
 	local betMoney = FishPrawnCrabConfig.betValuesArr[data.chip]
 	self.selfBets[areaIndex] = self.selfBets[areaIndex] + betMoney
-	self.totalBets[areaIndex] = self.totalBets[areaIndex] + betMoney
+	--self.totalBets[areaIndex] = self.totalBets[areaIndex] + betMoney
 	self.goldRealNum = self.goldRealNum - betMoney
 	table.insert(self.selfBetInfo, data)
 	

@@ -26,15 +26,15 @@ local scale = 0.5
 
 ---
 ---筹码抛到桌面上
----@param chip_type 抛的筹码类型 int
----@param start_pos 抛的起始位置 Vector3
----@param target 抛的目标对象区域 RectTransform
----@return GameObject 抛的筹码
+---@param chip_type number 抛的筹码类型
+---@param start_posx Vector3 抛的筹码类型
+---@param target UnityEngine.RectTransform 抛的目标对象区域
+---@return UnityEngine.GameObject 创建的筹码
 ---描述 功能实现 初始筹码到对象池中，然后从对象池中取出对象，并设置初始位置，然后筹码开始抛到target区域内 不需要回收 筹码需要留在桌面上堆积
 ---
 function FishPrawnCrabChipManager:AnimateChip(chip_type, start_pos, target)
     -- 从对象池获取金币实例
-    ---@type GameObject
+    ---@type #GameObject
     local chipObj = pool:SpawnPrefab(nil, FishPrawnCrabConfig.ABNames.ChipPool, FishPrawnCrabConfig.GetChipPoolName(chip_type))
 
     -- 设置金币初始位置和激活状态
@@ -111,14 +111,17 @@ function FishPrawnCrabChipManager:DestroyChipFly(chipObj, endPos)
         --chipObj.transform:SetParent(nil)
         sequence:Kill(false)
         pool:UnSpawnPrefab(chipObj)
+        chipObj = nil
     end)
 
     sequence:Play()
-
     FishPrawnCrabChipManager:RemoveChip(chipObj)
 end
 
 function FishPrawnCrabChipManager:CleanChip()
+    for i = 1, #chips do
+        pool:UnSpawnPrefab(chips[i])
+    end
     chips = {}
 end
 
