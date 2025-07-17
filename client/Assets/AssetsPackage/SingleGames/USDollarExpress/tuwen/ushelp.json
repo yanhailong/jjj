@@ -1,0 +1,100 @@
+{"frames": [
+
+{
+	"filename": "mykd_sm_$.png",
+	"frame": {"x":117,"y":191,"w":118,"h":98},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":118,"h":98},
+	"sourceSize": {"w":118,"h":98}
+},
+{
+	"filename": "mykd_sm_cmjhc.png",
+	"frame": {"x":0,"y":289,"w":122,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":122,"h":100},
+	"sourceSize": {"w":122,"h":100}
+},
+{
+	"filename": "mykd_sm_hhc.png",
+	"frame": {"x":0,"y":0,"w":98,"h":84},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":98,"h":84},
+	"sourceSize": {"w":98,"h":84}
+},
+{
+	"filename": "mykd_sm_jz.png",
+	"frame": {"x":0,"y":191,"w":117,"h":95},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":117,"h":95},
+	"sourceSize": {"w":117,"h":95}
+},
+{
+	"filename": "mykd_sm_kc.png",
+	"frame": {"x":235,"y":191,"w":118,"h":96},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":118,"h":96},
+	"sourceSize": {"w":118,"h":96}
+},
+{
+	"filename": "mykd_sm_lanhc.png",
+	"frame": {"x":98,"y":0,"w":98,"h":84},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":98,"h":84},
+	"sourceSize": {"w":98,"h":84}
+},
+{
+	"filename": "mykd_sm_lhc.png",
+	"frame": {"x":196,"y":0,"w":98,"h":84},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":98,"h":84},
+	"sourceSize": {"w":98,"h":84}
+},
+{
+	"filename": "mykd_sm_wild.png",
+	"frame": {"x":0,"y":84,"w":104,"h":107},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":104,"h":107},
+	"sourceSize": {"w":104,"h":107}
+},
+{
+	"filename": "mykd_sm_wildX2.png",
+	"frame": {"x":104,"y":84,"w":104,"h":106},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":104,"h":106},
+	"sourceSize": {"w":104,"h":106}
+},
+{
+	"filename": "mykd_sm_wildX5.png",
+	"frame": {"x":208,"y":84,"w":104,"h":106},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":104,"h":106},
+	"sourceSize": {"w":104,"h":106}
+},
+{
+	"filename": "mykd_sm_zhc.png",
+	"frame": {"x":294,"y":0,"w":98,"h":84},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":98,"h":84},
+	"sourceSize": {"w":98,"h":84}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "ushelp.png",
+	"format": "RGBA8888",
+	"size": {"w":392,"h":392},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:7338799e3edd6b289144a89244931316:cacad72308d67ca88cdb63f3165752a4:a98b78ae5edaf1289b6695051f26259c$"
+}
+}

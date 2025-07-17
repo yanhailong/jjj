@@ -10,8 +10,6 @@ local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 local SlotItem=require"SingleGames/USDollarExpress/Ctrl/USDollarExpressSlotItem"
 require("Logic/Common/commonSlots/MVCHead")
 
-
-
 ---构造函数
 function USDollarExpressMainCtrl:ctor(ctrlName,param)
     self.layer=2;

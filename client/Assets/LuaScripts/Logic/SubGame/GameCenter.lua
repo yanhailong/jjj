@@ -106,7 +106,7 @@ function this.GameStateTips(state,gameName)
     elseif state ==GameState.Updating then
         this.EnterGameErrorTips("游戏正在更新中!")
     elseif state ==GameState.WaitUpdate then
-        SuspensionTipsUtil.SuspensionTips(gameName.."游戏正在等待更新中....")
+        SuspensionTipsUtil.SuspensionTips(gameName.."游戏正在等待更新中...")
     elseif state ==GameState.Update then
         UpdateGameAssets.StartUpdate(gameName);
     end
