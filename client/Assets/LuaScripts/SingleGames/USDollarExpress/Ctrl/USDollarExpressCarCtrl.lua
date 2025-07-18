@@ -52,15 +52,20 @@ function USDollarExpressCarCtrl:InitCars()
 		logError("拉火车模式结束")
 		CorManager.StartCor(self, function
 		()
-			coroutine.wait(2)
+			self.view.ani:Play("USDollarExpressCar_chuchang")
+			coroutine.wait(1)
+			local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+			ctrl:EndSmallGame()
 			self:Close()
 		end)
 	else
+		self.isAllCarArrive=false
 		local trainInfo=self.CarQueue:Dequeue()
 		local carType=trainInfo.type
 		local goldList=trainInfo.goldList
 		self:SetCarTitle(carType)
 		self:InitTrainComponent(goldList,carType)
+		self.view.txt_trainLeft.text=self.CarQueue:Count()
 	end
 end
 
@@ -117,8 +122,14 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 		card.transform.localPosition = Vector3.New(lastPosx, 0, 0) -- 设置slotItem的位置
 		card.transform.localScale = Vector3.one
 		card.name = tostring(i)
-		item:SetText(goldList[i])
+		--item:SetText(goldList[i])
 		self.allItems[i]=item
+	end
+
+	for i = 1, #goldList+1 do
+		if i>1 then
+			self.allItems[i]:SetText(goldList[i-1])
+		end
 	end
 	
 	self.maxMoveIndex= #goldList
@@ -143,7 +154,9 @@ function USDollarExpressCarCtrl:Update()
 			if item.transform.position.x>=self.centerPos.x then
 				look("到达中心点了",item.gameObject.name)
 				item.isArriveCenterPos=true
-				item:DOPlayerAni()
+				if i>1 then
+					item:DOPlayerAni()
+				end
 			end
 		end
 		if item.isArriveEndPos==false then
@@ -155,13 +168,7 @@ function USDollarExpressCarCtrl:Update()
 		if i==#self.allItems and item.isArriveEndPos==true then
 			logError("所有元素都已经到达终点了")
 			self.isAllCarArrive=true
-			CorManager.StartCor(self, function
-			()
-				coroutine.wait(5)
-				local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
-				ctrl:EndSmallGame()
-				self:Close()
-			end)
+			self:InitCars()
 		end
 
 	end

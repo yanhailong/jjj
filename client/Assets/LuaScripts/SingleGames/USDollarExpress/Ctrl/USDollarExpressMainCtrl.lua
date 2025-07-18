@@ -12,7 +12,7 @@ require("Logic/Common/commonSlots/MVCHead")
 
 ---构造函数
 function USDollarExpressMainCtrl:ctor(ctrlName,param)
-    self.layer=1;
+    self.layer=2;
     self.abName="SingleGames/USDollarExpress/prefabs/USDollarExpressMain";
     self.prefabName="USDollarExpressMain"
     self.super.ctor(self,ctrlName,param);
@@ -173,13 +173,15 @@ function USDollarExpressMainCtrl:InitBigKuang()
 end
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
-	for i = 1, 5 do
-		if wheelId==i then
-			Tools.SetActive(self.bigKuangEffects[i],true)
-		else
-			Tools.SetActive(self.bigKuangEffects[i],false)
+	if config.gameTypeState==1 then
+		for i = 1, 5 do
+			if wheelId==i then
+				Tools.SetActive(self.bigKuangEffects[i],true)
+			else
+				Tools.SetActive(self.bigKuangEffects[i],false)
+			end
+
 		end
-		
 	end
 end
 
@@ -194,6 +196,9 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 	self.realCard=self.model.CardPos
 	CorManager.StartCor(self,function()
 		for i = 1,5 do
+			if config.gameTypeState==1 then
+				self:ShowBigKuang(1)
+			end
 			self:StartCirle(i)
 		end
 	end)
@@ -281,6 +286,9 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 						parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
 				if (wheelId == 5) then
 					self:ShowResoult()-- 旋转结束处理服务器数据表现
+					self:ShowBigKuang(0)
+				else
+					self:ShowBigKuang(wheelId+1)
 				end
 			end
 		else
@@ -362,6 +370,7 @@ function USDollarExpressMainCtrl:StartCirleStop2(parent_newObj,wheelId,endpos)
 					coroutine.yield(1)
 				end
 				self:ShowResoult()-- 旋转结束处理服务器数据表现
+				self:ShowBigKuang(0)
 			end)
 
 		end
@@ -496,16 +505,24 @@ function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
 	end
 end
 
+function USDollarExpressMainCtrl:SetAwardKuang()
+	
+end
+
 function USDollarExpressMainCtrl:EnterSmallGame()
 	if self.model.status==1 then
 		logError("进入二选1模式")
 		config.gameTypeState=1
 		CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
+	elseif self.model.status==3 then
+		config.gameTypeState=3
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
 	else
 		self:AddShowStep()
 	end
 end
 
+---各种模式小游戏完成后返回
 function USDollarExpressMainCtrl:EndSmallGame()
 	self:AddShowStep()
 	if self.model.status==1 then
@@ -516,7 +533,8 @@ function USDollarExpressMainCtrl:EndSmallGame()
 			config.gameTypeState=1
 			self.model:ReqStartGame()---请求旋转一次
 		end)
-
+	elseif self.model.status==3 then
+		logError("开火车模式完成！")
 	end
 end
 

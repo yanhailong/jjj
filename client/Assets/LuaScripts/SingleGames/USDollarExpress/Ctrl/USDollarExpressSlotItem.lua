@@ -8,7 +8,7 @@ function USDollarExpressSlotItem:ctor(go,ctrl)
     ---@type UnityEngine.Transform
     self.transform=self.gameObject.transform
     self.img_icon=ComponentUtilGet.Image(self.transform,"img_icon");
-    self.canvas=ComponentUtilGet.Canvas(self.transform)
+    --self.canvas=ComponentUtilGet.Canvas(self.transform)
     ---@type USDollarExpressMainCtrl
     self.ctrl=ctrl
 end
@@ -20,15 +20,16 @@ function USDollarExpressSlotItem:SetSprite(icon,index)
     self.img_icon.sprite=icon
     self.img_icon:SetNativeSize()
     self.iconIndex=index
-    if config.gameTypeState==1 then
-        if self.iconIndex>=15 and self.iconIndex<=22 then
-            self.canvas.sortingOrder=3
-        else
-            self.canvas.sortingOrder=2
-        end
-    else
-        self.canvas.sortingOrder=2
-    end
+    --if config.gameTypeState==1 then
+    --    if self.iconIndex>=15 and self.iconIndex<=22 then
+    --        self.canvas.sortingOrder=3
+    --    else
+    --        self.canvas.sortingOrder=1
+    --    end
+    --else
+    --    self.canvas.sortingOrder=1
+    --    
+    --end
 end
 
 function USDollarExpressSlotItem:SetSpriteColor(ishight)
@@ -80,6 +81,13 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     Tools.PlayerSpineAniByName(sp,"action",false)
                     coroutine.wait(1.233)
                     Tools.PlayerSpineAniByName(sp,"loop",true)
+                end)
+            elseif self.iconIndex==20 then
+                CorManager.StartCor(self.ctrl, function
+                ()
+                    Tools.PlayerSpineAniByName(sp,"action",false)
+                    coroutine.wait(1.233)
+                    Tools.PlayerSpineAniByName(sp,"idle",true)
                 end)
             else
                 Tools.PlayerSpineAniByName(sp,"action",true)

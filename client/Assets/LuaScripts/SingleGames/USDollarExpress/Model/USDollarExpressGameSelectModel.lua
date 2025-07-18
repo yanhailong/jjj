@@ -15,6 +15,7 @@ end
 
 function USDollarExpressGameSelectModel:Close()
     self.super.Close(self);
+	WebNetEvent.RemoveAllTo(self)
 end
 
 function USDollarExpressGameSelectModel:AddEvent()

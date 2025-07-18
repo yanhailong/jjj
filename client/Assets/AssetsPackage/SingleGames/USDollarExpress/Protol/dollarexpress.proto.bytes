@@ -91,6 +91,6 @@ message ResultLineInfo {
 message TrainInfo {
   int32 type = 1;  //火车类型(iconId)  19.绿火车 20.蓝火车  21.紫火车  22.红火车
   repeated int64 goldList = 2;  //中奖金额列表
-  bool pool = 3;  //奖池
+  int32 poolId = 3;  //奖池ID
 }
 

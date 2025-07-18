@@ -19,11 +19,11 @@ this.selfMotionNum=0  ---自动旋转次数
 
 ---@火车颜色
 this.TrainColorType={
-    GreenTrain=10,--绿车
-    BlueTrain=11,--蓝车
-    VioletTrain=12,--紫车
-    RedTrain=13,--红车
-    GoldTrain=14,--金车
+    GreenTrain=19,--绿车
+    BlueTrain=20,--蓝车
+    VioletTrain=21,--紫车
+    RedTrain=22,--红车
+    GoldTrain=23,--金车
 }
 this.gameTypeState=0--游戏玩法状态
 this.jackPotInfos={}
