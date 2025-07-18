@@ -33,8 +33,9 @@ function this:StartServer()
         this.AddEvent()
         this.isRunning = true
         --自动下注
-        if this.autoBetTickTimer ~= nil then
+        if this.autoBetTickTimer ~= nil and this.autoBetTickTimer.isRunning then
             TimerManager.StopTimer(this.autoBetTickTimer)
+            this.autoBetTickTimer = nil
         end
         this.autoBetTickTimer = TimerManager.StartTimer(this, function()
             this.AutoBetTick();
@@ -96,6 +97,8 @@ function this:StopServer()
         this.RemoveEvent()
         TimerManager.StopAllTimer(this)
         this.isRunning = false
+        this.autoBetTickTimer = nil
+        this.timeoutTimer = nil
     end
 end
 

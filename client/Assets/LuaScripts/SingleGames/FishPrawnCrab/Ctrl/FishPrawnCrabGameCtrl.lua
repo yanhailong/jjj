@@ -158,6 +158,7 @@ function FishPrawnCrabGameCtrl:RealCloseDestroy()
 	FishPrawnCrabChipManager:Destroy()
 	TimerManager.StopAllTimer(self)
 	CorManager.StopAll(self)
+	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.STOP_SIMULATION_SERVER)
 end
 
 ---进入到准备阶段

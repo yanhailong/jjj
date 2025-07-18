@@ -23,6 +23,8 @@ local pool = ObjectPoolUtil:New("FishPrawnCrabChipManager")
 local chips = {}
 DOTween:SetTweensCapacity(1000, 250);
 local scale = 0.5
+---保存正在播放的动画
+local sequenceList = {}
 
 ---
 ---筹码抛到桌面上
@@ -66,7 +68,9 @@ function FishPrawnCrabChipManager:AnimateChip(chip_type, start_pos, target)
     sequence:OnComplete(function()
         -- 可以在这里添加金币落地后的效果，如声音等
         sequence:Kill(false)
+        --table.remove(sequence)
     end)
+    --sequenceList[sequence] = sequence
 
     sequence:Play()
     
@@ -119,6 +123,13 @@ function FishPrawnCrabChipManager:DestroyChipFly(chipObj, endPos)
 end
 
 function FishPrawnCrabChipManager:CleanChip()
+    --for k,v in pairs(#sequenceList) do
+    --    if v ~= nil then
+    --        v:Kill(false)
+    --    end
+    --end
+    --sequenceList = {}
+    
     for i = 1, #chips do
         pool:UnSpawnPrefab(chips[i])
     end
@@ -137,7 +148,8 @@ function FishPrawnCrabChipManager:RemoveChip(chipObj)
 end
 
 function FishPrawnCrabChipManager:Destroy()
-    look("FishPrawnCrabChipManager:Destroy()")
+    --look("FishPrawnCrabChipManager:Destroy()")
+    FishPrawnCrabChipManager:CleanChip()
     pool:DestroyAll()
 end
 
