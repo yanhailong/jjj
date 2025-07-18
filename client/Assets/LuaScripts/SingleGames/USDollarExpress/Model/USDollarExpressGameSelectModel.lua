@@ -4,6 +4,8 @@
 ---
 ---@class USDollarExpressGameSelectModel:BaseModel
 local USDollarExpressGameSelectModel=Class("USDollarExpressGameSelectModel",BaseModel)
+---@type USDollarExpressConfig
+local config=require("SingleGames/USDollarExpress/USDollarExpressConfig")
 
 function USDollarExpressGameSelectModel:Awake()
 	self.super.Awake(self);
@@ -13,6 +15,7 @@ end
 
 function USDollarExpressGameSelectModel:Close()
     self.super.Close(self);
+	WebNetEvent.RemoveAllTo(self)
 end
 
 function USDollarExpressGameSelectModel:AddEvent()
@@ -27,11 +30,18 @@ end
 function USDollarExpressGameSelectModel:ReqChooseFreeModel(status)
 	local data={}
 	data.status=status
+	config.gameTypeState=3
 	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqChooseFreeModel,data)
 end
 
 function USDollarExpressGameSelectModel:ResChooseFreeModel(msg)
 	look("选择类型返回信息",msg)
+	---@type USDollarExpressMainCtrl
+	local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+	if ctrl then
+		ctrl:EndSmallGame()
+		self.ctrl:Close()
+	end
 end
 
 

@@ -16,3 +16,4 @@ CtrlManager.CtrlsCollection[CtrlNames.BaccaratRule].ctrl =require "SingleGames/B
 CtrlManager.CtrlsCollection[CtrlNames.BaccaratRule].view=require "SingleGames/Baccarat/View/BaccaratRuleView";
 CtrlManager.CtrlsCollection[CtrlNames.BaccaratRule].model=require "SingleGames/Baccarat/Model/BaccaratRuleModel";
 
+

@@ -984,7 +984,7 @@ function this.NumJump(form, to, time, func1, func2)
 end
 function this.TextJump(txt, from, to, time, str, cb)
     str = str or ""
-    this.NumJump(
+    return this.NumJump(
         tonumber(from),
         to,
         time,

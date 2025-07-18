@@ -21,6 +21,19 @@ end
 function USDollarExpressGameSelectCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	self:InitAnimator()
+end
+
+---获取动画相关
+function USDollarExpressGameSelectCtrl:InitAnimator()
+	self.stateAnimator = ComponentUtilGet.Animator(self.view.transform,"content")
+	self.stateAnimator.gameObject:SetActive(true)
+	CorManager.StartCor(self, function
+	()
+		coroutine.wait(0.5)
+		self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_idle")
+	end)
+
 end
 
 ---初始化数据
@@ -36,11 +49,21 @@ end
 function USDollarExpressGameSelectCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_SelectTrain, function
 	()
-		self.model:ReqChooseFreeModel(3)
+		CorManager.StartCor(self, function
+		()
+			self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanzuo")
+			coroutine.wait(0.6)
+			self.model:ReqChooseFreeModel(3)
+		end)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_SelectFree, function
 	()
-		self.model:ReqChooseFreeModel(5)
+		CorManager.StartCor(self, function
+		()
+			self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanyou")
+			coroutine.wait(0.6)
+			self.model:ReqChooseFreeModel(5)
+		end)
 	end)
 end
 

@@ -40,18 +40,19 @@ function USDollarExpressMainModel:RemoveEvent()
 	GlobalEvent.RemoveAllTo(self)
 end
 
-function USDollarExpressMainModel:ReqStartGame(dataSpin)
-
-	local _dataSpin=dataSpin
+function USDollarExpressMainModel:ReqStartGame(_dataSpin)
 	if _dataSpin then
-		look("点击按钮传入事件",_dataSpin)
-		if _dataSpin.isAuto==true then
-			config.selfMotionNum=_dataSpin.autoNum
+		self.dataSpin=_dataSpin
+	end
+	if self.dataSpin then
+		look("点击按钮传入事件",self.dataSpin)
+		if self.dataSpin.isAuto==true then
+			config.selfMotionNum=self.dataSpin.autoNum
 		end
 	end
 	
 	local data={}
-	data.stakeVlue=_dataSpin.betInfo
+	data.stakeVlue=self.dataSpin.betInfo
 	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
 end
 
@@ -73,30 +74,35 @@ function USDollarExpressMainModel:ResStartGame(msg)
 	self.freeCount=msg.freeCount						---免费次数
 	self.goldTrainInFree=msg.goldTrainInFree			---免费游戏中是否触发了金火车
 	self.trainInfoList=msg.trainInfoList				---火车模式数据
-	if self.status==0 then
-		config.gameTypeState=0
-		self.ctrl:OnStartDoSpin()--0.正常
-	end
-	if self.status==1 then--1.普通二选一
-		config.gameTypeState=1
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
-	end
-	if self.status==2 then--2.黄金列车二选一
-		config.gameTypeState=2
-		self.ctrl:OnStartDoSpin()
-	end
-	if self.status==3 then--3.二选一之拉普通火车
-		config.gameTypeState=3
-		self.ctrl:OnStartDoSpin()
-	end
-	if self.status==4 then--4.二选一之拉黄金火车
-		config.gameTypeState=4
-		self.ctrl:OnStartDoSpin()
-	end
-	if self.status==5 then--5.二选一之免费模式
-		config.gameTypeState=5
-		self.ctrl:OnStartDoSpin()
-	end
+
+	self.ctrl:OnStartDoSpin()
+	
+	---
+
+	--if self.status==0 then
+	--	config.gameTypeState=0
+	--	self.ctrl:OnStartDoSpin()--0.正常
+	--end
+	--if self.status==1 then--1.普通二选一
+	--	config.gameTypeState=1
+	--	self.ctrl:OnStartDoSpin()--还是要先转动一次
+	--end
+	--if self.status==2 then--2.黄金列车二选一
+	--	config.gameTypeState=2
+	--	self.ctrl:OnStartDoSpin()
+	--end
+	--if self.status==3 then--3.二选一之拉普通火车
+	--	config.gameTypeState=3
+	--	self.ctrl:OnStartDoSpin()
+	--end
+	--if self.status==4 then--4.二选一之拉黄金火车
+	--	config.gameTypeState=4
+	--	self.ctrl:OnStartDoSpin()
+	--end
+	--if self.status==5 then--5.二选一之免费模式
+	--	config.gameTypeState=5
+	--	self.ctrl:OnStartDoSpin()
+	--end
 end
 
 ---初始化卡牌位置

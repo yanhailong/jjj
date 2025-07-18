@@ -1,4 +1,6 @@
-syntax = "proto3";//每个场次配置信息
+syntax = "proto3";
+
+//每个场次配置信息
 message WareHouseConfigInfo {
   int32 wareId = 1;  //场次id
   string name = 2;  //场次名称
@@ -58,3 +60,16 @@ message GameListConfig {
   int32 status = 3;  //状态  0.开启  1.维护  2.关闭
 }
 
+//请求,msgID=0x6007
+message ReqJoinRoom {
+  enum E_MsgID {def = 0; msgID = 24583;};
+  int64 roomId = 1;  //房间ID
+  int32 gameType = 2;  //游戏类型
+  int32 wareId = 3;  //场次id
+}
+
+//请求,msgID=0x6008
+message RespJoinRoom {
+  enum E_MsgID {def = 0; msgID = 24584;};
+  int32 code = 1;  //状态码
+}

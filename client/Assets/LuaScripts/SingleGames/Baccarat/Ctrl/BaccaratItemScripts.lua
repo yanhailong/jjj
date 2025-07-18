@@ -16,8 +16,6 @@ function BaccaratItemScripts:ctor(obj,ctrl)
     self.transform = obj.transform
     ---@type BaccaratMainCtrl
     self.ctrl=ctrl
- 
-    
     self.obj_ZhuPanContent = ComponentUtilGet.GameObject(self.transform,"BaccaratRoad/ZhuPanScroll/Viewport/obj_ZhuPanContent");
     self.obj_DaLuContent = ComponentUtilGet.GameObject(self.transform,"BaccaratRoad/DaLuScroll/Viewport/obj_DaLuContent");
     self.obj_DaluZiluContent = ComponentUtilGet.GameObject(self.transform,"BaccaratRoad/DaluZiluScroll/Viewport/obj_DaluZiluContent");
@@ -34,10 +32,7 @@ function BaccaratItemScripts:ctor(obj,ctrl)
     ---@type BaccaratRoad
     self.BaccaratRoadScripts =BaccaratRoad.New()
     self.BaccaratRoadScripts:Init(self.obj_ZhuPanContent,self.obj_DaLuContent,self.obj_DaluZiluContent,self.obj_XiaoLuContent,self.obj_YueYouLuContent);
-    self.ctrl.uiEventListener:AddClick(self.btn_EnterGame,function()
-        require("SingleGames/Baccarat/MVCHead")
-        CtrlManager.SingleShow(CtrlNames.BaccaratGame)
-    end)
+    self.ctrl.uiEventListener:AddClick(self.btn_EnterGame,self:EnterGame())
     self.isCount = false;
     UpdateManager.AddUpdate(self,self.Update)
 end
@@ -45,62 +40,76 @@ end
 ---初始化数据显示
 function BaccaratItemScripts:InitDataShow(index,data)
     self.BaccaratTableSummary = data;
-    self.CurGamePhase = data.eGamePhase;
+    self.CurGamePhase = data.baccaratBaseInfo.eGamePhase;
     self.txt_ClassicNumber.text = string.format("%02d",index);
-    for _, v in ipairs(data.winStateList) do
-        if(v == 1) then 
+    for i, v in ipairs(data.cardStateList) do
+        if(self.CurGamePhase == 5 and i == #data.cardStateList ) then
+            self.BaccaratBaseInfo = v;
+            break;
+        end
+        if(v.winState == config.WhoWin.BankerWin) then 
             self.BankerWinNum = self.BankerWinNum+1
-        elseif(v==2) then
+        elseif(v==config.WhoWin.PlayerWin) then
             self.PlayerWinNum = self.PlayerWinNum+1
-        elseif(v==3) then
+        elseif(v==config.WhoWin.TieWin) then
             self.TieWinNum = self.TieWinNum+1
         end
     end
     self:RefreshUIShow(data)
-    self.BaccaratRoadScripts:InitData(data);
+    self:RefreshTmpShow();
+    self.BaccaratRoadScripts:InitData(data,self.CurGamePhase == 5);
 end
 ---刷新单个数据显示
 function BaccaratItemScripts:RefreshDataShow(data)
-    self.CurGamePhase = data.eGamePhase;
-    table.insert( self.BaccaratTableSummary.winStateList,data.winState)
-    table.insert( self.BaccaratTableSummary.cardTypeWinStateList,data.cardTypeWinState)
-    if(data.winState== 1) then
-        self.BankerWinNum = self.BankerWinNum+1
-    elseif(data.winState==2) then
-        self.PlayerWinNum = self.PlayerWinNum+1
-    elseif(data.winState==3) then
-        self.TieWinNum = self.TieWinNum+1
+    self.CurGamePhase = data.baccaratBaseInfo.eGamePhase;
+    if( data.baccaratBaseInfo.eGamePhase == 5 ) then
+        self.BaccaratBaseInfo = data.baccaratCardState;
+        table.insert(self.BaccaratTableSummary.cardStateList,data.baccaratCardState)
     end
     self:RefreshUIShow(data)
-    self.BaccaratRoadScripts:RefreshData(data,false)
 end
 ---刷新UI显示显示
 function BaccaratItemScripts:RefreshUIShow(data)
-    self.tmp_RemainingNumber.text = string.format("%d/%d",data.restCardNum,data.totalCardNum)
-    if data.eGamePhase == 0 then--下注中
+    self.tmp_RemainingNumber.text = string.format("%d/%d",data.baccaratBaseInfo.restCardNum,data.baccaratBaseInfo.totalCardNum)
+    if  self.CurGamePhase == 0 then--下注中
         self.tmp_Stage.text = LocalManager.GetStrById(200500004)
-    elseif data.eGamePhase == 4 then -- 结算中
+    elseif  self.CurGamePhase == 5 then -- 结算中
         self.tmp_Stage.text = LocalManager.GetStrById(200500003)
     end
-    self.tmp_ZNum.text = self.BankerWinNum;
-    self.tmp_XNum.text = self.PlayerWinNum;
-    self.tmp_HNum.text = self.TieWinNum;
-    self.slider_CountdownTime.maxValue = data.phaseTotalTime
-    self.CountdownTime = data.phaseRemainingTime;
+    self.slider_CountdownTime.maxValue = data.baccaratBaseInfo.phaseTotalTime
+    self.CountdownTime = data.baccaratBaseInfo.phaseRemainingTime;
     self.slider_CountdownTime.value = self.CountdownTime;
     self.isCount = true;
 end
 
+function BaccaratItemScripts:RefreshTmpShow()
+    self.tmp_ZNum.text = self.BankerWinNum;
+    self.tmp_XNum.text = self.PlayerWinNum;
+    self.tmp_HNum.text = self.TieWinNum;
+end
+---请求服务器进入房间
+function BaccaratItemScripts:EnterGame()
+    --请求进入房间
+    self.ctrl.model:ReqJoinRoom(self.BaccaratTableSummary.baccaratBaseInfo.roomId,200500,self.BaccaratTableSummary.baccaratBaseInfo.wareId);
+end
 function BaccaratItemScripts:Update()
     if(self.isCount) then
         self.CountdownTime = self.CountdownTime-Time.deltaTime;
         if( self.CountdownTime<=0) then
             self.isCount = false;
-            self.ctrl.model:ReqBaccaratTableSummary()
             if(self.CurGamePhase == 0) then--下注结束请求结算
-                self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.roomId, #self.BaccaratTableSummary.winStateList)
-            elseif(self.CurGamePhase == 4) then --结算结算，请求下一局    
-                self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.roomId, #self.BaccaratTableSummary.winStateList+1)
+                self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.baccaratBaseInfo.roomId, #self.BaccaratTableSummary.cardStateList)
+            elseif(self.CurGamePhase == 5) then --结算结算，请求下一局    
+                self.BaccaratRoadScripts:RefreshData(self.BaccaratBaseInfo,false)
+                if(self.BaccaratBaseInfo.winState==  config.WhoWin.BankerWin) then
+                    self.BankerWinNum = self.BankerWinNum+1
+                elseif(self.BaccaratBaseInfo.winState==config.WhoWin.PlayerWin) then
+                    self.PlayerWinNum = self.PlayerWinNum+1
+                elseif(self.BaccaratBaseInfo.winState==config.WhoWin.TieWin) then
+                    self.TieWinNum = self.TieWinNum+1
+                end
+                self:RefreshTmpShow();
+                self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.baccaratBaseInfo.roomId, #self.BaccaratTableSummary.cardStateList+1)
             end
         else
             self.slider_CountdownTime.value = self.CountdownTime;

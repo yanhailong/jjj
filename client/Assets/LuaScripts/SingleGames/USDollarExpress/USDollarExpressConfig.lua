@@ -19,13 +19,37 @@ this.selfMotionNum=0  ---自动旋转次数
 
 ---@火车颜色
 this.TrainColorType={
-    GreenTrain=10,--绿车
-    BlueTrain=11,--蓝车
-    VioletTrain=12,--紫车
-    RedTrain=13,--红车
-    GoldTrain=14,--金车
+    GreenTrain=19,--绿车
+    BlueTrain=20,--蓝车
+    VioletTrain=21,--紫车
+    RedTrain=22,--红车
+    GoldTrain=23,--金车
 }
 this.gameTypeState=0--游戏玩法状态
+this.jackPotInfos={}
+this.jackpotIds={
+    minni=100100101,
+    minori=100100102,
+    major=100100103,
+    grand=100100104,
+}
+---普通旋转圈数
+this.rollCircles={
+    [1]=4,
+    [2]=5,
+    [3]=6,
+    [4]=7,
+    [5]=8,
+}
+---二选一后旋转圈数
+this.rollCircles1={
+    [1]=8,
+    [2]=16,
+    [3]=24,
+    [4]=32,
+    [5]=40,
+}
+
 
 this.trainAssetName={
     [1]="chexiang_group_01",

@@ -1,5 +1,75 @@
-syntax = "proto3";import "room.proto";//百家乐玩家信息
-message BaccaratPlayerInfo {
+syntax = "proto3";import "room.proto";//百家乐基础信息
+message BaccaratBaseInfo {
+  int64 roomId = 1;  //房间ID,房间唯一ID
+  int32 wareId = 2;  //场次ID
+  int32 remainingCardNum = 3;  //剩余牌数量
+  int32 totalCardNum = 4;  //总的牌数量
+  EGamePhase eGamePhase = 5;  //游戏阶段信息
+  int32 phaseTotalTime = 6;  //阶段总时间
+  int32 phaseRemainingTime = 7;  //阶段剩余时间
+}
+
+//百家乐牌型状态
+message BaccaratCardState {
+  uint32 winState = 1;  //输赢状态, 1：庄赢，2：闲赢，3：和
+  uint32 cardTypeWinState = 2;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
+}
+
+//玩家金币更新
+message BaccaratPlayerChangedGold {
+  int64 playerId = 1;  //玩家ID
+  int64 playerWinGold = 2;  //玩家场上赢的金币
+}
+
+//百家乐结算信息
+message BaccaratSettlementInfo {
+  repeated uint32 bankerCardIds = 1;  //庄家牌ID信息
+  uint32 extraBankerCardId = 2;  //庄家补牌ID
+  uint32 bankerPointId = 3;  //庄家总点数
+  repeated uint32 playerCardIds = 4;  //闲家牌ID信息
+  uint32 extraPlayerCardId = 5;  //闲家补牌ID
+  uint32 playerPointId = 6;  //闲家总点数
+  BaccaratCardState cardState = 7;  //牌型状态
+}
+
+//百家乐桌上信息
+message BaccaratTableInfo {
+  repeated TablePlayerInfo tablePlayerInfoList = 1;  //房间的玩家信息
+  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
+  int32 totalTime = 3;  //场上总时间
+  repeated BetTableInfo tableAreaInfos = 4;  //区域下注信息
+}
+
+//百家乐房间摘要
+message BaccaratTableSingleRes {
+  BaccaratBaseInfo baccaratBaseInfo = 1;  //百家乐游戏基础信息
+  BaccaratCardState baccaratCardState = 2;  //百家乐牌状态
+  int32 roundId = 3;  //对局ID
+}
+
+//百家乐房间摘要
+message BaccaratTableSummary {
+  int64 roomId = 1;  //roomId
+  BaccaratBaseInfo baccaratBaseInfo = 2;  //百家乐游戏基础信息
+  repeated BaccaratCardState cardStateList = 3;  //牌型输赢状态
+}
+
+//请求押注的bean
+message ReqBetBean {
+  int64 betValue = 1;  //请求下注的金额
+  int32 betAreaIdx = 2;  //下注区域，1: 庄对 2: 和 3: 闲对 4: 闲 5: 庄
+}
+
+//押注信息
+message BetTableInfo {
+  int32 betIdx = 1;  //下标
+  int64 playerBetTotal = 2;  //玩家总押注
+  int64 betIdxTotal = 3;  //区域下标的总的押注数量
+  int64 betValue = 4;  //玩家此次下注的金币数量
+}
+
+//牌桌玩家信息
+message TablePlayerInfo {
   int64 playerId = 1;  //玩家ID
   string playerName = 2;  //玩家名
   string local = 3;  //玩家地址
@@ -7,53 +77,6 @@ message BaccaratPlayerInfo {
   int64 goldNum = 5;  //玩家当前金币
   int64 totalBet = 6;  //近20局下注金币总数
   int32 winCount = 7;  //近20局赢的总局数
-}
-
-//百家乐结算信息
-message BaccaratSettleInfo {
-  repeated uint32 bankerCardIds = 1;  //庄家牌ID信息
-  uint32 extraBankerCardId = 2;  //庄家补牌ID
-  uint32 bankerPointId = 3;  //庄家总点数
-  repeated uint32 playerCardIds = 4;  //闲家牌ID信息
-  uint32 extraPlayerCardId = 5;  //闲家补牌ID
-  uint32 playerPointId = 6;  //闲家总点数
-  uint32 winState = 7;  //输赢状态, 1：庄赢，2：闲赢，3：和
-  uint32 cardTypeWinState = 8;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
-  int64 playerGoldChange = 9;  //玩家金币变化值
-}
-
-//百家乐下注区域信息
-message BaccaratTableAreaInfo {
-  int32 areaId = 1;  //区域ID
-  int64 playerBetGold = 2;  //玩家已下注金币
-  int64 areaTotalBetGold = 3;  //区域总下注金币
-}
-
-//百家乐房间摘要
-message BaccaratTableSingleRes {
-  int64 roomId = 1;  //房间ID,房间唯一ID
-  int32 wareId = 2;  //场次ID
-  int32 restCardNum = 3;  //剩余牌数量
-  int32 totalCardNum = 4;  //总的牌数量
-  EGamePhase eGamePhase = 5;  //游戏阶段信息
-  int32 phaseTotalTime = 6;  //阶段总时间
-  int64 phaseRemainingTime = 7;  //阶段剩余时间
-  uint32 winState = 8;  //输赢状态, 1：庄赢，2：闲赢，3：和
-  uint32 cardTypeWinState = 9;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
-  int32 roundId = 10;  //对局ID
-}
-
-//百家乐房间摘要
-message BaccaratTableSummary {
-  int64 roomId = 1;  //房间ID,房间唯一ID
-  int32 wareId = 2;  //场次ID
-  int32 restCardNum = 3;  //剩余牌数量
-  int32 totalCardNum = 4;  //总的牌数量
-  EGamePhase eGamePhase = 5;  //游戏阶段信息
-  int32 phaseTotalTime = 6;  //阶段总时间
-  int32 phaseRemainingTime = 7;  //阶段剩余时间
-  repeated uint32 winStateList = 8;  //输赢状态, 1：庄赢，2：闲赢，3：和
-  repeated uint32 cardTypeWinStateList = 9;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
 }
 
 //请求,msgID=0x5082,desc=
@@ -76,41 +99,102 @@ message ReqBaccaratTableSummary {
   int32 roundId = 2;  //对局ID
 }
 
-//请求,msgID=0x18081,desc=通知百家乐桌上信息
+//请求,msgID=0x18004
+message ReqBaccaratTableInfo {
+  enum E_MsgID {def = 0; msgID = 98308;};
+}
+
+//请求,msgID=0x18081,desc=断线重连 通知玩家百家乐牌桌信息
 message NotifyBaccaratTableInfo {
   enum E_MsgID {def = 0; msgID = 98433;};
   EGamePhase gamePhase = 1;  //场上阶段信息
-  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
-  BaccaratSettleInfo baccaratSettleInfo = 3;  //场上结算信息，如果场上阶段不为结算，此值为空
-  repeated BaccaratTableAreaInfo tableAreaInfos = 4;  //区域下注信息
-  repeated BaccaratPlayerInfo playerInfos = 5;  //玩家当前信息
+  repeated BaccaratCardState cardStateList = 2;  //玩家第一次进入时初始化路单信息
+  BaccaratTableInfo baccaratTableInfo = 3;  //桌面的数据
+  repeated BaccaratPlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
+  BaccaratSettlementInfo baccaratSettlementInfo = 5;  //场上结算信息，如果场上阶段不为结算，此值为空
 }
 
 //请求,msgID=0x18082,desc=返回房间摘要信息
 message RespBaccaratTableSummaryList {
   enum E_MsgID {def = 0; msgID = 98434;};
-  repeated BaccaratTableSummary tableSummaryList = 1;  //房间摘要列表
+  int32 code = 1;  //状态码
+  repeated BaccaratTableSummary tableSummaryList = 2;  //房间摘要列表
 }
 
 //请求,msgID=0x18083,desc=返回房间单条摘要信息
 message RespBaccaratTableSummary {
   enum E_MsgID {def = 0; msgID = 98435;};
-  BaccaratTableSingleRes tableSummary = 1;  //房间单条摘要信息
-  int32 code = 2;  //状态码 状态码:200-消息正常 异常状态码202-房间已销毁
+  int32 code = 1;  //状态码
+  BaccaratTableSingleRes tableSummary = 2;  //房间单条摘要信息
+}
+
+//请求,msgID=0x18084,desc=返回百家乐桌上信息 首次进入
+message RespBaccaratTableInfo {
+  enum E_MsgID {def = 0; msgID = 98436;};
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  repeated BaccaratCardState cardStateList = 3;  //玩家第一次进入时初始化路单信息
+  BaccaratTableInfo baccaratTableInfo = 4;  //桌面的数据
+  repeated BaccaratPlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
+  BaccaratSettlementInfo baccaratSettlementInfo = 6;  //场上结算信息，如果场上阶段不为结算，此值为空
+  repeated int32 betInfoList = 7;  //压分列表
+}
+
+//请求,msgID=0x18085,desc=百家乐通知新的一局开始
+message NotifyBaccaratRoundStart {
+  enum E_MsgID {def = 0; msgID = 98437;};
+  int32 code = 1;  //状态码
+  BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
+}
+
+//请求,msgID=0x18086,desc=百家乐结算信息
+message NotifyBaccaratSettlementInfo {
+  enum E_MsgID {def = 0; msgID = 98438;};
+  int32 code = 1;  //状态码
+  BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
+  BaccaratSettlementInfo baccaratSettlementInfo = 3;  //场上结算信息，如果场上阶段不为结算，此值为空
+  repeated BaccaratPlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
 }
 
 //请求,msgID=0x20001,desc=请求下注
 message ReqBet {
   enum E_MsgID {def = 0; msgID = 131073;};
-  int32 betValue = 1;  //请求下注的金额
-  int32 betAreaIdx = 2;  //下注区域，1: 闲对 2: 和 3: 庄对 4: 闲 5: 庄
+  repeated ReqBetBean reqBetBeans = 1;  //请求押注和续押
+}
+
+//请求,msgID=0x20002,desc=在游戏中请求加入房间
+message ReqJoinRoom {
+  enum E_MsgID {def = 0; msgID = 131074;};
+  int64 roomId = 1;  //房间ID
+  int32 gameType = 2;  //游戏类型
+  int32 wareId = 3;  //场次id
+}
+
+//请求,msgID=0x20003,desc=请求获取百人牌桌的玩家信息
+message ReqTablePlayerInfo {
+  enum E_MsgID {def = 0; msgID = 131075;};
 }
 
 //请求,msgID=0x20081,desc=请求下注返回
-message RespBet {
+message NotifyPlayerBet {
   enum E_MsgID {def = 0; msgID = 131201;};
-  int32 bet = 1;  //下注倍数
+  int32 code = 1;  //状态码
   int64 playerId = 2;  //玩家ID
-  int32 betArea = 3;  //下注区域
+  int64 playerCurGold = 3;  //下注玩家当前金币
+  repeated BetTableInfo betTableInfoList = 4;  //玩家押注信息列表
+}
+
+//请求,msgID=0x20082,desc=在游戏中返回加入房间
+message RespJoinRoom {
+  enum E_MsgID {def = 0; msgID = 131202;};
+  int32 code = 1;  //状态码
+  int32 roomCfgId = 2;  //房间配置ID
+}
+
+//请求,msgID=0x20083,desc=返回百人牌桌玩家列表的下注信息
+message RespTablePlayerInfo {
+  enum E_MsgID {def = 0; msgID = 131203;};
+  int32 code = 1;  //状态码
+  repeated TablePlayerInfo tablePlayerInfo = 2;  //百人牌桌的玩家信息
 }
 

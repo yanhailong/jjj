@@ -1,0 +1,13 @@
+daojishi.png
+size:256,1024
+filter:Linear,Linear
+pma:true
+1
+bounds:2,2,118,268
+offsets:3,2,123,273
+2
+bounds:2,272,186,270
+offsets:2,2,189,274
+3
+bounds:2,544,186,273
+offsets:2,3,189,279

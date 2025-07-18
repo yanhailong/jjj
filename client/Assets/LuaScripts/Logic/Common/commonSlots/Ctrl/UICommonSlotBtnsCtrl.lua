@@ -210,6 +210,7 @@ function UICommonSlotBtnsCtrl:SetChipInfo(str)
 		end
 	end
 	self:SetChipText(self.stakeList[self.betIndex])
+	GlobalEvent.Notify(SlotGlobal.gameEventName.ChangeBetInfo,self.stakeList[self.betIndex])
 end
 --下注相关--------------------
 --endregion

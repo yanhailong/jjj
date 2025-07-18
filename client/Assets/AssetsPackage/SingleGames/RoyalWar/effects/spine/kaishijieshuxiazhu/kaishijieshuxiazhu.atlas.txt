@@ -1,0 +1,16 @@
+kaishijieshuxiazhu.png
+size:2048,256
+filter:Linear,Linear
+pma:true
+betting
+bounds:1065,71,334,109
+offsets:5,1,340,111
+db
+bounds:2,2,1061,178
+offsets:17,2,1092,182
+start
+bounds:1609,97,221,83
+offsets:1,1,223,87
+stop
+bounds:1401,76,206,104
+offsets:1,1,208,108

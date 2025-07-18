@@ -11,11 +11,11 @@ this.ChipState={
 }
 ---下注的区域
 this.BetState={
-    Banker = 1,
-    Player = 2,
-    Tie = 3,
-    PPair = 4,
-    BPair = 5,
+    BPair = 1,
+    Tie = 2,
+    PPair =3,
+    Player = 4,
+    Banker = 5,
 }
 
 
@@ -29,7 +29,21 @@ this.ABNames={
     Card="Common/GameArtsCommon/GameFight/alats/card",--牌
     chipPool="SingleGames/Baccarat/prefabs/Pool",--筹码
     prefabsItem = "SingleGames/Baccarat/prefabs" ,--预支item路径
+    commonMain = "Common/GameArtsCommon/GameFight/alats/main",--通用资源主路径
 }
+---通用资源
+this.commonMain_Pics = {}
+function this.InitCommonMainPic()
+    local pics=resMgr:LoadAllAssets(this.ABNames.commonMain,typeof(UnityEngine.Sprite))
+    for i = 0, pics.Length-1 do
+        local pic=pics[i];
+        this.commonMain_Pics[pic.name]=pic;
+    end
+end
+---获取通用资源Sprite
+function this.GetCommonMainPic(iconName)
+    return this.commonMain_Pics[iconName];
+end
 ---Main里面的图片
 this.icon_Pics={}
 function this.InitIconPic()
