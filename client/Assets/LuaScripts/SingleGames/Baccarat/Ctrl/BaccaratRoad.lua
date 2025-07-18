@@ -54,12 +54,17 @@ function BaccaratRoad:Init(ZhuPanContent,DaLuContent,DaluZiluContent,XiaoLuConte
     self:InitXiaoLuTable()
     self:InitYueYouLuTable()
 end
----初始化数据
-function BaccaratRoad:InitData(data)
-    for i, v in ipairs(data.winStateList) do
+---第一次拉取到数据初始化数据
+---@param data 牌型数据
+---@param isSettlement 是不是结算阶段
+function BaccaratRoad:InitData(data,isSettlement)
+    for i, v in ipairs(data.cardStateList) do
+        if(isSettlement and i== #data.cardStateList) then
+            break;
+        end
         local data2 = {};
-        data2[1] = v
-        data2[2] = data.cardTypeWinStateList[i]
+        data2[1] = v.winState
+        data2[2] = v.cardTypeWinState
         table.insert(self.ZhuPanDataTable,data2)
     end
     for _, v in ipairs(self.ZhuPanDataTable) do
@@ -71,11 +76,11 @@ function BaccaratRoad:RefreshData(data,isFlicker)
     if(#self.ZhuPanDataTable>=50) then
         self:CloseLuTable()
     end
-    local data = {};
-    data[1] = data.winState;
-    data[2] = data.cardTypeWinState
-    self:RefreshZhuPanShow(data,isFlicker)
-    table.insert(self.ZhuPanDataTable,data);
+    local data2 = {};
+    data2[1] = data.winState;
+    data2[2] = data.cardTypeWinState
+    self:RefreshZhuPanShow(data2,isFlicker)
+    table.insert(self.ZhuPanDataTable,data2);
 end
 
 ---初始化大路预制体表

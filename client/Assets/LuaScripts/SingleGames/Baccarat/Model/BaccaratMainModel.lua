@@ -13,15 +13,18 @@ end
 
 function BaccaratMainModel:Close()
     self.super.Close(self);
+	WebNetEvent.RemoveAllTo(self)
 end
 
 function BaccaratMainModel:AddEvent()
 	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummaryList, self.RespBaccaratTableSummaryList, self)
 	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummary, self.ResBaccaratTableSummary, self)
+	WebNetEvent.AddListener(pb_Baccarat.RespJoinRoom, self.RespJoinRoom, self)
+	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableInfo, self.RespBaccaratTableInfo, self)
 end
 
 function BaccaratMainModel:RemoveEvent()
-
+	
 end
 
 ---请求进入到百家乐大厅（大厅协议）
@@ -32,9 +35,14 @@ function BaccaratMainModel:ReqBaccaratTableSummaryList(wareId)
 	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableSummaryList,data)
 end
 ---返回进入到百家乐大厅
-function BaccaratMainModel:ResBaccaratTableSummaryList(data)
-	look("返回进入到百家乐大厅",data)
-	self.ctrl:InitSelectModel(data)
+function BaccaratMainModel:RespBaccaratTableSummaryList(data)
+	if data.code == 200 then
+		look("返回进入到百家乐大厅",data)
+		self.ctrl:InitSelectModel(data)
+	else
+		look("返回进入到百家乐大厅失败，错误码是",data.code)
+	end
+ 
 end
 ---请求百家乐游戏进入下一个阶段（大厅协议）
 function BaccaratMainModel:ReqBaccaratTableSummary(roomId,roundId)
@@ -48,6 +56,43 @@ end
 function BaccaratMainModel:ResBaccaratTableSummary(data)
 	look("请求百家乐游戏进入下一个阶段",data)
 	self.ctrl:RefreshSelectModel(data)
+end
+---请求进入百家乐房间
+---@param roomId 房间ID
+---@param gameType 游戏类型
+---@param wareId 场次ID
+function BaccaratMainModel:ReqJoinRoom(roomId,gameType,wareId)
+	local data={}
+	data.roomId=roomId;
+	data.gameType=gameType;
+	data.wareId=wareId;
+	look("请求进入百家乐房间",data)
+	WebNetworkManager.SendMsg(pb_Baccarat.ReqJoinRoom,data)
+end
+---进入百家类房间返回
+function BaccaratMainModel:RespJoinRoom(msg)
+	if (msg.code == 200) then
+		look("进入百家类房间返回成功")
+		self:ReqBaccaratTableInfo()
+	else
+		look("进入百家类房间返回失败，错误码是",msg.code)
+	end
+end
+
+---请求百家乐房间数据
+function BaccaratMainModel:ReqBaccaratTableInfo()
+	look("请求百家乐房间数据")
+	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableInfo)
+end
+---返回百家乐房间数据
+function BaccaratMainModel:RespBaccaratTableInfo(msg)
+	if(msg.code == 200) then
+		look("返回百家乐房间数据",msg)
+		CtrlManager.SingleShow(CtrlNames.BaccaratGame,msg)
+		self:Close()
+	else
+		look("返回百家乐房间数据失败",msg.code)
+	end
 end
 
 --region 事件方法

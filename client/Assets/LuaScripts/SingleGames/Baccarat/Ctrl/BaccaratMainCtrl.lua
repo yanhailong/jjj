@@ -67,6 +67,7 @@ end
 function BaccaratMainCtrl:AddUIEvent()
     self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close()
+		GameCenter.LeaveGame();
 	end)
 	
 	self.uiEventListener:AddClick(self.view.btn_Help,function()
