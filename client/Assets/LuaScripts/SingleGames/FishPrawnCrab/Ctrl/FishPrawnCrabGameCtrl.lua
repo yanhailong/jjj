@@ -86,7 +86,7 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		self:RefreshMenuShow()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_help,function()
-		--CtrlManager.SingleShow(CtrlNames)
+		CtrlManager.SingleShow(CtrlNames.FishPrawnCrabHelp)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close();
@@ -96,7 +96,7 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
-		--CtrlManager.SingleShow(CtrlNames)
+		CtrlManager.SingleShow(CtrlNames.FishPrawnCrabPlayers)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
 		SimulationServer:StartServer()
@@ -379,25 +379,52 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 		for areaIndex = 1, #message.dice_result do
 			--自己
 			local chipsArr = self.view.selfPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
-			for chipIndex = 1, #chipsArr do
-				FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
-			end
-			chipsArr = {}
+			--for chipIndex = 1, #chipsArr do
+			--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
+			--end
+			--chipsArr = {}
+			CorManager.StartCor(self, function()
+				for chipIndex = 1, #chipsArr do
+					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
+					if #chipsArr - chipIndex < 3 then
+						coroutine.wait(0.2)
+					end
+				end
+				chipsArr = {}
+			end)
 			--旁观的人
 			local lookOnChipsArr = self.lookOnBetData[message.dice_result[areaIndex].anim_index]
-			for chipIndex = 1, #lookOnChipsArr do
-				FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
-			end
-			lookOnChipsArr = {}
+			--for chipIndex = 1, #lookOnChipsArr do
+			--	FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
+			--end
+			--lookOnChipsArr = {}
+			CorManager.StartCor(self, function()
+				for chipIndex = 1, #lookOnChipsArr do
+					FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
+					if #lookOnChipsArr - chipIndex < 3 then
+						coroutine.wait(0.2)
+					end
+				end
+				lookOnChipsArr = {}
+			end)
 			
 			--座位上的人
 			for playerIndex = 1, #self.view.AllOtherPlayerHeads do
 				local otherPlayer = self.view.AllOtherPlayerHeads[playerIndex]
 				local chipsArr = otherPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
-				for chipIndex = 1, #chipsArr do
-					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
-				end
-				chipsArr = {}
+				--for chipIndex = 1, #chipsArr do
+				--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
+				--end
+				--chipsArr = {}
+				CorManager.StartCor(self, function()
+					for chipIndex = 1, #chipsArr do
+						FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
+						if #chipsArr - chipIndex < 3 then
+							coroutine.wait(0.2)
+						end
+					end
+					chipsArr = {}
+				end)
 			end
 		end
 		

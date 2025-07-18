@@ -212,6 +212,15 @@ function this.AddEvent()
     GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.START_SIMULATION_SERVER, this.StartServer, this)
     GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.STOP_SIMULATION_SERVER, this.StopServer, this)
     GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.REQUEST_BET, this.PlayerBet, this)
+    GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.REQUEST_RANKLIST, this.GetRankList, this)
+end
+
+function this:GetRankList()
+    local rankData = {}
+    for k, player in pairs(this.playerArr) do
+        table.insert(rankData, player)
+    end
+    GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.RES_RANKLIST, rankData)
 end
 
 function this:PlayerBet(message)

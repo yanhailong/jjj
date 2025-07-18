@@ -137,6 +137,7 @@ function FishPrawnCrabChipManager:RemoveChip(chipObj)
 end
 
 function FishPrawnCrabChipManager:Destroy()
+    look("FishPrawnCrabChipManager:Destroy()")
     pool:DestroyAll()
 end
 
