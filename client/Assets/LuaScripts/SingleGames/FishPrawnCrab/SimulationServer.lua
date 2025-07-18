@@ -17,6 +17,9 @@ this.stateStartTime = Time.time;
 this.dices = {}
 this.areasBetInfo = {0, 0, 0, 0, 0, 0}
 
+this.playerAutoBetDataArr = {}
+this.autoBetTickTimer = nil
+
 function this:StartServer()
     if this.isRunning then
         ---正在运行中，就直接把服务器数据发送给客户端
@@ -29,6 +32,13 @@ function this:StartServer()
         this.StartStateMachine()
         this.AddEvent()
         this.isRunning = true
+        --自动下注
+        if this.autoBetTickTimer ~= nil then
+            TimerManager.StopTimer(this.autoBetTickTimer)
+        end
+        this.autoBetTickTimer = TimerManager.StartTimer(this, function()
+            this.AutoBetTick();
+        end, 1, -1, true);
 
         --创建自己数据
         local selfPlayerInfo = this.createPlayer(FishPrawnCrabConfig.selfTestPlayerId)
@@ -101,6 +111,8 @@ function this.SwitchToPrepareState()
         this.SwitchToBetState();
     end, FishPrawnCrabConfig.prepareStateDuration, 1, true);
     this.stateStartTime = Time.time
+    --清空自动下注参数
+    this.playerAutoBetDataArr = {}
     --
     this.areasBetInfo = {0, 0, 0, 0, 0, 0}
     for k,v in pairs(this.playerArr) do
@@ -222,17 +234,52 @@ function this:PlayerBet(message)
                 resMsg.remaining_coin = targetPlayer.coin
                 
                 GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.SYNC_TOTAL_BETS, this.areasBetInfo)
+                if message.playerid ~= FishPrawnCrabConfig.selfTestPlayerId then
+                    local playerBetMsg = {}
+                    playerBetMsg.area = message.area
+                    playerBetMsg.playerid = message.playerid
+                    playerBetMsg.chip = message.chip
+                    GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.NOTIFY_PLAYER_BET, playerBetMsg)
+                end
             end
         end
     else
         resMsg.result = 1
     end
-    
-    GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.RES_BET_RESULT, resMsg)
+
+    if message ~= nil and message.playerid ~= nil and message.playerid == FishPrawnCrabConfig.selfTestPlayerId then
+        GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.RES_BET_RESULT, resMsg)
+    end
 end
 
 function this.RemoveEvent()
     GlobalEvent.RemoveAllTo(this)
+end
+
+function this.AutoBetTick()
+    if this.status == FishPrawnCrabConfig.GameState.Bet then
+        for k, player in pairs(this.playerArr) do
+            if k ~= FishPrawnCrabConfig.selfTestPlayerId then
+                local params = this.playerAutoBetDataArr[k]
+                if params == nil then
+                    params = {lastBetTime = Time.time}
+                    params.betCD = Tools.RandomInt(0, 5)
+                    this.playerAutoBetDataArr[k] = params
+                end
+
+                if params.lastBetTime + params.betCD >= Time.time then
+                    local betMsg = {}
+                    betMsg.area = Tools.RandomInt(1, FishPrawnCrabConfig.diceSideCount)
+                    betMsg.chip = Tools.RandomInt(1, #FishPrawnCrabConfig.betValuesArr)
+                    betMsg.playerid = k
+                    this:PlayerBet(betMsg)
+                    
+                    params.lastBetTime = Time.time
+                    params.betCD= Tools.RandomInt(0, 5)
+                end
+            end
+        end
+    end
 end
 
 return this

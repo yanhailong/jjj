@@ -127,17 +127,22 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		end)
 	end
 	self.uiEventListener:AddClick(self.view.btn_repeat,function()
-		if #self.lastBetInfo > 0 and self.isRepeatBet == false then
+		if self:AllowRepeatBet() then
 			self.isRepeatBet = true
 			for i = 1, #self.lastBetInfo do
 				if self.allowBet == false or self.curStatus ~= FishPrawnCrabConfig.GameState.Bet 
 						or FishPrawnCrabConfig.betValuesArr[self.lastBetInfo[i].chip] > self.goldRealNum then
 					break
 				end
-				self:OnSelfBet(self.lastBetInfo[i])
-				--self.view:PayXiaZhuCoinFly(VietnamChessConfig.lastXiaZhuInfo[i].side)
-				--飞筹码
-				FishPrawnCrabChipManager:AnimateChip(self.lastBetInfo[i].chip, self.view.selfPlayer.transform.position, self.view.betAreas[self.lastBetInfo[i].area])
+
+				--发送消息
+				local betMsg = { playerid = self.view.selfPlayer.id,
+								 area = self.lastBetInfo[i].area,
+								 chip = self.lastBetInfo[i].chip }
+				GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
+				--self:OnSelfBet(self.lastBetInfo[i])
+				----飞筹码
+				--FishPrawnCrabChipManager:AnimateChip(self.lastBetInfo[i].chip, self.view.selfPlayer.transform.position, self.view.betAreas[self.lastBetInfo[i].area])
 			end
 			self.view.btn_repeat.interactable = false
 		end
@@ -186,7 +191,7 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	end
 	
 	self.view:UpdateBetAreaInfo()
-	self.view.btn_repeat.interactable = self.allowBet
+	self.view.btn_repeat.interactable = false
 	self.view:UpdateBetBtnStatus()
 
 	--tip
@@ -206,7 +211,23 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
 		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
+end
+
+function FishPrawnCrabGameCtrl:AllowRepeatBet()
+	local allReBet = false
+	if self.allowBet and #self.lastBetInfo > 0 then
+		-- 判断钱是否足够
+		local lastBetAmount = 0
+		for i = 1, #self.lastBetInfo do
+			lastBetAmount = lastBetAmount + FishPrawnCrabConfig.betValuesArr[self.lastBetInfo[i].chip]
+		end
+		if lastBetAmount <= self.goldRealNum then
+			allReBet = true
+		end
+	end
+	
+	return allReBet
 end
 
 ---进入到下注阶段
@@ -215,7 +236,7 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 	self.allowBet = true
 	self.isRepeatBet = false
 
-	self.view.btn_repeat.interactable = self.allowBet and #self.lastBetInfo > 0
+	self.view.btn_repeat.interactable = self:AllowRepeatBet()
 	self.view:UpdateBetBtnStatus()
 	
 	--tip
@@ -238,7 +259,7 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 		--倒计时3s
 		if math.abs(self.statusRemainingSeconds - 3) <= 0.1 then
 			self.view.colockStateTimeTrs.gameObject:SetActive(false)
-			--self:PlayDaoJiShiEffect()
+			self.view:PlayDaoJiShiEffect()
 		end
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
@@ -249,8 +270,10 @@ function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
 	self.allowBet = false
 	self.lastBetInfo = self.selfBetInfo
 
-	self.view.btn_repeat.interactable = self.allowBet
+	self.view.btn_repeat.interactable = false
 	self.view:UpdateBetBtnStatus()
+
+	self.view.three.gameObject:SetActive(false)
 
 	--tip
 	self.view.tipsStartToBet:SetActive(false)
@@ -330,7 +353,6 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
 			if targetPlayer ~= nil then
 				targetChipArr = targetPlayer.chipInfo
-				look("targetChipArr:" .. #targetChipArr)
 			else
 				targetChipArr = self.lookOnBetData
 			end
@@ -358,7 +380,7 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			chipsArr = {}
 			--旁观的人
 			local lookOnChipsArr = self.lookOnBetData[message.dice_result[areaIndex].anim_index]
-			for chipIndex = 1, #chipsArr do
+			for chipIndex = 1, #lookOnChipsArr do
 				FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
 			end
 			lookOnChipsArr = {}
@@ -425,24 +447,38 @@ function FishPrawnCrabGameCtrl:OnClickCenterBetArea(areaIndex)
 	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
 end
 
-function FishPrawnCrabGameCtrl:OnBetRusultMsg(data)
-	--local data = {area = areaIndex,
+function FishPrawnCrabGameCtrl:OnPlayerBetMsg(message)
+	local targetPlayer = self.view:FindPlayer(message.playerid) 
+	--飞筹码
+	if targetPlayer ~= nil then
+		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, targetPlayer.transform.position, self.view.betAreas[message.area])
+		table.insert(self.allBetData[message.area], newChipObj)
+		targetPlayer:AddChip(message.area, newChipObj)
+	else
+		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, self.view.btn_players.transform.position, self.view.betAreas[message.area])
+		table.insert(self.allBetData[message.area], newChipObj)
+		table.insert(self.lookOnBetData[message.area], newChipObj)
+	end
+end
+
+function FishPrawnCrabGameCtrl:OnBetRusultMsg(message)
+	--local message = {area = areaIndex,
 	--			  chip = self.betIndex,
 	--              remaining_coin = 0,
 	--				result = 0}
-	if data ~= nil and data.result == 0 then
-		self:OnSelfBet(data)
+	if message ~= nil and message.result == 0 then
+		self:OnSelfBet(message)
 		--飞筹码
-		local newChipObj = FishPrawnCrabChipManager:AnimateChip(data.chip, self.view.selfPlayer.transform.position, self.view.betAreas[data.area])
-		table.insert(self.allBetData[data.area], newChipObj)
-		self.view.selfPlayer:AddChip(data.area, newChipObj)
+		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, self.view.selfPlayer.transform.position, self.view.betAreas[message.area])
+		table.insert(self.allBetData[message.area], newChipObj)
+		self.view.selfPlayer:AddChip(message.area, newChipObj)
 		--更新自身金币
-		self.goldRealNum = data.remaining_coin
+		self.goldRealNum = message.remaining_coin
 
 		self.view:UpdateBetBtnStatus()
 		self.view:UpdateSelfGoldCount()
 	else
-		logError("下注失败:" .. data.result)
+		logError("下注失败:" .. message.result)
 	end
 end
 

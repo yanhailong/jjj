@@ -216,6 +216,28 @@ function FishPrawnCrabGameView:ChangeAnte(index)
     self.ctrl.betIndex = index
 end
 
+---倒计时3秒
+function FishPrawnCrabGameView:PlayDaoJiShiEffect()
+    for i = 0, 1 do
+        self.three:GetChild(i).gameObject:SetActive(false)
+    end
+    self.three.gameObject:SetActive(true)
+    self.tipsTimeThree:SetActive(true)
+
+    self.three:GetChild(2).gameObject:SetActive(true)
+    for i = 1, 3 do
+        TimerManager.StartTimer(self,function()
+            if i == 3 then
+                self.three.gameObject:SetActive(false)
+                self.tipsTimeThree:SetActive(false)
+                return
+            end
+            self.three:GetChild(3-i).gameObject:SetActive(false)
+            self.three:GetChild(2-i).gameObject:SetActive(true)
+        end, i,0,false)
+    end
+end
+
 ---更新自己信息
 function FishPrawnCrabGameView:UpdateSelf(player)
     self.selfPlayer:UpdatePlayer(player)
@@ -272,7 +294,7 @@ function FishPrawnCrabGameView:FindPlayer(playerid)
     else
         for i = 1, #self.AllOtherPlayerHeads do
             if self.AllOtherPlayerHeads[i].id == playerid then
-                target = slef.AllOtherPlayerHeads[i]
+                target = self.AllOtherPlayerHeads[i]
             end
         end
     end

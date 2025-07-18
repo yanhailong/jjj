@@ -23,6 +23,7 @@ function FishPrawnCrabGameModel:AddEvent()
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.RES_BET_RESULT,self.OnBetRusultMsg,self)
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.SYNC_TOTAL_BETS,self.OnSyncTotalBetMsg,self)
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.GAME_SETTLEMENT,self.OnGameSettlementMsg,self)
+	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.NOTIFY_PLAYER_BET,self.OnPlayerBetMsg,self)
 end
 
 function FishPrawnCrabGameModel:RemoveEvent()
@@ -66,6 +67,11 @@ end
 ---下注结果消息
 function FishPrawnCrabGameModel:OnBetRusultMsg(message)
 	self.ctrl:OnBetRusultMsg(message)
+end
+
+---其他人下注消息
+function FishPrawnCrabGameModel:OnPlayerBetMsg(message)
+	self.ctrl:OnPlayerBetMsg(message)
 end
 
 ---游戏结算数据
