@@ -93,6 +93,11 @@ end
 function this.CanvasGroup(transform, childPath)
     return this.GetComponent(transform, childPath, "CanvasGroup")
 end
+---@return UnityEngine.Canvas
+function this.Canvas(transform, childPath)
+    return this.GetComponent(transform, childPath, "Canvas")
+end
+
 ---@return UnityEngine.LineRenderer
 function this.LineRenderer(transform, childPath)
     return this.GetComponent(transform, childPath, "LineRenderer")

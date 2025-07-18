@@ -11,6 +11,7 @@ this.gameEventName={
     NoticeStopAuto="NoticeStopAuto",--通知停止自动
     RollStop="RollStop",--转动k快速停止
     GameStateChange="GameStateChange",--游戏状态改变
+    ChangeBetInfo="ChangeBetInfo",--切换下注信息
     
 }
 

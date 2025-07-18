@@ -12,7 +12,7 @@ require("Logic/Common/commonSlots/MVCHead")
 
 ---构造函数
 function USDollarExpressMainCtrl:ctor(ctrlName,param)
-    self.layer=2;
+    self.layer=1;
     self.abName="SingleGames/USDollarExpress/prefabs/USDollarExpressMain";
     self.prefabName="USDollarExpressMain"
     self.super.ctor(self,ctrlName,param);
@@ -36,6 +36,19 @@ function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,betInfos)
 	---@type UICommonSlotTopCtrl
 	self.topCtrl=CtrlManager.SingleShow(CtrlNames.UICommonSlotTop)
+	
+	self.poolList=betInfos.poolList
+	for i = 1, #self.poolList do
+		config.jackPotInfos[self.poolList[i].id]=self.poolList
+	end
+
+	self.txtJackpots={}
+	self.txtJackpots[config.jackpotIds.minori]=self.view.txt_minor
+	self.txtJackpots[config.jackpotIds.major]=self.view.txt_mejor
+	self.txtJackpots[config.jackpotIds.grand]=self.view.txt_grand
+	self.txtJackpots[config.jackpotIds.minni]=self.view.txt_mini
+	self:BetInfoChange(betInfos.defaultBet)
+	look("收到的下注配置信息",betInfos)
 end
 
 
@@ -155,6 +168,8 @@ function USDollarExpressMainCtrl:InitBigKuang()
 	for i = 1, 5 do
 		self.bigKuangEffects[i]=ComponentUtilGet.GameObject(self.view.transform,"content/effects/effect_biankuang_su_liuguang"..i)
 	end
+	self.eff_choose_a_freature_bd=ComponentUtilGet.GameObject(self.view.transform,"content/effects/eff_choose_a_freature_bd")
+	self.eff_choose_a_freature_bd:SetActive(false)
 end
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
@@ -204,14 +219,17 @@ function USDollarExpressMainCtrl:ReSetData()
 
 	---默认都转3圈结束转动
 	self.rollCircles={}
-	for i = 1,5 do
-		--if i==5 then
-		--	self.rollCircles[i] = 15
-		--else
-		--	self.rollCircles[i] = 3+i
-		--end
-		self.rollCircles[i] = 3+i
+	if config.gameTypeState==1 then
+		--二选1模式
+		for i = 1,5 do
+			self.rollCircles[i] = config.rollCircles1[i]
+		end
+	else
+		for i = 1,5 do
+			self.rollCircles[i] = config.rollCircles[i]
+		end
 	end
+
 
 	if self.lineShowCor~=nil then
 		coroutine.stop(self.lineShowCor)
@@ -459,7 +477,6 @@ end
 
 function USDollarExpressMainCtrl:SetIconEffect(lineInfo)
 	local awardPos=lineInfo.iconIndexs
-	look("awardPos",awardPos)
 	for i=1,#awardPos do
 		---@type USDollarExpressSlotItem
 		local item=self.showChildsList[awardPos[i]]
@@ -467,7 +484,7 @@ function USDollarExpressMainCtrl:SetIconEffect(lineInfo)
 			item:SetIsAward(true)
 			Tools.SetActive(self.awardSmallKuangEffects[awardPos[i]],true)
 		else
-			logError("图标不存在"..awardPos[i])
+			logError("icon not has!"..awardPos[i])
 		end
 	end
 end
@@ -480,14 +497,30 @@ function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
 end
 
 function USDollarExpressMainCtrl:EnterSmallGame()
-	logError("进入拉火车小游戏")
-	if self.model.specialType==1 then
-		--CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+	if self.model.status==1 then
+		logError("进入二选1模式")
+		config.gameTypeState=1
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
+	else
+		self:AddShowStep()
 	end
-	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:EndSmallGame()
+	self:AddShowStep()
+	if self.model.status==1 then
+		CorManager.StartCor(self, function
+		()
+			self.eff_choose_a_freature_bd:SetActive(true)
+			coroutine.wait(1)
+			config.gameTypeState=1
+			self.model:ReqStartGame()---请求旋转一次
+		end)
+
+	end
+end
+
+function USDollarExpressMainCtrl:AddShowStep()
 	config.showStep=config.showStep+1
 end
 
@@ -541,8 +574,27 @@ end
 
 ---添加UI事件
 function USDollarExpressMainCtrl:AddUIEvent()
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.ChangeBetInfo, self.BetInfoChange,self)
+end
+
+---下注信息改变修改奖池显示
+function USDollarExpressMainCtrl:BetInfoChange(betInfo)
+	self:RestJackPots(betInfo)
+end
+
+function USDollarExpressMainCtrl:RestJackPots(_betInfo)
+	local betInfo=_betInfo
+	for i = 1, #self.poolList do
+		local jackPool=self.poolList[i]
+		local baseShow=math.floor(betInfo*jackPool.initTimes)
+		self.txtJackpots[jackPool.id].text=baseShow
+	end
+end
+
+function USDollarExpressMainCtrl:UpDateValue()
 
 end
+
 
 function USDollarExpressMainCtrl:BackHome()
 	GameCenter.LeaveGame();

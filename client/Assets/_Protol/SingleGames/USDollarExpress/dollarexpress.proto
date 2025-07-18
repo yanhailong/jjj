@@ -6,6 +6,15 @@ message DollarsInfo {
   int32 goldTrainCount = 4;  //黄金列车车厢节数
 }
 
+//奖池信息
+message PoolInfo {
+  int32 id = 1;  //奖池id
+  int32 initTimes = 2;  //初始倍数
+  int32 maxTimes = 3;  //最大倍数
+  int32 perSomeSec = 4;  //变化间隔时间
+  int32 updateProp = 5;  //每过单位时间，奖池变化万分比
+}
+
 //请求,msgID=0x7001,desc=请求选择免费模式的游戏
 message ReqChooseFreeModel {
   enum E_MsgID {def = 0; msgID = 28673;};
@@ -43,6 +52,7 @@ message ResConfigInfo {
   int32 code = 1;  //状态码
   repeated int32 stakeList = 2;  //押注列表
   int32 defaultBet = 3;  //默认押注
+  repeated PoolInfo poolList = 4;  //奖池信息
 }
 
 //响应,msgID=0x7004,desc=选择投资地区返回
