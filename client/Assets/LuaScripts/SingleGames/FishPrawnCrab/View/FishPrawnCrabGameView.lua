@@ -25,6 +25,8 @@ function FishPrawnCrabGameView:InitView()
     self:InitPalyers()
     ---下注区域
     self:InitBetArea()
+    --游戏记录
+    self:InitGameRecords()
 end
 
 ---获取组件
@@ -120,13 +122,35 @@ end
 
 ---结果信息
 function FishPrawnCrabGameView:InitGameResult()
-    self.dicePlate = ComponentUtilGet.GameObject(self.transform, "Background/resoult/plate")
-    self.diceBowl = ComponentUtilGet.GameObject(self.transform, "Background/resoult/bowl")
+    self.dicePlate = ComponentUtilGet.GameObject(self.transform, "content/resoult/plate")
+    self.diceBowl = ComponentUtilGet.GameObject(self.transform, "content/resoult/bowl")
     self.diceImages = {}
     self.diceTexts = {}
     for i = 1, FishPrawnCrabConfig.diceCount do
-        self.diceImages[i] = ComponentUtilGet.Image(self.transform, "Background/resoult/dices/dice" .. i)
-        self.diceTexts[i] = ComponentUtilGet.TextMeshProUGUI(self.transform, "Background/resoult/dices/dice" .. i .."/Text (TMP)")
+        self.diceImages[i] = ComponentUtilGet.Image(self.transform, "content/resoult/dices/dice" .. i)
+        self.diceTexts[i] = ComponentUtilGet.TextMeshProUGUI(self.transform, "content/resoult/dices/dice" .. i .."/Text (TMP)")
+    end
+end
+
+--游戏记录
+function FishPrawnCrabGameView:InitGameRecords()
+    local recordRootTrans = ComponentUtilGet.Transform(self.transform, "content/records")
+    self.recordsRootObj = recordRootTrans.gameObject
+    self.latestRecordIconObj = ComponentUtilGet.GameObject(recordRootTrans, "latest_image")
+    self.recordUIDatas = {}
+    for i = 1, FishPrawnCrabConfig.showRecordCount do
+        local perRecordData = {}
+        perRecordData.rootObj = ComponentUtilGet.GameObject(recordRootTrans, "record_grid/record" .. i)
+        local diceImages = {}
+        local diceTexts = {}
+        for diceIndex = 1, FishPrawnCrabConfig.diceCount do
+            diceImages[diceIndex] = ComponentUtilGet.Image(perRecordData.rootObj.transform, "dice" .. diceIndex)
+            diceTexts[diceIndex] = ComponentUtilGet.TextMeshProUGUI(diceImages[diceIndex].transform:GetChild(0))
+        end
+        perRecordData.diceImages = diceImages
+        perRecordData.diceTexts = diceTexts
+        
+        self.recordUIDatas[i] = perRecordData
     end
 end
 
@@ -163,6 +187,9 @@ function FishPrawnCrabGameView:InitPanelData(args)
     for i = 1, #self.winHighLights do
         self.winHighLights[i].gameObject:SetActive(false)
     end
+    
+    self.recordsRootObj:SetActive(false)
+    self.latestRecordIconObj:SetActive(false)
 end
 
 ---关闭界面

@@ -33,12 +33,6 @@ function FishPrawnCrabGameCtrl:InitData()
 	self.betIndex = 1;
 	---当前是否可以下注
 	self.allowBet = false
-	---本局结果
-	self.side = 0
-	self.isouNum = true
-	self.betAreas = {}
-	---本局骰子结果
-	self.resultDices = {0,0,0}
 	---当前总底注
 	self.totalBets = {0,0,0,0,0,0}
 	---当前个人底注
@@ -49,8 +43,6 @@ function FishPrawnCrabGameCtrl:InitData()
 	self.curStatus = FishPrawnCrabConfig.GameState.Bet
 	---当前状态剩余秒数 13
 	self.statusRemainingSeconds = 3
-	---房间总人数
-	self.totalPlayerNum = 66
 
 	---复投
 	self.lastBetInfo = {}
@@ -59,6 +51,7 @@ function FishPrawnCrabGameCtrl:InitData()
 	---本局下注数据
 	self.allBetData = {{}, {}, {}, {}, {}, {}}
 	self.lookOnBetData = {{}, {}, {}, {}, {}, {}}
+	self.recordData = {}
 	
 	self.view.selfPlayer:UpdatePlayer({ id = FishPrawnCrabConfig.selfTestPlayerId, coin = self.goldRealNum})
 	
@@ -329,7 +322,19 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			self.view.diceTexts[i].color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
 		end
 		self.view.diceBowl:SetActive(false)
-		coroutine.wait(1.5)
+		coroutine.wait(0.5)
+		--高亮中奖区域
+		for i = 1, #message.dice_result do
+			local index = message.dice_result[i].anim_index
+			self.view.winHighLights[index].gameObject:SetActive(true)
+			Tools.DOFade_Repeat(self.view.winHighLights[index],0.2,3,0,function()
+				self.view.winHighLights[index].gameObject:SetActive(false)
+			end)
+		end
+		--添加记录
+		self:AddNewRecord(message.dices)
+		self:UpdateRecordUI()
+		coroutine.wait(1)
 		--回收筹码到荷官处
 		for areaIndex = 1, FishPrawnCrabConfig.diceSideCount do
 			if not isAreaWin(areaIndex) then
@@ -407,6 +412,40 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			end
 		end
 	end)
+end
+
+function FishPrawnCrabGameCtrl:AddNewRecord(dices)
+	if dices ~= nil and #dices == FishPrawnCrabConfig.diceCount then
+		--删除多余的记录
+		while #self.recordData >= FishPrawnCrabConfig.showRecordCount do
+			table.remove(self.recordData, 1)
+		end
+		
+		--添加新的记录
+		table.insert(self.recordData, dices)
+	end
+end
+
+function FishPrawnCrabGameCtrl:UpdateRecordUI()
+	local recordCount = #self.recordData
+	self.view.recordsRootObj:SetActive(recordCount > 0)
+	self.view.latestRecordIconObj:SetActive(recordCount > 0)
+	for i = 1, FishPrawnCrabConfig.showRecordCount do
+		--有数据就显示
+		if i <= recordCount then
+			self.view.recordUIDatas[i].rootObj:SetActive(true)
+			local showDicesData = self.recordData[recordCount - i + 1]
+			for diceIndex = 1, FishPrawnCrabConfig.diceCount do
+				local diceSideIndex = showDicesData[diceIndex]
+				self.view.recordUIDatas[i].diceTexts[diceIndex].text = FishPrawnCrabConfig.animalShowData[diceSideIndex].name
+				local diceColor = FishPrawnCrabConfig.animalShowData[diceSideIndex].color
+				self.view.recordUIDatas[i].diceTexts[diceIndex].color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
+			end
+		else
+			--无数据就隐藏
+			self.view.recordUIDatas[i].rootObj:SetActive(false)
+		end
+	end
 end
 
 function FishPrawnCrabGameCtrl:GetChilIndexArrByAmount(goldAmount)

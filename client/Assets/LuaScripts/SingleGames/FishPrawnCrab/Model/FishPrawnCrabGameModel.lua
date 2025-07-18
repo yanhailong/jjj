@@ -32,7 +32,7 @@ end
 
 ---更新玩家信息
 function FishPrawnCrabGameModel:OnPlayerMsg(message)
-	look("FishPrawnCrab OnPlayerMsg")
+	--look("FishPrawnCrab OnPlayerMsg")
 	self.players = {}
 	for _,v in pairs(message) do
 		if v.id == FishPrawnCrabConfig.selfTestPlayerId then
@@ -54,7 +54,7 @@ end
 
 ---更新游戏状态
 function FishPrawnCrabGameModel:OnGameStatusMsg(message)
-	look("FishPrawnCrabGameModel:UpdateGameStatus" .. message.status)
+	--look("FishPrawnCrabGameModel:UpdateGameStatus" .. message.status)
 	if message.status == FishPrawnCrabConfig.GameState.Prepare then
 		self.ctrl:SwitchToPrepareState(message)
 	elseif message.status == FishPrawnCrabConfig.GameState.Bet then
