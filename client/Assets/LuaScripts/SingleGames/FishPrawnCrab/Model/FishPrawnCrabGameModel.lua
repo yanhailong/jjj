@@ -23,6 +23,7 @@ function FishPrawnCrabGameModel:AddEvent()
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.RES_BET_RESULT,self.OnBetRusultMsg,self)
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.SYNC_TOTAL_BETS,self.OnSyncTotalBetMsg,self)
 	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.GAME_SETTLEMENT,self.OnGameSettlementMsg,self)
+	GlobalEvent.AddListener(FishPrawnCrabConfig.GameEventName.NOTIFY_PLAYER_BET,self.OnPlayerBetMsg,self)
 end
 
 function FishPrawnCrabGameModel:RemoveEvent()
@@ -31,7 +32,7 @@ end
 
 ---更新玩家信息
 function FishPrawnCrabGameModel:OnPlayerMsg(message)
-	look("FishPrawnCrab OnPlayerMsg")
+	--look("FishPrawnCrab OnPlayerMsg")
 	self.players = {}
 	for _,v in pairs(message) do
 		if v.id == FishPrawnCrabConfig.selfTestPlayerId then
@@ -53,7 +54,7 @@ end
 
 ---更新游戏状态
 function FishPrawnCrabGameModel:OnGameStatusMsg(message)
-	look("FishPrawnCrabGameModel:UpdateGameStatus" .. message.status)
+	--look("FishPrawnCrabGameModel:UpdateGameStatus" .. message.status)
 	if message.status == FishPrawnCrabConfig.GameState.Prepare then
 		self.ctrl:SwitchToPrepareState(message)
 	elseif message.status == FishPrawnCrabConfig.GameState.Bet then
@@ -66,6 +67,11 @@ end
 ---下注结果消息
 function FishPrawnCrabGameModel:OnBetRusultMsg(message)
 	self.ctrl:OnBetRusultMsg(message)
+end
+
+---其他人下注消息
+function FishPrawnCrabGameModel:OnPlayerBetMsg(message)
+	self.ctrl:OnPlayerBetMsg(message)
 end
 
 ---游戏结算数据

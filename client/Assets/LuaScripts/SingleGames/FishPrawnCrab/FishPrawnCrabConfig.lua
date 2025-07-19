@@ -19,6 +19,9 @@ this.GameEventName = {
     START_SIMULATION_SERVER = "START_SIMULATION_SERVER",
     STOP_SIMULATION_SERVER = "STOP_SIMULATION_SERVER",
     SYNC_TOTAL_BETS = "SYNC_TOTAL_BETS",
+    NOTIFY_PLAYER_BET = "NOTIFY_PLAYER_BET",
+    REQUEST_RANKLIST = "REQUEST_RANKLIST",
+    RES_RANKLIST = "RES_RANKLIST",
 }
 
 ---游戏阶段
@@ -70,6 +73,7 @@ this.animalShowData = {{color = { r = 0.627451, g = 0.3333333, b = 0.3294118, a 
                        {color = { r = 0.6392157, g = 0.3490196, b = 0.3490196, a = 1}, name = "蝦"}}
 this.diceCount = 3  --每局骰子数量
 this.diceSideCount = 6  --每个骰子面数
+this.showRecordCount = 3  --显示记录条数
 --押中某个动物出现的次数对应的赔率表
 this.odds = {1, 2, 3}
 

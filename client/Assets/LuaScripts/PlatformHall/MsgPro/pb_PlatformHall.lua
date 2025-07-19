@@ -31,6 +31,10 @@ pb_PlatformHall.ResChooseGame = 24580
 pb_PlatformHall.ReqChooseWare = 24581
 --- 响应,msgID=0x6006,desc=选择游戏场次进入
 pb_PlatformHall.ResChooseWare = 24582
+--- 请求,msgID=0x6007
+pb_PlatformHall.ReqJoinRoom = 24583
+--- 请求,msgID=0x6008
+pb_PlatformHall.RespJoinRoom = 24584
 
 
 PbMsg[4097] = 'ReqHeartBeat'
@@ -48,6 +52,8 @@ PbMsg[24579] = 'ReqChooseGame'
 PbMsg[24580] = 'ResChooseGame'
 PbMsg[24581] = 'ReqChooseWare'
 PbMsg[24582] = 'ResChooseWare'
+PbMsg[24583] = 'ReqJoinRoom'
+PbMsg[24584] = 'RespJoinRoom'
 
 PBHelper.LoadPB('PlatformHall/Protol','core')
 PBHelper.LoadPB('PlatformHall/Protol','hall')
