@@ -1,6 +1,7 @@
 -- 定义全局模块
 IsShowLog = true;
 require "Logic/ZLancher/HeaderFile"
+require("Logic/PlayerManager/PlayerInfo")
 require("PlatformHall/MsgPro/pb_PlatformHall")
 require("Logic/Config/HallConfig")
 require("Logic/SubGame/GameCenter")
