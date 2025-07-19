@@ -43,6 +43,7 @@ function FishPrawnCrabChipManager:AnimateChip(chip_type, start_pos, target)
     ---chipObj.transform:SetParent(target.transform,false)
     chipObj.transform.localScale = Vector3(scale,scale,scale)
     chipObj.transform.position = start_pos
+    chipObj.transform:SetAsLastSibling()
     chipObj:SetActive(true)
 
     chips[#chips+1] = chipObj
@@ -97,6 +98,7 @@ function FishPrawnCrabChipManager:CreatChipInArea(chip_type, target)
     local endPos = Vector3(UnityEngine.Random.Range(corners[0].x,corners[2].x), UnityEngine.Random.Range(corners[0].y,corners[2].y), 0)
 
     chipObj.transform.position = endPos
+    chipObj.transform:SetAsLastSibling()
     chipObj:SetActive(true)
     
     return chipObj
