@@ -37,10 +37,10 @@ local sequenceList = {}
 function FishPrawnCrabChipManager:AnimateChip(chip_type, start_pos, target)
     -- 从对象池获取金币实例
     ---@type #GameObject
-    local chipObj = pool:SpawnPrefab(nil, FishPrawnCrabConfig.ABNames.ChipPool, FishPrawnCrabConfig.GetChipPoolName(chip_type))
+    local chipObj = pool:SpawnPrefab(nil, FishPrawnCrabConfig.ABNames.ChipPool, FishPrawnCrabConfig.GetChipPoolName(chip_type), target.transform)
 
     -- 设置金币初始位置和激活状态
-    chipObj.transform:SetParent(target.transform,false)
+    ---chipObj.transform:SetParent(target.transform,false)
     chipObj.transform.localScale = Vector3(scale,scale,scale)
     chipObj.transform.position = start_pos
     chipObj:SetActive(true)
@@ -68,9 +68,13 @@ function FishPrawnCrabChipManager:AnimateChip(chip_type, start_pos, target)
     sequence:OnComplete(function()
         -- 可以在这里添加金币落地后的效果，如声音等
         sequence:Kill(false)
-        --table.remove(sequence)
+
+        local findIndex = ArrayUtil.indexOf(sequenceList, sequence)
+        if findIndex ~= nil then
+            ArrayUtil.remove(sequenceList, findIndex)
+        end
     end)
-    --sequenceList[sequence] = sequence
+    table.insert(sequenceList, sequence)
 
     sequence:Play()
     
@@ -79,10 +83,10 @@ end
 
 ---创建底注到区域
 function FishPrawnCrabChipManager:CreatChipInArea(chip_type, target)
-    local chipObj = pool:SpawnPrefab(nil, FishPrawnCrabConfig.ABNames.ChipPool, FishPrawnCrabConfig.GetChipPoolName(chip_type))
+    local chipObj = pool:SpawnPrefab(nil, FishPrawnCrabConfig.ABNames.ChipPool, FishPrawnCrabConfig.GetChipPoolName(chip_type), target.transform)
 
     -- 设置金币初始位置和激活状态
-    chipObj.transform:SetParent(target.transform,false)
+    --chipObj.transform:SetParent(target.transform,false)
     chipObj.transform.localScale = Vector3.one
     chips[#chips+1] = chipObj
 
@@ -116,20 +120,28 @@ function FishPrawnCrabChipManager:DestroyChipFly(chipObj, endPos)
         sequence:Kill(false)
         pool:UnSpawnPrefab(chipObj)
         chipObj = nil
+        
+        local findIndex = ArrayUtil.indexOf(sequenceList, sequence)
+        if findIndex ~= nil then
+            ArrayUtil.remove(sequenceList, findIndex)
+        end
     end)
+    table.insert(sequenceList, sequence)
 
     sequence:Play()
     FishPrawnCrabChipManager:RemoveChip(chipObj)
 end
 
+function FishPrawnCrabChipManager:CleanAllChipAnim()
+    for _,sequence in ipairs(sequenceList) do
+        if sequence ~= nil then
+            sequence:Kill(false)
+        end
+    end
+    sequenceList = {}
+end
+
 function FishPrawnCrabChipManager:CleanChip()
-    --for k,v in pairs(#sequenceList) do
-    --    if v ~= nil then
-    --        v:Kill(false)
-    --    end
-    --end
-    --sequenceList = {}
-    
     for i = 1, #chips do
         pool:UnSpawnPrefab(chips[i])
     end
@@ -149,6 +161,7 @@ end
 
 function FishPrawnCrabChipManager:Destroy()
     --look("FishPrawnCrabChipManager:Destroy()")
+    FishPrawnCrabChipManager:CleanAllChipAnim()
     FishPrawnCrabChipManager:CleanChip()
     pool:DestroyAll()
 end
