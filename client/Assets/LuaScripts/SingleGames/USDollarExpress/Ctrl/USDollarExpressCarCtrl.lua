@@ -44,6 +44,7 @@ function USDollarExpressCarCtrl:InitData()
 	end
 	self:InitCars()
 	self.isAllCarArrive=false
+	self.allTweens={}
 end
 
 ---初始化火车厢
@@ -60,31 +61,41 @@ function USDollarExpressCarCtrl:InitCars()
 		end)
 	else
 		self.isAllCarArrive=false
-		local trainInfo=self.CarQueue:Dequeue()
-		local carType=trainInfo.type
-		local goldList=trainInfo.goldList
-		self:SetCarTitle(carType)
-		self:InitTrainComponent(goldList,carType)
+		self.trainInfo=self.CarQueue:Dequeue()
+		self.carType=self.trainInfo.type
+		self.goldList=self.trainInfo.goldList
+		self.poolId=self.trainInfo.poolId
+		self:SetCarTitle(self.carType)
+		self:InitTrainComponent(self.goldList,self.carType)
 		self.view.txt_trainLeft.text=self.CarQueue:Count()
 	end
+end
+
+function USDollarExpressCarCtrl:GetJackPotId(poolId)
+	for k,v in pairs(config.jackpotIds) do
+		if poolId==v then
+			return poolId
+		end
+	end
+	return -1
 end
 
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
 	if type==config.TrainColorType.GreenTrain then
-		self.view.tmp_loading.text="绿火车"
+		--self.view.tmp_loading.text="绿火车"
 	end
 	if type==config.TrainColorType.BlueTrain then
-		self.view.tmp_loading.text="蓝火车"
+		--self.view.tmp_loading.text="蓝火车"
 	end
 	if type==config.TrainColorType.RedTrain then
-		self.view.tmp_loading.text="红火车"
+		--self.view.tmp_loading.text="红火车"
 	end
 	if type==config.TrainColorType.VioletTrain then
-		self.view.tmp_loading.text="紫火车"
+		--self.view.tmp_loading.text="紫火车"
 	end
 	if type==config.TrainColorType.GoldTrain then
-		self.view.tmp_loading.text="金火车"
+		--self.view.tmp_loading.text="金火车"
 	end
 end
 
@@ -126,9 +137,14 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 		self.allItems[i]=item
 	end
 
-	for i = 1, #goldList+1 do
+	local gNums=#goldList+1
+	for i = 1, gNums do
 		if i>1 then
-			self.allItems[i]:SetText(goldList[i-1])
+			if self:GetJackPotId(self.poolId)>0 and i==gNums then
+				self.allItems[i]:SetText(self.poolId)
+			else
+				self.allItems[i]:SetText(goldList[i-1])
+			end
 		end
 	end
 	
@@ -183,6 +199,12 @@ end
 
 function USDollarExpressCarCtrl:Close()
     self.super.Close(self);
+	for k,v in pairs(self.allTweens) do
+		if v then
+			v:Kill()
+		end
+	end
+	
 	if self.tweener then
 		self.tweener:Kill()
 	end

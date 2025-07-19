@@ -547,17 +547,24 @@ end
 
 
 function USDollarExpressMainCtrl:EnterFreeGame()
-	logError("进入免费模式")
+	if self.model.remainFreeCount>0 then
+		logError("进入免费模式")
+		config.gameTypeState=5
+		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.FreeState)
+		CorManager.StartCor(self,function()
+			coroutine.wait(1)
+			self.model:ReqStartGame()
+		end)
+	end
 	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:SetStateLast()
 	logError("结束=====》")
 	self.isOnclickStart=false
-	local freeCount=0
-
+	local freeCount=self.model.remainFreeCount
 	if freeCount>0 then
-		logError("进入免费模式")
+		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.FreeState)
 	elseif config.selfMotionNum>0 then
 		logError("自动旋转模式")
 		config.selfMotionNum=config.selfMotionNum-1
@@ -604,16 +611,44 @@ function USDollarExpressMainCtrl:BetInfoChange(betInfo)
 end
 
 function USDollarExpressMainCtrl:RestJackPots(_betInfo)
+	config.curchipInfo=_betInfo
 	local betInfo=_betInfo
 	for i = 1, #self.poolList do
 		local jackPool=self.poolList[i]
 		local baseShow=math.floor(betInfo*jackPool.initTimes)
-		self.txtJackpots[jackPool.id].text=baseShow
+		config.jackpotvalue[jackPool.id]=baseShow
+		self.txtJackpots[jackPool.id].text=config.jackpotvalue[jackPool.id]
 	end
+	self:UpDateValue()
 end
 
 function USDollarExpressMainCtrl:UpDateValue()
+	self.numTween={}
+	for i = 1, #self.poolList do
+		self:UpDateValueByIndex(i)
+	end
+end
 
+function USDollarExpressMainCtrl:UpDateValueByIndex(index)
+	local jackPool=self.poolList[index]
+	local form=config.jackpotvalue[jackPool.id]
+	local to=math.floor(form*(1+jackPool.updateProp*0.0001))
+	local max=math.floor(config.curchipInfo*jackPool.maxTimes)
+	if to>=max then
+		to=max
+	end
+	local time=jackPool.perSomeSec
+	self.numTween[index]= Tools.NumJump(form,to,time, function
+	(v)
+		self.txtJackpots[jackPool.id].text=math.floor(v)
+	end, function
+	()
+		if to>=max then
+			config.jackpotvalue[jackPool.id]=math.floor(config.curchipInfo*jackPool.initTimes)
+			self.txtJackpots[jackPool.id].text=config.jackpotvalue[jackPool.id]
+		end
+		self:UpDateValueByIndex(index)
+	end)
 end
 
 

@@ -16,6 +16,7 @@ this.curFreeNum=0       --当前剩余免费次数
 this.showStep=0
 this.freeState=false    --游戏状态
 this.selfMotionNum=0  ---自动旋转次数
+this.curchipInfo=0
 
 ---@火车颜色
 this.TrainColorType={
@@ -33,6 +34,20 @@ this.jackpotIds={
     major=100100103,
     grand=100100104,
 }
+this.jackPotPicName={
+    [this.jackpotIds.minni]="mykd_lhc_zw1",--minni
+    [this.jackpotIds.minori]="mykd_lhc_zw6",--minori
+    [this.jackpotIds.major]="mykd_lhc_zw2",--major
+    [this.jackpotIds.grand]="mykd_lhc_zw3",--grand
+}
+---奖池金额值
+this.jackpotvalue={
+    [this.jackpotIds.minni]=0,--minni
+    [this.jackpotIds.minori]=0,--minori
+    [this.jackpotIds.major]=0,--major
+    [this.jackpotIds.grand]=0,--grand
+}
+
 ---普通旋转圈数
 this.rollCircles={
     [1]=4,

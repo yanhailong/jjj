@@ -15,95 +15,79 @@ end
 function USDollarExpressTrainItem:InitData()
     self.isArriveCenterPos = false
     self.isArriveEndPos=false
+    self.ishasJackpot=false
 end
 
-function USDollarExpressTrainItem:SetText(value)
-    --self.tmp_value.text = value
-    local obj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/prefabs/txt_TrainValue","txt_TrainValue",self.transform)
-    self.txt_value= ComponentUtilGet.Text(obj)
-    self.txt_value.transform.position=self.transform.position
-    self.txt_value.transform.localRotation=Quaternion.Euler(0,180,0)
-    self.txt_value.text = value
+function USDollarExpressTrainItem:SetText(value,jackPotVale)
+    if self.ctrl:GetJackPotId(value)>0 then
+        logError("最后一节车厢中奖池")
+        self.jackpotvalue=jackPotVale
+        self.poolId=value
+        self.twObj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/alats/lang_english","img_traincar",self.transform)
+        self.img_jackpot= ComponentUtilGet.Image(self.twObj)
+        self.img_jackpot.transform.position=self.transform.position
+        self.img_jackpot.transform.localRotation=Quaternion.Euler(0,180,0)
+        self.ishasJackpot=true
+    else
+        self.twObj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/prefabs/txt_TrainValue","txt_TrainValue",self.transform)
+        self.txt_value= ComponentUtilGet.Text(self.twObj)
+        self.txt_value.transform.position=self.transform.position
+        self.txt_value.transform.localRotation=Quaternion.Euler(0,180,0)
+        self.curValue=value
+        self.txt_value.text = Tools.numberToStrKM(value)
+        self.ishasJackpot=false
+    end
+
     
 end
 
 function USDollarExpressTrainItem:DOPlayerAni()
-    --self.transform:DOScale(1.1, 0.2)
-    ---@type UnityEngine.GameObject
-    local objText=Tools.Instance(self.txt_value.gameObject,self.transform.parent.parent)
-    local tempText=ComponentUtilGet.Text(objText.transform)
-    tempText.text = self.txt_value.text
-    tempText.transform:DOScale(1.1, 0.2)
 
+    self.twObj.transform:SetParent(self.transform.parent.parent)
+    self.twObj.transform:DOScale(1.1, 0.2)
     -- 创建动画序列
     local sequence = DOTween.Sequence()
-
-
-    local midPos = -300
-    local endPos =-650
-
+    local midPos = self.ctrl.view.trans_txtMidd.position
+    local endPos =self.ctrl.view.txt_value.transform.position
     -- 最大放大比例
     local maxScale = 1.5
-    local minScale=0.4
+    local minScale=0.45
 
 
     ---@type DG.Tweening.Tween
-    local tw= tempText.transform:DOLocalMoveY(endPos, 0.6)
+    local tw= self.twObj.transform:DOMove(endPos, 0.6)
             :SetEase(DG.Tweening.Ease.OutQuad)
     DOTween.To(function
     (val)
-        tempText.transform.localScale = CS.UnityEngine.Vector3.one * val
+        self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
     end,1,maxScale,0.3):OnComplete(function()
         -- 前半段放大完成后开始后半段缩小
         DOTween.To(function(val)
-            tempText.transform.localScale = CS.UnityEngine.Vector3.one * val
+            self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
         end, 1.5, 0.4, 0.3).onComplete= function
         ()
             logError("动画执行完毕！")
-            local gold=tonumber(tempText.text)
-            self.ctrl:Settmp_value(gold)
-            objText:SetActive(false)
+            if self.ishasJackpot==true then
+                logError("这一节车厢是奖池.....")
+                if self.jackpotvalue and self.jackpotvalue>0 then
+                    local data={}
+                    data.poolId=self.poolId
+                    data.jackpotvalue=self.jackpotvalue
+                    CtrlManager.SingleShow(CtrlNames.USDollarExpressJackPots,data)
+                else
+                    logError("数据错误了.....！")
+                end
+                
+            else
+                self.ctrl:Settmp_value(self.curValue)
+                self.twObj:SetActive(false)
+            end
+
         end
     end)
-
-
-    
-    
-    ---- 创建动画序列
-    --local sequence = DOTween.Sequence()
-    --
-    ---- 前半段：移动到中间点并放大
-    --sequence:Append(
-    --        tempText.transform:DOLocalMoveY(midPos, 0.3)
-    --                :SetEase(DG.Tweening.Ease.OutQuad)
-    --)
-    --sequence:Join(
-    --        tempText.transform:DOScale(maxScale, 0.3) 
-    --                :SetEase(DG.Tweening.Ease.OutQuad)
-    --)
-    --
-    ---- 后半段：移动到终点并缩小
-    --sequence:Append(
-    --        tempText.transform:DOLocalMoveY(endPos, 0.3)
-    --                :SetEase(DG.Tweening.Ease.InQuad)
-    --)
-    --sequence:Join(
-    --        tempText.transform:DOScale(minScale, 0.3)
-    --                :SetEase(DG.Tweening.Ease.InQuad
-    --)
-    --
-    --sequence:OnComplete(function()
-    --    logError("动画执行完毕！")
-    --    local gold=tonumber(tempText.text)
-    --    self.ctrl:Settmp_value(gold)
-    --    objText:SetActive(false)
-    --end)
-
+    table.insert(self.ctrl.allTweens,tw)
     sequence:Play()
-    self.txt_value.gameObject:SetActive(false)
-    
-    
-    
+    --self.twObj:SetActive(false)
 end
 
 

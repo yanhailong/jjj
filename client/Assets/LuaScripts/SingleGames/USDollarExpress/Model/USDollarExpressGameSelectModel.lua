@@ -30,7 +30,7 @@ end
 function USDollarExpressGameSelectModel:ReqChooseFreeModel(status)
 	local data={}
 	data.status=status
-	config.gameTypeState=3
+	config.gameTypeState=status
 	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqChooseFreeModel,data)
 end
 

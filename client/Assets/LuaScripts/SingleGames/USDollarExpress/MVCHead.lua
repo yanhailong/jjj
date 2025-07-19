@@ -16,6 +16,12 @@ CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].ctrl =require "Single
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].view=require "SingleGames/USDollarExpress/View/USDollarExpressHelpView";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressHelp].model=require "SingleGames/USDollarExpress/Model/USDollarExpressHelpModel";
 
+CtrlNames.USDollarExpressJackPots="USDollarExpressJackPots";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressJackPots]={};
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressJackPots].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressJackPotsCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressJackPots].view=require "SingleGames/USDollarExpress/View/USDollarExpressJackPotsView";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressJackPots].model=require "SingleGames/USDollarExpress/Model/USDollarExpressJackPotsModel";
+
 CtrlNames.USDollarExpressMain="USDollarExpressMain";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain]={};
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressMainCtrl";

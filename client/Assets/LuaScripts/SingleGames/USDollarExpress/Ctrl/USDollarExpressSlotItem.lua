@@ -89,6 +89,20 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     coroutine.wait(1.233)
                     Tools.PlayerSpineAniByName(sp,"idle",true)
                 end)
+            elseif self.iconIndex>=12 and self.iconIndex<=15 then
+                CorManager.StartCor(self.ctrl, function
+                ()
+                    Tools.PlayerSpineAniByName(sp,"action",false)
+                    coroutine.wait(0.667)
+                    Tools.PlayerSpineAniByName(sp,"loop",true)
+                end)
+            elseif self.iconIndex==21 then
+                CorManager.StartCor(self.ctrl, function
+                ()
+                    Tools.PlayerSpineAniByName(sp,"action",false)
+                    coroutine.wait(0.5)
+                    Tools.PlayerSpineAniByName(sp,"loop",true)
+                end)
             else
                 Tools.PlayerSpineAniByName(sp,"action",true)
             end

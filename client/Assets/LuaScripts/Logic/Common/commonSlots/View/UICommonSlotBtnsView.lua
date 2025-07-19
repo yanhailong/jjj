@@ -42,7 +42,6 @@ function UICommonSlotBtnsView:InitComponents()
     self.txt_StopNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_auto/txt_StopNum");
     self.btn_stop_buttom=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stop");
     self.btn_free=ComponentUtilGet.Button(self.transform,"content/buttom/btn_free");
-    self.txt_freeNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_free/txt_freeNum");
 end
 
 ---清空组件
@@ -75,7 +74,6 @@ function UICommonSlotBtnsView:ClearComponents()
     self.txt_StopNum=nil;
     self.btn_stop_buttom=nil;
     self.btn_free=nil;
-    self.txt_freeNum=nil;
 end
 
 ---初始化View数据

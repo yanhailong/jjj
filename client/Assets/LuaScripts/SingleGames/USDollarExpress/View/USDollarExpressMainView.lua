@@ -11,7 +11,6 @@ function USDollarExpressMainView:InitView()
     self.ctrl=self.ctrl
 	self:InitComponents()
     self:InitWheelRoot()
-    self:InitJackPot()
 end
 
 ---获取组件
@@ -44,25 +43,6 @@ function USDollarExpressMainView:InitWheelRoot()
 
     self.cardPrefab=self.transform:Find("content/gameCenter/item").gameObject
     self.cardPrefab:SetActive(false)
-end
-
-function USDollarExpressMainView:InitJackPot()
-    self.jackPotTexts={}
-    self.jackPotTexts[1]=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/grand/txt_grand")
-    self.jackPotTexts[2]=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mejor/txt_mejor")
-    self.jackPotTexts[3]=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/minor/txt_minor")
-    self.jackPotTexts[4]=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mini/txt_mini")
-    self:SetJackPot()
-end
-
-function USDollarExpressMainView:SetJackPot()
-    self.numTween= Tools.NumJump(1,100000,60, function
-    (v)
-        self.jackPotTexts[1].text=tonumber(v)
-    end, function
-    ()
-    
-    end)
 end
 
 ---初始化View数据
