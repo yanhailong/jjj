@@ -51,7 +51,7 @@ end
 ---下注底注按钮
 function FishPrawnCrabGameView:InitChipInfos()
     self.chipInfos={}
-    for i = 1, 5 do
+    for i = 1, #FishPrawnCrabConfig.betValuesArr do
         local chipItem={}
         chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/stakes/"..i)
         chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/stakes/"..i)
