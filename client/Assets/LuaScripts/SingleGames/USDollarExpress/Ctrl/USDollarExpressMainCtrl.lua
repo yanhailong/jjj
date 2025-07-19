@@ -103,10 +103,11 @@ end
 function USDollarExpressMainCtrl:InitFirstSlotPics()
 	local dis = config.itemSpace
 	for i = 1, config.lieNum do
-		local go = GameObject('newobj')
-		go.transform:SetParent(self.view.wheelRootList[i].transform) -- 将其设置为某一个滚轮的子物体
-		go.transform.localScale = Vector3.one
-		go.transform.localPosition = Vector3.New(0,0,0)
+		--local go = GameObject('newobj')
+		--go.transform:SetParent(self.view.wheelRootList[i].transform) -- 将其设置为某一个滚轮的子物体
+		local go=ComponentUtilGet.GameObject(self.view.wheelRootList[i],"newobj")
+		--go.transform.localScale = Vector3.one
+		--go.transform.localPosition = Vector3.New(0,0,0)
 		table.insert(self.parentList, go.transform) -- 将创建的newobj插入parentList表中
 		self.childsList[i] = {}
 		local nCircels = config.rollItemNum
@@ -285,8 +286,9 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 				parent_newObj.transform.localPosition =Vector3.New(
 						parent_newObj.transform.localPosition.x, 0, parent_newObj.transform.localPosition.z)
 				if (wheelId == 5) then
-					self:ShowResoult()-- 旋转结束处理服务器数据表现
 					self:ShowBigKuang(0)
+					self:ShowResoult()-- 旋转结束处理服务器数据表现
+
 				else
 					self:ShowBigKuang(wheelId+1)
 				end
@@ -369,8 +371,9 @@ function USDollarExpressMainCtrl:StartCirleStop2(parent_newObj,wheelId,endpos)
 				while self:IsAllArrivePos()==false do
 					coroutine.yield(1)
 				end
-				self:ShowResoult()-- 旋转结束处理服务器数据表现
 				self:ShowBigKuang(0)
+				self:ShowResoult()-- 旋转结束处理服务器数据表现
+
 			end)
 
 		end
