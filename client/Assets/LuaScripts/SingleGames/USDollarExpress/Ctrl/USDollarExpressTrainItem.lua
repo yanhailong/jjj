@@ -41,56 +41,91 @@ function USDollarExpressTrainItem:SetText(value,jackPotVale)
     
 end
 
-function USDollarExpressTrainItem:DOPlayerAni()
+--function USDollarExpressTrainItem:DOPlayerAni()
+--
+--    self.twObj.transform:SetParent(self.transform.parent.parent)
+--    self.twObj.transform:DOScale(1.1, 0.2)
+--    -- 创建动画序列
+--    local sequence = DOTween.Sequence()
+--    local midPos = self.ctrl.view.trans_txtMidd.position
+--    local endPos =self.ctrl.view.txt_value.transform.position
+--    -- 最大放大比例
+--    local maxScale = 1.5
+--    local minScale=0.45
+--
+--
+--    ---@type DG.Tweening.Tween
+--    local tw= self.twObj.transform:DOMove(endPos, 0.6)
+--            :SetEase(DG.Tweening.Ease.OutQuad)
+--    local tw1= DOTween.To(function
+--    (val)
+--        self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
+--    end,1,maxScale,0.3):OnComplete(function()
+--        -- 前半段放大完成后开始后半段缩小
+--        DOTween.To(function(val)
+--            self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
+--        end, 1.5, 0.4, 0.3).onComplete= function
+--        ()
+--            logError("动画执行完毕！")
+--            if self.ishasJackpot==true then
+--                logError("这一节车厢是奖池.....")
+--                if self.jackpotvalue and self.jackpotvalue>0 then
+--                    local data={}
+--                    data.poolId=self.poolId
+--                    data.jackpotvalue=self.jackpotvalue
+--                    CtrlManager.SingleShow(CtrlNames.USDollarExpressJackPots,data)
+--                else
+--                    logError("数据错误了.....！")
+--                end
+--                
+--            else
+--                self.ctrl:Settmp_value(self.curValue)
+--                self.twObj:SetActive(false)
+--            end
+--
+--        end
+--    end)
+--    sequence:Play()
+--end
 
+function USDollarExpressTrainItem:DOPlayerAni()
     self.twObj.transform:SetParent(self.transform.parent.parent)
     self.twObj.transform:DOScale(1.1, 0.2)
-    -- 创建动画序列
-    local sequence = DOTween.Sequence()
-    local midPos = self.ctrl.view.trans_txtMidd.position
-    local endPos =self.ctrl.view.txt_value.transform.position
-    -- 最大放大比例
-    local maxScale = 1.5
-    local minScale=0.45
 
+    local midPos = self.ctrl.view.trans_txtMidd.position
+    local endPos = self.ctrl.view.txt_value.transform.position
+    local maxScale = 1.5
 
     ---@type DG.Tweening.Tween
-    local tw= self.twObj.transform:DOMove(endPos, 0.6)
-            :SetEase(DG.Tweening.Ease.OutQuad)
-    DOTween.To(function
-    (val)
+    local tw = self.twObj.transform:DOMove(endPos, 0.6):SetEase(DG.Tweening.Ease.OutQuad)
+    local tw1 = DOTween.To(function(val)
         self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
-    end,1,maxScale,0.3):OnComplete(function()
-        -- 前半段放大完成后开始后半段缩小
-        DOTween.To(function(val)
+    end, 1, maxScale, 0.3):OnComplete(function()
+        local tw2= DOTween.To(function(val)
             self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
-        end, 1.5, 0.4, 0.3).onComplete= function
-        ()
+        end, maxScale, 0.4, 0.3):OnComplete(function()
             logError("动画执行完毕！")
-            if self.ishasJackpot==true then
+            if self.ishasJackpot then
                 logError("这一节车厢是奖池.....")
-                if self.jackpotvalue and self.jackpotvalue>0 then
-                    local data={}
-                    data.poolId=self.poolId
-                    data.jackpotvalue=self.jackpotvalue
-                    CtrlManager.SingleShow(CtrlNames.USDollarExpressJackPots,data)
+                if self.jackpotvalue and self.jackpotvalue > 0 then
+                    local data = {}
+                    data.poolId = self.poolId
+                    data.jackpotvalue = self.jackpotvalue
+                    CtrlManager.SingleShow(CtrlNames.USDollarExpressJackPots, data)
                 else
                     logError("数据错误了.....！")
                 end
-                
             else
                 self.ctrl:Settmp_value(self.curValue)
                 self.twObj:SetActive(false)
             end
-
-        end
+        end)
+        table.insert(self.ctrl.allTweens, tw2)
     end)
-    table.insert(self.ctrl.allTweens,tw)
-    sequence:Play()
-    --self.twObj:SetActive(false)
+    
+    table.insert(self.ctrl.allTweens, tw)
+    table.insert(self.ctrl.allTweens, tw1)
 end
-
-
 
 function USDollarExpressTrainItem:MoveToPos(pos)
     self.transform:DOLocalMove(pos, 0.3)

@@ -48,12 +48,12 @@ GameObject:
   - component: {fileID: 568944724260151972}
   - component: {fileID: 4214232850833791888}
   m_Layer: 5
-  m_Name: mejor
+  m_Name: obj_mejor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1332581443847275351
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1074,12 +1074,12 @@ GameObject:
   - component: {fileID: 4818594220752414557}
   - component: {fileID: 418693096344027369}
   m_Layer: 5
-  m_Name: gold
+  m_Name: obj_gold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2619328883355835937
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1470,7 +1470,7 @@ GameObject:
   - component: {fileID: 2075296870922536683}
   - component: {fileID: 8461408824784231278}
   m_Layer: 5
-  m_Name: grand
+  m_Name: obj_grand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1628,7 +1628,7 @@ GameObject:
   - component: {fileID: 8050775144712419573}
   - component: {fileID: 2252798842361788408}
   m_Layer: 5
-  m_Name: minor
+  m_Name: obj_minor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2150,7 +2150,7 @@ GameObject:
   - component: {fileID: 8107682567058617371}
   - component: {fileID: 2618311913006514035}
   m_Layer: 5
-  m_Name: mini
+  m_Name: obj_mini
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

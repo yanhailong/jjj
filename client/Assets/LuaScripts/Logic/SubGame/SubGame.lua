@@ -170,7 +170,7 @@ function SubGame:LeaveGame()
         if MainStateCtrl.curState~=MainStateCtrl.State.Game then
             return;
         end
-        --CtrlManager.AllCtrlClose()
+        CtrlManager.AllCtrlClose()
         GameCenter.CloseCurGame();
     end)
 end

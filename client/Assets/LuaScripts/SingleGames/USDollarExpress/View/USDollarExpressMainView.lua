@@ -53,7 +53,6 @@ end
 ---关闭界面
 function USDollarExpressMainView:Close()   
     self.super.Close(self);
-    self.numTween:Kill()
 end
 
 return USDollarExpressMainView

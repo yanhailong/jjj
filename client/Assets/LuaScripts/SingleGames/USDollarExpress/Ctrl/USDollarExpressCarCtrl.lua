@@ -35,6 +35,16 @@ end
 
 ---初始化数据
 function USDollarExpressCarCtrl:InitData()
+	self.poolList=config.jackPotInfos
+	self.numTween={}
+	self.txtJackpots={}
+	self.txtJackpots[config.jackpotIds.minori]=self.view.txt_minor
+	self.txtJackpots[config.jackpotIds.major]=self.view.txt_mejor
+	self.txtJackpots[config.jackpotIds.grand]=self.view.txt_grand
+	self.txtJackpots[config.jackpotIds.minni]=self.view.txt_mini
+	
+	
+	
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
 	---@type Queue
@@ -45,6 +55,7 @@ function USDollarExpressCarCtrl:InitData()
 	self:InitCars()
 	self.isAllCarArrive=false
 	self.allTweens={}
+	
 end
 
 ---初始化火车厢
@@ -82,20 +93,71 @@ end
 
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
-	if type==config.TrainColorType.GreenTrain then
-		--self.view.tmp_loading.text="绿火车"
+	self.view.ani:Play("USDollarExpressCar_top")
+	CorManager.StartCor(self, function
+	()
+		coroutine.wait(0.34)
+		self.view.obj_mini.gameObject:SetActive(false)
+		self.view.obj_minor.gameObject:SetActive(false)
+		self.view.obj_grand.gameObject:SetActive(false)
+		self.view.obj_mejor.gameObject:SetActive(false)
+		self.view.obj_gold.gameObject:SetActive(false)
+
+		if type==config.TrainColorType.GreenTrain then
+			--self.view.tmp_loading.text="绿火车"
+			self.view.obj_mini.gameObject:SetActive(true)
+			self:UpDateValueByIndex(config.jackpotIds.minni)
+		end
+		if type==config.TrainColorType.BlueTrain then
+			self.view.obj_minor.gameObject:SetActive(true)
+			self:UpDateValueByIndex(config.jackpotIds.minori)
+		end
+		if type==config.TrainColorType.RedTrain then
+			self.view.obj_grand.gameObject:SetActive(true)
+			self:UpDateValueByIndex(config.jackpotIds.grand)
+		end
+		if type==config.TrainColorType.VioletTrain then
+			self.view.obj_mejor.gameObject:SetActive(true)
+			self:UpDateValueByIndex(config.jackpotIds.major)
+		end
+		if type==config.TrainColorType.GoldTrain then
+			--self.view.tmp_loading.text="金火车"
+			self.view.obj_gold.gameObject:SetActive(true)
+		end
+		self.view.ani:Play("USDollarExpressCar_topchu")
+	end)
+
+end
+
+
+function USDollarExpressCarCtrl:UpDateValueByIndex(jackpoyId)
+	local jackPool=self.poolList[jackpoyId]
+	local form=config.jackpotvalue[jackPool.id]
+	local to=math.floor(form*(1+jackPool.updateProp*0.0001))
+	local max=math.floor(config.curchipInfo*jackPool.maxTimes)
+	if to>=max then
+		to=max
 	end
-	if type==config.TrainColorType.BlueTrain then
-		--self.view.tmp_loading.text="蓝火车"
+	local time=jackPool.perSomeSec
+	if self.numTween[jackpoyId] then
+		self.numTween[jackpoyId]:Kill()
 	end
-	if type==config.TrainColorType.RedTrain then
-		--self.view.tmp_loading.text="红火车"
-	end
-	if type==config.TrainColorType.VioletTrain then
-		--self.view.tmp_loading.text="紫火车"
-	end
-	if type==config.TrainColorType.GoldTrain then
-		--self.view.tmp_loading.text="金火车"
+	self.numTween[jackpoyId]= Tools.NumJump(form,to,time, function
+	(v)
+		self.txtJackpots[jackPool.id].text=math.floor(v)
+	end, function
+	()
+		if to>=max then
+			config.jackpotvalue[jackPool.id]=math.floor(config.curchipInfo*jackPool.initTimes)
+			self.txtJackpots[jackPool.id].text=config.jackpotvalue[jackPool.id]
+		end
+		self:UpDateValueByIndex(jackpoyId)
+	end)
+end
+
+function USDollarExpressCarCtrl:StopTweenbyJackPotId(jackpoyId)
+	if self.numTween[jackpoyId] then
+		self.numTween[jackpoyId]:Kill()
 	end
 end
 
@@ -110,7 +172,7 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 		else
 			abName=config.trainAssetName[index]
 		end
-		local card= self.objPools:SpawnPrefab(nil, config.ABNames.train[carType],abName, self.view.trans_root)
+		local card= resMgr:CreateGameObject(config.ABNames.train[carType],abName,self.view.trans_root)--self.objPools:SpawnPrefab(nil, config.ABNames.train[carType],abName, self.view.trans_root)
 		---@type USDollarExpressTrainItem
 		local item=USDollarExpressTrainItem.New(card,self)
 		local rectTrans=ComponentUtilGet.RectTransform(item.transform)

@@ -48,6 +48,12 @@ function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 	self.txtJackpots[config.jackpotIds.grand]=self.view.txt_grand
 	self.txtJackpots[config.jackpotIds.minni]=self.view.txt_mini
 	self:BetInfoChange(betInfos.defaultBet)
+	CorManager.StartCor(self, function
+	()
+		coroutine.wait(1)
+		logError("重中之重")
+		self:UpDateValue()
+	end)
 	look("收到的下注配置信息",betInfos)
 end
 
@@ -76,7 +82,7 @@ function USDollarExpressMainCtrl:InitData()
 	self.parentList={}
 	self.childsList = {}
 	self.showChildsList = {}---显示的card1-20
-
+	self.numTween={}
 	self.isOnclickStart=false
 	self.realCard={}
 	self.tweener={}
@@ -623,7 +629,6 @@ function USDollarExpressMainCtrl:RestJackPots(_betInfo)
 end
 
 function USDollarExpressMainCtrl:UpDateValue()
-	self.numTween={}
 	for i = 1, #self.poolList do
 		self:UpDateValueByIndex(i)
 	end
@@ -638,6 +643,9 @@ function USDollarExpressMainCtrl:UpDateValueByIndex(index)
 		to=max
 	end
 	local time=jackPool.perSomeSec
+	if self.numTween[index] then
+		self.numTween[index]:Kill()
+	end
 	self.numTween[index]= Tools.NumJump(form,to,time, function
 	(v)
 		self.txtJackpots[jackPool.id].text=math.floor(v)
@@ -662,25 +670,17 @@ function USDollarExpressMainCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
---region UI事件方法
-
-
-
-
-
-
-
-
-
-
---endregion
-
 
 ---销毁UI
 function USDollarExpressMainCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
 	self.buttomCtrl:Close()
 	self.topCtrl:Close()
+	for k,v in pairs(self.numTween) do
+		if v then
+			v:Kill()
+		end
+	end
 end
 
 return USDollarExpressMainCtrl
