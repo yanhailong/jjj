@@ -19,10 +19,26 @@ Font:
   m_ConvertCase: 0
   m_CharacterRects:
   - serializedVersion: 2
-    index: 48
+    index: 44
     uv:
       serializedVersion: 2
       x: 0
+      y: 0
+      width: 0.09327411
+      height: 1
+    vert:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 147
+      height: -191
+    advance: 147
+    flipped: 0
+  - serializedVersion: 2
+    index: 48
+    uv:
+      serializedVersion: 2
+      x: 0.09327411
       y: 0
       width: 0.09327411
       height: 1
@@ -38,7 +54,7 @@ Font:
     index: 49
     uv:
       serializedVersion: 2
-      x: 0.09327411
+      x: 0.18654822
       y: 0
       width: 0.06725888
       height: 1
@@ -54,7 +70,7 @@ Font:
     index: 50
     uv:
       serializedVersion: 2
-      x: 0.160533
+      x: 0.2538071
       y: 0
       width: 0.09327411
       height: 1
@@ -70,7 +86,7 @@ Font:
     index: 51
     uv:
       serializedVersion: 2
-      x: 0.2538071
+      x: 0.3470812
       y: 0
       width: 0.09327411
       height: 1
@@ -86,7 +102,7 @@ Font:
     index: 52
     uv:
       serializedVersion: 2
-      x: 0.3470812
+      x: 0.44035533
       y: 0
       width: 0.09327411
       height: 1
@@ -102,7 +118,7 @@ Font:
     index: 53
     uv:
       serializedVersion: 2
-      x: 0.44035533
+      x: 0.5336294
       y: 0
       width: 0.09327411
       height: 1
@@ -118,7 +134,7 @@ Font:
     index: 54
     uv:
       serializedVersion: 2
-      x: 0.5336294
+      x: 0.62690353
       y: 0
       width: 0.09327411
       height: 1
@@ -134,7 +150,7 @@ Font:
     index: 55
     uv:
       serializedVersion: 2
-      x: 0.62690353
+      x: 0.72017765
       y: 0
       width: 0.09327411
       height: 1
@@ -150,22 +166,6 @@ Font:
     index: 56
     uv:
       serializedVersion: 2
-      x: 0.72017765
-      y: 0
-      width: 0.09327411
-      height: 1
-    vert:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 147
-      height: -191
-    advance: 147
-    flipped: 0
-  - serializedVersion: 2
-    index: 57
-    uv:
-      serializedVersion: 2
       x: 0.81345177
       y: 0
       width: 0.09327411
@@ -179,7 +179,7 @@ Font:
     advance: 147
     flipped: 0
   - serializedVersion: 2
-    index: 65292
+    index: 57
     uv:
       serializedVersion: 2
       x: 0.9067259
