@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
-  m_Name: wild_SkeletonData
+  m_Name: jkdh_icon_SkeletonData
   m_EditorClassIdentifier: 
   atlasAssets:
-  - {fileID: 11400000, guid: 6c8f47cfa159e7c45b3d98ac8f19e009, type: 2}
+  - {fileID: 11400000, guid: 65b24a70dbb01f0459be144666226c57, type: 2}
   scale: 0.01
-  skeletonJSON: {fileID: 4900000, guid: e23f7246f18a7824f94f4506856ec848, type: 3}
+  skeletonJSON: {fileID: 4900000, guid: a22691a76a7fa1143b84cd7ba4bf7803, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
     requiresBlendModeMaterials: 1
     applyAdditiveMaterial: 1
     additiveMaterials:
-    - pageName: wild.png
-      material: {fileID: 2100000, guid: 9daf5b4eb53860a41a5be989f6060ad2, type: 2}
+    - pageName: jkdh_icon.png
+      material: {fileID: 2100000, guid: 2830b5aec9377d3419c07e03567fb3f1, type: 2}
     multiplyMaterials: []
     screenMaterials: []
   skeletonDataModifiers: []
@@ -30,4 +30,4 @@ MonoBehaviour:
   toAnimation: []
   duration: []
   defaultMix: 0.2
-  controller: {fileID: 9100000, guid: a9742bbb4672540459818e81210ce9a9, type: 2}
+  controller: {fileID: 9100000, guid: 1fc18b990a6bc8744952546025551369, type: 2}
