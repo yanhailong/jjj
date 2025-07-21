@@ -1,3 +1,5 @@
+require("SingleGames/BirdsAnimals/MsgPro/pb_BirdsAnimals")
+
 CtrlNames.BirdsAnimalsGame="BirdsAnimalsGame";
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsGame]={};
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsGame].ctrl =require "SingleGames/BirdsAnimals/Ctrl/BirdsAnimalsGameCtrl";

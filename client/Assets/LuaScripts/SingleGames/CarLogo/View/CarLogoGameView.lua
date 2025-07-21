@@ -9,7 +9,7 @@ local CarLogoHistoryItem=require("SingleGames/CarLogo/View/Item/CarLogoHistoryIt
 local CarLogoAreaItem=require("SingleGames/CarLogo/View/Item/CarLogoAreaItem")
 local CarLogoConfig=require("SingleGames/CarLogo/CarLogoConfig")
 local CarLogoHelper=require("SingleGames/CarLogo/CarLogoHelper")
-local CarLogoPlayCoinView=require("SingleGames/CarLogo/View/CarLogoPlayCoinView")
+local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 local CarLogoPlayerItem = require("SingleGames/CarLogo/View/Item/CarLogoPlayerItem")
 
 local DOTween = CS.DG.Tweening.DOTween
@@ -24,7 +24,6 @@ end
 
 ---获取组件
 function CarLogoGameView:InitComponents()
-    self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
     self.btn_trend=ComponentUtilGet.Button(self.transform,"content/top/history/btn_trend");
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
@@ -79,13 +78,26 @@ function CarLogoGameView:InitComponents()
     self.historyObj=ComponentUtilGet.GameObject(self.transform,"content/top/history")
     ---@type CarLogoHistoryItem
     self.history=CarLogoHistoryItem.New(self.historyObj)
+
+    self.dizhu=ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
+    self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
+    self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
+    self.img_next = ComponentUtilGet.Image(self.btn_next.transform,"img");
     ---下注底注按钮
     self.chipInfos={}
-    for i = 1, 5 do
+    local ChouMaItem = ComponentUtilGet.GameObject(self.dizhu,"ChouMaItem")
+    for i=1,6 do
+        local chouma = GameObject.Instantiate(ChouMaItem);
+        chouma.transform:SetParent(self.dizhu,false);
+    end
+    for i = 1, 7 do
         local chipItem={}
-        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/dizhu/"..i)
-        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/dizhu/"..i)
+        chipItem.obj=self.dizhu:GetChild(i-1).gameObject
+        chipItem.rectTrans=self.dizhu:GetChild(i-1)
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
+        chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
+        chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
         chipItem.effects=ComponentUtilGet.GameObject(chipItem.rectTrans,"checkd")
         chipItem.effects:SetActive(false)
         self.chipInfos[i]=chipItem
@@ -122,7 +134,26 @@ function CarLogoGameView:InitPanelData(args)
     self:InitUI()
 end
 
+function CarLogoGameView:InitChouMa()
+    ---底注数值
+    for i=1,#self.chipInfos do
+        if self.ctrl.model.config.betList[i] then
+            self.chipInfos[i].obj:SetActive(true)
+            self.chipInfos[i].image.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,CarLogoConfig.dizhuColor[i])
+            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.ctrl.model.config.betList[i])
+
+            local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
+            local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
+            img.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,CarLogoConfig.dizhuColor[i])
+            num.text = self.chipInfos[i].num.text
+        else
+            self.chipInfos[i].obj:SetActive(false)
+        end
+    end
+end
+
 function CarLogoGameView:InitUI()
+    self:InitChouMa()
     ---续押
     self.btn_repeat.interactable = false;
     self.tmp_totalPlayerNum.text="0"
@@ -163,6 +194,27 @@ end
 function CarLogoGameView:LogoShowLinght(index)
     for i, view in ipairs(self.logoViews) do
         view:ShowChoose(true,i ~= index)
+    end
+end
+
+function CarLogoGameView:DizhuPrev(isNext)
+    if isNext==false then
+        if self.dizhupos then
+            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
+            self.img_prev.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,"d_ph_jiantou1")
+            self.img_next.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,"d_ph_jiantou2")
+            self.img_prev.transform.localScale = Vector3.one
+            self.img_next.transform.localScale = Vector3.one
+            self.dizhupos = false
+        end
+    else if not self.dizhupos then
+        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
+        self.img_prev.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_next.sprite = resMgr:LoadSprite(CarLogoConfig.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_prev.transform.localScale = Vector3(-1,1,1)
+        self.img_next.transform.localScale = Vector3(-1,1,1)
+        self.dizhupos = true
+    end
     end
 end
 
@@ -379,19 +431,22 @@ function CarLogoGameView:UpdateSelfGoldCount()
 end
 ---本玩家下注动画
 function CarLogoGameView:PayXiaZhuCoinFly(side)
-    CarLogoPlayCoinView:AnimateCoin(self.dizhuNode,CarLogoConfig.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot)
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,CarLogoConfig.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
+            self.ctrl.model.config.betList[CarLogoConfig.dizhuIndex])
 end
 ---其他玩家下注动画
 function CarLogoGameView:PayOtherXiaZhuCoinFly(data)
     self:UpdateXiaZhuLabel()
-    CarLogoPlayCoinView:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.areaViews[data.areaType].noteRoot)
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.areaViews[data.areaType].noteRoot,
+            self.ctrl.model.config.betList[data.dizhuType])
 end
 
 ---显示房间已出的底注 不要动画
 function CarLogoGameView:RefresAreaCoin()
     if CarLogoConfig.allXiaZhuData and #CarLogoConfig.allXiaZhuData>0 then
         for i=1,#CarLogoConfig.allXiaZhuData do
-            CarLogoPlayCoinView:CreatCoinInArea(self.dizhuNode,CarLogoConfig.allXiaZhuData[i].dizhuType,self.areaViews[CarLogoConfig.allXiaZhuData[i].areaType].noteRoot)
+            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,CarLogoConfig.allXiaZhuData[i].dizhuType,self.areaViews[CarLogoConfig.allXiaZhuData[i].areaType].noteRoot,
+                    self.ctrl.model.config.betList[CarLogoConfig.allXiaZhuData[i].dizhuType])
         end
     end
 end
@@ -404,7 +459,7 @@ function CarLogoGameView:PlayCompeleCoinFLy(datas,players,cards)
     local targetPos = {}
     targetPos[1] = self.selfPlayerRoot.transform.position
     targetPos[2] = self.btn_players.transform.position
-    CarLogoPlayCoinView:DestroyCoin(targetPos,ratios)
+    ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
     --奖励数值
     self.selfPlayer:ShowResultCount(Tools.RandomInt(-100,1000))
 end

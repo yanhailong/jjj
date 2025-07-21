@@ -762,3 +762,19 @@ function StringUtil.formatString(format, ...)
     end
     return str
 end
+
+-- 底注数值 K 百万M 十亿B 单位
+function StringUtil.CheckDiZhu(value)
+    if value then
+        if value>=1000 then
+            if value>=1000000 then
+                if value>=1000000000 then
+                    return Mathf.Floor(value/1000000000).."B"
+                end
+                return Mathf.Floor(value/1000000).."M"
+            end
+            return Mathf.Floor(value/1000).."K"
+        end
+        return value
+    end
+end 

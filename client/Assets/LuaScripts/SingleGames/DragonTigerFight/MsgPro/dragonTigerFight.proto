@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+//--------网络接口----------
+//请求,msgID=0x2775,desc=进入房间
+message ReqEnterRoom {
+  enum E_MsgID { def = 0;msgID = 10101; };
+  int32 roomType = 1;//选择类型 1、普通场 2、中级场 3、高级场
+}
+
+//响应,msgID=0x2776,desc=返回房间信息
+message ResEnterRoom {
+  enum E_MsgID { def = 0;msgID = 10102; };
+  //房间基本信息
+  int32 roomId = 1;//房间ID
+  RoomBetConfig config = 2;//当前房间配置 Room_Bet
+
+  //押注池信息
+  repeated SideBetInfo sideBetInfos = 3;//押注池信息
+  repeated BetInfo selfBetInfos = 4;//自己的押注信息
+
+  //玩家信息
+  repeated PlayerInfo players = 5;//房间里所有玩家
+
+  //历史记录信息
+  repeated int32 history = 6;// 历史记录信息 1=龙，2=虎，3=和
+
+  //流程状态信息
+  int32 status = 7;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
+  int32 seconds = 8;//当前状态剩余秒数
+}
+
+//请求,msgID=0x2777,desc=玩家押注上报
+message ReqBetting{
+  enum E_MsgID { def = 0;msgID = 10103; };
+  int32 side = 1;//押注位置，1=龙，2=虎，3=和
+  int64 amount = 2;//押注金额
+};
+
+//响应,msgID=0x2778,desc=广播玩家押注信息
+message ResBetting{
+  enum E_MsgID { def = 0;msgID = 10104; };
+  repeated BetInfo betList = 1;//列表，多个投注信息 （如果服务器同时收到多个就一起下发）
+};
+
+//响应,msgID=0x2779,desc=广播切换状态时的信息
+message ResGameStatus{
+  enum E_MsgID { def = 0;msgID = 10105; };
+  int32 status = 1;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
+  int32 seconds = 2;//当前状态剩余秒数
+};
+
+//响应,msgID=0x2780,desc=广播玩家离开房间的消息
+message ResPlayerLeaveRoom{
+  enum E_MsgID { def = 0;msgID = 10106; };
+  int32 userId = 1;//玩家ID
+};
+
+//响应,msgID=0x2781,desc=广播玩家进入房间的消息
+message ResPlayerEnterRoom{
+  enum E_MsgID { def = 0;msgID = 10107; };
+  repeated PlayerInfo player = 1;//进入的玩家信息
+}
+
+//响应,msgID=0x2782,desc=广播结算信息
+message ResGameResult{
+  enum E_MsgID { def = 0;msgID = 10108; };
+  int32 winSide = 1;//胜利方
+  repeated int32 cards = 2;//牌面ID
+
+  PlayerInfo selfInfo = 3;//自己
+  repeated PlayerInfo players = 4;// 玩家赢钱的信息
+
+};
+
+//---------公共数据---------
+//房间配置 Room_Bet 用于显示当前房间所用筹码和阶段时间控制
+message RoomBetConfig {
+  int32 roomID = 1;//倍场ID
+  int32 betBase = 2;// 倍场底注
+  repeated int32 betList = 3;// 押分筹码列表
+  repeated int32 StageTime = 4;//阶段信息
+}
+
+
+//单个玩家信息
+message PlayerInfo{
+  int32 id = 1;//ID
+  string name = 2;//名字
+  string avatar = 3;//头像
+  string frame = 4;//头像框
+  int64 currency = 5;//金币数量 (用于显示和排名)
+  int64 winCurrency = 6;//玩家这一局赢了多少
+}
+
+//下注信息
+message BetInfo{
+  int32 side = 1;//押注位置，1=龙，2=虎，3=和
+  int64 amounts = 2;//押注金额
+  int32 playerId = 3;//押注玩家id
+};
+
+
+//每个注池信息
+message SideBetInfo{
+  int32 side = 1;//押注位置，1=龙，2=虎，3=和
+  int64 amounts = 2;//押注总金额
+  repeated BetInfo BetInfos = 3;//押注详细信息
+};

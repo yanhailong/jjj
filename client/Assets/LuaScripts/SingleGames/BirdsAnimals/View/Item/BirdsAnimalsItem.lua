@@ -13,9 +13,10 @@ function BirdsAnimalsItem:ctor(trs)
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
     self.choose = ComponentUtilGet.Image(self.transform,"Choose");
     self.Rate = ComponentUtilGet.Image(self.transform,"Rate")
-    
+    self.Text = ComponentUtilGet.Text(self.transform,"Text")
     self.choose.gameObject:SetActive(true)
     self.Rate.gameObject:SetActive(false)
+    self.Text.gameObject:SetActive(false)
     self:ShowChoose(false)
 end
 
@@ -33,14 +34,15 @@ end
 function BirdsAnimalsItem:ShowLogo(logo_id)
     self.image.sprite = BirdsAnimalsHelper.LoadLogoSprite(logo_id);
     self.image:SetNativeSize()
-    if logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.JINSHA then
-        self.Rate.sprite=BirdsAnimalsHelper.LoadTxtSprite("BirdsAnimals_x_100")
+    if logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.JINSHA  or logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.YINSHA then
+        self.Text.text="X100"
+        self.Text.gameObject:SetActive(true)
+    elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.TONGPEI then
+        self.Rate.sprite = BirdsAnimalsHelper.LoadTxtSprite("fqzs_txt_take")
         self.Rate.gameObject:SetActive(true)
-    elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.YINSHA then
-        self.Rate.sprite=BirdsAnimalsHelper.LoadTxtSprite("BirdsAnimals_x_24")
+    elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.TONGSHA then
+        self.Rate.sprite = BirdsAnimalsHelper.LoadTxtSprite("fqzs_txt_pay")
         self.Rate.gameObject:SetActive(true)
-    elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.TONGPEI or logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.TONGSHA then
-        self.image.transform.localScale=Vector3(0.7,0.7,1)
     end
     self.logoId = logo_id;
 end
@@ -67,7 +69,7 @@ end
 ---閃燈
 function BirdsAnimalsItem:FlashLight(time,fadeTimes,delayTime)
     self:ShowChoose(false)
-    Tools.DOFade_Repeat(self.choose,time,fadeTimes,delayTime)
+    Tools.DOFade_Repeat(self.choose,time,fadeTimes,delayTime,function() self:ShowChoose(false) end)
 end
 
 --- 选中的图标由大变小效果

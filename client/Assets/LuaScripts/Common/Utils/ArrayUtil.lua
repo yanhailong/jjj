@@ -76,4 +76,15 @@ function ArrayUtil.countByVale(array,value)
     return count
 end
 
+-- 求和
+function ArrayUtil.Sum(array)
+    local total =0
+    for k, v in pairs(array) do
+        if type(v)=="number" then
+            total = total + v
+        end
+    end
+    return total
+end
+
 return this

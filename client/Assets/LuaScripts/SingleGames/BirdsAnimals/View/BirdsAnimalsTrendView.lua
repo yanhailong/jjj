@@ -5,7 +5,6 @@
 ---@class BirdsAnimalsTrendView:BaseView
 local BirdsAnimalsTrendView=Class("BirdsAnimalsTrendView",BaseView)
 local BirdsAnimalsConfig =require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
-local BirdsAnimalsGameModel =require("SingleGames/BirdsAnimals/Model/BirdsAnimalsGameModel")
 local BirdsAnimalsHelper=require("SingleGames/BirdsAnimals/BirdsAnimalsHelper")
 
 ---初始化panel
@@ -23,11 +22,7 @@ function BirdsAnimalsTrendView:InitComponents()
     self.rateTrs=ComponentUtilGet.Transform(self.transform,"content/rate")
     self.rateTmps={}
     for i=1,12 do
-        if i==3 or i==4 then
-            table.insert(self.rateTmps,ComponentUtilGet.Text(self.rateTrs:GetChild(i-1),"num"))
-        else
-            table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
-        end
+        table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
     end
     self.resultsItems={}
     table.insert(  self.resultsItems,self:InitResultItem(self.resultsTrs:GetChild(0)))
@@ -45,19 +40,15 @@ end
 ---初始化View数据
 function BirdsAnimalsTrendView:InitPanelData(args)
     self:InitRateUI()
-    self:UpdateHistory()
+    self:UpdateHistory(args or {})
 end
 
 function BirdsAnimalsTrendView:InitRateUI()
     for i=1,12 do
         local img = ComponentUtilGet.Image(self.rateTrs:GetChild(i-1),"icon")
         local logo_id = BirdsAnimalsConfig.ANIMA_HISTORY[i]
-        if logo_id <=12 then
+        if logo_id ~=BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin and logo_id ~=BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou  then
             img.sprite = BirdsAnimalsHelper.LoadLogoSprite(logo_id)
-        elseif logo_id ==BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin then
-            img.sprite = BirdsAnimalsHelper.LoadTxtSprite("BirdsAnimals_FeiQin")
-        elseif logo_id ==BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou then
-            img.sprite = BirdsAnimalsHelper.LoadTxtSprite("BirdsAnimals_Beast")
         end
     end
 end
@@ -84,19 +75,13 @@ function BirdsAnimalsTrendView:InitResultItem(transform)
     return table
 end
 
-function BirdsAnimalsTrendView:UpdateHistory()
-    ---测试
-    BirdsAnimalsGameModel.historyList = {}
-    for i=1,Tools.RandomInt(30,50) do
-        table.insert(BirdsAnimalsGameModel.historyList,{logo_index=1,logo_id=Tools.RandomInt(1,12)})
-    end
-    ---
-    local index = #BirdsAnimalsGameModel.historyList
+function BirdsAnimalsTrendView:UpdateHistory(history)
+    local historyList = history
+    local total = #historyList
     for i=1,50 do
-        if index>0 then
-            self.resultsItems[i].ShowLogo(BirdsAnimalsGameModel.historyList[index].logo_id)
-            index = index - 1
-            if i==1 then self.resultsItems[1].ShowNew(true) end
+        if i <= total then
+            self.resultsItems[i].ShowLogo(historyList[i])
+            if i==total then self.resultsItems[i].ShowNew(true) end
         else
             self.resultsItems[i].ShowLogo()
         end
@@ -104,10 +89,10 @@ function BirdsAnimalsTrendView:UpdateHistory()
 
     ---概率
     self.rateData = {0,0,0,0,0,0,0,0,0,0,0,0}
-    local offset=math.max(#BirdsAnimalsGameModel.historyList-49,1)
-    local count = #BirdsAnimalsGameModel.historyList-offset+1
-    for i=#BirdsAnimalsGameModel.historyList,offset,-1 do
-        self.rateData[BirdsAnimalsGameModel.historyList[i].logo_id]=self.rateData[BirdsAnimalsGameModel.historyList[i].logo_id]+1
+    local offset=math.max(#historyList-49,1)
+    local count = #historyList-offset+1
+    for i=#historyList,offset,-1 do
+        self.rateData[historyList[i]]=self.rateData[historyList[i]]+1
     end
 
     self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=0
