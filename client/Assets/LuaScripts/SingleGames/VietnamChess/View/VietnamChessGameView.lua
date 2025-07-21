@@ -5,7 +5,7 @@
 ---@class VietnamChessGameView:BaseView
 local VietnamChessGameView=Class("VietnamChessGameView",BaseView)
 local VietnamChessConfig=require("SingleGames/VietnamChess/VietnamChessConfig")
-local VietnamChessPlayCoin = require("SingleGames/VietnamChess/View/Item/VietnamChessPlayCoin")
+local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 local VietnamChessPlayerItem = require("SingleGames/VietnamChess/View/Item/VietnamChessPlayerItem")
 local VietnamChessRoadView = require("SingleGames/VietnamChess/View/Item/VietnamChessRoadView")
 local DOTween = CS.DG.Tweening.DOTween
@@ -23,14 +23,14 @@ function VietnamChessGameView:InitComponents()
     self.btn_nav=ComponentUtilGet.Button(self.transform,"content/RoadView/mask/node/btn_nav");
     self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
-    self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/buttom/btn_repeat");
-    self.btn_players=ComponentUtilGet.Button(self.transform,"content/buttom/btn_players");
-    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_players/tmp_total_player_num");
+    self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
+    self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
+    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.transform,"content/bottom/btn_players/tmp_total_player_num");
     
-    self.dizhu=ComponentUtilGet.Transform(self.transform,"content/buttom/dizhu");
+    self.dizhu=ComponentUtilGet.Transform(self.transform,"content/bottom/dizhu");
     self.xiazhuArea = ComponentUtilGet.Transform(self.transform,"content/center/XiaZhu")
     self.clickRect = ComponentUtilGet.Transform(self.transform,"content/clickRect")
-    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/buttom/SelfHead")
+    self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
     ---下注数量
     ---@type  TMPro.TextMeshProUGUI[]
     self.xiazhuNumLabels = {}
@@ -56,19 +56,31 @@ function VietnamChessGameView:InitComponents()
         self.xiazhuStarAreas[i] = ComponentUtilGet.Transform(self.clickRect:GetChild(i-1),"Star")
         self.xiazhuSelfNumsLabels[i] = ComponentUtilGet.TextMeshProUGUI(self.clickRect:GetChild(i-1),"yazhuNum/num")
     end
+    self.dizhu=ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
+    self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
+    self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
+    self.img_next = ComponentUtilGet.Image(self.btn_next.transform,"img");
     ---下注底注按钮
     self.chipInfos={}
-    for i = 1, 5 do
+    local ChouMaItem = ComponentUtilGet.GameObject(self.dizhu,"ChouMaItem")
+    for i=1,6 do
+        local chouma = GameObject.Instantiate(ChouMaItem);
+        chouma.transform:SetParent(self.dizhu,false);
+    end
+    for i = 1, 7 do
         local chipItem={}
-        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/buttom/dizhu/"..i)
-        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/buttom/dizhu/"..i)
+        chipItem.obj=self.dizhu:GetChild(i-1).gameObject
+        chipItem.rectTrans=self.dizhu:GetChild(i-1)
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
+        chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
+        chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
         chipItem.effects=ComponentUtilGet.GameObject(chipItem.rectTrans,"checkd")
         chipItem.effects:SetActive(false)
         self.chipInfos[i]=chipItem
     end
     ---底注节点
-    self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/buttom/nodes")
+    self.dizhuNode = ComponentUtilGet.GameObject(self.transform,"content/bottom/nodes")
     ---其他玩家信息 left right
     ---@type VietnamChessPlayerItem[]
     self.AllOtherPlayerHeads = {}
@@ -134,6 +146,26 @@ function VietnamChessGameView:InitPanelData(args)
 	self:InitUI()
 end
 
+function VietnamChessGameView:DizhuPrev(isNext)
+    if isNext==false then
+        if self.dizhupos then
+            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
+            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+            self.img_prev.transform.localScale = Vector3.one
+            self.img_next.transform.localScale = Vector3.one
+            self.dizhupos = false
+        end
+    else if not self.dizhupos then
+        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_prev.transform.localScale = Vector3(-1,1,1)
+        self.img_next.transform.localScale = Vector3(-1,1,1)
+        self.dizhupos = true
+    end
+    end
+end
 
 ---切换当前选中的底注
 function VietnamChessGameView:ChangeDiZhu(index)
@@ -199,7 +231,8 @@ end
 
 ---本玩家下注动画
 function VietnamChessGameView:PayXiaZhuCoinFly(side)
-    VietnamChessPlayCoin:AnimateCoin(self.dizhuNode,VietnamChessConfig.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side])
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,VietnamChessConfig.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side],
+            self.ctrl.model.config.betList[VietnamChessConfig.dizhuIndex])
 end
 ---通过id找到玩家
 function VietnamChessGameView:FindPlayerByID(id)
@@ -219,13 +252,15 @@ function VietnamChessGameView:PayOtherXiaZhuCoinFly(data)
         if data.id == self.ctrl.model.players[i].id then
             local playerItem = self:FindPlayerByID(data.id)
             if playerItem ~= nil then
-                VietnamChessPlayCoin:AnimateCoin(self.dizhuNode,data.dizhuType,playerItem.transform.position,self.xiazhuStarAreas[data.areaType])
+                ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.dizhuType,playerItem.transform.position,self.xiazhuStarAreas[data.areaType],
+                        self.ctrl.model.config.betList[data.dizhuType])
             end
             break
         end
 
         if i>=6 then
-            VietnamChessPlayCoin:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.xiazhuStarAreas[data.areaType])
+            ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.xiazhuStarAreas[data.areaType],
+                    self.ctrl.model.config.betList[data.dizhuType])
             break
         end
     end
@@ -235,7 +270,8 @@ end
 function VietnamChessGameView:RefresAreaCoin()
     if VietnamChessConfig.allXiaZhuData and #VietnamChessConfig.allXiaZhuData>0 then
         for i=1,#VietnamChessConfig.allXiaZhuData do
-            VietnamChessPlayCoin:CreatCoinInArea(self.dizhuNode,VietnamChessConfig.allXiaZhuData[i].dizhuType,self.xiazhuStarAreas[VietnamChessConfig.allXiaZhuData[i].areaType])
+            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,VietnamChessConfig.allXiaZhuData[i].dizhuType,self.xiazhuStarAreas[VietnamChessConfig.allXiaZhuData[i].areaType],
+                    self.ctrl.model.config.betList[VietnamChessConfig.allXiaZhuData[i].dizhuType])
         end
     end
 end
@@ -258,15 +294,33 @@ function VietnamChessGameView:PlayCompeleCoinFLy(datas,players,cards)
     targetPos[1] = self.selfPlayerRoot.transform.position
     targetPos[2] = self.btn_players.transform.position
     targetPos[3] = self.AllOtherPlayerHeads[p].transform.position
-    VietnamChessPlayCoin:DestroyCoin(targetPos,ratios)
+    ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
     --奖励数值
     self.selfPlayer:ShowResultCount(Tools.RandomInt(-100,1000))
     self.AllOtherPlayerHeads[p]:ShowResultCount(Tools.RandomInt(-100,1000))
 end
 
+function VietnamChessGameView:InitChouMa()
+    ---底注数值
+    for i=1,#self.chipInfos do
+        if self.ctrl.model.config.betList[i] then
+            self.chipInfos[i].obj:SetActive(true)
+            self.chipInfos[i].image.sprite = resMgr:LoadSprite(VietnamChessConfig.dizhuImgAtlas,VietnamChessConfig.dizhuColor[i])
+            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.ctrl.model.config.betList[i])
+
+            local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
+            local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
+            img.sprite = resMgr:LoadSprite(VietnamChessConfig.dizhuImgAtlas,VietnamChessConfig.dizhuColor[i])
+            num.text = self.chipInfos[i].num.text
+        else
+            self.chipInfos[i].obj:SetActive(false)
+        end
+    end
+end
 
 ---初始界面
 function VietnamChessGameView:InitUI()
+    self:InitChouMa()
     ---续押
     self.btn_repeat.interactable = false;
     ---其他玩家信息
@@ -514,7 +568,7 @@ end
 
 ---关闭界面
 function VietnamChessGameView:Close()
-    VietnamChessPlayCoin:Destroy()
+    ChouMaFlyUtil:Destroy()
     self.super.Close(self);
 end
 

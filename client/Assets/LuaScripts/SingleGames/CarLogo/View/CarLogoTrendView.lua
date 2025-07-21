@@ -5,7 +5,6 @@
 ---@class CarLogoTrendView:BaseView
 local CarLogoTrendView=Class("CarLogoTrendView",BaseView)
 local CarLogoConfig =require("SingleGames/CarLogo/CarLogoConfig")
-local CarLogoGameModel =require("SingleGames/CarLogo/Model/CarLogoGameModel")
 local CarLogoHelper=require("SingleGames/CarLogo/CarLogoHelper")
 
 ---初始化panel
@@ -22,7 +21,7 @@ function CarLogoTrendView:InitComponents()
     self.resultsTrs=ComponentUtilGet.Transform(self.transform,"content/results")
     self.rateTrs=ComponentUtilGet.Transform(self.transform,"content/rate")
     self.rateTmps={}
-    for i=1,8 do
+    for i=1,self.rateTrs.childCount do
         table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
     end
     self.resultsItems={}
@@ -41,11 +40,11 @@ end
 ---初始化View数据
 function CarLogoTrendView:InitPanelData(args)
     self:InitRateUI()
-    self:UpdateHistory()
+    self:UpdateHistory(args or {})
 end
 
 function CarLogoTrendView:InitRateUI()
-    for i=1,8 do
+    for i=1,self.rateTrs.childCount do
         local img = ComponentUtilGet.Image(self.rateTrs:GetChild(i-1),"icon")
         img.sprite = CarLogoHelper.LoadLogoSprite(i)
     end
@@ -73,17 +72,17 @@ function CarLogoTrendView:InitResultItem(transform)
     return table
 end
 
-function CarLogoTrendView:UpdateHistory()
+function CarLogoTrendView:UpdateHistory(history)
     ---测试
-    CarLogoGameModel.historyList = {}
+    local historyList =history
     for i=1,Tools.RandomInt(30,50) do
-        table.insert(CarLogoGameModel.historyList,{logo_index=1,logo_id=Tools.RandomInt(1,8)})
+        table.insert(historyList,{logo_index=1,logo_id=Tools.RandomInt(1,8)})
     end
     ---
-    local index = #CarLogoGameModel.historyList
+    local index = #historyList
     for i=1,50 do
         if index>0 then
-            self.resultsItems[i].ShowLogo(CarLogoGameModel.historyList[index].logo_id)
+            self.resultsItems[i].ShowLogo(historyList[index].logo_id)
             index = index - 1
             if i==1 then self.resultsItems[1].ShowNew(true) end
         else
@@ -93,10 +92,10 @@ function CarLogoTrendView:UpdateHistory()
     
     ---概率
     self.rateData = {0,0,0,0,0,0,0,0}
-    local offset=math.max(#CarLogoGameModel.historyList-49,1)
-    local count = #CarLogoGameModel.historyList-offset+1
-    for i=#CarLogoGameModel.historyList,offset,-1 do
-        self.rateData[CarLogoGameModel.historyList[i].logo_id]=self.rateData[CarLogoGameModel.historyList[i].logo_id]+1
+    local offset=math.max(#historyList-49,1)
+    local count = #historyList-offset+1
+    for i=#historyList,offset,-1 do
+        self.rateData[historyList[i].logo_id]=self.rateData[historyList[i].logo_id]+1
     end
 
     if count>0 then

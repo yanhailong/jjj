@@ -1238,17 +1238,3 @@ function this.DOFade_Repeat(graphic, fadeTime,fadeTimes, delayTime, callFunc)
     end)
     sequence:Play()
 end
-
-function this.numberToStrKM(number)
-    if number < 1000 then
-        return tostring(number)
-    elseif number < 1000000 then
-        return string.format("%.1fK", number / 1000)
-    elseif number < 1000000000 then
-        return string.format("%.1fM", number / 1000000)
-    elseif number < 1000000000000 then
-        return string.format("%.1fB", number / 1000000000)
-    else
-        return string.format("%.1fT", number / 1000000000000)
-    end
-end

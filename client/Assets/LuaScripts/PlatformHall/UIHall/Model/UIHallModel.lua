@@ -16,16 +16,16 @@ function UIHallModel:Close()
 end
 
 function UIHallModel:AddEvent()
-
+	WebNetEvent.AddListener(pb_PlatformHall.NoticeBaseInfoChange,self.NoticeBaseInfoChange,self)
 end
 
 function UIHallModel:RemoveEvent()
-
+	WebNetEvent.RemoveAllTo(self)
 end
 
---region 事件方法
-
---endregion
+function UIHallModel:NoticeBaseInfoChange(msg)
+	self.ctrl:RefreshPlayerInfos(msg)
+end
 
 
 return UIHallModel

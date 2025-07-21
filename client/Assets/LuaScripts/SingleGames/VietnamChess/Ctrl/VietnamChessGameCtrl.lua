@@ -46,6 +46,10 @@ function VietnamChessGameCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_nav,function()
 		self.view:NavRoleView()
 	end)
+	
+	self.uiEventListener:AddClick(self.view.btn_prev,function()  self.view:DizhuPrev(false) end)
+	self.uiEventListener:AddClick(self.view.btn_next,function()  self.view:DizhuPrev(true) end)
+	
 	---压注按钮
 	for i=1,#self.view.chipInfos do
 		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()

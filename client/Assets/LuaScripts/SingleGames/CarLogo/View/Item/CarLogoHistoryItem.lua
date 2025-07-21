@@ -1,12 +1,8 @@
 local CarLogoHelper=require("SingleGames/CarLogo/CarLogoHelper")
 local CarLogoConfig = require("SingleGames/CarLogo/CarLogoConfig")
-local CarLogoGameModel =require("SingleGames/CarLogo/Model/CarLogoGameModel")
 
 ---@class CarLogoHistoryItem
 local CarLogoHistoryItem=Class("CarLogoHistoryItem")
-
----右侧历史记录显示的条数
-local ShowItemCount = 8
 
 function CarLogoHistoryItem:ctor(gameObject)
     self.gameObject = gameObject;
@@ -23,7 +19,6 @@ function CarLogoHistoryItem:ctor(gameObject)
     
     ---logo飞行目标点
     self.point = self.logos[1].position
-    
     self:UpdateCarLogo()
 end
 
@@ -32,15 +27,16 @@ function CarLogoHistoryItem:GetPoint()
 end
 
 --直接显示没有动画
-function CarLogoHistoryItem:UpdateCarLogo()
-    for i=#CarLogoGameModel.historyList+1,#self.logos do
+function CarLogoHistoryItem:UpdateCarLogo(history)
+    local historyList = history or {}
+    for i=#historyList+1,#self.logos do
         self.logos[i].gameObject:SetActive(false)
     end
-    if #CarLogoGameModel.historyList>0 then
-        local endIndex = math.max(1,#CarLogoGameModel.historyList-7)
+    if #historyList>0 then
+        local endIndex = math.max(1,#historyList-#self.logos+1)
         local index = 1
-        for i = #CarLogoGameModel.historyList,endIndex,-1 do
-            self:ShowLogo(self.logos[index],CarLogoGameModel.historyList[i],index==1)
+        for i = #historyList,endIndex,-1 do
+            self:ShowLogo(self.logos[index],historyList[i],index==1)
             index=index+1
         end
     end
@@ -61,11 +57,11 @@ function CarLogoHistoryItem:ShowLogoNew(transform,showNew)
     tag:SetActive(showNew)
 end
 
-function CarLogoHistoryItem:PlayMoveAni()
+function CarLogoHistoryItem:PlayMoveAni(history)
     self:ShowLogoNew(self.logos[1],false)
     self.content:DOLocalMoveY(-110,1):OnComplete(function ()
         self.content.localPosition = Vector3.Zero()
-        self:UpdateCarLogo()
+        self:UpdateCarLogo(history)
     end)
 end
 

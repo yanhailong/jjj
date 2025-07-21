@@ -21,6 +21,7 @@ end
 function UICommonSlotTopCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	self:GoldShowChange()
 end
 
 ---初始化数据
@@ -41,6 +42,8 @@ function UICommonSlotTopCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_set, function()  
 		GlobalEvent.Notify(SlotGlobal.gameEventName.OpenHelp)
 	end)
+	
+	GlobalEvent.AddListener(PlayerInfoEvent.playerInfoChange,self.GoldShowChange,self)
 end
 
 ---移除UI事件
@@ -48,10 +51,9 @@ function UICommonSlotTopCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
---region UI事件方法
-
---endregion
-
+function UICommonSlotTopCtrl:GoldShowChange()
+	self.view.tmp_coinNum.text=PlayerManager:GetPlayerInfo().goldNum
+end
 
 ---销毁UI
 function UICommonSlotTopCtrl:RealCloseDestroy()
