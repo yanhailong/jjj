@@ -46,8 +46,9 @@ function BirdsAnimalsGameView:InitComponents()
     self.tipsTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_time_center")
     self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTimeTrs,"tips_time_end")
     self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTimeTrs,"tips_start_xiazhu")
-    
-    self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
+
+    self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
+
     ---结果
     self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/result");
     self.resultAnimal=ComponentUtilGet.GameObject(self.resultTrs,"Animal")
@@ -186,7 +187,7 @@ function BirdsAnimalsGameView:InitUI()
     self.tmp_totalPlayerNum.text="0"
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
-    self.three.gameObject:SetActive(false)
+    self.daojishiParticles.gameObject:SetActive(false)
     self.tipsTimeTrs.gameObject:SetActive(false)
     self.resultTrs.gameObject:SetActive(true);
     self:InitXiaZhuLabel()
@@ -567,21 +568,9 @@ end
 ------------tips-------------
 ---倒计时3秒
 function BirdsAnimalsGameView:PlayDaoJiShiEffect()
-    for i=0,1 do
-        self.three:GetChild(i).gameObject:SetActive(false)
-    end
-    self.three.gameObject:SetActive(true)
-
-    self.three:GetChild(2).gameObject:SetActive(true)
-    for i=1,3 do
-        TimerManager.StartTimer(self,function()
-            if i==3 then
-                self.three.gameObject:SetActive(false)
-                return
-            end
-            self.three:GetChild(3-i).gameObject:SetActive(false)
-            self.three:GetChild(2-i).gameObject:SetActive(true)
-        end,i,0,false)
+    self.daojishiParticles.gameObject:SetActive(true)
+    if self.daojishiParticles.isStopped  then
+        self.daojishiParticles:Play();
     end
 end
 
@@ -653,7 +642,7 @@ function BirdsAnimalsGameView:OnGameStatus(status, seconds)
     -- 隐藏所有阶段相关UI
     self.tipsTimeEnd:SetActive(false)
     self.resultAnimal:SetActive(false)
-    self.three.gameObject:SetActive(false)
+    self.daojishiParticles.gameObject:SetActive(false)
 
     if self.statusTimer then
         TimerManager.StopTimer(self,self.statusTimer)

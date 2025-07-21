@@ -11,7 +11,7 @@ local ChouMaFlyUtil=Class("ChouMaFlyUtil")
 local ImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
 
 ---scale
-local scale = 0.45
+local scale = 0.5
 ---桌面上的底注
 local coins = {}
 DOTween:SetTweensCapacity(1000, 250); 
@@ -90,28 +90,32 @@ function ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
     local results = distributeCoins(#coins,ratios)
     local index = 1
     local next = 0
+    local delay = 0
     for i=1,#coins do
         if results[index] == nil then break end
         if next + results[index] >= i then
-            self:DestroyCoinFly(coins[i],targetPos[index])
+            self:DestroyCoinFly(coins[i],targetPos[index],delay)
+            delay = delay + 0.15
         else
             next = next + results[index]
             index = index + 1
-            self:DestroyCoinFly(coins[i],targetPos[index])
+            delay = 0
+            self:DestroyCoinFly(coins[i],targetPos[index],delay)
         end
     end
     coins = {}
 end
 
-function ChouMaFlyUtil:DestroyCoinFly(coinObj,endPos)
+function ChouMaFlyUtil:DestroyCoinFly(coinObj,endPos,delay)
     if endPos == nil or coinObj == nil then
         return
     end
     -- 创建动画序列
     local sequence = DOTween.Sequence()
     -- 设置金币动画效果
-    sequence:Append(coinObj.transform:DOMove(endPos, 0.8):SetEase(Ease.OutQuad))
-    sequence:Join(coinObj.transform:DOScale(0.9, 0.8):SetEase(Ease.OutQuad):SetDelay(1))
+    sequence:AppendInterval(delay)
+    sequence:Append(coinObj.transform:DOMove(endPos, 0.5):SetEase(Ease.OutQuad))
+    sequence:Join(coinObj.transform:DOScale(0, 0.3):SetEase(Ease.OutQuad):SetDelay(0.5))
     -- 动画完成后保持金币在桌面上
     sequence:OnComplete(function()
         GameObject.Destroy(coinObj)
