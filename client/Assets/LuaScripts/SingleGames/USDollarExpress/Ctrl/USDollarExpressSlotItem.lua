@@ -20,16 +20,22 @@ function USDollarExpressSlotItem:SetSprite(icon,index)
     self.img_icon.sprite=icon
     self.img_icon:SetNativeSize()
     self.iconIndex=index
-    --if config.gameTypeState==1 then
-    --    if self.iconIndex>=15 and self.iconIndex<=22 then
-    --        self.canvas.sortingOrder=3
-    --    else
-    --        self.canvas.sortingOrder=1
-    --    end
-    --else
-    --    self.canvas.sortingOrder=1
-    --    
-    --end
+    if config.gameTypeState==1 then
+        self:SetItemMask(true)
+    end
+end
+
+function USDollarExpressSlotItem:SetItemMask(isMask)
+    if isMask==true then
+        if self.iconIndex>=15 and self.iconIndex<=22 then
+            self.transform:SetAsLastSibling()
+        else
+            self.transform:SetAsFirstSibling()
+        end
+    else
+        self.transform:SetAsFirstSibling()
+    end
+
 end
 
 function USDollarExpressSlotItem:SetSpriteColor(ishight)

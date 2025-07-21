@@ -37,14 +37,21 @@ end
 
 function USDollarExpressMainView:InitWheelRoot()
     self.wheelRootList={}
+    self.wheelMasks={}
     for i = 1, 5 do
         self.wheelRootList[i]=ComponentUtilGet.Transform(self.transform,"content/gameCenter/slotsMain/wheelRoot/trans_slots/slotColumn"..i)
+        self.wheelMasks[i]=ComponentUtilGet.GameObject(self.wheelRootList[i],"newobj/mask")
     end
-
+    
     self.cardPrefab=self.transform:Find("content/gameCenter/item").gameObject
     self.cardPrefab:SetActive(false)
+    self:IsShowBl(false)
 end
-
+function USDollarExpressMainView:IsShowBl(isShow)
+    for i = 1, 5 do
+        self.wheelMasks[i]:SetActive(isShow)
+    end
+end
 ---初始化View数据
 function USDollarExpressMainView:InitPanelData(args)
 	

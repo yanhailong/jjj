@@ -232,11 +232,13 @@ function USDollarExpressMainCtrl:ReSetData()
 	---默认都转3圈结束转动
 	self.rollCircles={}
 	if config.gameTypeState==1 then
+		self:SetAllChildItemMask(true)
 		--二选1模式
 		for i = 1,5 do
 			self.rollCircles[i] = config.rollCircles1[i]
 		end
 	else
+		self:SetAllChildItemMask(false)
 		for i = 1,5 do
 			self.rollCircles[i] = config.rollCircles[i]
 		end
@@ -298,6 +300,7 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 				else
 					self:ShowBigKuang(wheelId+1)
 				end
+				self:CheckWheelIdAndPlayAni(wheelId)
 			end
 		else
 			self.rollCircles[wheelId]=self.rollCircles[wheelId]-1
@@ -381,8 +384,8 @@ function USDollarExpressMainCtrl:StartCirleStop2(parent_newObj,wheelId,endpos)
 				self:ShowResoult()-- 旋转结束处理服务器数据表现
 
 			end)
-
 		end
+		self:CheckWheelIdAndPlayAni(wheelId)
 	end
 end
 
@@ -420,8 +423,72 @@ function USDollarExpressMainCtrl:RestWheelPos(wheelid,isEnd)
 	end
 end
 
+function USDollarExpressMainCtrl:SetAllChildItemMask(isSetMask)
+	if isSetMask==true then
+		self.view:IsShowBl(true)
+		for i = 1, config.lieNum do
+			for j = 1, config.rollItemNum do
+				self.childsList[i][j]:SetItemMask(true)
+			end
+		end
+	else
+		self.view:IsShowBl(false)
+		for i = 1, config.lieNum do
+			for j = 1, config.rollItemNum do
+				self.childsList[i][j]:SetItemMask(false)
+			end
+		end
+	end
+end
 
+---item.iconIndex>=15 and item.iconIndex<=22出现则要播放动画
+function USDollarExpressMainCtrl:CheckWheelIdAndPlayAni(wheelId)
+	if wheelId==1 then
+		for i = 1, 4 do
+			local item=self.showChildsList[i]
+			if item.iconIndex>=15 and item.iconIndex<=22 then
+				item:SetIsAward(true)
+			end
 
+		end
+	end
+	if wheelId==2 then
+		for i = 5, 8 do
+			local item=self.showChildsList[i]
+			if item.iconIndex>=15 and item.iconIndex<=22 then
+				item:SetIsAward(true)
+			end
+
+		end
+	end
+	if wheelId==3 then
+		for i = 9, 12 do
+			local item=self.showChildsList[i]
+			if item.iconIndex>=15 and item.iconIndex<=22 then
+				item:SetIsAward(true)
+			end
+
+		end
+	end
+	if wheelId==4 then
+		for i = 13, 16 do
+			local item=self.showChildsList[i]
+			if item.iconIndex>=15 and item.iconIndex<=22 then
+				item:SetIsAward(true)
+			end
+
+		end
+	end
+	if wheelId==5 then
+		for i = 17, 20 do
+			local item=self.showChildsList[i]
+			if item.iconIndex>=15 and item.iconIndex<=22 then
+				item:SetIsAward(true)
+			end
+
+		end
+	end
+end
 
 
 
