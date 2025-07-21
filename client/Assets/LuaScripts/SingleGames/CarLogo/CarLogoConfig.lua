@@ -105,6 +105,8 @@ CarLogoConfig.SpecTimes = {
     [this.SpecialEffects.SYS_WIN] = 0,
 }
 
+this.dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
+
 ---每个押注区域直接显示筹码数限制
 CarLogoConfig.Side_Show_Chouma_Num = 30
 
@@ -117,6 +119,8 @@ CarLogoConfig.XiaZhu_Limit_Num = 2000000
 --每一个区域场外玩家扔筹码的数量限制
 CarLogoConfig.EveryArea_OtherPlayer_ThrowChouMa_Limit = 40
 
+---游戏ID
+this.gameID = 200400
 ---当前选中的底注
 this.dizhuIndex = 1
 ---底注数值
@@ -134,6 +138,8 @@ this.selfXiaZhuInfo = {}
 this.goldRealNum = 100000
 ---流程状态信息 当前房间阶段 1=等待押注,2=押注冻结，等待开牌,3=本局结束
 this.currStatus = 1
+---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
+this.StageTime = {0,15000,11000,0 }
 ---当前状态剩余秒数 13
 this.lessSeconds = 13
 ---房间总人数

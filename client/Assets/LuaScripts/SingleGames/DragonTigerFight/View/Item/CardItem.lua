@@ -17,6 +17,7 @@ function CardItem:ctor(go)
     self.back=ComponentUtilGet.GameObject(self.transform,"back")
     self.img_front=ComponentUtilGet.Image(self.transform,"front")
     self.img_back=ComponentUtilGet.Image(self.transform,"back")
+    self:Hiden()
 end
 
 function CardItem:LoadCard(carIndex)
@@ -30,8 +31,6 @@ function CardItem:LoadCard(carIndex)
     --self.img_front:SetNativeSize()
     self.img_back.sprite = resMgr:LoadSprite(cardsPath,"pai_beim")
     --self.img_back:SetNativeSize()
-    
-    self:Hiden()
 end
 
 function CardItem:ShowFront()

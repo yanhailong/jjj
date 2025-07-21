@@ -48,10 +48,13 @@ this.CHESS_ODS_GROUP = {
     [this.CHESS_ODS_TYPE.BLACKALL]={5}
 }
 
+this.dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
+---游戏ID
+this.gameID = 200700
 ---当前选中的底注
 this.dizhuIndex = 1
 ---底注数值
-this.dizhuNumArr = {1,10,50,100,500}
+this.dizhuNumArr = {10,50,100,500,1000,5000,10000}
 ---当前是否可以下注
 this.allow = true
 ---本局结果
@@ -69,6 +72,8 @@ this.selfXiaZhuInfo = {}
 this.goldRealNum = 100000
 ---流程状态信息 当前房间阶段 1=等待押注,2=押注冻结，等待开牌,3=本局结束
 this.currStatus = 1
+---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
+this.StageTime = {3000,14000,11000,0 }
 ---当前状态剩余秒数 13
 this.lessSeconds = 13
 ---房间总人数

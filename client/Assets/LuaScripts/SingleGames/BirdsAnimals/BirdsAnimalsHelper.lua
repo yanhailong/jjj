@@ -5,28 +5,17 @@ local BirdsAnimalsHelper = {}
 local atlasPath = "SingleGames/BirdsAnimals/atlas"
 ---加载Logo
 function BirdsAnimalsHelper.LoadLogoSprite(logo_id)
+    if BirdsAnimalsConfig.ANIMA_ICON_IMAGES[logo_id] == nil then look("xxxxxxxxxxxxx"..logo_id) end
     return resMgr:LoadSprite(atlasPath.."/animal",BirdsAnimalsConfig.ANIMA_ICON_IMAGES[logo_id]);
-end
----加载小Logo
-function BirdsAnimalsHelper.LoadSmallLogoSprite(logo_id)
-    return resMgr:LoadSprite(atlasPath.."/animal", BirdsAnimalsConfig.ANIMA_SMALL_IMAGES[logo_id]);
 end
 
 ---加載图片文字
 function BirdsAnimalsHelper.LoadTxtSprite(name)
-    return resMgr:LoadSprite(atlasPath.."/txt",name)
-end
-
-function BirdsAnimalsHelper.LoadNameTxtSprite(logo_id)
-    return BirdsAnimalsHelper.LoadTxtSprite(BirdsAnimalsConfig.ANIMA_NAME_IMAGES[logo_id])
+    return resMgr:LoadSprite(atlasPath.."/art",name)
 end
 
 function BirdsAnimalsHelper.LoadNameLanguage(logo_id)
-    return BirdsAnimalsConfig.ANIMA_NAME_LANGUAGE[logo_id]
-end
-
-function BirdsAnimalsHelper.LoadRateTxtSprite(num)
-    return BirdsAnimalsHelper.LoadTxtSprite("BirdsAnimals_×"..num)
+    return LocalManager.GetStrById(BirdsAnimalsConfig.ANIMA_NAME_LANGUAGE[logo_id])
 end
 
 function BirdsAnimalsHelper.is_certain_type(animal_type, animal_id)

@@ -6,94 +6,129 @@
 local DragonTigerFightModel=Class("DragonTigerFightModel",BaseModel)
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
 
-local EventBinner = {
-	XIAZHU = "XIAZHU",
-	UPDATE_PLAYER = "UPDATE_PLAYER",
-	XIAZHU_END = "XIAZHU_END",
-	UPDATE_HIS_ITEMS = "UPDATE_HIS_ITEMS",
-}
-
 function DragonTigerFightModel:Awake()
-	self.super.Awake(self);
-	---@type DragonTigerFightCtrl
-	self.ctrl=self.ctrl
-
-	self.players = {}
-	self.allXiaZhuData = {}
+    self.super.Awake(self);
+    self.ctrl=self.ctrl
+    self.players = {}
+    self.sideBetInfos={}
+    self.history = {}
+    self.Result = {}
+    self.AreaChipTotals = {0,0,0}
 end
 
 function DragonTigerFightModel:Close()
     self.super.Close(self);
 end
-
----网络监听
+---流程
+---获取房间信息和状态 历史数据 获取排名
+---注册推送的状态信息 根据状态显示界面和倒计时
+---注册玩家进入和离开的更新
+---个人未下注提示和退出管理
 function DragonTigerFightModel:AddEvent()
-	GlobalEvent.AddListener(EventBinner.XIAZHU,self.PlayerXiaZhu,self)
-	GlobalEvent.AddListener(EventBinner.UPDATE_PLAYER,self.OnPlayerMsg,self)
-	GlobalEvent.AddListener(EventBinner.XIAZHU_END,self.OnXiaZhuComplete,self)
-	GlobalEvent.AddListener(EventBinner.UPDATE_HIS_ITEMS,self.UpdateHistoryRecord,self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResEnterRoom, self.OnEnterRoom, self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResBetting, self.OnBetting, self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResGameStatus, self.OnGameStatus, self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResPlayerEnterRoom, self.OnPlayerEnterRoom, self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResPlayerLeaveRoom, self.OnPlayerLeaveRoom, self)
+    WebNetEvent.AddListener(pb_DragonTigerFight.ResGameResult, self.OnGameResult, self)
 end
 
 function DragonTigerFightModel:RemoveEvent()
-	GlobalEvent.Remove(EventBinner.XIAZHU,self.PlayerXiaZhu,self)
-	GlobalEvent.Remove(EventBinner.UPDATE_PLAYER,self.OnPlayerMsg,self)
-	GlobalEvent.Remove(EventBinner.XIAZHU_END,self.OnXiaZhuComplete,self)
-	GlobalEvent.Remove(EventBinner.UPDATE_HIS_ITEMS,self.UpdateHistoryRecord,self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResEnterRoom, self.OnEnterRoom, self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResBetting, self.OnBetting, self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResGameStatus, self.OnGameStatus, self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResPlayerEnterRoom, self.OnPlayerEnterRoom, self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResPlayerLeaveRoom, self.OnPlayerLeaveRoom, self)
+    WebNetEvent.Remove(pb_DragonTigerFight.ResGameResult, self.OnGameResult, self)
 end
 
 --region 事件方法
-
----收到玩家下注消息
-function DragonTigerFightModel:PlayerXiaZhu()
-	local data  = {id=Tools.RandomInt(1,30),dizhuType=Tools.RandomInt(1,5),areaType=Tools.RandomInt(1,3)}
-	config.allXiaZhuData[#config.allXiaZhuData+1] = data
-	config.totalDiZhuNums[data.areaType] = config.totalDiZhuNums[data.areaType]+config.dizhuNumArr[data.dizhuType]
-	
-	self.ctrl.view:PayOtherXiaZhuCoinFly(data)
+-- 进入房间返回
+function DragonTigerFightModel:OnEnterRoom(msg)
+    self.roomId = msg.roomId
+    self.config = msg.config
+    self.sideBetInfos = msg.sideBetInfos
+    self.players = msg.players
+    self.history = msg.history
+    self.status = msg.status
+    self.seconds = msg.seconds
+    if self.ctrl and self.ctrl.view and self.ctrl.view.UpdateRoomInfo then
+        self.ctrl.view:UpdateRoomInfo(self)
+    end
 end
 
----更新玩家信息
-function DragonTigerFightModel:OnPlayerMsg()
-	look("OnPlayerMsg")
-	self.players = {}
-	for i=1,50 do
-		self.players[i] = {id=i,name="role"..i,coin=Tools.RandomInt(1,10000)}
-	end
-	self.ctrl.view:UpdatePlayers(self.players)
+-- 广播玩家押注信息
+function DragonTigerFightModel:OnBetting(msg)
+    -- msg.betList: {BetInfo}
+    if self.ctrl and self.ctrl.view and self.ctrl.view.PayOtherXiaZhuCoinFly then
+        for _, bet in ipairs(msg.betList or {}) do
+            self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+        end
+    end
 end
 
----下注完成结算
-function DragonTigerFightModel:OnXiaZhuComplete()
-	---牌面结果信息
-	local cards = {Tools.RandomInt(1,13),Tools.RandomInt(1,13)}
-	---显示结果动画
-	---回收金币奖励动画
-	self.ctrl.view:PlayCompeleCoinFLy(config.allXiaZhuData,self.players,cards)
-	
-	---清理下注数据
-	config.allXiaZhuData = {}
+-- 广播切换状态
+function DragonTigerFightModel:OnGameStatus(msg)
+    self.status = msg.status
+    self.seconds = msg.seconds
+    if self.ctrl and self.ctrl.view and self.ctrl.view.OnGameStatus then
+        self.ctrl.view:OnGameStatus(msg.status, msg.seconds)
+    end
 end
 
----更新历史信息
-function DragonTigerFightModel:UpdateHistoryRecord()
-	--测试数据
+-- 广播玩家进入房间
+function DragonTigerFightModel:OnPlayerEnterRoom(msg)
+    if msg.player then
+        for _, p in ipairs(msg.player) do
+            table.insert(self.players, p)
+        end
+        if self.ctrl and self.ctrl.view and self.ctrl.view.UpdatePlayers then
+            self.ctrl.view:UpdatePlayers(self.players)
+        end
+    end
+end
 
-	local side = config.side
-	if side == nil then
-		look("side数据为nil")
-		return
-	end
-	if self.game_his_items == nil then
-		self.game_his_items = {}
-	end
-	if #self.game_his_items >=60 then
-		self.game_his_items = {}
-	end
-	table.insert(self.game_his_items,{seri_id=#self.game_his_items+1,win_side=side})
-	self.ctrl.view:UpdateRoleView(self.game_his_items)
+-- 广播玩家离开房间
+function DragonTigerFightModel:OnPlayerLeaveRoom(msg)
+    if msg.userId then
+        for i, p in ipairs(self.players) do
+            if p.id == msg.userId then
+                table.remove(self.players, i)
+                break
+            end
+        end
+        if self.ctrl and self.ctrl.view and self.ctrl.view.UpdatePlayers then
+            self.ctrl.view:UpdatePlayers(self.players)
+        end
+    end
+end
+
+-- 广播结算信息
+function DragonTigerFightModel:OnGameResult(msg)
+    self.Result = msg;
+    if #self.history>=64 then
+        self.history = {}
+    end
+    table.insert(self.history,msg.winSide)
+    
+    if self.ctrl and self.ctrl.view and self.ctrl.view.ResultEffect then
+        ---显示牌面结果
+        self.ctrl.view:ResultEffect(msg.cards)
+        ---金币回收动画
+        self.ctrl.view:PlayCompeleCoinFLy(msg.players)
+    end
+end
+
+function DragonTigerFightModel:ResetConfig()
+    for i=1,#config.selfDiZhuNums do
+        config.selfDiZhuNums[i]=0
+        config.totalDiZhuNums[i]=0
+    end
+    self.sideBetInfos={}
+    self.Result = {}
+    self.AreaChipTotals = {0,0,0}
 end
 
 --endregion
-
 
 return DragonTigerFightModel

@@ -1,0 +1,73 @@
+syntax="proto3";
+
+
+
+//--------网络接口----------
+//请求,msgID=0x7531,desc=进入房间
+message ReqBirdsAnimalsEnterRoom {
+  enum E_MsgID { def = 0;msgID = 30001; };
+  int32 roomType = 1;//选择类型 1、普通场 2、中级场 3、高级场
+}
+
+//响应,msgID=0x7532,desc=返回房间信息
+message ResBirdsAnimalsEnterRoom {
+  enum E_MsgID { def = 0;msgID = 30002; };
+  //房间基本信息
+  int32 roomId = 1;//房间ID
+  RoomBetConfig config = 2;//当前房间配置 Room_Bet
+
+  //押注池信息
+  repeated SideBetInfo sideBetInfos = 3;//押注池信息
+
+  //玩家信息
+  repeated PlayerInfo players = 4;//房间里所有玩家
+
+  //历史记录信息
+  repeated int32 history = 5;// 历史记录信息 
+
+  //流程状态信息
+  int32 status = 6;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
+  int32 seconds = 7;//当前状态剩余秒数
+}
+
+//请求,msgID=0x7533,desc=玩家押注上报
+message ReqBirdsAnimalsBetting{
+  enum E_MsgID { def = 0;msgID = 30003; };
+  int32 side = 1;//押注位置
+  int64 amount = 2;//押注金额
+};
+
+//响应,msgID=0x7534,desc=广播玩家押注信息
+message ResBirdsAnimalsBetting{
+  enum E_MsgID { def = 0;msgID = 30004; };
+  repeated BetInfo betList = 1;//列表，多个投注信息 （如果服务器同时收到多个就一起下发）
+};
+
+//响应,msgID=0x7535,desc=广播切换状态时的信息
+message ResBirdsAnimalsGameStatus{
+  enum E_MsgID { def = 0;msgID = 30005; };
+  int32 status = 1;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
+  int32 seconds = 2;//当前状态剩余秒数
+};
+
+//响应,msgID=0x7536,desc=广播玩家离开房间的消息
+message ResBirdsAnimalsPlayerLeaveRoom{
+  enum E_MsgID { def = 0;msgID = 30006; };
+  int32 userId = 1;//玩家ID
+};
+
+//响应,msgID=0x7537,desc=广播玩家进入房间的消息
+message ResBirdsAnimalsPlayerEnterRoom{
+  enum E_MsgID { def = 0;msgID = 30007; };
+  repeated PlayerInfo player = 1;//进入的玩家信息
+}
+
+//响应,msgID=0x7538,desc=广播结算信息
+message ResBirdsAnimalsGameResult{
+  enum E_MsgID { def = 0;msgID = 30008; };
+   int32 winSide = 1;//本局命中的ID
+   int32 winIndex  = 2;  //本局命中的位置
+   int32 lastIndex = 3;  //上一局命中的位置
+
+  repeated PlayerInfo players = 4;// 所有玩家信息 赢的需要填 winCurrency字段 默认0
+};

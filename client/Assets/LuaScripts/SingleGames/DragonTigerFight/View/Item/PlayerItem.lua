@@ -9,12 +9,13 @@ local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 local Vector3 = CS.UnityEngine.Vector3
 
-function PlayerItem:ctor(go)
-    self.gameObject = go
-    self.transform=self.gameObject.transform
+function PlayerItem:ctor(transform)
+    self.gameObject = transform.gameObject
+    self.transform=transform
     self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
     self.headIcon = ComponentUtilGet.Image(self.transform,"HeadPic/Head")
     self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"Money/GoldNumber")
+    self.playerName = ComponentUtilGet.TextMeshProUGUI(self.transform,"PlayerName");
     self.resultNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"result")
     self.resultNum.gameObject:SetActive(false)
 end
@@ -51,9 +52,15 @@ end
 
 
 function PlayerItem:UpdatePlayer(player)
-    self.goldCount.text = player.coin
-    self.player = player
-    self.id = player.id
+    if player == nil then
+        self.gameObject:SetActive(false)
+    else
+        self.gameObject:SetActive(true)
+        self.goldCount.text = player.currency
+        self.playerName.text = player.name
+        self.player = player
+        self.id = player.id
+    end
 end
 
 return PlayerItem

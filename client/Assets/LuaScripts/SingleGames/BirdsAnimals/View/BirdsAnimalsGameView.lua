@@ -7,9 +7,9 @@ local BirdsAnimalsGameView=Class("BirdsAnimalsGameView",BaseView)
 local BirdsAnimalsItem=require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsItem")
 local BirdsAnimalsHistoryItem=require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsHistoryItem")
 local BirdsAnimalsAreaItem=require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsAreaItem")
-local BirdsAnimalsConfig=require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
+local config =require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
 local BirdsAnimalsHelper=require("SingleGames/BirdsAnimals/BirdsAnimalsHelper")
-local BirdsAnimalsPlayCoinView=require("SingleGames/BirdsAnimals/View/BirdsAnimalsPlayCoinView")
+local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 local BirdsAnimalsPlayerItem = require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsPlayerItem")
 
 local DOTween = CS.DG.Tweening.DOTween
@@ -26,7 +26,6 @@ end
 function BirdsAnimalsGameView:InitComponents()
     self.btn_trend=ComponentUtilGet.Button(self.transform,"content/top/history/btn_trend");
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
-    self.btn_1=ComponentUtilGet.Button(self.transform,"content/top/btn_1");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
     self.muenRect=ComponentUtilGet.RectTransform(self.transform,"content/setting/mask/muen")
@@ -38,57 +37,91 @@ function BirdsAnimalsGameView:InitComponents()
 
     self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_total_player_num")
     ---提示信息
-    self.txt_mybets=ComponentUtilGet.Text(self.transform,"content/center/tips/tips_center/mybets/txt_mybets");
-    self.tmp_totalnote=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/center/tips/tips_center/totalnote/tmp_totalnote");
-    self.tmp_automatic=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/center/tips/tips_center/automatic/tmp_automatic");
-
-    self.bottomtips=ComponentUtilGet.Transform(self.transform,"content/center/bottomtips");
-    self.img_watch=ComponentUtilGet.Image(self.transform,"content/center/bottomtips/img_watch");
-    self.img_netganm=ComponentUtilGet.Image(self.transform,"content/center/bottomtips/img_netganm");
-    self.img_tips1=ComponentUtilGet.Image(self.transform,"content/center/bottomtips/img_tips1");
+    self.txt_mybets=ComponentUtilGet.Text(self.transform,"content/tips/tips_center/mybets/txt_mybets");
+    self.tmp_totalnote=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tips/tips_center/totalnote/tmp_totalnote");
+    self.tmp_automatic=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tips/tips_center/automatic/tmp_automatic");
     
-    self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/center/tips")
+    self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
 
     self.tipsTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_time_center")
     self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTimeTrs,"tips_time_end")
     self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTimeTrs,"tips_start_xiazhu")
     
-    self.tipsPassedTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_passed")
-    self.tipsTimePassed = ComponentUtilGet.TextMeshProUGUI(self.tipsPassedTrs,"tips_time_passed")
-
     self.three=ComponentUtilGet.Transform(self.tipsTrs,"three")
     ---结果
-    self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/center/result");
+    self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/result");
     self.resultAnimal=ComponentUtilGet.GameObject(self.resultTrs,"Animal")
-    self.img_name=ComponentUtilGet.Image(self.transform,"content/center/result/Animal/img_name");
-    self.img_icon=ComponentUtilGet.Image(self.transform,"content/center/result/Animal/img_icon");
-    self.img_rate=ComponentUtilGet.Text(self.transform,"content/center/result/Animal/img_rate");
+    self.txt_name=ComponentUtilGet.Text(self.transform,"content/result/Animal/txt_name");
+    self.img_icon=ComponentUtilGet.Image(self.transform,"content/result/Animal/img_icon");
+    self.img_rate=ComponentUtilGet.Text(self.transform,"content/result/Animal/img_rate");
     ---下注区域
-    self.areasTrs=ComponentUtilGet.Transform(self.transform,"content/center/areas")
+    self.areasTrs=ComponentUtilGet.Transform(self.transform,"content/areas")
+    local areaItem=self.areasTrs:GetChild(0)
     ---@type BirdsAnimalsAreaItem[]
     self.areaViews = {};
-    for i = 1, self.areasTrs.childCount do
-        self.areaViews[i] = BirdsAnimalsAreaItem.New(self.areasTrs:GetChild(i-1),i);
+    self.areaViews[1] = BirdsAnimalsAreaItem.New(areaItem,1);
+    for i = 2, 12 do
+        local areaObj = Tools.Instance(areaItem.gameObject)
+        areaObj.transform:SetParent(self.areasTrs,false)
+        self.areaViews[i] = BirdsAnimalsAreaItem.New(areaObj.transform,i);
     end
     ---车标 跑马灯
     self.logosTrs=ComponentUtilGet.Transform(self.transform,"content/center/logos")
+    local logoItem=self.logosTrs:GetChild(0)
     ---@type BirdsAnimalsItem[]
-    self.logoViews = {};
-    for i = 1, self.logosTrs.childCount do
-        self.logoViews[i] = BirdsAnimalsItem.New(self.logosTrs:GetChild(i-1))
+    self.logoViews = {BirdsAnimalsItem.New(logoItem)};
+    local logoV3 = logoItem.localPosition;
+    local v2x, v2y = 187, 218
+    local logoV3x, logoV3y, logoV3z = logoV3.x, logoV3.y, logoV3.z
+    for i = 2, 28 do
+        local logoObj = Tools.Instance(logoItem.gameObject)
+        logoObj.transform:SetParent(self.logosTrs,false)
+        local newX, newY, newZ
+        if i < 12 then
+            newX = logoV3x + v2x * (i - 1)
+            newY = logoV3y
+            newZ = logoV3z
+        elseif i < 16 then
+            newX = logoV3x + v2x * 10
+            newY = logoV3y - v2y * (i - 11)
+            newZ = logoV3z
+        elseif i < 26 then
+            newX = logoV3x + v2x * (25 - i)
+            newY = logoV3y - v2y * 4
+            newZ = logoV3z
+        else
+            newX = logoV3x
+            newY = logoV3y - v2y * (29 - i)
+            newZ = logoV3z
+        end
+        logoObj.transform.localPosition = Vector3(newX, newY, newZ)
+        self.logoViews[i] = BirdsAnimalsItem.New(logoObj.transform)
     end
 
     ---历史信息
     self.historyObj=ComponentUtilGet.GameObject(self.transform,"content/top/history")
     ---@type BirdsAnimalsHistoryItem
     self.history=BirdsAnimalsHistoryItem.New(self.historyObj)
+
+    self.dizhu = ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
+    self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
+    self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
+    self.img_next = ComponentUtilGet.Image(self.btn_next.transform,"img");
     ---下注底注按钮
     self.chipInfos={}
-    for i = 1, 5 do
+    local ChouMaItem = ComponentUtilGet.GameObject(self.dizhu,"ChouMaItem")
+    for i=1,6 do
+      local chouma = GameObject.Instantiate(ChouMaItem);
+        chouma.transform:SetParent(self.dizhu,false);
+    end
+    for i = 1, 7 do
         local chipItem={}
-        chipItem.obj=ComponentUtilGet.Button(self.transform,"content/bottom/dizhu/"..i)
-        chipItem.rectTrans=ComponentUtilGet.RectTransform(self.transform,"content/bottom/dizhu/"..i)
+        chipItem.obj=self.dizhu:GetChild(i-1).gameObject
+        chipItem.rectTrans=self.dizhu:GetChild(i-1)
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
+        chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
+        chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
         chipItem.effects=ComponentUtilGet.GameObject(chipItem.rectTrans,"checkd")
         chipItem.effects:SetActive(false)
         self.chipInfos[i]=chipItem
@@ -104,17 +137,13 @@ end
 function BirdsAnimalsGameView:ClearComponents()
     self.btn_trend=nil;
     self.btn_recharge=nil;
-    self.btn_1=nil;
     self.btn_players=nil;
     self.tmp_totalPlayerNum=nil;
     self.btn_repeat=nil;
     self.txt_mybets=nil;
     self.tmp_totalnote=nil;
     self.tmp_automatic=nil;
-    self.img_watch=nil;
-    self.img_netganm=nil;
-    self.img_tips1=nil;
-    self.img_name=nil;
+    self.txt_name=nil;
     self.img_icon=nil;
     self.img_rate=nil;
     self.btn_touch=nil;
@@ -128,29 +157,66 @@ end
 function BirdsAnimalsGameView:InitPanelData(args)
     self:InitMarquee()
     self:InitLogos()
-    self:InitUI()
+end
+
+function BirdsAnimalsGameView:InitChouMa()
+    ---底注数值
+    for i=1,#self.chipInfos do
+        if self.ctrl.model.config.betList[i] then
+            self.chipInfos[i].obj:SetActive(true)
+            self.chipInfos[i].image.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
+            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.ctrl.model.config.betList[i])
+
+            local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
+            local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
+            img.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
+            num.text = self.chipInfos[i].num.text
+        else
+            self.chipInfos[i].obj:SetActive(false)
+        end
+    end
 end
 
 function BirdsAnimalsGameView:InitUI()
     ---续押
-    self.btn_repeat.interactable = false;
-    self.tmp_totalPlayerNum.text="0"
+    self:SetRepeatState(false)
+    self:InitChouMa()
+    
     --请下注提示
+    self.tmp_totalPlayerNum.text="0"
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
     self.three.gameObject:SetActive(false)
-    self.tipsPassedTrs.gameObject:SetActive(false)
     self.tipsTimeTrs.gameObject:SetActive(false)
-    self.bottomtips.gameObject:SetActive(false)
-    
-    BirdsAnimalsConfig.allow=false
-
+    self.resultTrs.gameObject:SetActive(true);
     self:InitXiaZhuLabel()
 end
 
+function BirdsAnimalsGameView:DizhuPrev(isNext)
+    if isNext==false then
+        if self.dizhupos then
+            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
+            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+            self.img_prev.transform.localScale = Vector3.one
+            self.img_next.transform.localScale = Vector3.one
+            self.dizhupos = false
+        end
+    else if not self.dizhupos then
+        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_prev.transform.localScale = Vector3(-1,1,1)
+        self.img_next.transform.localScale = Vector3(-1,1,1)
+        self.dizhupos = true
+    end
+    end
+end
+
+
 ---初始化图标
 function BirdsAnimalsGameView:InitLogos()
-    for logo_id, indexs in ipairs(BirdsAnimalsConfig.LOGO_IDX) do
+    for logo_id, indexs in pairs(config.LOGO_IDX) do
         for i, index in ipairs(indexs) do
             self.logoViews[index]:ShowLogo(logo_id);
         end
@@ -180,8 +246,8 @@ function BirdsAnimalsGameView:InitMarquee()
     end
 
     self.curve = CS.UnityEngine.AnimationCurve()
-    for i=1,#BirdsAnimalsConfig.CURVE_KEYS do
-        self.curve:AddKey(BirdsAnimalsConfig.CURVE_KEYS[i][1], BirdsAnimalsConfig.CURVE_KEYS[i][2])
+    for i=1,#config.CURVE_KEYS do
+        self.curve:AddKey(config.CURVE_KEYS[i][1], config.CURVE_KEYS[i][2])
     end
 end
 
@@ -189,7 +255,7 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
     time = time or 6
     if leftTime > 0 then
         leftTime =  leftTime > time and time or leftTime
-        to = to + BirdsAnimalsConfig.ANIMAL_MAX * 3
+        to = to + config.ANIMAL_MAX * 3
 
         local startTime = Time.realtimeSinceStartup - (time - leftTime);
         local deltaTime = Time.realtimeSinceStartup - startTime;
@@ -204,9 +270,9 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
                 for i = lastIndex + 1, newIndex do
                     lastIndex = i;
 
-                    local index = i%BirdsAnimalsConfig.ANIMAL_MAX
+                    local index = i% config.ANIMAL_MAX
                     if index<=0 then
-                        index = index + BirdsAnimalsConfig.ANIMAL_MAX
+                        index = index + config.ANIMAL_MAX
                     end
 
                     self.logoViews[index]:ShowChoose(true)
@@ -245,7 +311,7 @@ end
 
 ---
 function BirdsAnimalsGameView:LogoFlyToHistory(index)
-    self.history:PlayMoveAni()
+    self.history:PlayMoveAni(self.ctrl.model.history)
     self.logoViews[index]:FlyLogoHistory(self.resultTrs,self.history:GetPoint())
 
 end
@@ -258,25 +324,23 @@ function BirdsAnimalsGameView:UnChooseAllLogos()
 end
 
 --播放奔跑动画
---result {win_logo:{logo_index,logo_id},last_logo:{logo_index,logo_id}}
+--result {winSide,winIndex,lastIndex players}
 function BirdsAnimalsGameView:PlayRuningAnimtion(result, isPlay, callFunc)
-    table.insert(self.ctrl.model.historyList,result.win_logo)
     if isPlay then
         self.marqueeCallFunc = callFunc
-        self:IntMove(result.last_logo.logo_index, result.win_logo.logo_index,6,6)
+        self:IntMove(result.lastIndex, result.winIndex,6,6)
     else
-        self.LogoShowLinght(result.win_logo.logo_index)
-        --self.history:UpdateBirdsAnimals()
+        self.LogoShowLinght(result.winIndex)
+        --self.history:UpdateBirdsAnimals(self.ctrl.model.history)
         if callFunc then  callFunc() end
     end
 end
 
 function BirdsAnimalsGameView:PlayCarEffectView(logo_id,callFunc)
     self.resultAnimal:SetActive(true)
-    self.img_rate.text = "X"..BirdsAnimalsConfig.ODDS[logo_id]
+    self.img_rate.text = "X".. config.ODDS[logo_id]
     self.img_icon.sprite=BirdsAnimalsHelper.LoadLogoSprite(logo_id)
-    self.img_name.sprite=BirdsAnimalsHelper.LoadNameTxtSprite(logo_id)
-    self.img_name:SetNativeSize()
+    self.txt_name.text=BirdsAnimalsHelper.LoadNameLanguage(logo_id)
     self.img_icon:SetNativeSize()
     
     self.img_icon.transform.localScale=Vector3.Zero()
@@ -293,33 +357,27 @@ end
 
 
 --播放结算动画
-function BirdsAnimalsGameView:PlayResultAnimation(result)
+function BirdsAnimalsGameView:ResultEffect(result)
     --播放奔跑动画
     self:PlayRuningAnimtion(result, true,function()
-        -- 播放车子特效
-        self:PlayCarEffectView(result.win_logo.logo_id,function()
+        -- 显示结果
+        self:PlayCarEffectView(result.winSide,function()
             -- 播放赢的区域闪动
-            local index = BirdsAnimalsHelper.FindIndexById(result.win_logo.logo_id)
-            self.areaViews[index]:ShowWinFlashAnim(function()
-                ---回收
-                GlobalEvent.Notify(BirdsAnimalsConfig.EventBinner.XIAZHU_END,{})
-                
-            end)
+            local index = BirdsAnimalsHelper.FindIndexById(result.winSide)
+            self.areaViews[index]:ShowWinFlashAnim()
 
-            --飞鸟和走兽区域
-            if BirdsAnimalsHelper.IsFeiQinType(result.win_logo.logo_id) then
+            --飞鸟和走兽区域闪动
+            if BirdsAnimalsHelper.IsFeiQinType(result.winSide) then
                 self.areaViews[3]:ShowWinFlashAnim()
-            elseif BirdsAnimalsHelper.IsZouShouType(result.win_logo.logo_id) then
+            elseif BirdsAnimalsHelper.IsZouShouType(result.winSide) then
                 self.areaViews[4]:ShowWinFlashAnim()
             end
-            
-            -- 播放筹码飞动效果
-            --self.PlayCollectNoteAnim(result)
-            --self.ShowResultCurrencyChange(result)
+
         end)
-        
+
+        -- 播放筹码飞动效果
         TimerManager.StartTimer(self,function()
-            self:LogoFlyToHistory(result.win_logo.logo_index)
+            self:LogoFlyToHistory(result.winIndex)
         end,0.4)
     end)
 
@@ -332,11 +390,11 @@ function BirdsAnimalsGameView:ChangeDiZhu(index)
     end
 
     -- 如果点击的是当前已选中的按钮，不做任何操作
-    if index == BirdsAnimalsConfig.dizhuIndex and self.chipInfos[index].effects.activeSelf then
+    if index == config.dizhuIndex and self.chipInfos[index].effects.activeSelf then
         return
     end
 
-    local oldIndex = BirdsAnimalsConfig.dizhuIndex
+    local oldIndex = config.dizhuIndex
     local oldChip = self.chipInfos[oldIndex]
     local newChip = self.chipInfos[index]
 
@@ -367,7 +425,7 @@ function BirdsAnimalsGameView:ChangeDiZhu(index)
     end
 
     -- 更新配置中的当前选中索引
-    BirdsAnimalsConfig.dizhuIndex = index
+    config.dizhuIndex = index
 end
 
 function BirdsAnimalsGameView:InitXiaZhuLabel()
@@ -375,18 +433,22 @@ function BirdsAnimalsGameView:InitXiaZhuLabel()
         self.areaViews[i]:UpdateTotal(0)
         self.areaViews[i]:UpdateSelf(0)
     end
+    self.tmp_totalnote.text =0;
+    self.tmp_automatic.text = 0;
 end
 
 function BirdsAnimalsGameView:UpdateXiaZhuLabel()
     for i=1,#self.areaViews do
-        self.areaViews[i]:UpdateTotal(BirdsAnimalsConfig.totalDiZhuNums[i])
-        self.areaViews[i]:UpdateSelf(BirdsAnimalsConfig.selfDiZhuNums[i])
+        self.areaViews[i]:UpdateTotal(config.totalDiZhuNums[i])
+        self.areaViews[i]:UpdateSelf(config.selfDiZhuNums[i])
     end
+    self.tmp_totalnote.text = ArrayUtil.Sum(config.totalDiZhuNums);
+    self.tmp_automatic.text = ArrayUtil.Sum(config.selfDiZhuNums);
 end
 
 function BirdsAnimalsGameView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = BirdsAnimalsConfig.allow and BirdsAnimalsConfig.dizhuNumArr[i]<=BirdsAnimalsConfig.goldRealNum
+        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<= config.goldRealNum
     end
 end
 ---更新自己信息
@@ -394,94 +456,106 @@ function BirdsAnimalsGameView:UpdateSelf(player)
     self.selfPlayer:UpdatePlayer(player)
 end
 function BirdsAnimalsGameView:UpdateSelfGoldCount()
-    self.selfPlayer:UpdateGoldCount(BirdsAnimalsConfig.goldRealNum)
+    self.selfPlayer:UpdateGoldCount(config.goldRealNum)
+end
+function BirdsAnimalsGameView:UpdatePlayerTotal(total)
+    self.tmp_totalPlayerNum.text = total
 end
 ---本玩家下注动画
 function BirdsAnimalsGameView:PayXiaZhuCoinFly(side)
-    BirdsAnimalsPlayCoinView:AnimateCoin(self.dizhuNode,BirdsAnimalsConfig.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot)
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode, config.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
+            self.ctrl.model.config.betList[config.dizhuIndex])
 end
 ---其他玩家下注动画
 function BirdsAnimalsGameView:PayOtherXiaZhuCoinFly(data)
-    self:UpdateXiaZhuLabel()
-    BirdsAnimalsPlayCoinView:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.areaViews[data.areaType].noteRoot)
-end
-
----显示房间已出的底注 不要动画
-function BirdsAnimalsGameView:RefresAreaCoin()
-    if BirdsAnimalsConfig.allXiaZhuData and #BirdsAnimalsConfig.allXiaZhuData>0 then
-        for i=1,#BirdsAnimalsConfig.allXiaZhuData do
-            BirdsAnimalsPlayCoinView:CreatCoinInArea(self.dizhuNode,BirdsAnimalsConfig.allXiaZhuData[i].dizhuType,self.areaViews[BirdsAnimalsConfig.allXiaZhuData[i].areaType].noteRoot)
-        end
+    -- 更新总押注金额
+    config.totalDiZhuNums[data.side] = config.totalDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+    -- 自己下注
+    local selfId = config.selfPlayer.playerId
+    if selfId==data.playerId then
+        config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+        config.goldRealNum = data.currency or 0; -- 更新金币
+        table.insert(config.selfXiaZhuInfo,data)
+        self:PayXiaZhuCoinFly(data.side)
+        self:UpdateXiaZhuLabel()
+        self:UpdateSelfGoldCount()
+        return
     end
+    -- 其他玩家下注
+    local areaTotal = self.ctrl.model.AreaChipTotals
+    self:UpdateXiaZhuLabel()
+    if areaTotal[data.side] >= config.OtherPlayer_ChouMaLimit[data.side] then
+        return
+    end
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.amounts,self.btn_players.transform.position,self.areaViews[data.side].noteRoot,
+            self.ctrl.model.config.betList[data.amounts])
+    areaTotal[data.side] = areaTotal[data.side] + 1
 end
 
 ---金币回收动画
-function BirdsAnimalsGameView:PlayCompeleCoinFLy(datas,players,cards)
-
-    ---测试
-    local ratios = {0.3,0.7}
+function BirdsAnimalsGameView:PlayCompeleCoinFLy()
+    local results = self.ctrl.model.players
+    --数据处理 winCurrency
     local targetPos = {}
-    targetPos[1] = self.selfPlayerRoot.transform.position
+    local winCurrency = {0,0}
+    local totalCurrency = 0
+    targetPos[1] = self.selfPlayerRoot.position
     targetPos[2] = self.btn_players.transform.position
-    BirdsAnimalsPlayCoinView:DestroyCoin(targetPos,ratios)
-    --奖励数值
-    self.selfPlayer:ShowResultCount(Tools.RandomInt(-100,1000))
+    for i=1,#results do
+        local player = results[i]
+        --跳过没有赢钱的玩家
+        if player.winCurrency == 0 then break end
+        totalCurrency = totalCurrency + player.winCurrency
+        if player.id == config.selfPlayer.playerId then
+            winCurrency[1] = player.winCurrency
+            self.selfPlayer:ShowResultCount( player.winCurrency)
+            -- 更新金币
+            config.goldRealNum = player.currency or 0; 
+            self:UpdateSelfGoldCount()
+        else
+            winCurrency[2] = winCurrency[2] + player.winCurrency
+        end
+
+    end
+    --按比例回收
+    local ratios = {}
+    for i=1,#winCurrency do
+        table.insert(ratios,winCurrency[i]/totalCurrency)
+    end
+    if totalCurrency==0 then
+        ratios = {0,1}
+    end
+    ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
 end
 
-function BirdsAnimalsGameView:StartEffect(callFunc)
+function BirdsAnimalsGameView:StartEffect()
     --点亮灯圈
     self:UnChooseAllLogos()
     
     --开始下注提示
     self.tipsTimeTrs.gameObject:SetActive(true)
     self.tipsStartXiaZhu:SetActive(true)
-    self:UpdateXiaZhuLabel()
     TimerManager.StartTimer(self,function()
         self.tipsStartXiaZhu:SetActive(false)
         self.tipsTimeTrs.gameObject:SetActive(false)
     end,1.5,0,false)
-
-    --倒计时
-    BirdsAnimalsConfig.lessSeconds = BIRDS_ANIMALS_GAME_TIME
-    self.txt_mybets.text = BirdsAnimalsConfig.lessSeconds
-    TimerManager.StartTimer(self, function
-    ()
-        BirdsAnimalsConfig.lessSeconds = BirdsAnimalsConfig.lessSeconds - 1
-        self.txt_mybets.text = BirdsAnimalsConfig.lessSeconds
-        --倒计时3s
-        if BirdsAnimalsConfig.lessSeconds==3 then
-            self:PlayDaoJiShiEffect()
-        end
-    end, 1, BIRDS_ANIMALS_GAME_TIME, true,function()
-        BirdsAnimalsConfig.allow=false
-        self:UpdateDiZhuBtnState()
-        self:SetRepeatState(false)
-        --闪灯
-        self:FlashLight()
-        
-        --下注结束提示
-        self.tipsTimeTrs.gameObject:SetActive(true)
-        self.tipsTimeEnd:SetActive(true)
-        TimerManager.StartTimer(self,function()
-            self.tipsTimeEnd:SetActive(false)
-            self.tipsTimeTrs.gameObject:SetActive(false)
-        end,1.5,0,false)
-
-        --结算倒计时
-        BirdsAnimalsConfig.lessSeconds = BIRDS_ANIMALS_GAME_TIME+3
-        self.txt_mybets.text = BirdsAnimalsConfig.lessSeconds
-        TimerManager.StartTimer(self, function
-        ()
-            BirdsAnimalsConfig.lessSeconds = BirdsAnimalsConfig.lessSeconds - 1
-            self.txt_mybets.text = BirdsAnimalsConfig.lessSeconds
-        end, 1, BIRDS_ANIMALS_GAME_TIME+3, true,function()
-            --结算完成
-        end)
-
-    end)
-
-    if callFunc then callFunc() end
+    
 end
+
+function BirdsAnimalsGameView:EndEffect()
+    --闪灯
+    self:FlashLight()
+
+    --下注结束提示
+    self.tipsTimeTrs.gameObject:SetActive(true)
+    self.tipsTimeEnd:SetActive(true)
+    TimerManager.StartTimer(self,function()
+        self.tipsTimeEnd:SetActive(false)
+        self.tipsTimeTrs.gameObject:SetActive(false)
+    end,1.5,0,false)
+    
+end
+
 ---设置续投按钮是否可以点击 当前局已经手动投注或者上局未投注不能点 其他可点
 function BirdsAnimalsGameView:SetRepeatState(isOn)
     if isOn then
@@ -509,6 +583,139 @@ function BirdsAnimalsGameView:PlayDaoJiShiEffect()
             self.three:GetChild(2-i).gameObject:SetActive(true)
         end,i,0,false)
     end
+end
+
+-- 更新房间信息
+function BirdsAnimalsGameView:UpdateRoomInfo(model)
+    Debug.Log("更新房间信息")
+    -- 1. 初始化UI状态
+    self:InitUI()
+
+    -- 2. 刷新玩家信息
+    ------------------
+    local player = model.players[#model.players]
+    config.selfPlayer.playerId = player.id;
+    ------------------
+    -- 更新玩家信息
+    self:UpdateSelf(player)
+    self.tmp_totalPlayerNum.text = #model.players
+    
+    -- 3. 刷新历史信息
+    self.history:UpdateBirdsAnimals(model.history)
+    
+    -- 4. 刷新押注池信息
+    if model.sideBetInfos then
+        -- sideBetInfos: {SideBetInfo}
+        for i = 1, 12 do
+            local sideInfo = model.sideBetInfos[i]
+            if sideInfo then
+                -- 更新总押注金额
+                config.totalDiZhuNums[sideInfo.side] = sideInfo.amounts or 0
+                -- 更新区域筹码显示
+                self:ShowAreaChouMa(sideInfo)
+            else
+                config.totalDiZhuNums[i] = 0
+            end
+        end
+        self:UpdateXiaZhuLabel()
+    end
+
+    -- 5. 刷新当前游戏状态和倒计时
+    if model.status then
+        self:OnGameStatus(model.status, model.seconds or 0)
+    end
+
+end
+
+
+-- 直接显示区域筹码 SideBetInfo
+function BirdsAnimalsGameView:ShowAreaChouMa(sideInfo)
+    local areaTotal = self.ctrl.model.AreaChipTotals
+    for ix=1,#sideInfo.BetInfos do
+        local chip = sideInfo.BetInfos[ix]
+        if areaTotal[chip.side] < config.OtherPlayer_ChouMaLimit[chip.side] then
+            areaTotal[chip.side]=areaTotal[chip.side]+1
+            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,chip.amounts,self.areaViews[chip.side].noteRoot,self.ctrl.model.config.betList[chip.side])
+        end
+        -- 更新自己的筹码
+        if chip.playerId == config.selfPlayer.playerId then
+            config.selfDiZhuNums[chip.side] = config.selfDiZhuNums[chip.side] + chip.amounts
+        end
+    end
+end
+
+-- 切换状态
+function BirdsAnimalsGameView:OnGameStatus(status, seconds)
+    -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
+    config.currStatus = status
+    config.lessSeconds = Mathf.Floor(seconds/1000)
+    config.allow= status==2
+    -- 隐藏所有阶段相关UI
+    self.tipsTimeEnd:SetActive(false)
+    self.resultAnimal:SetActive(false)
+    self.three.gameObject:SetActive(false)
+
+    if self.statusTimer then
+        TimerManager.StopTimer(self,self.statusTimer)
+        self.statusTimer = nil
+    end
+
+    if status == 1 then -- 准备阶段
+        self.ctrl.model:ResetConfig()
+        self:UpdateDiZhuBtnState()
+        self:SetRepeatState(false)
+        self:StartEffect()
+        self:InitXiaZhuLabel()
+    elseif status == 2 then -- 押分阶段
+        self:UpdateDiZhuBtnState()
+        self:SetRepeatState(config.isRepeat)
+        
+        self.txt_mybets.text = tostring(config.lessSeconds)
+        -- 启动倒计时
+        self.statusTimer = TimerManager.StartTimer(self, function()
+            config.lessSeconds = config.lessSeconds - 1
+            self.txt_mybets.text = tostring(config.lessSeconds)
+            if config.lessSeconds == 3 then
+                self:PlayDaoJiShiEffect()
+            end
+            if config.lessSeconds <= 0 then
+                TimerManager.StopTimer(self,self.statusTimer)
+                self.statusTimer = nil
+            end
+        end, 1, config.lessSeconds, true)
+    elseif status == 3 then -- 亮牌阶段
+        self:UpdateDiZhuBtnState()
+        self:SetRepeatState(false)
+        self:EndEffect()
+        --结算倒计时
+        self.txt_mybets.text = config.lessSeconds
+        self.statusTimer = TimerManager.StartTimer(self, function
+        ()
+            config.lessSeconds = config.lessSeconds - 1
+            self.txt_mybets.text = config.lessSeconds
+            if config.lessSeconds <= 0 then
+                TimerManager.StopTimer(self,self.statusTimer)
+                self.statusTimer = nil
+            end
+        end, 1, config.lessSeconds,true)
+    elseif status == 4 then -- 结算阶段
+        self:UpdateDiZhuBtnState()
+        self:RepeatInit()
+        ---金币回收动画
+        self.ctrl.view:PlayCompeleCoinFLy()
+    end
+end
+
+---复投功能
+function BirdsAnimalsGameView:RepeatInit()
+    if config.isRepeat then
+        config.lastXiaZhuInfo={}
+    else
+        config.lastXiaZhuInfo = config.selfXiaZhuInfo
+    end
+    config.selfXiaZhuInfo = {}
+
+    self:SetRepeatState(false)
 end
 
 ---关闭界面
