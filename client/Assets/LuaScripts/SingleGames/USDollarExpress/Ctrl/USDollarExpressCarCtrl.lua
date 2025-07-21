@@ -55,6 +55,7 @@ end
 
 ---初始化数据
 function USDollarExpressCarCtrl:InitData()
+	self.isFirstEnter=true
 	self.isCanUpdate=false
 	self.poolList=config.jackPotInfos
 	self.numTween={}
@@ -116,7 +117,12 @@ end
 
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
-	self.view.ani:Play("USDollarExpressCar_top")
+	if self.isFirstEnter==true then
+		self.isFirstEnter=false
+	end
+	if self.isFirstEnter==false then
+		self.view.ani:Play("USDollarExpressCar_top")
+	end
 	CorManager.StartCor(self, function
 	()
 		coroutine.wait(0.34)

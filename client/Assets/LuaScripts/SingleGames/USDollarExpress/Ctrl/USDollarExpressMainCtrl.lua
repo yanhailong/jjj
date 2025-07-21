@@ -589,10 +589,20 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 	if self.model.status==1 then
 		logError("进入二选1模式")
 		config.gameTypeState=1
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(1)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
+		end)
+
 	elseif self.model.status==3 then
 		config.gameTypeState=3
-		CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(1)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+		end)
+
 	else
 		self:AddShowStep()
 	end
