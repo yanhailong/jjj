@@ -122,13 +122,13 @@ end
 
 ---结果信息
 function FishPrawnCrabGameView:InitGameResult()
-    self.dicePlate = ComponentUtilGet.GameObject(self.transform, "content/resoult/plate")
-    self.diceBowl = ComponentUtilGet.GameObject(self.transform, "content/resoult/bowl")
+    self.dicePlate = ComponentUtilGet.GameObject(self.transform, "content/result/plate")
+    self.diceBowl = ComponentUtilGet.GameObject(self.transform, "content/result/bowl")
     self.diceImages = {}
     self.diceTexts = {}
     for i = 1, FishPrawnCrabConfig.diceCount do
-        self.diceImages[i] = ComponentUtilGet.Image(self.transform, "content/resoult/dices/dice" .. i)
-        self.diceTexts[i] = ComponentUtilGet.TextMeshProUGUI(self.transform, "content/resoult/dices/dice" .. i .."/Text (TMP)")
+        self.diceImages[i] = ComponentUtilGet.Image(self.transform, "content/result/dices/dice" .. i)
+        self.diceTexts[i] = ComponentUtilGet.TextMeshProUGUI(self.transform, "content/result/dices/dice" .. i .."/Text (TMP)")
     end
 end
 
