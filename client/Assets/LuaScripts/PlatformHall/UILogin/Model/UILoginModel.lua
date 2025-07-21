@@ -70,7 +70,7 @@ end
 
 function UILoginModel:ResLogin(msg)
 	look("登录成功",msg)
-	PlayerInfo.InitPlayerData(msg)
+	PlayerManager:Init(msg)
 	CtrlManager.SingleShow(CtrlNames.UIHallGames)
 end
 

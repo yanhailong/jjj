@@ -4,6 +4,7 @@
 ---
 ---@class UIHallCtrl:BaseCtrl
 local UIHallCtrl=Class("UIHallCtrl",BaseCtrl)
+require("PlatformHall/UIGM/MVCHead")
 
 ---构造函数
 function UIHallCtrl:ctor(ctrlName,param)
@@ -20,7 +21,9 @@ end
 ---初始化
 function UIHallCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	CtrlManager.SingleShow(CtrlNames.UIGM)
 	self:InitData()
+	self:RefreshPlayerShow()
 end
 
 ---初始化数据
@@ -34,6 +37,7 @@ end
 
 ---添加UI事件
 function UIHallCtrl:AddUIEvent()
+	GlobalEvent.AddListener(PlayerInfoEvent.playerInfoChange,self.RefreshPlayerShow,self)
 	self.uiEventListener:AddClick(self.view.btn_shop, function
 	()
 		require("PlatformHall/UITestScroll/MVCHead")
@@ -68,11 +72,23 @@ end
 ---移除UI事件
 function UIHallCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
+	GlobalEvent.RemoveAllTo(self)
 end
 
---region UI事件方法
+function UIHallCtrl:RefreshPlayerInfos(msg)
+	look("RefreshPlayerInfos",msg)
+	local playerInfo=PlayerManager:GetPlayerInfo()
+	playerInfo.vipLevel=msg.vipLevel
+	playerInfo.goldNum=msg.gold
+	playerInfo.diamondNum=msg.diamond
+	PlayerManager:SetPlayerInfo(playerInfo)
 
---endregion
+end
+
+function UIHallCtrl:RefreshPlayerShow()
+	self.view.txt_vip.text=PlayerManager:GetPlayerInfo().vipLevel
+	self.view.tmp_coinNum.text=PlayerManager:GetPlayerInfo().goldNum
+end
 
 
 ---销毁UI

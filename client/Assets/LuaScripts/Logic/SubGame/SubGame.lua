@@ -72,7 +72,7 @@ function SubGame:LoadGame()
     ()
         coroutine.wait(0.05)
         ----关闭所有界面
-        CtrlManager.AllCtrlClose();
+        CtrlManager.AllCtrlClose(CtrlNames.UIGM);
         ---判断打开游戏加载界面
         if self.gameLoadingLuaPath~=nil then
             self.gameLoading=require(self.gameLoadingLuaPath).New(self.gameLoadingPanelPath);
@@ -170,7 +170,7 @@ function SubGame:LeaveGame()
         if MainStateCtrl.curState~=MainStateCtrl.State.Game then
             return;
         end
-        CtrlManager.AllCtrlClose()
+        CtrlManager.AllCtrlClose(CtrlNames.UIGM)
         GameCenter.CloseCurGame();
     end)
 end

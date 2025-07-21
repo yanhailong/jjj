@@ -9,7 +9,8 @@ enum NetStatEnum {
 //响应,msgID=0x1003,desc=通知网络状态
 message NoticeServerStatus {
   enum E_MsgID {def = 0; msgID = 4099;};
-  NetStatEnum result = 1;
+  int32 code = 1;  //状态码
+  NetStatEnum result = 2;
 }
 
 //请求,msgID=0x1001,desc=心跳请求
@@ -30,17 +31,18 @@ message Pack {
 }
 
 //响应,msgID=0x4099,desc=推送金钱变化
-message NoticeMoneyChange {
+message NoticeBaseInfoChange {
   enum E_MsgID {def = 0; msgID = 16537;};
-  int64 gold = 1;  //金币
-  int64 diamond = 2;  //钻石
+  int32 code = 1;  //状态码
+  int64 gold = 2;  //金币
+  int64 diamond = 3;  //钻石
+  int32 vipLevel = 4;  //vip等级
 }
 
 //响应,msgID=0x4001,desc=gm请求
 message ReqGm {
   enum E_MsgID {def = 0; msgID = 16385;};
   string order = 1;  //命令参数
-  int64 playerId = 2;  //玩家id
 }
 
 //响应,msgID=0x4002,desc=gm返回
