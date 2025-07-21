@@ -12,6 +12,7 @@ this.gameEventName={
     RollStop="RollStop",--转动k快速停止
     GameStateChange="GameStateChange",--游戏状态改变
     ChangeBetInfo="ChangeBetInfo",--切换下注信息
+    AwardValue="AwardValue",--中奖信息
     
 }
 

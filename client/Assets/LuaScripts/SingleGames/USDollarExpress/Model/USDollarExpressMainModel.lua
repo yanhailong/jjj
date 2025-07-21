@@ -75,6 +75,7 @@ function USDollarExpressMainModel:ResStartGame(msg)
 	self.goldTrainInFree=msg.goldTrainInFree			---免费游戏中是否触发了金火车
 	self.trainInfoList=msg.trainInfoList				---火车模式数据
 	self.remainFreeCount=msg.remainFreeCount
+	
 
 	self.ctrl:OnStartDoSpin()
 	

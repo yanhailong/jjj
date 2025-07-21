@@ -25,16 +25,37 @@ end
 ---初始化
 function USDollarExpressCarCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
-	self.trainInfoList=args
-	self:InitData()
-
+	--local da={
+	--	[1] =
+	--	{
+	--		["poolId"] = 100100104,
+	--		["goldList"] =
+	--		{
+	--			[1] = 1040,
+	--			[2] = 880,
+	--			[3] = 320,
+	--			[4] = 1200,
+	--			[5] = 640,
+	--			[6] = 400,
+	--			[7] = 320,
+	--			[8] = 111111111,
+	--		},
+	--		["type"] = 22,
+	--	},
+	--}
+	self.trainInfoList=da
 	
-	look("拉火车数据",self.trainInfoList)
+	self.trainInfoList=args
+	--look("拉火车数据",self.trainInfoList)
+	self:InitData()
+	UpdateManager.AddUpdate(self,self.Update)
+
 end
 
 
 ---初始化数据
 function USDollarExpressCarCtrl:InitData()
+	self.isCanUpdate=false
 	self.poolList=config.jackPotInfos
 	self.numTween={}
 	self.txtJackpots={}
@@ -43,7 +64,7 @@ function USDollarExpressCarCtrl:InitData()
 	self.txtJackpots[config.jackpotIds.grand]=self.view.txt_grand
 	self.txtJackpots[config.jackpotIds.minni]=self.view.txt_mini
 	
-	
+	self.showStep=0
 	
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
@@ -55,13 +76,15 @@ function USDollarExpressCarCtrl:InitData()
 	self:InitCars()
 	self.isAllCarArrive=false
 	self.allTweens={}
-	
+	self.curCarAwardJackPots=false
+	self.curCarAwardjackPotValue=0
+	self.view.txt_value.text=""
 end
 
 ---初始化火车厢
 function USDollarExpressCarCtrl:InitCars()
+	self.isCanUpdate=false
 	if self.CarQueue:Count()==0 then
-		logError("拉火车模式结束")
 		CorManager.StartCor(self, function
 		()
 			self.view.ani:Play("USDollarExpressCar_chuchang")
@@ -163,6 +186,7 @@ end
 
 ---初始化火车车厢
 function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
+	config.iscarhasjackpot=false
 	self.allItems={}
 	for i = 1, #goldList+1 do
 		local abName=""
@@ -203,7 +227,11 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 	for i = 1, gNums do
 		if i>1 then
 			if self:GetJackPotId(self.poolId)>0 and i==gNums then
-				self.allItems[i]:SetText(self.poolId)
+				self.allItems[i]:SetText(self.poolId,goldList[i-1])
+				self.curCarAwardJackPots=true
+				config.iscarhasjackpot=true
+				self.curCarAwardjackPotValue=goldList[i-1]
+				config.iscarjackpotvalue=goldList[i-1]
 			else
 				self.allItems[i]:SetText(goldList[i-1])
 			end
@@ -216,10 +244,20 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 	self.centerPos=self.view.trans_centerPos.position
 	self.endPos= self.view.trans_endPos.position
 	self.isCanMove=false
-	UpdateManager.AddUpdate(self,self.Update)
+
+	if self:GetJackPotId(self.poolId)>0 then
+		self.curCarAwardJackPots=true
+		config.iscarhasjackpot=true
+	end
+
+
+	self.isCanUpdate=true
 end
 
 function USDollarExpressCarCtrl:Update()
+	if self.isCanUpdate==false then
+		return
+	end
 	if self.isAllCarArrive==true then
 		return
 	end
@@ -230,7 +268,6 @@ function USDollarExpressCarCtrl:Update()
 		--look("item.transform.position",item.transform.position)
 		if item.isArriveCenterPos==false then
 			if item.transform.position.x>=self.centerPos.x then
-				look("到达中心点了",item.gameObject.name)
 				item.isArriveCenterPos=true
 				if i>1 then
 					item:DOPlayerAni()
@@ -244,17 +281,59 @@ function USDollarExpressCarCtrl:Update()
 
 		end
 		if i==#self.allItems and item.isArriveEndPos==true then
-			logError("所有元素都已经到达终点了")
 			self.isAllCarArrive=true
-			self:InitCars()
+			self:ShowNextStep()
 		end
 
 	end
 end
 
+function USDollarExpressCarCtrl:ShowNextStep()
+	if self.resoultCor then
+		coroutine.stop(self.resoultCor)
+		self.resoultCor=nil
+	end
+	self.showStep=0
+	self.resoultCor=CorManager.StartCor(self,function()
+		self:CkeckISAwardJackPot()
+		while self.showStep < 1 do
+			coroutine.yield(1)
+		end
+		self:CheckNext()
+	end)
+end
+---检测是否中奖池
+function USDollarExpressCarCtrl:CkeckISAwardJackPot()
+	if config.iscarhasjackpot==true then
+	else
+		self.showStep=self.showStep+1
+	end
+end
+
+function USDollarExpressCarCtrl:NextStep()
+	CorManager.StartCor(self, function
+	()
+		if config.iscarhasjackpot==true then
+			self:Settmp_value(config.iscarjackpotvalue)
+			coroutine.wait(1)
+			self.view.txt_value.text=""
+			self.showStep=self.showStep+1
+		end
+	end)
+
+end
+
+
+function USDollarExpressCarCtrl:CheckNext()
+	self:InitCars()
+end
 
 function USDollarExpressCarCtrl:Settmp_value(num)
-	local curNum=tonumber(self.view.txt_value.text)
+	local str=self.view.txt_value.text
+	if str=="" then
+		str=0
+	end
+	local curNum=tonumber(str)
 	local nextNum=curNum+num
 	self.view.txt_value.text=tostring(nextNum)
 end
@@ -262,6 +341,11 @@ end
 function USDollarExpressCarCtrl:Close()
     self.super.Close(self);
 	for k,v in pairs(self.allTweens) do
+		if v then
+			v:Kill()
+		end
+	end
+	for k,v in pairs(self.numTween) do
 		if v then
 			v:Kill()
 		end
@@ -287,6 +371,7 @@ end
 ---移除UI事件
 function USDollarExpressCarCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
+	CorManager.StopAll(self)
 end
 
 --region UI事件方法

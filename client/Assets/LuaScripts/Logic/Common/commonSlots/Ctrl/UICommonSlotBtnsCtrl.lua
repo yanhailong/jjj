@@ -51,6 +51,7 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAuto, self.NoticeAuto,self)
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto, self.NoticeStopAuto,self)
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.GameStateChange,self.GameStateChange,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.AwardValue,self.SetAwardText,self)
 	
 	self.uiEventListener:AddClick(self.view.btn_start, function()
 		if self.isLongPress==true then
@@ -233,6 +234,13 @@ function UICommonSlotBtnsCtrl:SetChipState(bl)
 	self.view.btn_add.interactable=bl
 	self.view.btn_reduce.interactable=bl
 	self.view.btn_max.interactable=bl
+end
+
+function UICommonSlotBtnsCtrl:SetAwardText(value)
+	if tostring(value)=="0" then
+		value=""
+	end
+	self.view.txt_win.text=value
 end
 
 

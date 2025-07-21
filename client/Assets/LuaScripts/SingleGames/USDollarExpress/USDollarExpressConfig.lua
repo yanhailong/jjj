@@ -17,6 +17,8 @@ this.showStep=0
 this.freeState=false    --游戏状态
 this.selfMotionNum=0  ---自动旋转次数
 this.curchipInfo=0
+this.iscarhasjackpot=false
+this.iscarjackpotvalue=0
 
 ---@火车颜色
 this.TrainColorType={

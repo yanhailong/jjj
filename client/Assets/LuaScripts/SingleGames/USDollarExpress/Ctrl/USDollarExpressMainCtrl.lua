@@ -39,7 +39,7 @@ function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 	
 	self.poolList=betInfos.poolList
 	for i = 1, #self.poolList do
-		config.jackPotInfos[self.poolList[i].id]=self.poolList
+		config.jackPotInfos[self.poolList[i].id]=self.poolList[i]
 	end
 
 	self.txtJackpots={}
@@ -258,7 +258,7 @@ function USDollarExpressMainCtrl:ReSetData()
 		self.allendPos[i]=false
 	end
 	self.isArrpos=true
-	
+	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
 end
 
 --旋转
@@ -320,7 +320,7 @@ function USDollarExpressMainCtrl:StopRollState()
 		end
 		---@type DG.Tweening.Tween
 		local tw=self.tweener[i]
-		look("self.rollCircles[i]",i,self.rollCircles[i])
+		--look("self.rollCircles[i]",i,self.rollCircles[i])
 		if self.rollCircles[i]>=1 then
 			self:SetRealIndex(i)
 			self.rollCircles[i]=0
@@ -537,9 +537,10 @@ function USDollarExpressMainCtrl:EndSmallGame()
 	if self.model.status==1 then
 		CorManager.StartCor(self, function
 		()
+			config.gameTypeState=1
 			self.eff_choose_a_freature_bd:SetActive(true)
 			coroutine.wait(1)
-			config.gameTypeState=1
+			self.eff_choose_a_freature_bd:SetActive(false)
 			self.model:ReqStartGame()---请求旋转一次
 		end)
 	elseif self.model.status==3 then
@@ -567,6 +568,7 @@ end
 
 function USDollarExpressMainCtrl:SetStateLast()
 	logError("结束=====》")
+	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,self.model.allWinGold)
 	self.isOnclickStart=false
 	local freeCount=self.model.remainFreeCount
 	if freeCount>0 then
@@ -581,7 +583,9 @@ function USDollarExpressMainCtrl:SetStateLast()
 		end
 		self.model:ReqStartGame()
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
-	else
+	elseif config.gameTypeState==1 then
+		logError("其他模式---》")
+ 	else
 		---正常模式
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
 	end

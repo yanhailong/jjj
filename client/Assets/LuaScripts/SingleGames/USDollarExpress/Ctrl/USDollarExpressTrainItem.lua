@@ -1,6 +1,7 @@
 ---@class USDollarExpressTrainItem
 local USDollarExpressTrainItem=Class("USDollarExpressTrainItem")
-
+---@type USDollarExpressConfig
+local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 function USDollarExpressTrainItem:ctor(obj,ctrl)
     ---@type UnityEngine.GameObject
     self.gameObject = obj
@@ -23,8 +24,10 @@ function USDollarExpressTrainItem:SetText(value,jackPotVale)
         logError("最后一节车厢中奖池")
         self.jackpotvalue=jackPotVale
         self.poolId=value
-        self.twObj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/alats/lang_english","img_traincar",self.transform)
+        self.twObj=self.ctrl.objPools:SpawnPrefab(nil,"SingleGames/USDollarExpress/prefabs/img_traincar","img_traincar",self.transform)
         self.img_jackpot= ComponentUtilGet.Image(self.twObj)
+        self.img_jackpot.sprite=resMgr:LoadSprite("SingleGames/USDollarExpress/alats/lang_english",config.jackPotPicName[self.poolId])
+        self.img_jackpot:SetNativeSize()
         self.img_jackpot.transform.position=self.transform.position
         self.img_jackpot.transform.localRotation=Quaternion.Euler(0,180,0)
         self.ishasJackpot=true
@@ -104,17 +107,19 @@ function USDollarExpressTrainItem:DOPlayerAni()
         local tw2= DOTween.To(function(val)
             self.twObj.transform.localScale = CS.UnityEngine.Vector3.one * val
         end, maxScale, 0.4, 0.3):OnComplete(function()
-            logError("动画执行完毕！")
-            if self.ishasJackpot then
-                logError("这一节车厢是奖池.....")
+            if self.ishasJackpot==true then
                 if self.jackpotvalue and self.jackpotvalue > 0 then
                     local data = {}
                     data.poolId = self.poolId
                     data.jackpotvalue = self.jackpotvalue
+                    data.func=function()
+                        self.ctrl:NextStep()
+                    end
                     CtrlManager.SingleShow(CtrlNames.USDollarExpressJackPots, data)
                 else
                     logError("数据错误了.....！")
                 end
+                self.twObj:SetActive(false)
             else
                 self.ctrl:Settmp_value(self.curValue)
                 self.twObj:SetActive(false)
