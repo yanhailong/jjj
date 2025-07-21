@@ -102,8 +102,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "//\u6DFB\u52A0\u91D1\u5E01\r\naddGold <\u91D1\u5E01\u6570\u91CF>\r\n\r\n//\u6DFB\u52A0\u94BB\u77F3\r\naddGold
-    <\u94BB\u77F3\u6570\u91CF>\r\n\r\n//\u8BBE\u7F6Evip\u7B49\u7EA7\r\naddGold <vip\u7B49\u7EA7>"
+  m_text: "//\u6DFB\u52A0\u91D1\u5E01\naddGold <\u91D1\u5E01\u6570\u91CF>\n\n//\u6DFB\u52A0\u94BB\u77F3\naddDiamond
+    <\u94BB\u77F3\u6570\u91CF>\n\n//\u8BBE\u7F6Evip\u7B49\u7EA7\nsetVip <vip\u7B49\u7EA7>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5cc5a7a669949684bbf68b96181ad1b6, type: 2}
   m_sharedMaterial: {fileID: -6911498551228378754, guid: 5cc5a7a669949684bbf68b96181ad1b6, type: 2}
