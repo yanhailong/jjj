@@ -80,7 +80,7 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
             self.iconEffect= self.ctrl.objPools:SpawnPrefab(nil, config.ABNames.iconEffect,effectName, self.ctrl.view.rootEffects)
             self.iconEffect.transform.position=self.transform.position
             local sp=ComponentUtilGet.SkeletonGraphic(self.iconEffect.transform,"Spine_Chess")
-            if self.iconIndex>=16 and self.iconIndex<=18 then
+            if self.iconIndex>=12 and self.iconIndex<=14 then
                 
                 CorManager.StartCor(self.ctrl, function
                 ()
@@ -88,21 +88,21 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     coroutine.wait(1.233)
                     Tools.PlayerSpineAniByName(sp,"loop",true)
                 end)
-            elseif self.iconIndex==20 or self.iconIndex==19 then
+            elseif self.iconIndex==18 or self.iconIndex==16 then
                 CorManager.StartCor(self.ctrl, function
                 ()
                     Tools.PlayerSpineAniByName(sp,"action",false)
                     coroutine.wait(1.233)
                     Tools.PlayerSpineAniByName(sp,"idle",true)
                 end)
-            elseif self.iconIndex>=12 and self.iconIndex<=15 then
+            elseif self.iconIndex>=19 and self.iconIndex<=22 then
                 CorManager.StartCor(self.ctrl, function
                 ()
                     Tools.PlayerSpineAniByName(sp,"action",false)
                     coroutine.wait(0.667)
                     Tools.PlayerSpineAniByName(sp,"loop",true)
                 end)
-            elseif self.iconIndex==21 then
+            elseif self.iconIndex==15 then
                 CorManager.StartCor(self.ctrl, function
                 ()
                     Tools.PlayerSpineAniByName(sp,"action",false)
