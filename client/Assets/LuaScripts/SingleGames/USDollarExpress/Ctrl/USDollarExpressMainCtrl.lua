@@ -60,17 +60,25 @@ end
 
 
 function USDollarExpressMainCtrl:InitRollData()
-	self.rollData={}
+	self.rollNormalData={}
 	self.initAllGrid={}
 	for i = 1, 5 do
-		self.rollData[i]={}
+		self.rollNormalData[i]={}
 		self.initAllGrid[i]={}
 		local data=ConfigManager.CfgC_Roller[GameConfig[GameNames.USDollarExpress].gameType.."_"..i]
-		self.rollData[i]=jsonDecode(data.elements)
+		self.rollNormalData[i]=jsonDecode(data.elements)
 		self.initAllGrid[i]=jsonDecode(data.initGrid)
 	end
 	self.curIndex=Tools.RandomInt(1,#self.initAllGrid[1])
 	look("self.initAllGrid",self.initAllGrid)
+
+	self.rollFreeData={}
+	for i = 1, 5 do
+		self.rollFreeData[i]={}
+		local data=ConfigManager.CfgC_Freeroller[GameConfig[GameNames.USDollarExpress].gameType.."_"..i]
+		self.rollFreeData[i]=jsonDecode(data.elements)
+	end
+
 end
 
 
@@ -103,6 +111,7 @@ function USDollarExpressMainCtrl:InitData()
 	for i = 1, 5 do
 		self.curRollData[i]=0	
 	end
+	self.rollData=self.rollNormalData
 	
 	
 end
@@ -475,11 +484,7 @@ end
 ----美元飞到指定位置
 local dollarCount=0
 function USDollarExpressMainCtrl:DollarFlyTo(pos)
-	self.view.obj_top1:SetActive(false)
-	self.view.obj_top2:SetActive(true)
-	self.view.txt_repeatWin.text=""
-	dollarCount=0
-	local pos=self.view.txt_repeatWin.transform.position
+
 	
 	CorManager.StartCor(self, function
 	()
@@ -497,7 +502,12 @@ end
 
 function USDollarExpressMainCtrl:RefreshRepeatWin(value)
 	dollarCount=dollarCount+value
-	self.view.txt_repeatWin.text=dollarCount
+	if self.model.coinIndexId>0 then
+		self.buttomCtrl.view.txt_win.text=dollarCount
+	else
+		self.view.txt_repeatWin.text=dollarCount
+	end
+
 end
 
 
@@ -565,16 +575,20 @@ function USDollarExpressMainCtrl:ShowResoult()
 		while config.showStep < 1 do
 			coroutine.yield(1)
 		end
-		self:EnterSmallGame()
+		self:DollarFly()
 		while config.showStep < 2 do
 			coroutine.yield(1)
 		end
-		self:EnterFreeGame()
+		self:EnterSmallGame()
 		while config.showStep < 3 do
 			coroutine.yield(1)
 		end
-		self:ShowDollarProgress()
+		self:EnterFreeGame()
 		while config.showStep < 4 do
+			coroutine.yield(1)
+		end
+		self:ShowDollarProgress()
+		while config.showStep < 5 do
 			coroutine.yield(1)
 		end
 		self:SetStateLast()
@@ -651,14 +665,37 @@ function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
 	end
 end
 
-function USDollarExpressMainCtrl:SetAwardKuang()
-	
+function USDollarExpressMainCtrl:DollarFly()
+	if self.model.coinIndexId>0 then--现金奖励
+		dollarCount=0
+		local pos=self.buttomCtrl.view.txt_win.transform.position
+		self:DollarFlyTo(pos)
+	else
+		local isHasHuangjinlieche=false
+		local trainInfoList= self.model.trainInfoList
+		if #trainInfoList>0 then
+			local train=trainInfoList[1]
+			if train.type==15 then
+				isHasHuangjinlieche=true
+			end
+		end
+		if isHasHuangjinlieche==true then
+			self.view.obj_top1:SetActive(false)
+			self.view.obj_top2:SetActive(true)
+			self.view.txt_repeatWin.text=""
+			dollarCount=0
+			local pos=self.view.txt_repeatWin.transform.position
+		else
+			logError("正常状态")
+			config.showStep=config.showStep+1
+		end
+	end
 end
+
+
+
 ---二选一进入火车或者免费模式
 function USDollarExpressMainCtrl:EnterSmallGame()
-	
-	self:DollarFlyTo()
-	
 	if self.model.status==1 then
 		logError("进入二选1模式")
 		config.gameTypeState=1
