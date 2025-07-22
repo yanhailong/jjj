@@ -8,7 +8,7 @@ function NetworkPing:ctor(connect)
     ---@type WebNetworkManager
     self.connect = connect;
     self.sendTime = nil;
-    
+
     WebNetEvent.AddListener(pb_PlatformHall.ResHeartBeat, self.ResHeartBeat, self)
     self.timer = TimerManager.CreateTimer(self, function()
         self:SendPing();
@@ -17,6 +17,7 @@ function NetworkPing:ctor(connect)
     self.timeoutTimer = TimerManager.CreateTimer(self, function()
         self:SendTimeout();
     end, timeout, 1, true);
+    self:SendPing();
 end
 
 function NetworkPing:Start()
