@@ -51,48 +51,7 @@ function UILoginCtrl:AddUIEvent()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_phone, function
 	()
-		--SuspensionTipsUtil.SuspensionTips("暂未开放！")
-	--	Camera mainCamera = Camera.main;
-	--
-	--	// 将视口坐标(0,0.5,0)转换为世界坐标
-	--// x=0表示屏幕最左侧，y=0.5表示垂直居中
-	--Vector3 spawnPosition = mainCamera.ViewportToWorldPoint(new Vector3(0, 0.5f, 0));
-	--
-	--// 调整x坐标，减去物体的宽度/2(假设物体中心是锚点)
-	--// 如果你知道物体宽度，可以直接减去宽度
-	--spawnPosition.x -= objectToSpawn.GetComponent<SpriteRenderer>().bounds.extents.x;
-	--
-	--// 确保z坐标为0(2D空间)
-	--spawnPosition.z = 0;
-	--
-	--// 实例化物体
-	--Instantiate(objectToSpawn, spawnPosition, Quaternion.identity);
-		
-		look("CS.UnityEngine.Screen.width",CS.UnityEngine.Screen.width)
-		local spawPos=CS.UnityEngine.Screen.width/2
-		
-		local rectTrans=ComponentUtilGet.RectTransform(self.view.obj_test.transform)
-		logError("rectTrans.rect.width:"..rectTrans.rect.width)
-		logError("CS.UnityEngine.Screen.width:"..CS.UnityEngine.Screen.width)
-		
-		local pos =rectTrans.rect.width/2+spawPos
-
-
-		local leftPos=ComponentUtilGet.RectTransform(self.transform,"content/leftpos")
-		look("leftPos",leftPos.anchoredPosition)
-		
-		logError("需要实例化的位"..pos)
-		---@type UnityEngine.GameObject
-		local obj= Tools.Instance(self.view.obj_test,self.view.obj_test.transform.parent)
-		obj:SetActive(true)
-		local rect=ComponentUtilGet.RectTransform(obj.transform)
-		
-		local pos222=Vector3.New(leftPos.anchoredPosition.x-rectTrans.rect.width,leftPos.anchoredPosition.y,0)
-		look("pos222",pos222)
-		rect.anchoredPosition=Vector2(pos222,0)
-
-		
-		
+		SuspensionTipsUtil.SuspensionTips("暂未开放！")
 	end)
 	
 end

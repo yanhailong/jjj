@@ -17,11 +17,15 @@ end
 function USDollarExpressMainView:InitComponents()
     self.trans_slots=ComponentUtilGet.Transform(self.transform,"content/gameCenter/slotsMain/wheelRoot/trans_slots");
     self.img_icon=ComponentUtilGet.Image(self.transform,"content/gameCenter/item/img_icon");
-    self.txt_grand=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/grand/txt_grand")
-    self.txt_mejor=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mejor/txt_mejor")
-    self.txt_minor=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/minor/txt_minor")
-    self.txt_mini=ComponentUtilGet.Text(self.transform,"content/gameCenter/jackPots/mini/txt_mini")
+    self.txt_grand=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top1/jackPots/grand/txt_grand")
+    self.txt_mejor=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top1/jackPots/mejor/txt_mejor")
+    self.txt_minor=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top1/jackPots/minor/txt_minor")
+    self.txt_mini=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top1/jackPots/mini/txt_mini")
     self.rootEffects=ComponentUtilGet.Transform(self.transform,"content/effects")
+    self.obj_top1=ComponentUtilGet.GameObject(self.transform,"content/gameCenter/obj_top1")
+    self.obj_top2=ComponentUtilGet.GameObject(self.transform,"content/gameCenter/obj_top2")
+    self.txt_repeatWin=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top2/txt_repeatWin")
+    self.img_slider=ComponentUtilGet.Image(self.transform,"content/gameCenter/img_slider")
 end
 
 ---清空组件

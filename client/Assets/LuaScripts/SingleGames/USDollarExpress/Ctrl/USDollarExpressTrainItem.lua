@@ -92,6 +92,9 @@ end
 --end
 
 function USDollarExpressTrainItem:DOPlayerAni()
+    
+    local ani= ComponentUtilGet.Animator(self.transform,"chesuofang")
+    ani:Play("chexiang_xuanzhong",0)
     self.twObj.transform:SetParent(self.transform.parent.parent)
     self.twObj.transform:DOScale(1.1, 0.2)
 

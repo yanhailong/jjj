@@ -29,9 +29,7 @@ message ReqConfigInfo {
 //请求,msgID=0x7003,desc=选择投资地区
 message ReqInvestArea {
   enum E_MsgID {def = 0; msgID = 28675;};
-  int32 areaId1 = 1;  //地区id1
-  int32 areaId2 = 2;  //地区id2
-  int32 areaId3 = 3;  //地区id3
+  int32 areaId = 1;  //地区id
 }
 
 //请求,msgID=0x7005,desc=请求开始游戏
@@ -53,16 +51,17 @@ message ResConfigInfo {
   repeated int32 stakeList = 2;  //押注列表
   int32 defaultBet = 3;  //默认押注
   repeated PoolInfo poolList = 4;  //奖池信息
+  int32 dollarTargetCount = 5;  //美元收集目标值
 }
 
 //响应,msgID=0x7004,desc=选择投资地区返回
 message ResInvestArea {
   enum E_MsgID {def = 0; msgID = 28676;};
   int32 code = 1;  //状态码
-  int64 areaGold1 = 2;  //回报金额1
-  int64 areaGold2 = 3;  //回报金额2
-  int64 areaGold3 = 4;  //回报金额3
-  repeated TrainInfo trainInfoList = 5;  //火车信息
+  repeated int64 goldList = 2;  //回报金额列表
+  TrainInfo allWinTrainInfo = 3;  //3次都中奖，奖励的火车信息
+  repeated int32 iconList = 4;  //地图全部解锁时的图标id列表
+  TrainInfo areaAllUnlockTrainInfo = 5;  //地图全部解锁，奖励的火车信息
 }
 
 //响应,msgID=0x7006,desc=开始游戏结果返回
@@ -77,6 +76,8 @@ message ResStartGame {
   DollarsInfo dollarsInfo = 7;  //美元信息
   int32 totalDollars = 8;  //累计的美元数量，进度条
   int32 remainFreeCount = 9;  //剩余免费次数
+  repeated int32 choosableAreas = 10;  //投资可选区域，只有当触发投资游戏后才会有值
+  int64 allGold = 11;  //玩家当前金币
 }
 
 //每条中奖线信息
@@ -89,7 +90,7 @@ message ResultLineInfo {
 
 //火车信息
 message TrainInfo {
-  int32 type = 1;  //火车类型(iconId)  19.绿火车 20.蓝火车  21.紫火车  22.红火车
+  int32 type = 1;  //火车类型(iconId)  15.金火车  19.绿火车 20.蓝火车  21.紫火车  22.红火车
   repeated int64 goldList = 2;  //中奖金额列表
   int32 poolId = 3;  //奖池ID
 }

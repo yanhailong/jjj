@@ -54,6 +54,7 @@ function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 		logError("重中之重")
 		self:UpDateValue()
 	end)
+	self.proTarget=100---零时后期由服务器下发
 	look("收到的下注配置信息",betInfos)
 end
 
@@ -180,7 +181,7 @@ function USDollarExpressMainCtrl:InitBigKuang()
 end
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
-	if config.gameTypeState==1 then
+	if config.gameTypeState==1 or config.gameTypeState==2 then
 		for i = 1, 5 do
 			if wheelId==i then
 				Tools.SetActive(self.bigKuangEffects[i],true)
@@ -243,7 +244,7 @@ function USDollarExpressMainCtrl:ReSetData()
 
 	---默认都转3圈结束转动
 	self.rollCircles={}
-	if config.gameTypeState==1 then
+	if config.gameTypeState==1 or config.gameTypeState==2 then
 		self:SetAllChildItemMask(true)
 		--二选1模式
 		for i = 1,5 do
@@ -471,6 +472,34 @@ function USDollarExpressMainCtrl:HideAllDollars()
 
 end
 
+----美元飞到指定位置
+local dollarCount=0
+function USDollarExpressMainCtrl:DollarFlyTo(pos)
+	self.view.obj_top1:SetActive(false)
+	self.view.obj_top2:SetActive(true)
+	self.view.txt_repeatWin.text=""
+	dollarCount=0
+	local pos=self.view.txt_repeatWin.transform.position
+	
+	CorManager.StartCor(self, function
+	()
+		for i = 1, 20 do
+			local item=self.showChildsList[i]
+			if item.iconIndex==18 then
+				coroutine.wait(0.5)
+				item:DollarsFlyTo(pos)
+			end
+
+		end
+	end)
+
+end
+
+function USDollarExpressMainCtrl:RefreshRepeatWin(value)
+	dollarCount=dollarCount+value
+	self.view.txt_repeatWin.text=dollarCount
+end
+
 
 
 ---item.iconIndex>=15 and item.iconIndex<=22出现则要播放动画
@@ -544,8 +573,17 @@ function USDollarExpressMainCtrl:ShowResoult()
 		while config.showStep < 3 do
 			coroutine.yield(1)
 		end
+		self:ShowDollarProgress()
+		while config.showStep < 4 do
+			coroutine.yield(1)
+		end
 		self:SetStateLast()
 	end)
+end
+---收集进度值
+function USDollarExpressMainCtrl:ShowDollarProgress()
+	self.view.img_slider.fillAmount=self.model.totalDollars/self.proTarget
+	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:ShowAwardEffect()
@@ -616,8 +654,11 @@ end
 function USDollarExpressMainCtrl:SetAwardKuang()
 	
 end
-
+---二选一进入火车或者免费模式
 function USDollarExpressMainCtrl:EnterSmallGame()
+	
+	self:DollarFlyTo()
+	
 	if self.model.status==1 then
 		logError("进入二选1模式")
 		config.gameTypeState=1
@@ -651,12 +692,21 @@ end
 ---各种模式小游戏完成后返回
 function USDollarExpressMainCtrl:EndSmallGame()
 	self:AddShowStep()
-	if self.model.status==1 then
+	if self.model.status==1 then--普通二选1
 		CorManager.StartCor(self, function
 		()
 			config.gameTypeState=1
 			self.eff_choose_a_freature_bd:SetActive(true)
 			coroutine.wait(1)
+			self.eff_choose_a_freature_bd:SetActive(false)
+			self.model:ReqStartGame()---请求旋转一次
+		end)
+	elseif self.model.status==2 then--黄金二选1
+		CorManager.StartCor(self, function
+		()
+			config.gameTypeState=2
+			self.eff_choose_a_freature_bd:SetActive(true)
+			coroutine.wait(2)
 			self.eff_choose_a_freature_bd:SetActive(false)
 			self.model:ReqStartGame()---请求旋转一次
 		end)
@@ -700,8 +750,8 @@ function USDollarExpressMainCtrl:SetStateLast()
 		end
 		self.model:ReqStartGame()
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
-	elseif config.gameTypeState==1 then
-		logError("其他模式---》")
+	elseif config.gameTypeState==1 or config.gameTypeState==2 then
+		logError("二选一模式---》")
  	else
 		---正常模式
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)

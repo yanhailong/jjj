@@ -109,12 +109,19 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                         coroutine.wait(1.233)
                         Tools.PlayerSpineAniByName(sp,"loop",true)
                     end)
-                elseif self.iconIndex==18 or self.iconIndex==16 then
+                elseif self.iconIndex==18  then
                     CorManager.StartCor(self.ctrl, function
                     ()
                         Tools.PlayerSpineAniByName(sp,"action",false)
-                        coroutine.wait(1.233)
+                        coroutine.wait(0.5)
                         Tools.PlayerSpineAniByName(sp,"idle",true)
+                    end)
+                elseif self.iconIndex==16 then
+                    CorManager.StartCor(self.ctrl, function
+                    ()
+                        Tools.PlayerSpineAniByName(sp,"action",false)
+                        coroutine.wait(0.667)
+                        Tools.PlayerSpineAniByName(sp,"xunhuan",true)
                     end)
                 elseif self.iconIndex>=19 and self.iconIndex<=22 then
                     CorManager.StartCor(self.ctrl, function
@@ -136,6 +143,7 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
 
                 if self.iconIndex==18 then
                     local txt_dollars=ComponentUtilGet.Text(self.iconEffect.transform,"txt_dollers")
+                    txt_dollars.gameObject:SetActive(true)
                     txt_dollars.text=Tools.numberToStrKM(self.dollarValue)
                 end
             end
@@ -148,6 +156,25 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
         Tools.SetActive(self.img_icon.gameObject,not isAward)
     end
 
+end
+
+function USDollarExpressSlotItem:DollarsFlyTo(pos)
+    if self.iconIndex==18 then
+        local txt_dollars=ComponentUtilGet.Text(self.iconEffect.transform,"txt_dollers")
+        txt_dollars.gameObject:SetActive(false)
+        ---@type  UnityEngine.GameObject
+        local dollar= self.ctrl.objPools:SpawnPrefab(nil, "SingleGames/USDollarExpress/prefabs/txt_dollers","txt_dollers", self.ctrl.view.rootEffects)
+        dollar.transform.position=self.transform.position
+        ComponentUtilGet.Text(dollar.transform).text=txt_dollars.text
+        
+        ---@type DG.Tweening.Tween
+        self.twDollars= dollar.transform:DOMove(pos,0.5)
+        self.twDollars.onComplete= function
+        ()
+            self.ctrl.objPools:UnSpawnPrefab(dollar)
+            self.ctrl:RefreshRepeatWin(self.dollarValue)
+        end
+    end
 end
 
 return USDollarExpressSlotItem
