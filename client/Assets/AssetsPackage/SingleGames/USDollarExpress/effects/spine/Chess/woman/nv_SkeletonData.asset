@@ -18,7 +18,7 @@ MonoBehaviour:
   skeletonJSON: {fileID: 4900000, guid: f2a32402407bd6547a042db406d834ae, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
-    requiresBlendModeMaterials: 0
+    requiresBlendModeMaterials: 1
     applyAdditiveMaterial: 1
     additiveMaterials:
     - pageName: nv.png
