@@ -21,6 +21,8 @@ end
 function USDollarExpressGameSelectCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	self.type=args
+	look("二选一模式",self.type)
 	self:InitAnimator()
 	self.waitCor= CorManager.StartCor(self, function
 	()
@@ -78,7 +80,13 @@ function USDollarExpressGameSelectCtrl:SelectLeft()
 	()
 		self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanzuo")
 		coroutine.wait(0.6)
-		self.model:ReqChooseFreeModel(3)
+		if self.type==1 then
+			self.model:ReqChooseFreeModel(3)
+		end
+		if self.type==2 then
+			self.model:ReqChooseFreeModel(4)
+		end
+
 	end)
 end
 function USDollarExpressGameSelectCtrl:SelectRight()
@@ -86,7 +94,13 @@ function USDollarExpressGameSelectCtrl:SelectRight()
 	()
 		self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanyou")
 		coroutine.wait(0.6)
-		self.model:ReqChooseFreeModel(5)
+		if self.type==1 then
+			self.model:ReqChooseFreeModel(5)
+		end
+		if self.type==2 then
+			self.model:ReqChooseFreeModel(5)
+		end
+
 	end)
 end
 

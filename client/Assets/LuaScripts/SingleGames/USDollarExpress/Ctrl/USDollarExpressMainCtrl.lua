@@ -215,11 +215,23 @@ function USDollarExpressMainCtrl:SetRealIndex(wheelId)
 	for j = 1,4 do
 		local num=5
 		num=num-j
-		---@type SlotItem1
+		---@type USDollarExpressSlotItem
 		local item=self.childsList[wheelId][config.rollItemNum-num]
-		item:SetSprite(config.icon_Pics[config.iocnPicName[self.realCard[wheelId][num]]],self.realCard[wheelId][num])
+		local iconId=self.realCard[wheelId][num]
+		item:SetSprite(config.icon_Pics[config.iocnPicName[iconId]],iconId)
+		if self.model.isHasDollars==true then
+			if iconId==18 then
+				item:SetDollar(true,self.model.dollarsInfo[wheelId][num])
+			else
+				item:SetDollar(false)
+			end
+		end
+
 	end
+	
 end
+
+
 
 ---重置数据
 function USDollarExpressMainCtrl:ReSetData()
@@ -243,6 +255,8 @@ function USDollarExpressMainCtrl:ReSetData()
 			self.rollCircles[i] = config.rollCircles[i]
 		end
 	end
+	
+	self:HideAllDollars()
 
 
 	if self.lineShowCor~=nil then
@@ -261,6 +275,7 @@ function USDollarExpressMainCtrl:ReSetData()
 	end
 	self.isArrpos=true
 	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
+	
 end
 
 --旋转
@@ -410,9 +425,15 @@ function USDollarExpressMainCtrl:RestWheelPos(wheelid,isEnd)
 			local num=6
 			num=num-j
 
-			---@type SlotItem1
+			---@type USDollarExpressSlotItem
 			local item=self.childsList[wheelid][config.rollItemNum-num]
 			self.childsList[wheelid][j]:SetSprite(item:GetCurSprite(),item:GetIconIndex())
+			if item:GetIconIndex()==18 then
+				local value=item.dollarValue
+				self.childsList[wheelid][j]:SetDollar(true,value)
+			else
+				self.childsList[wheelid][j]:SetDollar(false)
+			end
 		else
 			self.curRollData[wheelid]=self.curRollData[wheelid]+(j-6)
 			local rollIndex=#self.rollData[wheelid]-self.curRollData[wheelid]
@@ -440,6 +461,17 @@ function USDollarExpressMainCtrl:SetAllChildItemMask(isSetMask)
 		end
 	end
 end
+
+function USDollarExpressMainCtrl:HideAllDollars()
+	for i = 1, config.lieNum do
+		for j = 1, config.rollItemNum do
+			self.childsList[i][j]:SetDollar(false)
+		end
+	end
+
+end
+
+
 
 ---item.iconIndex>=15 and item.iconIndex<=22出现则要播放动画
 function USDollarExpressMainCtrl:CheckWheelIdAndPlayAni(wheelId)
@@ -592,7 +624,15 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
-			CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect,1)
+		end)
+	elseif self.model.status==2 then
+		logError("黄金二选一")
+		config.gameTypeState=2
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(1)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect,2)
 		end)
 
 	elseif self.model.status==3 then

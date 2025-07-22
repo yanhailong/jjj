@@ -41,19 +41,21 @@ function USDollarExpressMainModel:RemoveEvent()
 end
 
 function USDollarExpressMainModel:ReqStartGame(_dataSpin)
-	if _dataSpin then
-		self.dataSpin=_dataSpin
-	end
-	if self.dataSpin then
-		look("点击按钮传入事件",self.dataSpin)
-		if self.dataSpin.isAuto==true then
-			config.selfMotionNum=self.dataSpin.autoNum
-		end
-	end
+	--if _dataSpin then
+	--	self.dataSpin=_dataSpin
+	--end
+	--if self.dataSpin then
+	--	look("点击按钮传入事件",self.dataSpin)
+	--	if self.dataSpin.isAuto==true then
+	--		config.selfMotionNum=self.dataSpin.autoNum
+	--	end
+	--end
+	--
+	--local data={}
+	--data.stakeVlue=self.dataSpin.betInfo
+	--WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
 	
-	local data={}
-	data.stakeVlue=self.dataSpin.betInfo
-	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
+	self:ResStartGame({})
 end
 
 function USDollarExpressMainModel:RollStop()
@@ -66,6 +68,80 @@ end
 
 function USDollarExpressMainModel:ResStartGame(msg)
 	look("收到请求开始游戏返回",msg)
+
+	msg={
+		["trainInfoList"] =
+		{
+		},
+		["code"] = 200,
+		["dollarsInfo"] =
+		{
+			["goldTrainCount"] = 6,
+			["dollarValueList"] =
+			{
+				[1] = 1640,
+				[2] = 1640,
+				[3] = 1640,
+				[4] = 1640,
+				[5] = 1640,
+				[6] = 1640,
+				[7] = 1640,
+				[8] = 1640,
+				[9] = 1640,
+				[10] = 1640,
+				[11] = 1640,
+				[12] = 1640,
+			},
+			["coinIndexId"] = 0,
+			["dollarIndexIds"] =
+			{
+				[1] = 1,
+				[2] = 2,
+				[3] = 3,
+				[4] = 4,
+				[5] = 5,
+				[6] = 6,
+				[7] = 7,
+				[8] = 8,
+				[9] = 9,
+				[10] = 12,
+				[11] = 13,
+				[12] = 16,
+			},
+		},
+		["iconList"] =
+		{
+			[1] = 18,
+			[2] = 18,
+			[3] = 18,
+			[4] = 18,
+			[5] = 18,
+			[6] = 18,
+			[7] = 18,
+			[8] = 18,
+			[9] = 18,
+			[10] = 3,
+			[11] = 3,
+			[12] = 18,
+			[13] = 18,
+			[14] = 1,
+			[15] = 8,
+			[16] = 18,
+			[17] = 15,
+			[18] = 4,
+			[19] = 6,
+			[20] = 6,
+		},
+		["status"] = 4,
+		["allWinGold"] = 118080,
+		["totalDollars"] = 0,
+		["remainFreeCount"] = 0,
+		["resultLineInfoList"] =
+		{
+		},
+	}
+	
+	
 	self:InitCardPos(msg.iconList)
 
 	self.resultLineInfoList=msg.resultLineInfoList		---中奖信息
@@ -75,6 +151,23 @@ function USDollarExpressMainModel:ResStartGame(msg)
 	self.goldTrainInFree=msg.goldTrainInFree			---免费游戏中是否触发了金火车
 	self.trainInfoList=msg.trainInfoList				---火车模式数据
 	self.remainFreeCount=msg.remainFreeCount
+
+	local dollarsInfo={}
+	self.isHasDollars=false
+	if msg.dollarsInfo then
+		self.isHasDollars=true
+		local dollarValueList= msg.dollarsInfo.dollarValueList
+		local dollarIndexIds= msg.dollarsInfo.dollarIndexIds
+		for i=1,#dollarIndexIds do
+			local id=dollarIndexIds[i]
+			dollarsInfo[id]=dollarValueList[i]
+		end
+		self:InitDollars(dollarsInfo)
+	end
+	look("self.dollarsInfo",self.dollarsInfo)
+	
+	
+	
 	
 
 	self.ctrl:OnStartDoSpin()
@@ -123,6 +216,22 @@ function USDollarExpressMainModel:InitCardPos(pos)
 	
 	look("处理后的数据",self.CardPos)
 
+end
+
+function USDollarExpressMainModel:InitDollars(dollarsInfo)
+	local rows, cols = 4, 5
+	self.dollarsInfo={}
+	-- 先遍历列，再遍历行（但仍然填充到行优先结构）
+	for i = 1, cols do
+		self.dollarsInfo[i] = {}
+		for j = 1, rows do
+			local index = (i-1)*rows + j  -- 计算原始索引
+			local dv= dollarsInfo[index]
+			if dv and dv>0 then
+				self.dollarsInfo[i][j]=dv
+			end
+		end
+	end
 end
 
 ---位置转坐标
