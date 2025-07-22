@@ -48,20 +48,10 @@ this.Bet_Limit_Info = {100000000,100000000,100000000,100000000,100000000,1000000
 this.ABNames={
     ChipPool="SingleGames/FishPrawnCrab/prefabs/Pool",--筹码
 }
---筹码的预支名列表
-this.chipPrefabNamesArr = {
-    "FishPrawnCrabChip1K",
-    "FishPrawnCrabChip5K",
-    "FishPrawnCrabChip10K",
-    "FishPrawnCrabChip50K",
-    "FishPrawnCrabChip100K",
-    "FishPrawnCrabChip500K",
-    "FishPrawnCrabChip1M"
-}
 
 ---获取对应筹码的预支名字
 function this.GetChipPoolName(betIndex)
-    return this.chipPrefabNamesArr[betIndex]
+    return "FishPrawnCrabChip_" .. betIndex
 end
 
 --动物序号对应的显示数据

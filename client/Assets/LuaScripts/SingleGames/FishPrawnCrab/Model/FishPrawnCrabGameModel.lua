@@ -86,7 +86,7 @@ function FishPrawnCrabGameModel:OnSyncTotalBetMsg(message)
 			self.ctrl.totalBets[i] = message[i]
 		end
 		
-		self.view:UpdateBetAreaInfo()
+		self.view:UpdateTotalBetAreaInfo(-1)
 	end
 end
 

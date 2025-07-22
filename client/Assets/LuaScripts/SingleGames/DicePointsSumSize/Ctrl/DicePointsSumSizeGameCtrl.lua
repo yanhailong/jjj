@@ -1,46 +1,53 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-11 09:39:31
+---DateTime: 2025-07-22 10:18:39
 ---
----@class FishPrawnCrabGameCtrl:BaseCtrl
-local FishPrawnCrabGameCtrl=Class("FishPrawnCrabGameCtrl",BaseCtrl)
-local FishPrawnCrabConfig = require("SingleGames/FishPrawnCrab/FishPrawnCrabConfig")
-local FishPrawnCrabChipManager = require("SingleGames/FishPrawnCrab/FishPrawnCrabChipManager")
-local SimulationServer = require("SingleGames/FishPrawnCrab/SimulationServer")
+---@class DicePointsSumSizeGameCtrl:BaseCtrl
+local DicePointsSumSizeGameCtrl=Class("DicePointsSumSizeGameCtrl",BaseCtrl)
+
+local DicePointsSumSizeConfig = require("SingleGames/DicePointsSumSize/DicePointsSumSizeConfig")
+
+local DicePointsSumSizeConfig = require("SingleGames/DicePointsSumSize/DicePointsSumSizeConfig")
+local DicePointsSumSizeChipManager = require("SingleGames/DicePointsSumSize/DicePointsSumSizeChipManager")
+local SimulationServer = require("SingleGames/DicePointsSumSize/DiceSizeSimulationServer")
 local Ease = CS.DG.Tweening.Ease
 
 ---构造函数
-function FishPrawnCrabGameCtrl:ctor(ctrlName,param)
+function DicePointsSumSizeGameCtrl:ctor(ctrlName,param)
     self.layer=2;
-    self.abName="SingleGames/FishPrawnCrab/prefabs/FishPrawnCrabGamePanel";
-    self.prefabName="FishPrawnCrabGamePanel"
+    self.abName="SingleGames/DicePointsSumSize/prefabs/DicePointsSumSizeGamePanel";
+    self.prefabName="DicePointsSumSizeGamePanel"
     self.super.ctor(self,ctrlName,param);
-	---@type FishPrawnCrabGameView
+	---@type DicePointsSumSizeGameView
 	self.view = self.view
-	---@type FishPrawnCrabGameModel
+	---@type DicePointsSumSizeGameModel
 	self.model = self.model
 end
 
 ---初始化
-function FishPrawnCrabGameCtrl:CtrlInit(args)
+function DicePointsSumSizeGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	DicePointsSumSizeConfig.InitDiceRecordsPic()
+	DicePointsSumSizeConfig.InitDiceResultPic()
+	DicePointsSumSizeConfig.InitIconPic()
+	self:FirstEntryGame(args)
 end
 
 ---初始化数据
-function FishPrawnCrabGameCtrl:InitData()
+function DicePointsSumSizeGameCtrl:InitData()
 	---当前选中的底注
 	self.betIndex = 1;
 	---当前是否可以下注
 	self.allowBet = false
 	---当前总底注
-	self.totalBets = {0,0,0,0,0,0}
+	self.totalBets = {0,0}
 	---当前个人底注
-	self.selfBets = {0,0,0,0,0,0}
+	self.selfBets = {0,0}
 	self.selfBetInfo = {}
 	---玩家真实金币数量
 	self.goldRealNum = 1000000000
-	self.curStatus = FishPrawnCrabConfig.GameState.Bet
+	self.curStatus = DicePointsSumSizeConfig.GameState.Bet
 	---当前状态剩余秒数 13
 	self.statusRemainingSeconds = 3
 
@@ -49,21 +56,25 @@ function FishPrawnCrabGameCtrl:InitData()
 	---本局是否使用了复投
 	self.isRepeatBet = false
 	---本局下注数据
-	self.allBetData = {{}, {}, {}, {}, {}, {}}
-	self.lookOnBetData = {{}, {}, {}, {}, {}, {}}
+	self.allBetData = {{}, {}}
+	self.lookOnBetData = {{}, {}}
 	self.recordData = {}
-	
-	self.view.selfPlayer:UpdatePlayer({ id = FishPrawnCrabConfig.selfTestPlayerId, coin = self.goldRealNum})
-	
+
+	self.view.selfPlayer:UpdatePlayer({ id = DicePointsSumSizeConfig.selfTestPlayerId, coin = self.goldRealNum})
+
 	--刷新底注界面
-	self.view:UpdateBetBtnStatus()
-	self.view:ChangeAnte(self.betIndex)
+	--self.view:UpdateBetBtnStatus()
+	--self.view:ChangeAnte(self.betIndex)
 	self.view:UpdateTotalBetAreaInfo(-1)
 	self.view:UpdateSelfBetAreaInfo(-1)
 end
 
+function DicePointsSumSizeGameCtrl:Close()
+    self.super.Close(self);
+end
+
 ---刷新菜单显示隐藏
-function FishPrawnCrabGameCtrl:RefreshMenuShow()
+function DicePointsSumSizeGameCtrl:RefreshMenuShow()
 	if self.view.btn_touch.gameObject.activeSelf then
 		self.view.trans_menu_panel:DOLocalMoveY(self.view.trans_menu_panel.sizeDelta.y+100,0.5):SetEase(Ease.InBack)
 		self.view.btn_touch.gameObject:SetActive(false)
@@ -74,12 +85,8 @@ function FishPrawnCrabGameCtrl:RefreshMenuShow()
 
 end
 
-function FishPrawnCrabGameCtrl:Close()
-    self.super.Close(self);
-end
-
 ---添加UI事件
-function FishPrawnCrabGameCtrl:AddUIEvent()
+function DicePointsSumSizeGameCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_muen,function()
 		self:RefreshMenuShow()
 	end)
@@ -87,7 +94,7 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		self:RefreshMenuShow()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_help,function()
-		CtrlManager.SingleShow(CtrlNames.FishPrawnCrabHelp)
+		--CtrlManager.SingleShow(CtrlNames.DicePointsSumSizeHelp)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_close,function()
 		self:Close();
@@ -96,8 +103,8 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		look("打开设置界面")
 	end)
 
-	self.uiEventListener:AddClick(self.view.btn_players,function(obj)
-		CtrlManager.SingleShow(CtrlNames.FishPrawnCrabPlayers)
+	self.uiEventListener:AddClick(self.view.btn_AllOther,function(obj)
+		--CtrlManager.SingleShow(CtrlNames.DicePointsSumSizePlayers)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
 		SimulationServer:StartServer()
@@ -107,16 +114,16 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 	for i=1,#self.view.chipInfos do
 		self.uiEventListener:AddClick(self.view.chipInfos[i].obj,function()
 			if self.allowBet then
-				self.view:ChangeAnte(i)
-				--look("btn 抵住数值"..FishPrawnCrabGameConfig.dizhuNumArr[FishPrawnCrabGameConfig.anteIndex])
+				--self.view:ChangeAnte(i)
+				--look("btn 抵住数值"..DicePointsSumSizeGameConfig.dizhuNumArr[DicePointsSumSizeGameConfig.anteIndex])
 				---测试数据生成 龙虎和 对应前三个币
 				--GlobalEvent.Notify("UPDATE_HIS_ITEMS",i)
 			end
 		end)
 	end
 	---下注区域
-	for i=1,self.view.clickRect.childCount do
-		self.uiEventListener:AddClick(self.view.clickRect:GetChild(i-1),function()
+	for i=1,self.view.clickAreaRoot.childCount do
+		self.uiEventListener:AddClick(self.view.clickAreaRoot:GetChild(i-1),function()
 			self:OnClickCenterBetArea(i)
 		end)
 	end
@@ -124,8 +131,8 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 		if self:AllowRepeatBet() then
 			self.isRepeatBet = true
 			for i = 1, #self.lastBetInfo do
-				if self.allowBet == false or self.curStatus ~= FishPrawnCrabConfig.GameState.Bet 
-						or FishPrawnCrabConfig.betValuesArr[self.lastBetInfo[i].chip] > self.goldRealNum then
+				if self.allowBet == false or self.curStatus ~= DicePointsSumSizeConfig.GameState.Bet
+						or DicePointsSumSizeConfig.betValuesArr[self.lastBetInfo[i].chip] > self.goldRealNum then
 					break
 				end
 
@@ -133,10 +140,10 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 				local betMsg = { playerid = self.view.selfPlayer.id,
 								 area = self.lastBetInfo[i].area,
 								 chip = self.lastBetInfo[i].chip }
-				GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
+				GlobalEvent.Notify(DicePointsSumSizeConfig.GameEventName.REQUEST_BET, betMsg)
 				--self:OnSelfBet(self.lastBetInfo[i])
 				----飞筹码
-				--FishPrawnCrabChipManager:AnimateChip(self.lastBetInfo[i].chip, self.view.selfPlayer.transform.position, self.view.betAreas[self.lastBetInfo[i].area])
+				--DicePointsSumSizeChipManager:AnimateChip(self.lastBetInfo[i].chip, self.view.selfPlayer.transform.position, self.view.betAreas[self.lastBetInfo[i].area])
 			end
 			self.view.btn_repeat.interactable = false
 		end
@@ -144,48 +151,50 @@ function FishPrawnCrabGameCtrl:AddUIEvent()
 end
 
 ---移除UI事件
-function FishPrawnCrabGameCtrl:RemoveEvent()
+function DicePointsSumSizeGameCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
 --region UI事件方法
-
---endregion
-
-
----销毁UI
-function FishPrawnCrabGameCtrl:RealCloseDestroy()
-	self.super.RealCloseDestroy(self);
-	FishPrawnCrabChipManager:Destroy()
-	TimerManager.StopAllTimer(self)
-	CorManager.StopAll(self)
-	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.STOP_SIMULATION_SERVER)
+---首次进入游戏刷新显示
+function DicePointsSumSizeGameCtrl:FirstEntryGame(data)
+	--self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == 5);
+	----初始化筹码
+	--for i = 1, #data.betInfoList do
+	--	local item =self.objPools:Spawn(nil,self.view.obj_chipItem,self.view.obj_ChipContent.transform)
+	--	item:SetActive(true);
+	--	---@type BaccaratChipItems
+	--	local chipItem = BaccaratChipItems.New(item,self);
+	--	chipItem:InitUIShow(i,data.betInfoList[i]);
+	--	table.insert(ChipItems,chipItem);
+	--end
+	--self:RefreshDataShow(data);
 end
 
 ---进入到准备阶段
-function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
+function DicePointsSumSizeGameCtrl:SwitchToPrepareState(message)
 	---当前总底注
-	self.totalBets = {0,0,0,0,0,0}
+	self.totalBets = {0,0}
 	---当前个人底注
-	self.selfBets = {0,0,0,0,0,0}
+	self.selfBets = {0,0}
 	self.selfBetInfo = {}
 	self.allowBet = false
-	self.allBetData = {{}, {}, {}, {}, {}, {}}
-	self.lookOnBetData = {{}, {}, {}, {}, {}, {}}
-	self.curStatus = FishPrawnCrabConfig.GameState.Prepare
+	self.allBetData = {{}, {}}
+	self.lookOnBetData = {{}, {}}
+	self.curStatus = DicePointsSumSizeConfig.GameState.Prepare
 	--重置筹码数据
 	self.view.selfPlayer:ResetBetData()
 	for i = 1, #self.view.AllOtherPlayerHeads do
 		self.view.AllOtherPlayerHeads[i]:ResetBetData()
 	end
 	--筹码是否回收完
-	local chipsArr = FishPrawnCrabChipManager:GetChipArr()
+	local chipsArr = DicePointsSumSizeChipManager:GetChipArr()
 	if #chipsArr > 0 then
 		logError("筹码未回收完")
-		FishPrawnCrabChipManager:CleanAllChipAnim()
-		FishPrawnCrabChipManager:CleanChip()
+		DicePointsSumSizeChipManager:CleanAllChipAnim()
+		DicePointsSumSizeChipManager:CleanChip()
 	end
-	
+
 	self.view:UpdateTotalBetAreaInfo(-1)
 	self.view:UpdateSelfBetAreaInfo(-1)
 	self.view.btn_repeat.interactable = false
@@ -196,8 +205,9 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	self.view.tipsStopBetting:SetActive(false)
 
 	--骰子
-	self.view.diceBowl:SetActive(true)
-	
+	self.view.bigDiceLid:SetActive(true)
+	self.view.smallDiceLid:SetActive(true)
+
 	--倒计时
 	self.view.colockStateTimePrepare:SetActive(true)
 	self.view.colockStateTimeBet:SetActive(false)
@@ -207,35 +217,35 @@ function FishPrawnCrabGameCtrl:SwitchToPrepareState(message)
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
 end
 
-function FishPrawnCrabGameCtrl:AllowRepeatBet()
+function DicePointsSumSizeGameCtrl:AllowRepeatBet()
 	local allReBet = false
 	if self.allowBet and #self.lastBetInfo > 0 then
 		-- 判断钱是否足够
 		local lastBetAmount = 0
 		for i = 1, #self.lastBetInfo do
-			lastBetAmount = lastBetAmount + FishPrawnCrabConfig.betValuesArr[self.lastBetInfo[i].chip]
+			lastBetAmount = lastBetAmount + DicePointsSumSizeConfig.betValuesArr[self.lastBetInfo[i].chip]
 		end
 		if lastBetAmount <= self.goldRealNum then
 			allReBet = true
 		end
 	end
-	
+
 	return allReBet
 end
 
 ---进入到下注阶段
-function FishPrawnCrabGameCtrl:SwitchToBetState(message)
-	self.curStatus = FishPrawnCrabConfig.GameState.Bet
+function DicePointsSumSizeGameCtrl:SwitchToBetState(message)
+	self.curStatus = DicePointsSumSizeConfig.GameState.Bet
 	self.allowBet = true
 	self.isRepeatBet = false
 
 	self.view.btn_repeat.interactable = self:AllowRepeatBet()
 	self.view:UpdateBetBtnStatus()
-	
+
 	--tip
 	self.view.tipsStartToBet:SetActive(true)
 	self.view.tipsStopBetting:SetActive(false)
@@ -252,18 +262,18 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
-		--倒计时3s
-		if math.abs(self.statusRemainingSeconds - 3) <= 0.1 then
-			self.view.colockStateTimeTrs.gameObject:SetActive(false)
-			self.view:PlayDaoJiShiEffect()
-		end
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
+		----倒计时3s
+		--if math.abs(self.statusRemainingSeconds - 3) <= 0.1 then
+		--	self.view.colockStateTimeTrs.gameObject:SetActive(false)
+		--	self.view:PlayDaoJiShiEffect()
+		--end
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
 
 ---进入到结算阶段
-function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
-	self.curStatus = FishPrawnCrabConfig.GameState.Settlement
+function DicePointsSumSizeGameCtrl:SwitchToSettlementState(message)
+	self.curStatus = DicePointsSumSizeConfig.GameState.Settlement
 	self.allowBet = false
 	self.lastBetInfo = self.selfBetInfo
 
@@ -288,19 +298,19 @@ function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
 	local timeInterval = 0.5
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
+		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
 
 ---游戏结算数据
-function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
+function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 	--{"dices":[2,4,6],
 	--"dice_result":[{"odd":1,"anim_index":2},{"odd":1,"anim_index":4},{"odd":1,"anim_index":6}],
 	--"win_info":[{"winAmount":6000,"win_info":[{"anim_index":2,"betAmount":1000,"oddAmount":1000},{"anim_index":4,"betAmount":1000,"oddAmount":1000},{"anim_index":6,"betAmount":1000,"oddAmount":1000}],"playerid":1314}]}
 	if message == nil then
 		return
-	end 
-	
+	end
+
 	function isAreaWin(index)
 		local isWin = false
 		for i = 1, #message.dice_result do
@@ -309,23 +319,28 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 				break
 			end
 		end
-		
+
 		return isWin
 	end
-	
+
 	CorManager.StartCor(self, function()
 		coroutine.wait(1.5)
 		--播放骰子动画
-		self.view.diceBowl:SetActive(true)
+		self.view.bigDiceLid:SetActive(true)
+		self.view.smallDiceLid:SetActive(true)
 		coroutine.wait(1.5)
 		--设置结果
-		for i = 1, FishPrawnCrabConfig.diceCount do 
+		for i = 1, DicePointsSumSizeConfig.diceCount do
 			local diceSideIndex = message.dices[i]
-			self.view.diceTexts[i].text = FishPrawnCrabConfig.animalShowData[diceSideIndex].name
-			local diceColor = FishPrawnCrabConfig.animalShowData[diceSideIndex].color
-			self.view.diceTexts[i].color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
+			local curResultIcon = DicePointsSumSizeConfig.diceResult_Pics["tb_tz_" .. i]
+			self.view.bigDiceImages[i].sprite = curResultIcon
+			self.view.bigDiceImages[i]:SetNativeSize()
+
+			self.view.smallDiceImages[i].sprite = curResultIcon
+			self.view.smallDiceImages[i]:SetNativeSize()
 		end
-		self.view.diceBowl:SetActive(false)
+		self.view.smallDiceLid:SetActive(false)
+		self.view.bigDiceLid:SetActive(false)
 		coroutine.wait(0.5)
 		--高亮中奖区域
 		for i = 1, #message.dice_result do
@@ -340,43 +355,39 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 		self:UpdateRecordUI()
 		coroutine.wait(1)
 		--回收筹码到荷官处
-		for areaIndex = 1, FishPrawnCrabConfig.diceSideCount do
-			if not isAreaWin(areaIndex) then
-				local chipsArr = self.allBetData[areaIndex]
-				--while #chipsArr > 0 do
-				--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[#chipsArr], self.view.btn_dealer.transform.position)
-				--	table.remove(chipsArr,#chipsArr)
-				--end
-				for chipIndex = 1, #chipsArr do
-					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.btn_dealer.transform.position)
-				end
-				chipsArr = {}
-			end
-		end
-		
-		coroutine.wait(2)
+		--for areaIndex = 1, DicePointsSumSizeConfig.diceSideCount do
+		--	if not isAreaWin(areaIndex) then
+		--		local chipsArr = self.allBetData[areaIndex]
+		--		for chipIndex = 1, #chipsArr do
+		--			DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.btn_dealer.transform.position)
+		--		end
+		--		chipsArr = {}
+		--	end
+		--end
+
+		--coroutine.wait(2)
 		--荷官赔下中的筹码到桌面上
-		for playerIndex = 1, #message.win_info do
-			local playerWinInfo = message.win_info[playerIndex]
-			local targetChipArr = nil
-			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
-			if targetPlayer ~= nil then
-				targetChipArr = targetPlayer.chipInfo
-			else
-				targetChipArr = self.lookOnBetData
-			end
-			
-			for winIndex = 1, #playerWinInfo.win_info do
-				local oddAmount = playerWinInfo.win_info[winIndex].oddAmount
-				local winAreaIndex = playerWinInfo.win_info[winIndex].anim_index
-				local chipList = self:GetChilIndexArrByAmount(oddAmount)
-				for chipIndex = 1, #chipList do
-					--飞筹码
-					local newChipObj = FishPrawnCrabChipManager:AnimateChip(chipList[chipIndex], self.view.btn_dealer.transform.position, self.view.betAreas[winAreaIndex])
-					table.insert(targetChipArr[winAreaIndex], newChipObj)
-				end
-			end
-		end
+		--for playerIndex = 1, #message.win_info do
+		--	local playerWinInfo = message.win_info[playerIndex]
+		--	local targetChipArr = nil
+		--	local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
+		--	if targetPlayer ~= nil then
+		--		targetChipArr = targetPlayer.chipInfo
+		--	else
+		--		targetChipArr = self.lookOnBetData
+		--	end
+		--
+		--	for winIndex = 1, #playerWinInfo.win_info do
+		--		local oddAmount = playerWinInfo.win_info[winIndex].oddAmount
+		--		local winAreaIndex = playerWinInfo.win_info[winIndex].anim_index
+		--		local chipList = self:GetChilIndexArrByAmount(oddAmount)
+		--		for chipIndex = 1, #chipList do
+		--			--飞筹码
+		--			local newChipObj = DicePointsSumSizeChipManager:AnimateChip(chipList[chipIndex], self.view.btn_dealer.transform.position, self.view.betAreas[winAreaIndex])
+		--			table.insert(targetChipArr[winAreaIndex], newChipObj)
+		--		end
+		--	end
+		--end
 
 		coroutine.wait(2)
 		--把桌面上的筹码分到对应的人身上
@@ -384,12 +395,12 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			--自己
 			local chipsArr = self.view.selfPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
 			--for chipIndex = 1, #chipsArr do
-			--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
+			--	DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
 			--end
 			--chipsArr = {}
 			CorManager.StartCor(self, function()
 				for chipIndex = 1, #chipsArr do
-					FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
+					DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
 					if #chipsArr - chipIndex < 3 then
 						coroutine.wait(0.2)
 					end
@@ -399,30 +410,30 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 			--旁观的人
 			local lookOnChipsArr = self.lookOnBetData[message.dice_result[areaIndex].anim_index]
 			--for chipIndex = 1, #lookOnChipsArr do
-			--	FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
+			--	DicePointsSumSizeChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_AllOther.transform.position)
 			--end
 			--lookOnChipsArr = {}
 			CorManager.StartCor(self, function()
 				for chipIndex = 1, #lookOnChipsArr do
-					FishPrawnCrabChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_players.transform.position)
+					DicePointsSumSizeChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_AllOther.transform.position)
 					if #lookOnChipsArr - chipIndex < 3 then
 						coroutine.wait(0.2)
 					end
 				end
 				lookOnChipsArr = {}
 			end)
-			
+
 			--座位上的人
 			for playerIndex = 1, #self.view.AllOtherPlayerHeads do
 				local otherPlayer = self.view.AllOtherPlayerHeads[playerIndex]
 				local chipsArr = otherPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
 				--for chipIndex = 1, #chipsArr do
-				--	FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
+				--	DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
 				--end
 				--chipsArr = {}
 				CorManager.StartCor(self, function()
 					for chipIndex = 1, #chipsArr do
-						FishPrawnCrabChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
+						DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
 						if #chipsArr - chipIndex < 3 then
 							coroutine.wait(0.2)
 						end
@@ -431,7 +442,7 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 				end)
 			end
 		end
-		
+
 		coroutine.wait(2)
 		--显示结果
 		for playerIndex = 1, #message.win_info do
@@ -445,33 +456,47 @@ function FishPrawnCrabGameCtrl:OnGameSettlementMsg(message)
 	end)
 end
 
-function FishPrawnCrabGameCtrl:AddNewRecord(dices)
-	if dices ~= nil and #dices == FishPrawnCrabConfig.diceCount then
+function DicePointsSumSizeGameCtrl:AddNewRecord(dices)
+	if dices ~= nil and #dices == DicePointsSumSizeConfig.diceCount then
 		--删除多余的记录
-		while #self.recordData >= FishPrawnCrabConfig.showRecordCount do
+		while #self.recordData >= DicePointsSumSizeConfig.showRecordCount do
 			table.remove(self.recordData, 1)
 		end
-		
+
 		--添加新的记录
 		table.insert(self.recordData, dices)
 	end
 end
 
-function FishPrawnCrabGameCtrl:UpdateRecordUI()
+function DicePointsSumSizeGameCtrl:UpdateRecordUI()
 	local recordCount = #self.recordData
 	self.view.recordsRootObj:SetActive(recordCount > 0)
-	self.view.latestRecordIconObj:SetActive(recordCount > 0)
-	for i = 1, FishPrawnCrabConfig.showRecordCount do
+	for i = 1, DicePointsSumSizeConfig.showRecordCount do
 		--有数据就显示
 		if i <= recordCount then
 			self.view.recordUIDatas[i].rootObj:SetActive(true)
 			local showDicesData = self.recordData[recordCount - i + 1]
-			for diceIndex = 1, FishPrawnCrabConfig.diceCount do
+			local pointSum = 0
+			for diceIndex = 1, DicePointsSumSizeConfig.diceCount do
+				pointSum = pointSum + showDicesData[diceIndex]
 				local diceSideIndex = showDicesData[diceIndex]
-				self.view.recordUIDatas[i].diceTexts[diceIndex].text = FishPrawnCrabConfig.animalShowData[diceSideIndex].name
-				local diceColor = FishPrawnCrabConfig.animalShowData[diceSideIndex].color
-				self.view.recordUIDatas[i].diceTexts[diceIndex].color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
+				local curResultIcon = DicePointsSumSizeConfig.diceRecords_Pics["tb_tz_" .. diceIndex]
+				self.view.recordUIDatas[i].diceImages[diceIndex].sprite = curResultIcon
+				self.view.recordUIDatas[i].diceImages[diceIndex]:SetNativeSize()
 			end
+			local diceSizeType = DicePointsSumSizeConfig.DiceSumType.Small
+			local diceTypeSprite = nil
+			if pointSum >= 11 and pointSum <= 18 then
+				diceSizeType = DicePointsSumSizeConfig.DiceSumType.Big
+				diceTypeSprite = DicePointsSumSizeConfig.icon_Pics["dxtz_da"]
+			else
+				diceTypeSprite = DicePointsSumSizeConfig.icon_Pics["dxtz_xiao"]
+			end
+			local diceColor = DicePointsSumSizeConfig.diceSumShowData[diceSizeType]
+			self.view.recordUIDatas[i].dicePointSumText.text = tostring(pointSum)
+			self.view.recordUIDatas[i].dicePointSumText.color = Color.New(diceColor.r, diceColor.g, diceColor.b, diceColor.a)
+			self.view.recordUIDatas[i].resultTypeImage.sprite = diceTypeSprite
+			self.view.recordUIDatas[i].resultTypeImage:SetNativeSize()
 		else
 			--无数据就隐藏
 			self.view.recordUIDatas[i].rootObj:SetActive(false)
@@ -479,12 +504,12 @@ function FishPrawnCrabGameCtrl:UpdateRecordUI()
 	end
 end
 
-function FishPrawnCrabGameCtrl:GetChilIndexArrByAmount(goldAmount)
+function DicePointsSumSizeGameCtrl:GetChilIndexArrByAmount(goldAmount)
 	local chipList = {}
 	local tmpGold = goldAmount
-	for i = 1, #FishPrawnCrabConfig.betValuesArr do
-		local index = #FishPrawnCrabConfig.betValuesArr - i + 1
-		local curChipValue = FishPrawnCrabConfig.betValuesArr[index]
+	for i = 1, #DicePointsSumSizeConfig.betValuesArr do
+		local index = #DicePointsSumSizeConfig.betValuesArr - i + 1
+		local curChipValue = DicePointsSumSizeConfig.betValuesArr[index]
 		while tmpGold >= curChipValue do
 			tmpGold = tmpGold - curChipValue
 			table.insert(chipList, index)
@@ -493,15 +518,15 @@ function FishPrawnCrabGameCtrl:GetChilIndexArrByAmount(goldAmount)
 	if tmpGold ~= 0 then
 		logError("GetChilIndexArrByAmount err!! goldAmount:" .. goldAmount .. " >>Remaining:" .. tmpGold)
 	end
-	
+
 	return chipList
 end
 
 ---中心下注区域
-function FishPrawnCrabGameCtrl:OnClickCenterBetArea(areaIndex)
+function DicePointsSumSizeGameCtrl:OnClickCenterBetArea(areaIndex)
 	--look("点击了下注区域：" .. areaIndex)
-	if self.allowBet == false or self.curStatus ~= FishPrawnCrabConfig.GameState.Bet 
-			or FishPrawnCrabConfig.betValuesArr[self.betIndex] > self.goldRealNum then
+	if self.allowBet == false or self.curStatus ~= DicePointsSumSizeConfig.GameState.Bet
+			or DicePointsSumSizeConfig.betValuesArr[self.betIndex] > self.goldRealNum then
 		return
 	end
 
@@ -509,29 +534,29 @@ function FishPrawnCrabGameCtrl:OnClickCenterBetArea(areaIndex)
 	local targetAreaHighLight = self.view.winHighLights[areaIndex]
 	targetAreaHighLight.gameObject:SetActive(true)
 	Tools.DoColor_Alpha(targetAreaHighLight,1,0,0.1)
-	
+
 	--发送消息
 	local betMsg = { playerid = self.view.selfPlayer.id,
 					 area = areaIndex,
 					 chip = self.betIndex }
-	GlobalEvent.Notify(FishPrawnCrabConfig.GameEventName.REQUEST_BET, betMsg)
+	GlobalEvent.Notify(DicePointsSumSizeConfig.GameEventName.REQUEST_BET, betMsg)
 end
 
-function FishPrawnCrabGameCtrl:OnPlayerBetMsg(message)
-	local targetPlayer = self.view:FindPlayer(message.playerid) 
+function DicePointsSumSizeGameCtrl:OnPlayerBetMsg(message)
+	local targetPlayer = self.view:FindPlayer(message.playerid)
 	--飞筹码
 	if targetPlayer ~= nil then
-		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, targetPlayer.transform.position, self.view.betAreas[message.area])
+		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, targetPlayer.transform.position, self.view.betAreas[message.area])
 		table.insert(self.allBetData[message.area], newChipObj)
 		targetPlayer:AddChip(message.area, newChipObj)
 	else
-		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, self.view.btn_players.transform.position, self.view.betAreas[message.area])
+		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, self.view.btn_AllOther.transform.position, self.view.betAreas[message.area])
 		table.insert(self.allBetData[message.area], newChipObj)
 		table.insert(self.lookOnBetData[message.area], newChipObj)
 	end
 end
 
-function FishPrawnCrabGameCtrl:OnBetRusultMsg(message)
+function DicePointsSumSizeGameCtrl:OnBetRusultMsg(message)
 	--local message = {area = areaIndex,
 	--			  chip = self.betIndex,
 	--              remaining_coin = 0,
@@ -539,7 +564,7 @@ function FishPrawnCrabGameCtrl:OnBetRusultMsg(message)
 	if message ~= nil and message.result == 0 then
 		self:OnSelfBet(message)
 		--飞筹码
-		local newChipObj = FishPrawnCrabChipManager:AnimateChip(message.chip, self.view.selfPlayer.transform.position, self.view.betAreas[message.area])
+		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, self.view.selfPlayer.transform.position, self.view.betAreas[message.area])
 		table.insert(self.allBetData[message.area], newChipObj)
 		self.view.selfPlayer:AddChip(message.area, newChipObj)
 		--更新自身金币
@@ -552,15 +577,23 @@ function FishPrawnCrabGameCtrl:OnBetRusultMsg(message)
 	end
 end
 
-function FishPrawnCrabGameCtrl:OnSelfBet(data)
+function DicePointsSumSizeGameCtrl:OnSelfBet(data)
 	local areaIndex = data.area
-	local betMoney = FishPrawnCrabConfig.betValuesArr[data.chip]
+	local betMoney = DicePointsSumSizeConfig.betValuesArr[data.chip]
 	self.selfBets[areaIndex] = self.selfBets[areaIndex] + betMoney
 	--self.totalBets[areaIndex] = self.totalBets[areaIndex] + betMoney
 	self.goldRealNum = self.goldRealNum - betMoney
 	table.insert(self.selfBetInfo, data)
-	
+
 	self.view:UpdateSelfBetAreaInfo(data.area)
 end
 
-return FishPrawnCrabGameCtrl
+--endregion
+
+
+---销毁UI
+function DicePointsSumSizeGameCtrl:RealCloseDestroy()
+	self.super.RealCloseDestroy(self);
+end
+
+return DicePointsSumSizeGameCtrl

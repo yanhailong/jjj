@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 838338972500880983}
   m_Layer: 5
-  m_Name: FishPrawnCrabChip5K
+  m_Name: DicePointsSumSizeChip_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,7 +25,7 @@ RectTransform:
   m_GameObject: {fileID: 838338972500880976}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 838338973189042520}
@@ -181,8 +181,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 59c0e568228a58e4cbd32e692b490141, type: 3}
-    m_FontSize: 64
+    m_Font: {fileID: 12800000, guid: fd372a58c1579f6409d75cfd96c30b86, type: 2}
+    m_FontSize: 0
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0

@@ -281,14 +281,23 @@ function FishPrawnCrabGameView:UpdateBetBtnStatus()
     end
 end
 
----更新区域下注数据，index有效，更新指定区域；无效则更新所有区域。
-function FishPrawnCrabGameView:UpdateBetAreaInfo(index)
+---更新区域自己下注数据，index有效，更新指定区域；无效则更新所有区域。
+function FishPrawnCrabGameView:UpdateSelfBetAreaInfo(index)
     if index ~= nil and index > 0 and index <= #self.betSelfNumLabels then
         self.betSelfNumLabels[index].text = tostring(self.ctrl.selfBets[index])
-        self.betTotalNumLabels[index].text = tostring(self.ctrl.totalBets[index])
     else
         for tmpIndex = 1, #self.betSelfNumLabels do
             self.betSelfNumLabels[tmpIndex].text = tostring(self.ctrl.selfBets[tmpIndex])
+        end
+    end
+end
+
+---更新区域总下注数据，index有效，更新指定区域；无效则更新所有区域。
+function FishPrawnCrabGameView:UpdateTotalBetAreaInfo(index)
+    if index ~= nil and index > 0 and index <= #self.betSelfNumLabels then
+        self.betTotalNumLabels[index].text = tostring(self.ctrl.totalBets[index])
+    else
+        for tmpIndex = 1, #self.betTotalNumLabels do
             self.betTotalNumLabels[tmpIndex].text = tostring(self.ctrl.totalBets[tmpIndex])
         end
     end
