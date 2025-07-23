@@ -16,13 +16,6 @@ message BaccaratCardState {
   uint32 cardTypeWinState = 2;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
 }
 
-//玩家金币更新
-message BaccaratPlayerChangedGold {
-  int64 playerId = 1;  //玩家ID
-  int64 playerWinGold = 2;  //玩家场上赢的金币
-  int64 playerBetGold = 3;  //玩家场上下注金币
-}
-
 //百家乐结算信息
 message BaccaratSettlementInfo {
   repeated uint32 bankerCardIds = 1;  //庄家牌ID信息
@@ -56,12 +49,6 @@ message BaccaratTableSummary {
   repeated BaccaratCardState cardStateList = 3;  //牌型输赢状态
 }
 
-//请求押注的bean
-message ReqBetBean {
-  int64 betValue = 1;  //请求下注的金额
-  int32 betAreaIdx = 2;  //下注区域，1: 庄对 2: 和 3: 闲对 4: 闲 5: 庄
-}
-
 //押注信息
 message BetTableInfo {
   int32 betIdx = 1;  //下标
@@ -69,6 +56,19 @@ message BetTableInfo {
   int64 betIdxTotal = 3;  //区域下标的总的押注数量
   int64 betValue = 4;  //玩家此次下注的金币数量
   repeated int32 betGoldList = 5;  //区域押注金币列表
+}
+
+//玩家金币更新
+message PlayerChangedGold {
+  int64 playerId = 1;  //玩家ID
+  int64 playerWinGold = 2;  //玩家场上赢的金币
+  int64 playerBetGold = 3;  //玩家场上下注金币
+}
+
+//请求押注的bean
+message ReqBetBean {
+  int64 betValue = 1;  //请求下注的金额
+  int32 betAreaIdx = 2;  //下注区域，1: 庄对 2: 和 3: 闲对 4: 闲 5: 庄
 }
 
 //牌桌玩家信息
@@ -80,20 +80,6 @@ message TablePlayerInfo {
   int64 goldNum = 5;  //玩家当前金币
   int64 totalBet = 6;  //近20局下注金币总数
   int32 winCount = 7;  //近20局赢的总局数
-}
-
-//红黑大战玩家结算信息
-message LoongTigerWarPlayerSettleInfo {
-  int64 playerId = 1;  //玩家id
-  int32 index = 2;  //位置(从0开始从左往下;-1为在线玩家)
-  int64 amount = 3;  //获得的货币
-}
-
-//红黑大战玩家结算信息
-message RBWPlayerSettleInfo {
-  int64 playerId = 1;  //玩家id
-  int32 index = 2;  //位置(从0开始从左往下;-1为在线玩家)
-  int64 amount = 3;  //获得的货币
 }
 
 //红黑大战历史记录
@@ -120,29 +106,31 @@ message NotifyRedBlackWarSettleInfo {
   int32 blackCardType = 5;  //黑方牌型
   int32 winState = 6;  //获胜状态(1红方胜 2黑方胜)
   int64 getGold = 7;  //玩家获得的金币数
-  repeated RBWPlayerSettleInfo playerSettleInfos = 8;  //玩家结算信息
+  repeated PlayerChangedGold playerSettleInfos = 8;  //玩家结算信息
 }
 
 //响应,msgID=0x13081,desc=通知红黑大战桌上信息
 message NotifyRedBlackWarInfo {
   enum E_MsgID {def = 0; msgID = 77953;};
-  EGamePhase gamePhase = 1;  //场上阶段信息
-  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
-  repeated BetTableInfo tableAreaInfos = 3;  //区域下注信息
-  repeated TablePlayerInfo playerInfos = 4;  //玩家当前信息
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 4;  //区域下注信息
   repeated RedBlackWarHistory redBlackHistories = 5;  //当前房间的历史记录
   NotifyRedBlackWarSettleInfo settleInfos = 6;  //结算信息
+  repeated int32 betPointList = 7;  //押分列表
 }
 
 //响应,msgID=0x14001,desc=通知龙虎斗桌上信息
 message NotifyLoongTigerWarInfo {
   enum E_MsgID {def = 0; msgID = 81921;};
-  EGamePhase gamePhase = 1;  //场上阶段信息
-  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
-  repeated BetTableInfo tableAreaInfos = 3;  //区域下注信息
-  repeated TablePlayerInfo playerInfos = 4;  //玩家当前信息
-  repeated int32 redBlackHistories = 5;  //当前房间的历史记录
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 4;  //区域下注信息
+  repeated int32 histories = 5;  //当前房间的历史记录
   NotifyLoongTigerWarSettleInfo settleInfos = 6;  //结算信息
+  repeated int32 betPointList = 7;  //押分列表
 }
 
 //响应,msgID=0x14002,desc=龙虎斗结算信息
@@ -152,8 +140,7 @@ message NotifyLoongTigerWarSettleInfo {
   int32 loongCard = 2;  //龙方牌
   int32 tigerCard = 3;  //虎方牌
   int32 winState = 4;  //获胜状态(1龙胜 2虎胜 3和)
-  int64 getGold = 5;  //玩家获得的金币数
-  repeated LoongTigerWarPlayerSettleInfo playerSettleInfos = 6;  //玩家结算信息
+  repeated PlayerChangedGold playerSettleInfos = 5;  //玩家结算信息
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
@@ -190,11 +177,12 @@ message ReqExitRoomInGame {
 //响应,msgID=0x18081,desc=断线重连 通知玩家百家乐牌桌信息
 message NotifyBaccaratTableInfo {
   enum E_MsgID {def = 0; msgID = 98433;};
-  EGamePhase gamePhase = 1;  //场上阶段信息
-  repeated BaccaratCardState cardStateList = 2;  //玩家第一次进入时初始化路单信息
-  BaccaratTableInfo baccaratTableInfo = 3;  //桌面的数据
-  repeated BaccaratPlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
-  BaccaratSettlementInfo baccaratSettlementInfo = 5;  //场上结算信息，如果场上阶段不为结算，此值为空
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  repeated BaccaratCardState cardStateList = 3;  //玩家第一次进入时初始化路单信息
+  BaccaratTableInfo baccaratTableInfo = 4;  //桌面的数据
+  repeated PlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
+  BaccaratSettlementInfo baccaratSettlementInfo = 6;  //场上结算信息，如果场上阶段不为结算，此值为空
 }
 
 //响应,msgID=0x18082,desc=返回房间摘要信息
@@ -218,7 +206,7 @@ message RespBaccaratTableInfo {
   EGamePhase gamePhase = 2;  //场上阶段信息
   repeated BaccaratCardState cardStateList = 3;  //玩家第一次进入时初始化路单信息
   BaccaratTableInfo baccaratTableInfo = 4;  //桌面的数据
-  repeated BaccaratPlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
+  repeated PlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
   BaccaratSettlementInfo baccaratSettlementInfo = 6;  //场上结算信息，如果场上阶段不为结算，此值为空
   repeated int32 betInfoList = 7;  //压分列表
 }
@@ -236,7 +224,7 @@ message NotifyBaccaratSettlementInfo {
   int32 code = 1;  //状态码
   BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
   BaccaratSettlementInfo baccaratSettlementInfo = 3;  //场上结算信息，如果场上阶段不为结算，此值为空
-  repeated BaccaratPlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
+  repeated PlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
 }
 
 //响应,msgID=0x18087,desc=在游戏中返回加入房间
