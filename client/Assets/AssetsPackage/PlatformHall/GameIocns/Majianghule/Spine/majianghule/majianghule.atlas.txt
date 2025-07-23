@@ -1,0 +1,12 @@
+majianghule.png
+size:2048,512
+filter:Linear,Linear
+pma:true
+da
+bounds:2,2,438,839
+offsets:2,2,442,843
+rotate:90
+xiao
+bounds:843,22,418,441
+offsets:2,1,422,443
+rotate:90
