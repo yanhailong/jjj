@@ -11,9 +11,11 @@ function BaccaratChipItems:ctor(obj,ctrl)
     self.ctrl=ctrl
     self.icon = ComponentUtilGet.Image(self.transform);
     self.checked = ComponentUtilGet.GameObject(self.transform,"checked")
-    self.number = ComponentUtilGet.TextMeshProUGUI(self.transform,"number")
+    self.number = ComponentUtilGet.Text(self.transform,"number")
     self.btn = ComponentUtilGet.Button(self.transform);
-    self.ctrl.uiEventListener:AddClick(self.btn, self.ctrl:SetCheckedShow(self))
+    self.ctrl.uiEventListener:AddClick(self.btn,function()
+        self.ctrl:SetCheckedShow(self)
+    end )
 end
 
 ---初始化UI显示

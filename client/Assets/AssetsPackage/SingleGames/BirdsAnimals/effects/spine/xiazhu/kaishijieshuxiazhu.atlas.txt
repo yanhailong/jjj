@@ -1,0 +1,16 @@
+kaishijieshuxiazhu.png
+size:2048,512
+filter:Linear,Linear
+pma:true
+bg
+bounds:2,158,1227,219
+offsets:1,1,1279,221
+jieshu
+bounds:490,2,306,154
+offsets:1,1,308,156
+kaishi
+bounds:1231,248,333,129
+offsets:1,1,335,131
+xiazhu
+bounds:2,2,486,154
+offsets:1,1,488,156
