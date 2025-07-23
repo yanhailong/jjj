@@ -82,12 +82,78 @@ message TablePlayerInfo {
   int32 winCount = 7;  //近20局赢的总局数
 }
 
+//红黑大战玩家结算信息
+message LoongTigerWarPlayerSettleInfo {
+  int64 playerId = 1;  //玩家id
+  int32 index = 2;  //位置(从0开始从左往下;-1为在线玩家)
+  int64 amount = 3;  //获得的货币
+}
+
+//红黑大战玩家结算信息
+message RBWPlayerSettleInfo {
+  int64 playerId = 1;  //玩家id
+  int32 index = 2;  //位置(从0开始从左往下;-1为在线玩家)
+  int64 amount = 3;  //获得的货币
+}
+
+//红黑大战历史记录
+message RedBlackWarHistory {
+  int32 winner = 1;  //获胜方(1红 2黑)
+  int32 cardType = 2;  //牌型 
+}
+
 //响应,msgID=0x5082,desc=通知房间进入
 message NotifyRoomReadyWait {
   enum E_MsgID {def = 0; msgID = 20610;};
   int32 code = 1;  //状态码
   int64 roomId = 2;  //房间ID
   int64 waitEndTime = 3;  //等待时间结束的时间戳
+}
+
+//响应,msgID=0x13003,desc=红黑大战结算信息
+message NotifyRedBlackWarSettleInfo {
+  enum E_MsgID {def = 0; msgID = 77827;};
+  int32 code = 1;  //状态码
+  repeated int32 redCards = 2;  //红方牌
+  int32 redCardType = 3;  //红方牌型
+  repeated int32 blackCards = 4;  //黑方牌
+  int32 blackCardType = 5;  //黑方牌型
+  int32 winState = 6;  //获胜状态(1红方胜 2黑方胜)
+  int64 getGold = 7;  //玩家获得的金币数
+  repeated RBWPlayerSettleInfo playerSettleInfos = 8;  //玩家结算信息
+}
+
+//响应,msgID=0x13081,desc=通知红黑大战桌上信息
+message NotifyRedBlackWarInfo {
+  enum E_MsgID {def = 0; msgID = 77953;};
+  EGamePhase gamePhase = 1;  //场上阶段信息
+  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 3;  //区域下注信息
+  repeated TablePlayerInfo playerInfos = 4;  //玩家当前信息
+  repeated RedBlackWarHistory redBlackHistories = 5;  //当前房间的历史记录
+  NotifyRedBlackWarSettleInfo settleInfos = 6;  //结算信息
+}
+
+//响应,msgID=0x14001,desc=通知龙虎斗桌上信息
+message NotifyLoongTigerWarInfo {
+  enum E_MsgID {def = 0; msgID = 81921;};
+  EGamePhase gamePhase = 1;  //场上阶段信息
+  int64 tableCountDownTime = 2;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 3;  //区域下注信息
+  repeated TablePlayerInfo playerInfos = 4;  //玩家当前信息
+  repeated int32 redBlackHistories = 5;  //当前房间的历史记录
+  NotifyLoongTigerWarSettleInfo settleInfos = 6;  //结算信息
+}
+
+//响应,msgID=0x14002,desc=龙虎斗结算信息
+message NotifyLoongTigerWarSettleInfo {
+  enum E_MsgID {def = 0; msgID = 81922;};
+  int32 code = 1;  //状态码
+  int32 loongCard = 2;  //龙方牌
+  int32 tigerCard = 3;  //虎方牌
+  int32 winState = 4;  //获胜状态(1龙胜 2虎胜 3和)
+  int64 getGold = 5;  //玩家获得的金币数
+  repeated LoongTigerWarPlayerSettleInfo playerSettleInfos = 6;  //玩家结算信息
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
@@ -114,6 +180,11 @@ message ReqJoinRoomInGame {
   int64 roomId = 1;  //房间ID
   int32 gameType = 2;  //游戏类型
   int32 wareId = 3;  //场次id
+}
+
+//请求,msgID=0x18006,desc=在游戏中请求退出房间
+message ReqExitRoomInGame {
+  enum E_MsgID {def = 0; msgID = 98310;};
 }
 
 //响应,msgID=0x18081,desc=断线重连 通知玩家百家乐牌桌信息
@@ -152,8 +223,8 @@ message RespBaccaratTableInfo {
   repeated int32 betInfoList = 7;  //压分列表
 }
 
-//响应,msgID=0x18085,desc=百家乐通知新的一局开始
-message NotifyBaccaratRoundStart {
+//响应,msgID=0x18085,desc=百家乐通知下注开始
+message NotifyBaccaratBetStart {
   enum E_MsgID {def = 0; msgID = 98437;};
   int32 code = 1;  //状态码
   BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
@@ -173,6 +244,12 @@ message RespJoinRoomInGame {
   enum E_MsgID {def = 0; msgID = 98439;};
   int32 code = 1;  //状态码
   int32 roomCfgId = 2;  //房间配置ID
+}
+
+//响应,msgID=0x18088,desc=在游戏中返回退出房间
+message RespExitRoomInGame {
+  enum E_MsgID {def = 0; msgID = 98440;};
+  int32 code = 1;  //状态码
 }
 
 //请求,msgID=0x20001,desc=请求下注
@@ -195,14 +272,14 @@ message NotifyPlayerBet {
   repeated BetTableInfo betTableInfoList = 4;  //玩家押注信息列表
 }
 
-//响应,msgID=0x20083,desc=返回百人牌桌玩家列表的下注信息
+//响应,msgID=0x20083,desc=返回牌桌玩家列表的下注信息
 message RespTablePlayerInfo {
   enum E_MsgID {def = 0; msgID = 131203;};
   int32 code = 1;  //状态码
-  repeated TablePlayerInfo tablePlayerInfo = 2;  //百人牌桌的玩家信息
+  repeated TablePlayerInfo tablePlayerInfo = 2;  //牌桌的玩家信息
 }
 
-//请求,msgID=0x20088,desc=通知押注类房间玩家信息变化
+//响应,msgID=0x20088,desc=通知押注类房间玩家信息变化
 message NotifyTableRoomPlayerInfoChange {
   enum E_MsgID {def = 0; msgID = 131208;};
   int32 code = 1;  //状态码

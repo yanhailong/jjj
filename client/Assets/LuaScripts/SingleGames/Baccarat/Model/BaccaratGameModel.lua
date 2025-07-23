@@ -18,13 +18,16 @@ end
 
 function BaccaratGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_Baccarat.NotifyPlayerBet, self.NotifyPlayerBet, self)
-	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratRoundStart, self.NotifyBaccaratRoundStart, self)
+	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratBetStart, self.NotifyBaccaratBetStart, self)
 	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
+	WebNetEvent.AddListener(pb_Baccarat.RespExitRoomInGame, self.RespExitRoomInGame, self)
 end
 
 function BaccaratGameModel:RemoveEvent()
 
 end
+--region 事件方法
+
 ---请求下注
 ---@param betData 下注列表
 function BaccaratGameModel:ReqBet(betData)
@@ -44,7 +47,7 @@ function BaccaratGameModel:NotifyPlayerBet(data)
 end
 
 ---推送百家乐通知新的一局开始
-function BaccaratGameModel:NotifyBaccaratRoundStart(data)
+function BaccaratGameModel:NotifyBaccaratBetStart(data)
 	look("推送百家乐通知新的一局开始",data)
 	self.ctrl:NotifyBaccaratRoundStart(data);
 end
@@ -63,8 +66,18 @@ function BaccaratGameModel:NotifyTableRoomPlayerInfoChange(data)
 		self.ctrl:NotifyTableRoomPlayerInfoChange(data);
 	end
 end
-
---region 事件方法
+---请求退出房间
+function BaccaratGameModel:ReqExitRoomInGame()
+	look("请求退出房间")
+	WebNetworkManager.SendMsg(pb_Baccarat.ReqExitRoomInGame)
+end
+---返回推出房间
+function BaccaratGameModel:RespExitRoomInGame(data)
+	if(data.code == 200) then
+		look("返回推出房间成功")
+		self.ctrl:Close();
+	end
+end
 
 --endregion
 
