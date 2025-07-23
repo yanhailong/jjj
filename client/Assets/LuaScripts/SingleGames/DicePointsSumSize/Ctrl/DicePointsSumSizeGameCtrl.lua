@@ -63,6 +63,8 @@ function DicePointsSumSizeGameCtrl:InitData()
 	self.allBetData = {{}, {}}
 	self.lookOnBetData = {{}, {}}
 	self.recordData = {}
+	--桌面所有的筹码
+	self.tabelChipItems = {}
 
 	self.view.selfPlayer:UpdatePlayer({ id = DicePointsSumSizeConfig.selfTestPlayerId, coin = self.goldRealNum})
 	
@@ -234,6 +236,7 @@ function DicePointsSumSizeGameCtrl:SwitchToPrepareState(message)
 	self.allowBet = false
 	self.allBetData = {{}, {}}
 	self.lookOnBetData = {{}, {}}
+	self.tabelChipItems = {}
 	self.curStatus = DicePointsSumSizeConfig.GameState.Prepare
 	--重置筹码数据
 	self.view.selfPlayer:ResetBetData()
@@ -367,18 +370,6 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 		return
 	end
 
-	function isAreaWin(index)
-		local isWin = false
-		for i = 1, #message.dice_result do
-			if index == message.dice_result[i].anim_index then
-				isWin = true
-				break
-			end
-		end
-
-		return isWin
-	end
-
 	CorManager.StartCor(self, function()
 		coroutine.wait(1.5)
 		--播放骰子动画
@@ -412,94 +403,21 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 		self:AddNewRecord(message.dices)
 		self:UpdateRecordUI()
 		coroutine.wait(1)
-		--回收筹码到荷官处
-		--for areaIndex = 1, DicePointsSumSizeConfig.diceSideCount do
-		--	if not isAreaWin(areaIndex) then
-		--		local chipsArr = self.allBetData[areaIndex]
-		--		for chipIndex = 1, #chipsArr do
-		--			DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.btn_dealer.transform.position)
-		--		end
-		--		chipsArr = {}
-		--	end
-		--end
-
-		--coroutine.wait(2)
-		--荷官赔下中的筹码到桌面上
-		--for playerIndex = 1, #message.win_info do
-		--	local playerWinInfo = message.win_info[playerIndex]
-		--	local targetChipArr = nil
-		--	local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
-		--	if targetPlayer ~= nil then
-		--		targetChipArr = targetPlayer.chipInfo
-		--	else
-		--		targetChipArr = self.lookOnBetData
-		--	end
-		--
-		--	for winIndex = 1, #playerWinInfo.win_info do
-		--		local oddAmount = playerWinInfo.win_info[winIndex].oddAmount
-		--		local winAreaIndex = playerWinInfo.win_info[winIndex].anim_index
-		--		local chipList = self:GetChilIndexArrByAmount(oddAmount)
-		--		for chipIndex = 1, #chipList do
-		--			--飞筹码
-		--			local newChipObj = DicePointsSumSizeChipManager:AnimateChip(chipList[chipIndex], self.view.btn_dealer.transform.position, self.view.betAreas[winAreaIndex])
-		--			table.insert(targetChipArr[winAreaIndex], newChipObj)
-		--		end
-		--	end
-		--end
-
-		coroutine.wait(2)
+		
 		--把桌面上的筹码分到对应的人身上
-		for areaIndex = 1, #message.dice_result do
-			--自己
-			local chipsArr = self.view.selfPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
-			--for chipIndex = 1, #chipsArr do
-			--	DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
-			--end
-			--chipsArr = {}
-			CorManager.StartCor(self, function()
-				for chipIndex = 1, #chipsArr do
-					DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], self.view.selfPlayer.transform.position)
-					if #chipsArr - chipIndex < 3 then
-						coroutine.wait(0.2)
-					end
-				end
-				chipsArr = {}
-			end)
-			--旁观的人
-			local lookOnChipsArr = self.lookOnBetData[message.dice_result[areaIndex].anim_index]
-			--for chipIndex = 1, #lookOnChipsArr do
-			--	DicePointsSumSizeChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_AllOther.transform.position)
-			--end
-			--lookOnChipsArr = {}
-			CorManager.StartCor(self, function()
-				for chipIndex = 1, #lookOnChipsArr do
-					DicePointsSumSizeChipManager:DestroyChipFly(lookOnChipsArr[chipIndex], self.view.btn_AllOther.transform.position)
-					if #lookOnChipsArr - chipIndex < 3 then
-						coroutine.wait(0.2)
-					end
-				end
-				lookOnChipsArr = {}
-			end)
-
-			--座位上的人
-			for playerIndex = 1, #self.view.AllOtherPlayerHeads do
-				local otherPlayer = self.view.AllOtherPlayerHeads[playerIndex]
-				local chipsArr = otherPlayer.chipInfo[message.dice_result[areaIndex].anim_index]
-				--for chipIndex = 1, #chipsArr do
-				--	DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
-				--end
-				--chipsArr = {}
-				CorManager.StartCor(self, function()
-					for chipIndex = 1, #chipsArr do
-						DicePointsSumSizeChipManager:DestroyChipFly(chipsArr[chipIndex], otherPlayer.transform.position)
-						if #chipsArr - chipIndex < 3 then
-							coroutine.wait(0.2)
-						end
-					end
-					chipsArr = {}
-				end)
+		for playerIndex = 1, #message.win_info do
+			local playerWinInfo = message.win_info[playerIndex]
+			local targetChipArr = nil
+			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
+			if targetPlayer ~= nil then
+				self:ScreeningChip(DicePointsSumSizeConfig.betValuesArr, playerWinInfo.winAmount, targetPlayer.transform.position)
 			end
 		end
+		--剩下的筹码飞到其他玩家按钮那里
+		for _, value in pairs(self.tabelChipItems) do
+			DicePointsSumSizeChipManager:DestroyChipFly(value.chip, self.view.btn_players.transform.position)
+		end
+		self.tabelChipItems = {}
 
 		coroutine.wait(2)
 		--显示结果
@@ -509,9 +427,50 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
 			if targetPlayer ~= nil then
 				targetPlayer:ShowResultCount(playerWinInfo.winAmount)
+			else
 			end
 		end
 	end)
+end
+
+---筛选筹码r
+function DicePointsSumSizeGameCtrl:ScreeningChip(list, winGold, pos)
+	local result = self:GetChipAndNum(list,winGold);
+	local selfChip={}
+	for value, count in pairs(result) do
+		if(count>0) then
+			for j = 1, count do
+				local chip =self:FindChipNumObj(value)
+				table.insert(selfChip,chip);
+			end
+		end
+	end
+	for _, chipObj in pairs(selfChip) do
+		DicePointsSumSizeChipManager:DestroyChipFly(chipObj,pos)
+	end
+end
+
+---获取某个玩家需要回收多少筹码和数量
+function DicePointsSumSizeGameCtrl:GetChipAndNum(betList, winGold)
+	local Result = {}
+	for _, value in ipairs(betList) do
+		Result[value] = math.floor(winGold / value)
+		winGold = winGold % value
+	end
+	return Result;
+end
+
+---通过筹码数量找到场上下注的筹码预支体返回去
+function DicePointsSumSizeGameCtrl:FindChipNumObj(num)
+	for i, v in ipairs(self.tabelChipItems) do
+		if(v.betIdxTotal == num) then
+			local chip =  v.chip;
+			table.remove(self.tabelChipItems, i);
+			return chip
+		end
+	end
+	
+	return nil;
 end
 
 function DicePointsSumSizeGameCtrl:AddNewRecord(dices)
@@ -601,16 +560,30 @@ function DicePointsSumSizeGameCtrl:OnClickCenterBetArea(areaIndex)
 end
 
 function DicePointsSumSizeGameCtrl:OnPlayerBetMsg(message)
+	if #self.tabelChipItems >= DicePointsSumSizeConfig.Area_Show_Chip_Max_Num then
+		return
+	end
+	
 	local targetPlayer = self.view:FindPlayer(message.playerid)
 	--飞筹码
 	if targetPlayer ~= nil then
 		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, targetPlayer.transform.position, self.view.betAreas[message.area])
 		table.insert(self.allBetData[message.area], newChipObj)
 		targetPlayer:AddChip(message.area, newChipObj)
+		
+		local chipNumTable = {}
+		chipNumTable.betIdxTotal = DicePointsSumSizeConfig.betValuesArr[message.chip];
+		chipNumTable.chip = newChipObj;
+		table.insert(self.tabelChipItems, chipNumTable)
 	else
 		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, self.view.btn_AllOther.transform.position, self.view.betAreas[message.area])
 		table.insert(self.allBetData[message.area], newChipObj)
 		table.insert(self.lookOnBetData[message.area], newChipObj)
+		
+		local chipNumTable = {}
+		chipNumTable.betIdxTotal = DicePointsSumSizeConfig.betValuesArr[message.chip];
+		chipNumTable.chip = newChipObj;
+		table.insert(self.tabelChipItems, chipNumTable)
 	end
 end
 
@@ -622,9 +595,16 @@ function DicePointsSumSizeGameCtrl:OnBetRusultMsg(message)
 	if message ~= nil and message.result == 0 then
 		self:OnSelfBet(message)
 		--飞筹码
-		local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, self.view.selfPlayer.transform.position, self.view.betAreas[message.area])
-		table.insert(self.allBetData[message.area], newChipObj)
-		self.view.selfPlayer:AddChip(message.area, newChipObj)
+		if #self.tabelChipItems < DicePointsSumSizeConfig.Area_Show_Chip_Max_Num then
+			local newChipObj = DicePointsSumSizeChipManager:AnimateChip(message.chip, self.view.selfPlayer.transform.position, self.view.betAreas[message.area])
+			table.insert(self.allBetData[message.area], newChipObj)
+			self.view.selfPlayer:AddChip(message.area, newChipObj)
+
+			local chipNumTable = {}
+			chipNumTable.betIdxTotal = DicePointsSumSizeConfig.betValuesArr[message.chip];
+			chipNumTable.chip = newChipObj;
+			table.insert(self.tabelChipItems, chipNumTable)
+		end
 		--更新自身金币
 		self.goldRealNum = message.remaining_coin
 
