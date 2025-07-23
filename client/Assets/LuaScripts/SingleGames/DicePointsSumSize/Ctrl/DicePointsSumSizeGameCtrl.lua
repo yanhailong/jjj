@@ -6,9 +6,8 @@
 local DicePointsSumSizeGameCtrl=Class("DicePointsSumSizeGameCtrl",BaseCtrl)
 
 local DicePointsSumSizeConfig = require("SingleGames/DicePointsSumSize/DicePointsSumSizeConfig")
-
-local DicePointsSumSizeConfig = require("SingleGames/DicePointsSumSize/DicePointsSumSizeConfig")
 local DicePointsSumSizeChipManager = require("SingleGames/DicePointsSumSize/DicePointsSumSizeChipManager")
+local DicePointsSumSizeChipItem = require("SingleGames/DicePointsSumSize/View/Item/DicePointsSumSizeChipItem")
 local SimulationServer = require("SingleGames/DicePointsSumSize/DiceSizeSimulationServer")
 local Ease = CS.DG.Tweening.Ease
 
@@ -28,16 +27,21 @@ end
 function DicePointsSumSizeGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	DicePointsSumSizeConfig.InitDiceRecordsPic()
-	DicePointsSumSizeConfig.InitDiceResultPic()
-	DicePointsSumSizeConfig.InitIconPic()
 	self:FirstEntryGame(args)
+	self:UpdateChipPageBtns()
 end
 
 ---初始化数据
 function DicePointsSumSizeGameCtrl:InitData()
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
 	---当前选中的底注
 	self.betIndex = 1;
+	---@type DicePointsSumSizeChipItem
+	self.curSelectChip = nil
+	self.showChipIndex = 1
+	---筹码的集合
+	self.chipItems = {};
 	---当前是否可以下注
 	self.allowBet = false
 	---当前总底注
@@ -61,7 +65,12 @@ function DicePointsSumSizeGameCtrl:InitData()
 	self.recordData = {}
 
 	self.view.selfPlayer:UpdatePlayer({ id = DicePointsSumSizeConfig.selfTestPlayerId, coin = self.goldRealNum})
-
+	
+	DicePointsSumSizeConfig.InitDiceRecordsPic()
+	DicePointsSumSizeConfig.InitDiceResultPic()
+	DicePointsSumSizeConfig.InitIconPic()
+	DicePointsSumSizeConfig.InitCommonMainPic()
+	
 	--刷新底注界面
 	--self.view:UpdateBetBtnStatus()
 	--self.view:ChangeAnte(self.betIndex)
@@ -71,6 +80,31 @@ end
 
 function DicePointsSumSizeGameCtrl:Close()
     self.super.Close(self);
+end
+
+function DicePointsSumSizeGameCtrl:UpdateChipPageBtns()
+	self.view.btn_Chipleft.gameObject:SetActive(self.showChipIndex > 1)
+	self.view.btn_ChipRight.gameObject:SetActive(self.showChipIndex < table.getCount(self.chipItems) - DicePointsSumSizeConfig.chipItemShowCount + 1)
+
+	local curIndex = 1
+	for _, v in pairs(self.chipItems) do
+		---@type DicePointsSumSizeChipItem
+		local item = v;
+		item.gameObject:SetActive(curIndex >= self.showChipIndex)
+		
+		curIndex = curIndex + 1
+	end
+end
+
+---选中哪个筹码
+---@param DicePointsSumSizeChipItem
+function DicePointsSumSizeGameCtrl:SetCheckedShow(chipItem)
+	self.curSelectChip = chipItem;
+	for _, v in pairs(self.chipItems) do
+		---@type DicePointsSumSizeChipItem
+		local item = v;
+		item:RefreshChecked(self.curSelectChip.index)
+	end
 end
 
 ---刷新菜单显示隐藏
@@ -108,6 +142,18 @@ function DicePointsSumSizeGameCtrl:AddUIEvent()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_1,function(obj)
 		SimulationServer:StartServer()
+	end)
+	self.uiEventListener:AddClick(self.view.btn_Chipleft,function(obj)
+		if self.showChipIndex > 1 then
+			self.showChipIndex = self.showChipIndex - 1
+			self:UpdateChipPageBtns()
+		end
+	end)
+	self.uiEventListener:AddClick(self.view.btn_ChipRight,function(obj)
+		if self.showChipIndex < table.getCount(self.chipItems) - DicePointsSumSizeConfig.chipItemShowCount + 1 then
+			self.showChipIndex = self.showChipIndex + 1
+			self:UpdateChipPageBtns()
+		end
 	end)
 
 	---压注按钮
@@ -158,16 +204,23 @@ end
 --region UI事件方法
 ---首次进入游戏刷新显示
 function DicePointsSumSizeGameCtrl:FirstEntryGame(data)
-	--self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == 5);
 	----初始化筹码
 	--for i = 1, #data.betInfoList do
-	--	local item =self.objPools:Spawn(nil,self.view.obj_chipItem,self.view.obj_ChipContent.transform)
-	--	item:SetActive(true);
-	--	---@type BaccaratChipItems
-	--	local chipItem = BaccaratChipItems.New(item,self);
-	--	chipItem:InitUIShow(i,data.betInfoList[i]);
-	--	table.insert(ChipItems,chipItem);
-	--end
+	for i = 1, #DicePointsSumSizeConfig.betValuesArr do
+		local item = self.objPools:Spawn(nil, self.view.obj_chipItem, self.view.obj_ChipContent.transform)
+		item:SetActive(true);
+		---@type DicePointsSumSizeChipItem
+		local chipItem = DicePointsSumSizeChipItem.New(item, self);
+		look("FirstEntryGame:" .. i .. "betAmount:" .. DicePointsSumSizeConfig.betValuesArr[i])
+		chipItem:InitUIShow(i, DicePointsSumSizeConfig.betValuesArr[i]);
+		table.insert(self.chipItems, chipItem);
+		--默认选中第一个
+		if i == 1 then
+			self.curSelectChip = chipItem
+		end
+	end
+	
+	self:SetCheckedShow(self.curSelectChip)
 	--self:RefreshDataShow(data);
 end
 
@@ -215,10 +268,11 @@ function DicePointsSumSizeGameCtrl:SwitchToPrepareState(message)
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
 	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
+	self.view.colockStateTimeNumPrepare.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
+		self.view.colockStateTimeNumPrepare.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
 
 function DicePointsSumSizeGameCtrl:AllowRepeatBet()
@@ -260,9 +314,10 @@ function DicePointsSumSizeGameCtrl:SwitchToBetState(message)
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
 	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
+	self.view.colockStateTimeNumBet.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
+		self.view.colockStateTimeNumBet.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
 		----倒计时3s
 		--if math.abs(self.statusRemainingSeconds - 3) <= 0.1 then
 		--	self.view.colockStateTimeTrs.gameObject:SetActive(false)
@@ -296,9 +351,10 @@ function DicePointsSumSizeGameCtrl:SwitchToSettlementState(message)
 	self.view.colockStateTimeSettlement:SetActive(true)
 	self.statusRemainingSeconds = message.remaining_time
 	local timeInterval = 0.5
+	self.view.colockStateTimeNumSettlement.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
-		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1)) .. "s"
+		self.view.colockStateTimeNumSettlement.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
 	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
 end
 
@@ -326,13 +382,15 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 	CorManager.StartCor(self, function()
 		coroutine.wait(1.5)
 		--播放骰子动画
+		self.view.bigDiceResultObj:SetActive(true)
+		self.view.smallDiceResultObj:SetActive(true)
 		self.view.bigDiceLid:SetActive(true)
 		self.view.smallDiceLid:SetActive(true)
 		coroutine.wait(1.5)
 		--设置结果
 		for i = 1, DicePointsSumSizeConfig.diceCount do
 			local diceSideIndex = message.dices[i]
-			local curResultIcon = DicePointsSumSizeConfig.diceResult_Pics["tb_tz_" .. i]
+			local curResultIcon = DicePointsSumSizeConfig.diceResult_Pics["tb_tz_" .. diceSideIndex]
 			self.view.bigDiceImages[i].sprite = curResultIcon
 			self.view.bigDiceImages[i]:SetNativeSize()
 
@@ -480,7 +538,7 @@ function DicePointsSumSizeGameCtrl:UpdateRecordUI()
 			for diceIndex = 1, DicePointsSumSizeConfig.diceCount do
 				pointSum = pointSum + showDicesData[diceIndex]
 				local diceSideIndex = showDicesData[diceIndex]
-				local curResultIcon = DicePointsSumSizeConfig.diceRecords_Pics["tb_tz_" .. diceIndex]
+				local curResultIcon = DicePointsSumSizeConfig.diceRecords_Pics["tb_tz_" .. showDicesData[diceIndex]]
 				self.view.recordUIDatas[i].diceImages[diceIndex].sprite = curResultIcon
 				self.view.recordUIDatas[i].diceImages[diceIndex]:SetNativeSize()
 			end
@@ -526,7 +584,7 @@ end
 function DicePointsSumSizeGameCtrl:OnClickCenterBetArea(areaIndex)
 	--look("点击了下注区域：" .. areaIndex)
 	if self.allowBet == false or self.curStatus ~= DicePointsSumSizeConfig.GameState.Bet
-			or DicePointsSumSizeConfig.betValuesArr[self.betIndex] > self.goldRealNum then
+			or self.curSelectChip == nil or DicePointsSumSizeConfig.betValuesArr[self.curSelectChip.index] > self.goldRealNum then
 		return
 	end
 
@@ -538,7 +596,7 @@ function DicePointsSumSizeGameCtrl:OnClickCenterBetArea(areaIndex)
 	--发送消息
 	local betMsg = { playerid = self.view.selfPlayer.id,
 					 area = areaIndex,
-					 chip = self.betIndex }
+					 chip = self.curSelectChip.index }
 	GlobalEvent.Notify(DicePointsSumSizeConfig.GameEventName.REQUEST_BET, betMsg)
 end
 
@@ -594,6 +652,10 @@ end
 ---销毁UI
 function DicePointsSumSizeGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	DicePointsSumSizeChipManager:Destroy()
+	TimerManager.StopAllTimer(self)
+	CorManager.StopAll(self)
+	GlobalEvent.Notify(DicePointsSumSizeConfig.GameEventName.STOP_SIMULATION_SERVER)
 end
 
 return DicePointsSumSizeGameCtrl

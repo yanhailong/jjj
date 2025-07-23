@@ -37,8 +37,7 @@ function DicePointsSumSizeGameView:InitComponents()
     self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/bottom/btn_AllOther");
     self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_AllOther/tmp_AllOtherNumber");
     self.obj_ChipContent=ComponentUtilGet.GameObject(self.transform,"content/bottom/ChipScrollView/Viewport/obj_ChipContent");
-    self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/bottom/ChipScrollView/Viewport/obj_ChipContent/obj_chipItem");
-    self.obj_chipItem_bottom=ComponentUtilGet.GameObject(self.transform,"content/bottom/obj_chipItem");
+    self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/bottom/obj_chipItem");
     self.btn_Chipleft=ComponentUtilGet.Button(self.transform,"content/bottom/Image/btn_Chipleft");
     self.btn_ChipRight=ComponentUtilGet.Button(self.transform,"content/bottom/Image (1)/btn_ChipRight");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
@@ -94,11 +93,13 @@ function DicePointsSumSizeGameView:InitTips()
     self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
     self.tipsGameStart = ComponentUtilGet.GameObject(self.tipsTrs, "game_start")
 
-    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
-    self.colockStateTimeNum = ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
-    self.colockStateTimePrepare = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"prepare") --准备倒计时文字
-    self.colockStateTimeBet = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"bet") --下注倒计时文字
-    self.colockStateTimeSettlement = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"settlement") --结算倒计时文字
+    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center")
+    self.colockStateTimePrepare = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_prepare") --准备倒计时Root
+    self.colockStateTimeNumPrepare = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_prepare/time") --准备倒计时
+    self.colockStateTimeBet = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_bet") --下注倒计时Root
+    self.colockStateTimeNumBet = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_bet/time") --下注倒计时
+    self.colockStateTimeSettlement = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_settlement") --结算倒计时Root
+    self.colockStateTimeNumSettlement = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_settlement/time") --结算倒计时
     self.colockNumTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/count_down")
     self.colockNumTime = ComponentUtilGet.Text(self.colockNumTrs,"time")
 
