@@ -11,7 +11,7 @@ local config =require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
 local BirdsAnimalsHelper=require("SingleGames/BirdsAnimals/BirdsAnimalsHelper")
 local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 local BirdsAnimalsPlayerItem = require("SingleGames/BirdsAnimals/View/Item/BirdsAnimalsPlayerItem")
-
+local BirdsAnimalsSounds = require("SingleGames/BirdsAnimals/BirdsAnimalsSounds")
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 DOTween:SetTweensCapacity(1000, 250);
@@ -158,6 +158,8 @@ end
 function BirdsAnimalsGameView:InitPanelData(args)
     self:InitMarquee()
     self:InitLogos()
+    --播放背景音乐
+    BirdsAnimalsSounds.PlaySoundMusic()
 end
 
 function BirdsAnimalsGameView:InitChouMa()
@@ -291,6 +293,8 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
                 self.marqueeCallFunc()
                 self.marqueeCallFunc = nil
             end
+            --转轴停止的音效
+            BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.End)
         end)
     end
 end
@@ -328,6 +332,10 @@ end
 --result {winSide,winIndex,lastIndex players}
 function BirdsAnimalsGameView:PlayRuningAnimtion(result, isPlay, callFunc)
     if isPlay then
+        --慢速旋转
+        BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.XuanZhuan)
+        --转轴旋转
+        BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Running)
         self.marqueeCallFunc = callFunc
         self:IntMove(result.lastIndex, result.winIndex,6,6)
     else
@@ -343,6 +351,8 @@ function BirdsAnimalsGameView:PlayCarEffectView(logo_id,callFunc)
     self.img_icon.sprite=BirdsAnimalsHelper.LoadLogoSprite(logo_id)
     self.txt_name.text=BirdsAnimalsHelper.LoadNameLanguage(logo_id)
     self.img_icon:SetNativeSize()
+    --动物音效
+    BirdsAnimalsSounds.PlaySoundAnimal(logo_id)
     
     self.img_icon.transform.localScale=Vector3.Zero()
     self.img_icon.transform:DOScale(Vector3(1,1,1),0.2):SetEase(Ease.OutBack):OnComplete(function()
@@ -449,7 +459,7 @@ end
 
 function BirdsAnimalsGameView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<= config.goldRealNum
+        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<= PlayerManager:GetPlayerInfo().goldNum
     end
 end
 ---更新自己信息
@@ -457,7 +467,7 @@ function BirdsAnimalsGameView:UpdateSelf(player)
     self.selfPlayer:UpdatePlayer(player)
 end
 function BirdsAnimalsGameView:UpdateSelfGoldCount()
-    self.selfPlayer:UpdateGoldCount(config.goldRealNum)
+    self.selfPlayer:UpdateGoldCount(PlayerManager:GetPlayerInfo().goldNum)
 end
 function BirdsAnimalsGameView:UpdatePlayerTotal(total)
     self.tmp_totalPlayerNum.text = total
@@ -466,16 +476,18 @@ end
 function BirdsAnimalsGameView:PayXiaZhuCoinFly(side)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode, config.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
             self.ctrl.model.config.betList[config.dizhuIndex])
+    --下注音效
+    BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
 end
 ---其他玩家下注动画
 function BirdsAnimalsGameView:PayOtherXiaZhuCoinFly(data)
     -- 更新总押注金额
     config.totalDiZhuNums[data.side] = config.totalDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
     -- 自己下注
-    local selfId = config.selfPlayer.playerId
+    local selfId = PlayerManager:GetPlayerInfo().playerId
     if selfId==data.playerId then
         config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
-        config.goldRealNum = data.currency or 0; -- 更新金币
+        PlayerManager:GetPlayerInfo().goldNum = data.currency or 0; -- 更新金币
         table.insert(config.selfXiaZhuInfo,data)
         self:PayXiaZhuCoinFly(data.side)
         self:UpdateXiaZhuLabel()
@@ -491,6 +503,8 @@ function BirdsAnimalsGameView:PayOtherXiaZhuCoinFly(data)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.amounts,self.btn_players.transform.position,self.areaViews[data.side].noteRoot,
             self.ctrl.model.config.betList[data.amounts])
     areaTotal[data.side] = areaTotal[data.side] + 1
+    --下注音效
+    BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
 end
 
 ---金币回收动画
@@ -507,12 +521,14 @@ function BirdsAnimalsGameView:PlayCompeleCoinFLy()
         --跳过没有赢钱的玩家
         if player.winCurrency == 0 then break end
         totalCurrency = totalCurrency + player.winCurrency
-        if player.id == config.selfPlayer.playerId then
+        if player.id == PlayerManager:GetPlayerInfo().playerId then
             winCurrency[1] = player.winCurrency
             self.selfPlayer:ShowResultCount( player.winCurrency)
             -- 更新金币
-            config.goldRealNum = player.currency or 0; 
+            PlayerManager:GetPlayerInfo().goldNum = player.currency or 0; 
             self:UpdateSelfGoldCount()
+            -- 播放得奖音效
+            BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.WinBet)
         else
             winCurrency[2] = winCurrency[2] + player.winCurrency
         end
@@ -534,6 +550,7 @@ function BirdsAnimalsGameView:StartEffect()
     self:UnChooseAllLogos()
     
     --开始下注提示
+    BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.KaiShiXiaZhu)
     self.tipsTimeTrs.gameObject:SetActive(true)
     self.tipsStartXiaZhu:SetActive(true)
     TimerManager.StartTimer(self,function()
@@ -548,11 +565,15 @@ function BirdsAnimalsGameView:EndEffect()
     self:FlashLight()
 
     --下注结束提示
+    BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhu)
+    
     self.tipsTimeTrs.gameObject:SetActive(true)
     self.tipsTimeEnd:SetActive(true)
     TimerManager.StartTimer(self,function()
         self.tipsTimeEnd:SetActive(false)
         self.tipsTimeTrs.gameObject:SetActive(false)
+        -- 停止下注吹哨
+        BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhuEnd)
     end,1.5,0,false)
     
 end
@@ -583,7 +604,7 @@ function BirdsAnimalsGameView:UpdateRoomInfo(model)
     -- 2. 刷新玩家信息
     ------------------
     local player = model.players[#model.players]
-    config.selfPlayer.playerId = player.id;
+    PlayerManager:GetPlayerInfo().playerId = player.id;
     ------------------
     -- 更新玩家信息
     self:UpdateSelf(player)
@@ -627,7 +648,7 @@ function BirdsAnimalsGameView:ShowAreaChouMa(sideInfo)
             ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,chip.amounts,self.areaViews[chip.side].noteRoot,self.ctrl.model.config.betList[chip.side])
         end
         -- 更新自己的筹码
-        if chip.playerId == config.selfPlayer.playerId then
+        if chip.playerId == PlayerManager:GetPlayerInfo().playerId then
             config.selfDiZhuNums[chip.side] = config.selfDiZhuNums[chip.side] + chip.amounts
         end
     end
@@ -671,6 +692,9 @@ function BirdsAnimalsGameView:OnGameStatus(status, seconds)
                 TimerManager.StopTimer(self,self.statusTimer)
                 self.statusTimer = nil
             end
+            if config.lessSeconds<=3 then
+                BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.DaoJiShi)
+            end
         end, 1, config.lessSeconds, true)
     elseif status == 3 then -- 亮牌阶段
         self:UpdateDiZhuBtnState()
@@ -691,7 +715,7 @@ function BirdsAnimalsGameView:OnGameStatus(status, seconds)
         self:UpdateDiZhuBtnState()
         self:RepeatInit()
         ---金币回收动画
-        self.ctrl.view:PlayCompeleCoinFLy()
+        self:PlayCompeleCoinFLy()
     end
 end
 

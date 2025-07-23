@@ -131,6 +131,18 @@ BirdsAnimalsConfig.LOGO_IDX={
     [this.ANIMAL_TYPE.SHIZI]  ={17,18,19},   --狮子
 }
 
+BirdsAnimalsConfig.AUDIO_KEY = {
+    KaiShiXiaZhu=1,  --开始下注
+    StopXiaZhu=2,  --停止下注
+    XuanZhuan=3,  --旋转 开始旋转的时候，慢速旋转的音效，单次播放
+    DaoJiShi=4,  --倒计时音效
+    StopXiaZhuEnd =5,  --停止下注吹哨
+    End=6,  --转轴停止的音效
+    Running=7,  --转轴旋转 转轴旋转的音效，单次播放
+    WinBet=8,  --筹码赢奖
+    Bet=9,  --筹码音效
+}
+
 ---曲线关键帧
 BirdsAnimalsConfig.CURVE_KEYS = {
     {0, 0},

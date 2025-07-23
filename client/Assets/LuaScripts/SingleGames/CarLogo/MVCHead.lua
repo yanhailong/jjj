@@ -16,11 +16,14 @@ CtrlManager.CtrlsCollection[CtrlNames.CarLogoRule].ctrl =require "SingleGames/Ca
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoRule].view=require "SingleGames/CarLogo/View/CarLogoRuleView";
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoRule].model=require "SingleGames/CarLogo/Model/CarLogoRuleModel";
 
+CtrlNames.CarLogoSelect="CarLogoSelect";
+CtrlManager.CtrlsCollection[CtrlNames.CarLogoSelect]={};
+CtrlManager.CtrlsCollection[CtrlNames.CarLogoSelect].ctrl =require "SingleGames/CarLogo/Ctrl/CarLogoSelectCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.CarLogoSelect].view=require "SingleGames/CarLogo/View/CarLogoSelectView";
+CtrlManager.CtrlsCollection[CtrlNames.CarLogoSelect].model=require "SingleGames/CarLogo/Model/CarLogoSelectModel";
+
 CtrlNames.CarLogoTrend="CarLogoTrend";
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoTrend]={};
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoTrend].ctrl =require "SingleGames/CarLogo/Ctrl/CarLogoTrendCtrl";
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoTrend].view=require "SingleGames/CarLogo/View/CarLogoTrendView";
 CtrlManager.CtrlsCollection[CtrlNames.CarLogoTrend].model=require "SingleGames/CarLogo/Model/CarLogoTrendModel";
-
-
-

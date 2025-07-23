@@ -9,6 +9,7 @@ function CarLogoHistoryItem:ctor(gameObject)
     ---@type UnityEngine.Transform
     self.transform = gameObject.transform;
     self.content = ComponentUtilGet.Transform(self.transform,"mask/content")
+    self.positon = ComponentUtilGet.Transform(self.transform,"mask/positon")
     ---@type UnityEngine.Transform[]
     self.logos = {};
 
@@ -18,7 +19,7 @@ function CarLogoHistoryItem:ctor(gameObject)
     end
     
     ---logo飞行目标点
-    self.point = self.logos[1].position
+    self.point = self.positon.position
     self:UpdateCarLogo()
 end
 
@@ -43,9 +44,9 @@ function CarLogoHistoryItem:UpdateCarLogo(history)
     
 end
 
-function CarLogoHistoryItem:ShowLogo(transform,data,showNew)
+function CarLogoHistoryItem:ShowLogo(transform,winSide,showNew)
     local image = ComponentUtilGet.Image(transform, "Icon")
-    image.sprite = CarLogoHelper.LoadLogoSprite(data.logo_id);
+    image.sprite = CarLogoHelper.LoadLogoSprite(winSide);
     transform.gameObject:SetActive(true)
     self:ShowLogoNew(transform,showNew)
 end

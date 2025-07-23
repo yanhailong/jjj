@@ -74,17 +74,12 @@ end
 
 function CarLogoTrendView:UpdateHistory(history)
     ---测试
-    local historyList =history
-    for i=1,Tools.RandomInt(30,50) do
-        table.insert(historyList,{logo_index=1,logo_id=Tools.RandomInt(1,8)})
-    end
-    ---
-    local index = #historyList
+    local historyList = history
+    local total = #historyList
     for i=1,50 do
-        if index>0 then
-            self.resultsItems[i].ShowLogo(historyList[index].logo_id)
-            index = index - 1
-            if i==1 then self.resultsItems[1].ShowNew(true) end
+        if i <= total then
+            self.resultsItems[i].ShowLogo(historyList[i])
+            if i==total then self.resultsItems[i].ShowNew(true) end
         else
             self.resultsItems[i].ShowLogo()
         end
@@ -95,7 +90,7 @@ function CarLogoTrendView:UpdateHistory(history)
     local offset=math.max(#historyList-49,1)
     local count = #historyList-offset+1
     for i=#historyList,offset,-1 do
-        self.rateData[historyList[i].logo_id]=self.rateData[historyList[i].logo_id]+1
+        self.rateData[historyList[i]]=self.rateData[historyList[i]]+1
     end
 
     if count>0 then

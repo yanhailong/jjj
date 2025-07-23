@@ -56,10 +56,10 @@ function PlayerItem:UpdatePlayer(player)
         self.gameObject:SetActive(false)
     else
         self.gameObject:SetActive(true)
-        self.goldCount.text = player.currency
-        self.playerName.text = player.name
+        self.goldCount.text = player.goldNum
+        self.playerName.text = player.playerName
         self.player = player
-        self.id = player.id
+        self.id = player.playerId
     end
 end
 

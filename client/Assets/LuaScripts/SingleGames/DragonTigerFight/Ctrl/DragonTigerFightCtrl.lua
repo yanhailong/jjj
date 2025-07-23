@@ -22,7 +22,6 @@ end
 function DragonTigerFightCtrl:CtrlInit(args)
     self.super.CtrlInit(self, args)
     self:InitData()
-    TimerManager.StartTimer(self,function()    self:EnterRoom(args and args[1] or 1)  end,1,0)
 end
 
 function DragonTigerFightCtrl:InitData()
@@ -72,13 +71,15 @@ end
 function DragonTigerFightCtrl:RepeatBet()
     if #config.lastXiaZhuInfo > 0 and not config.isRepeat then
         config.isRepeat = true
+        local ReqBet = { reqBetBeans = {} }
         for _, info in ipairs(config.lastXiaZhuInfo) do
-            if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > config.goldRealNum then
+            if not config.allow or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
                 break
             end
-            self:Bet(info.side,config.dizhuNumArr[info.index])
+            table.insert(ReqBet.reqBetBeans, {betValue = self.model.betPointList[info.index],betAreaIdx=config.gameID*100+info.side} )
         end
         self.view.btn_repeat.interactable = false
+        self.model:Bet(ReqBet)
     end
 end
 
@@ -87,23 +88,19 @@ function DragonTigerFightCtrl:OnClickCenterYaZhuSide(area)
     if config.allow == false then
         return
     end
-    --local amount = config.dizhuNumArr[config.dizhuIndex]
-    self:Bet(area, config.dizhuIndex)
+    local ReqBet = {
+        reqBetBeans = {
+            {betValue = self.model.betPointList[config.dizhuIndex],betAreaIdx=config.gameID*100+area}
+        }
+    }
+    self.model:Bet(ReqBet)
 end
 
--- 进入房间
-function DragonTigerFightCtrl:EnterRoom(roomType)
-    WebNetworkManager.SendMsg(pb_DragonTigerFight.ReqEnterRoom, {roomType = roomType})
-end
-
--- 押注
-function DragonTigerFightCtrl:Bet(side, amount)
-    WebNetworkManager.SendMsg(pb_DragonTigerFight.ReqBetting, {side = side, amount = amount})
-end
 
 ---移除UI事件
 function DragonTigerFightCtrl:RemoveEvent()
-	self.super.RemoveEvent(self);
+	self.model:ExitRoom()
+    self.super.RemoveEvent(self);
 end
 
 --region UI事件方法
