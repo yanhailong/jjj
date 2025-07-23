@@ -1,0 +1,29 @@
+gongxihuode .png
+size:1024,1024
+filter:Linear,Linear
+pma:true
+eff_BirdsAnimals_tanchuang_bd_bd_gg
+bounds:595,544,371,372
+offsets:73,68,512,512
+eff_BirdsAnimals_tanchuang_bd_bd_wai_gc
+bounds:2,345,591,571
+offsets:4,15,600,588
+tiao
+bounds:2,151,846,192
+offsets:1,0,848,192
+yousui
+bounds:595,397,145,301
+offsets:2,0,147,302
+rotate:90
+zuosui
+bounds:2,2,147,300
+offsets:0,0,147,302
+rotate:90
+
+gongxihuode _2.png
+size:512,512
+filter:Linear,Linear
+pma:true
+yuan
+bounds:2,2,460,460
+offsets:1,1,462,462
