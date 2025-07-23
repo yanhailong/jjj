@@ -15,27 +15,25 @@ message PoolInfo {
   int32 updateProp = 5;  //每过单位时间，奖池变化万分比
 }
 
+//每条中奖线信息
+message ResultLineInfo {
+  int32 id = 1;  //中奖线id
+  repeated int32 iconIndexs = 2;  //这条线上中奖图标的坐标
+  int32 times = 3;  //倍率
+  int64 winGold = 4;  //中奖金币
+}
+
+//火车信息
+message TrainInfo {
+  int32 type = 1;  //火车类型(iconId)  15.金火车  19.绿火车 20.蓝火车  21.紫火车  22.红火车
+  repeated int64 goldList = 2;  //中奖金额列表
+  int32 poolId = 3;  //奖池ID
+}
+
 //请求,msgID=0x7001,desc=请求选择免费模式的游戏
 message ReqChooseFreeModel {
   enum E_MsgID {def = 0; msgID = 28673;};
   int32 status = 1;  //选择类型  3.普通火车  4.黄金火车   5.免费游戏
-}
-
-//请求,msgID=0x7007,desc=请求配置信息
-message ReqConfigInfo {
-  enum E_MsgID {def = 0; msgID = 28679;};
-}
-
-//请求,msgID=0x7003,desc=选择投资地区
-message ReqInvestArea {
-  enum E_MsgID {def = 0; msgID = 28675;};
-  int32 areaId = 1;  //地区id
-}
-
-//请求,msgID=0x7005,desc=请求开始游戏
-message ReqStartGame {
-  enum E_MsgID {def = 0; msgID = 28677;};
-  int64 stakeVlue = 1;  //下注金额
 }
 
 //响应,msgID=0x7002,desc=返回选择免费模式的游戏
@@ -44,14 +42,10 @@ message ResChooseFreeModel {
   int32 code = 1;  //状态码
 }
 
-//响应,msgID=0x7008,desc=请求配置信息
-message ResConfigInfo {
-  enum E_MsgID {def = 0; msgID = 28680;};
-  int32 code = 1;  //状态码
-  repeated int32 stakeList = 2;  //押注列表
-  int32 defaultBet = 3;  //默认押注
-  repeated PoolInfo poolList = 4;  //奖池信息
-  int32 dollarTargetCount = 5;  //美元收集目标值
+//请求,msgID=0x7003,desc=选择投资地区
+message ReqInvestArea {
+  enum E_MsgID {def = 0; msgID = 28675;};
+  int32 areaId = 1;  //地区id
 }
 
 //响应,msgID=0x7004,desc=选择投资地区返回
@@ -60,8 +54,13 @@ message ResInvestArea {
   int32 code = 1;  //状态码
   repeated int64 goldList = 2;  //回报金额列表
   TrainInfo allWinTrainInfo = 3;  //3次都中奖，奖励的火车信息
-  repeated int32 iconList = 4;  //地图全部解锁时的图标id列表
-  TrainInfo areaAllUnlockTrainInfo = 5;  //地图全部解锁，奖励的火车信息
+  bool allAreaUnLock = 4;  //是否全地图解锁
+}
+
+//请求,msgID=0x7005,desc=请求开始游戏
+message ReqStartGame {
+  enum E_MsgID {def = 0; msgID = 28677;};
+  int64 stakeVlue = 1;  //下注金额
 }
 
 //响应,msgID=0x7006,desc=开始游戏结果返回
@@ -80,18 +79,18 @@ message ResStartGame {
   int64 allGold = 11;  //玩家当前金币
 }
 
-//每条中奖线信息
-message ResultLineInfo {
-  int32 id = 1;  //中奖线id
-  repeated int32 iconIndexs = 2;  //这条线上中奖图标的坐标
-  int32 times = 3;  //倍率
-  int64 winGold = 4;  //中奖金币
+//请求,msgID=0x7007,desc=请求配置信息
+message ReqConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28679;};
 }
 
-//火车信息
-message TrainInfo {
-  int32 type = 1;  //火车类型(iconId)  15.金火车  19.绿火车 20.蓝火车  21.紫火车  22.红火车
-  repeated int64 goldList = 2;  //中奖金额列表
-  int32 poolId = 3;  //奖池ID
+//响应,msgID=0x7008,desc=请求配置信息
+message ResConfigInfo {
+  enum E_MsgID {def = 0; msgID = 28680;};
+  int32 code = 1;  //状态码
+  repeated int32 stakeList = 2;  //押注列表
+  int32 defaultBet = 3;  //默认押注
+  repeated PoolInfo poolList = 4;  //奖池信息
+  int32 dollarTargetCount = 5;  //美元收集目标值
 }
 

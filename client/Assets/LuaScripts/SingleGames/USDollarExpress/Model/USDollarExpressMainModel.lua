@@ -72,16 +72,18 @@ function USDollarExpressMainModel:ResStartGame(msg)
 
 	self.resultLineInfoList=msg.resultLineInfoList		---中奖信息
 	self.allWinGold=tonumber(msg.allWinGold) 			---累计中奖金币
-	self.status=msg.status					---//当前状态 0.正常  1.普通二选一  2.黄金列车二选一  3.二选一之拉普通火车  4.二选一之拉黄金火车  5.二选一之免费模式
+	self.status=msg.status					---//当前状态 0.正常  1.普通二选一  2.黄金列车二选一  3.二选一之拉普通火车  4.二选一之拉黄金火车  5.二选一之免费模式6.
 	self.freeCount=msg.freeCount						---免费次数
 	self.goldTrainInFree=msg.goldTrainInFree			---免费游戏中是否触发了金火车
 	self.trainInfoList=msg.trainInfoList				---火车模式数据
 	self.remainFreeCount=msg.remainFreeCount
 	self.totalDollars=msg.totalDollars--//累计的美元数量，进度条
+	self.choosableAreas=msg.choosableAreas
 
 	local dollarsInfo={}
 	self.isHasDollars=false
 	self.coinIndexId=0
+	self.collectDollarIndexIds={}
 	if msg.dollarsInfo then
 		self.isHasDollars=true
 		self.coinIndexId=msg.dollarsInfo.coinIndexId
@@ -92,6 +94,8 @@ function USDollarExpressMainModel:ResStartGame(msg)
 			dollarsInfo[id]=dollarValueList[i]
 		end
 		self:InitDollars(dollarsInfo)
+		self.collectDollarIndexIds=msg.dollarsInfo.collectDollarIndexIds
+		look("可以收集的美元飞入右侧",self.collectDollarIndexIds)
 	end
 	look("self.dollarsInfo，self.coinIndexId",self.dollarsInfo,self.coinIndexId)
 	

@@ -14,13 +14,11 @@ end
 
 ---获取组件
 function UICommonSelectionView:InitComponents()
-    self.tmp_loading=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/tmp_loading");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/btn_close");
 end
 
 ---清空组件
 function UICommonSelectionView:ClearComponents()
-    self.tmp_loading=nil;
     self.btn_close=nil;
 end
 

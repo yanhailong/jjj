@@ -22,7 +22,7 @@ function UICommonSelectionItem:InitData(wareHouse)
     self.tmp_limitgold.text="limitVipMin:"..wareHouse.limitGoldMin
     self.tmp_limitVip.text="limitVipMin"..wareHouse.limitVipMin
     self.tmp_pool.text="pool"..wareHouse.pool
-    self.txt_bet.text="BET "..0
+    self.txt_bet.text="BET "..wareHouse.defaultBet
 end
 
 function UICommonSelectionItem:SetActive(bl)

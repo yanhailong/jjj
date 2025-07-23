@@ -26,6 +26,7 @@ function USDollarExpressMainView:InitComponents()
     self.obj_top2=ComponentUtilGet.GameObject(self.transform,"content/gameCenter/obj_top2")
     self.txt_repeatWin=ComponentUtilGet.Text(self.transform,"content/gameCenter/obj_top2/txt_repeatWin")
     self.img_slider=ComponentUtilGet.Image(self.transform,"content/gameCenter/img_slider")
+    self.trans_gold=ComponentUtilGet.Transform(self.transform,"content/gameCenter/gold")
 end
 
 ---清空组件

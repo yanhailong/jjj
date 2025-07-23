@@ -7,7 +7,7 @@ require("Logic/Config/HallConfig")
 require("Logic/SubGame/GameCenter")
 require("Logic/MainState/MainStateCtrl")
 
---require "Debug/EmmyLuaDebugger"
+require "Debug/EmmyLuaDebugger"
 
 main = {}
 

@@ -28,3 +28,15 @@ CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].ctrl =require "Single
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].view=require "SingleGames/USDollarExpress/View/USDollarExpressMainView";
 CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMain].model=require "SingleGames/USDollarExpress/Model/USDollarExpressMainModel";
 
+CtrlNames.USDollarExpressMapMain="USDollarExpressMapMain";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapMain]={};
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapMain].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressMapMainCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapMain].view=require "SingleGames/USDollarExpress/View/USDollarExpressMapMainView";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapMain].model=require "SingleGames/USDollarExpress/Model/USDollarExpressMapMainModel";
+
+CtrlNames.USDollarExpressMapSelect="USDollarExpressMapSelect";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapSelect]={};
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapSelect].ctrl =require "SingleGames/USDollarExpress/Ctrl/USDollarExpressMapSelectCtrl";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapSelect].view=require "SingleGames/USDollarExpress/View/USDollarExpressMapSelectView";
+CtrlManager.CtrlsCollection[CtrlNames.USDollarExpressMapSelect].model=require "SingleGames/USDollarExpress/Model/USDollarExpressMapSelectModel";
+

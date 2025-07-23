@@ -43,7 +43,6 @@ function USDollarExpressCarCtrl:CtrlInit(args)
 	--		["type"] = 22,
 	--	},
 	--}
-	self.trainInfoList=da
 	
 	self.trainInfoList=args
 	--look("拉火车数据",self.trainInfoList)

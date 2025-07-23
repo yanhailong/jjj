@@ -54,7 +54,7 @@ function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 		logError("重中之重")
 		self:UpDateValue()
 	end)
-	self.proTarget=100---零时后期由服务器下发
+	self.proTarget=betInfos.dollarTargetCount---零时后期由服务器下发
 	look("收到的下注配置信息",betInfos)
 end
 
@@ -482,22 +482,21 @@ function USDollarExpressMainCtrl:HideAllDollars()
 end
 
 ----美元飞到指定位置
-function USDollarExpressMainCtrl:DollarFlyTo(pos)
-
-	
+function USDollarExpressMainCtrl:DollarFlyTo(pos,time,func)
 	CorManager.StartCor(self, function
 	()
 		for i = 1, 20 do
 			local item=self.showChildsList[i]
 			if item.iconIndex==18 then
-				coroutine.wait(0.5)
+				coroutine.wait(time)
 				item:DollarsFlyTo(pos)
 			end
 		end
-		logError("所有的执行完毕！")
+		if func then
+			func()
+		end
 		config.showStep=config.showStep+1
 	end)
-
 end
 
 function USDollarExpressMainCtrl:RefreshRepeatWin(value)
@@ -587,17 +586,33 @@ function USDollarExpressMainCtrl:ShowResoult()
 		while config.showStep < 4 do
 			coroutine.yield(1)
 		end
-		self:ShowDollarProgress()
+		self:EnterInvestGame()
 		while config.showStep < 5 do
 			coroutine.yield(1)
 		end
 		self:SetStateLast()
 	end)
 end
+
+function USDollarExpressMainCtrl:EnterInvestGame()
+	if #self.model.choosableAreas>0 then
+		logError("进入投资小游戏--->")
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(0.5)
+			self:SetAllChildItemMask(true)
+			coroutine.wait(0.5)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressMapMain,self.model.choosableAreas)
+		end)
+	else
+		config.showStep=config.showStep+1
+	end
+end
+
+
 ---收集进度值
 function USDollarExpressMainCtrl:ShowDollarProgress()
 	self.view.img_slider.fillAmount=self.model.totalDollars/self.proTarget
-	config.showStep=config.showStep+1
 end
 
 function USDollarExpressMainCtrl:ShowAwardEffect()
@@ -666,31 +681,41 @@ function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
 end
 
 function USDollarExpressMainCtrl:DollarFly()
-	if self.model.coinIndexId>0 then--现金奖励
-		self.dollarCount=0
-		local pos=self.buttomCtrl.view.txt_win.transform.position
-		self:DollarFlyTo(pos)
+	if  #self.model.collectDollarIndexIds>0 then
+		local pos=self.view.trans_gold.transform.position
+		self:DollarFlyTo(pos,0, function
+		()
+			self:ShowDollarProgress()
+		end)
 	else
-		local isHasHuangjinlieche=false
-		local trainInfoList= self.model.trainInfoList
-		if #trainInfoList>0 then
-			local train=trainInfoList[1]
-			if train.type==15 then
-				isHasHuangjinlieche=true
+		if self.model.coinIndexId>0 then--现金奖励
+			self.dollarCount=0
+			local pos=self.buttomCtrl.view.txt_win.transform.position
+			self:DollarFlyTo(pos,0.5)
+		else
+			local isHasHuangjinlieche=false
+			local trainInfoList= self.model.trainInfoList
+			if #trainInfoList>0 then
+				local train=trainInfoList[1]
+				if train.type==15 then
+					isHasHuangjinlieche=true
+				end
+			end
+			if isHasHuangjinlieche==true then
+				self.view.obj_top1:SetActive(false)
+				self.view.obj_top2:SetActive(true)
+				self.view.txt_repeatWin.text=""
+				self.dollarCount=0
+				local pos=self.view.txt_repeatWin.transform.position
+				self:DollarFlyTo(pos,0.5)
+			else
+				logError("正常状态")
+				config.showStep=config.showStep+1
 			end
 		end
-		if isHasHuangjinlieche==true then
-			self.view.obj_top1:SetActive(false)
-			self.view.obj_top2:SetActive(true)
-			self.view.txt_repeatWin.text=""
-			self.dollarCount=0
-			local pos=self.view.txt_repeatWin.transform.position
-			self:DollarFlyTo(pos)
-		else
-			logError("正常状态")
-			config.showStep=config.showStep+1
-		end
 	end
+	
+
 end
 
 
