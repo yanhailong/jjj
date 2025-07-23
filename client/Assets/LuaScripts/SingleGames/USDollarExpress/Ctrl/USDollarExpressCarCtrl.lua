@@ -152,6 +152,8 @@ function USDollarExpressCarCtrl:SetCarTitle(type)
 		if type==config.TrainColorType.GoldTrain then
 			--self.view.tmp_loading.text="金火车"
 			self.view.obj_gold.gameObject:SetActive(true)
+			local ctrl=CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+			self.view.txt_gold.text=ctrl.dollarCount
 		end
 		self.view.ani:Play("USDollarExpressCar_topchu")
 	end)

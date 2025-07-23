@@ -31,7 +31,7 @@ end
 ---初始化数据
 function UICommonSelectionCtrl:InitData()
 	self.objselects={}
-	for i = 1, 4 do
+	for i = 1, 3 do
 		local go =ComponentUtilGet.GameObject(self.view.transform,"content/obj/select"..i)
 		local item=UICommonSelectionItem.New(go,self)
 		item:SetActive(false)

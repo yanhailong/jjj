@@ -6,7 +6,8 @@ function UICommonSelectionItem:ctor(go,ctrl)
     self.tmp_name=ComponentUtilGet.TextMeshProUGUI(self.transform,"name")
     self.tmp_limitgold=ComponentUtilGet.TextMeshProUGUI(self.transform,"limitgold")
     self.tmp_limitVip=ComponentUtilGet.TextMeshProUGUI(self.transform,"limitVip")
-    self.tmp_pool=ComponentUtilGet.TextMeshProUGUI(self.transform,"pool")
+    self.tmp_pool=ComponentUtilGet.Text(self.transform,"pool")
+    self.txt_bet=ComponentUtilGet.Text(self.transform,"betBase/txt_bet")
     ---@type UICommonSelectionCtrl
     self.ctrl=ctrl
 end
@@ -21,6 +22,7 @@ function UICommonSelectionItem:InitData(wareHouse)
     self.tmp_limitgold.text="limitVipMin:"..wareHouse.limitGoldMin
     self.tmp_limitVip.text="limitVipMin"..wareHouse.limitVipMin
     self.tmp_pool.text="pool"..wareHouse.pool
+    self.txt_bet.text="BET "..0
 end
 
 function UICommonSelectionItem:SetActive(bl)

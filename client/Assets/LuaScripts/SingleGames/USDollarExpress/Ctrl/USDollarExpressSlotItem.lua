@@ -39,7 +39,7 @@ function USDollarExpressSlotItem:SetSprite(icon,index)
     self.img_icon.sprite=icon
     self.img_icon:SetNativeSize()
     self.iconIndex=index
-    if config.gameTypeState==1 then
+    if config.gameTypeState==1 or config.gameTypeState==2 then
         self:SetItemMask(true)
     end
 end
@@ -144,7 +144,9 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                 if self.iconIndex==18 then
                     local txt_dollars=ComponentUtilGet.Text(self.iconEffect.transform,"txt_dollers")
                     txt_dollars.gameObject:SetActive(true)
+                    --ComponentUtilGet.GameObject(dollar.transform,"effect_jinzhuan_trail"):SetActive(false)
                     txt_dollars.text=Tools.numberToStrKM(self.dollarValue)
+                    self:SetDollar(false)
                 end
             end
         else
@@ -163,16 +165,24 @@ function USDollarExpressSlotItem:DollarsFlyTo(pos)
         local txt_dollars=ComponentUtilGet.Text(self.iconEffect.transform,"txt_dollers")
         txt_dollars.gameObject:SetActive(false)
         ---@type  UnityEngine.GameObject
-        local dollar= self.ctrl.objPools:SpawnPrefab(nil, "SingleGames/USDollarExpress/prefabs/txt_dollers","txt_dollers", self.ctrl.view.rootEffects)
+        local dollar= self.ctrl.objPools:SpawnPrefab(nil, "SingleGames/USDollarExpress/prefabs/txt_dollers","txt_dollers", self.ctrl.buttomCtrl.view.effects)
         dollar.transform.position=self.transform.position
         ComponentUtilGet.Text(dollar.transform).text=txt_dollars.text
-        
+        ComponentUtilGet.GameObject(dollar.transform,"effect_jinzhuan_trail"):SetActive(true)
         ---@type DG.Tweening.Tween
         self.twDollars= dollar.transform:DOMove(pos,0.5)
         self.twDollars.onComplete= function
         ()
             self.ctrl.objPools:UnSpawnPrefab(dollar)
             self.ctrl:RefreshRepeatWin(self.dollarValue)
+            CorManager.StartCor(self.ctrl, function
+            ()
+                ---@type  UnityEngine.GameObject
+                local effect_jinzhuan_trail_bd= self.ctrl.objPools:SpawnPrefab(nil, "SingleGames/USDollarExpress/effects/prefab/effect_jinzhuan_trail_bd","effect_jinzhuan_trail_bd", self.ctrl.buttomCtrl.view.effects)
+                effect_jinzhuan_trail_bd.transform.position=self.transform.position
+                coroutine.wait(1.3)
+                self.ctrl.objPools:UnSpawnPrefab(effect_jinzhuan_trail_bd)
+            end)
         end
     end
 end

@@ -67,6 +67,7 @@ end
 
 function USDollarExpressMainModel:ResStartGame(msg)
 	look("收到请求开始游戏返回",msg)
+
 	self:InitCardPos(msg.iconList)
 
 	self.resultLineInfoList=msg.resultLineInfoList		---中奖信息

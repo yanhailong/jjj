@@ -26,7 +26,7 @@ this.TrainColorType={
     BlueTrain=20,--蓝车
     VioletTrain=21,--紫车
     RedTrain=22,--红车
-    GoldTrain=23,--金车
+    GoldTrain=15,--金车
 }
 this.gameTypeState=0--游戏玩法状态
 this.jackPotInfos={}

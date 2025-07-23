@@ -112,7 +112,7 @@ function USDollarExpressMainCtrl:InitData()
 		self.curRollData[i]=0	
 	end
 	self.rollData=self.rollNormalData
-	
+	self.dollarCount=0
 	
 end
 -- 初始化第一批展示用的SlotPics
@@ -253,7 +253,7 @@ function USDollarExpressMainCtrl:ReSetData()
 
 	---默认都转3圈结束转动
 	self.rollCircles={}
-	if config.gameTypeState==1 or config.gameTypeState==2 then
+	if config.gameTypeState==1 or config.gameTypeState==2  then
 		self:SetAllChildItemMask(true)
 		--二选1模式
 		for i = 1,5 do
@@ -482,7 +482,6 @@ function USDollarExpressMainCtrl:HideAllDollars()
 end
 
 ----美元飞到指定位置
-local dollarCount=0
 function USDollarExpressMainCtrl:DollarFlyTo(pos)
 
 	
@@ -494,18 +493,19 @@ function USDollarExpressMainCtrl:DollarFlyTo(pos)
 				coroutine.wait(0.5)
 				item:DollarsFlyTo(pos)
 			end
-
 		end
+		logError("所有的执行完毕！")
+		config.showStep=config.showStep+1
 	end)
 
 end
 
 function USDollarExpressMainCtrl:RefreshRepeatWin(value)
-	dollarCount=dollarCount+value
+	self.dollarCount=self.dollarCount+value
 	if self.model.coinIndexId>0 then
-		self.buttomCtrl.view.txt_win.text=dollarCount
+		self.buttomCtrl.view.txt_win.text=self.dollarCount
 	else
-		self.view.txt_repeatWin.text=dollarCount
+		self.view.txt_repeatWin.text=self.dollarCount
 	end
 
 end
@@ -667,7 +667,7 @@ end
 
 function USDollarExpressMainCtrl:DollarFly()
 	if self.model.coinIndexId>0 then--现金奖励
-		dollarCount=0
+		self.dollarCount=0
 		local pos=self.buttomCtrl.view.txt_win.transform.position
 		self:DollarFlyTo(pos)
 	else
@@ -683,8 +683,9 @@ function USDollarExpressMainCtrl:DollarFly()
 			self.view.obj_top1:SetActive(false)
 			self.view.obj_top2:SetActive(true)
 			self.view.txt_repeatWin.text=""
-			dollarCount=0
+			self.dollarCount=0
 			local pos=self.view.txt_repeatWin.transform.position
+			self:DollarFlyTo(pos)
 		else
 			logError("正常状态")
 			config.showStep=config.showStep+1
@@ -713,14 +714,20 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 			CtrlManager.SingleShow(CtrlNames.USDollarExpressGameSelect,2)
 		end)
 
-	elseif self.model.status==3 then
+	elseif self.model.status==3 then--进入普通列车
 		config.gameTypeState=3
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
 			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
 		end)
-
+	elseif self.model.status==4 then--进入黄金列车
+		config.gameTypeState=4
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(1)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+		end)
 	else
 		self:AddShowStep()
 	end
@@ -747,7 +754,7 @@ function USDollarExpressMainCtrl:EndSmallGame()
 			self.eff_choose_a_freature_bd:SetActive(false)
 			self.model:ReqStartGame()---请求旋转一次
 		end)
-	elseif self.model.status==3 then
+	elseif self.model.status==3 or self.model.status==4 then
 		logError("开火车模式完成！")
 	end
 end

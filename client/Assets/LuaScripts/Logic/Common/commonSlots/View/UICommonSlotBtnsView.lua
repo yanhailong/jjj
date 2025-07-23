@@ -42,6 +42,7 @@ function UICommonSlotBtnsView:InitComponents()
     self.txt_StopNum=ComponentUtilGet.Text(self.transform,"content/buttom/btn_auto/txt_StopNum");
     self.btn_stop_buttom=ComponentUtilGet.Button(self.transform,"content/buttom/btn_stop");
     self.btn_free=ComponentUtilGet.Button(self.transform,"content/buttom/btn_free");
+    self.effects=ComponentUtilGet.Transform(self.transform,"content/buttom/effects")
 end
 
 ---清空组件
