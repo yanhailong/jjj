@@ -44,6 +44,7 @@ function BaccaratRoad:Init(ZhuPanContent,DaLuContent,DaluZiluContent,XiaoLuConte
     self.YueYouLuTable = {};
     self.YueYouLuObjTable = {};
     
+    
     self.ZhuPanContent = ZhuPanContent;
     self.DaLuContent = DaLuContent;
     self.DaluZiluContent = DaluZiluContent;
@@ -72,8 +73,8 @@ function BaccaratRoad:InitData(data,isSettlement)
     end
 end
 ---刷新数据显示
-function BaccaratRoad:RefreshData(data,isFlicker)
-    if(#self.ZhuPanDataTable>=50) then
+function BaccaratRoad:RefreshData(data,isFlicker,IsNewRound)
+    if(IsNewRound) then
         self:CloseLuTable()
     end
     local data2 = {};
@@ -85,7 +86,7 @@ end
 
 ---初始化大路预制体表
 function BaccaratRoad:InitDaLuTable()
-    for i = 1, 240 do
+    for i = 1, 300 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem",self.DaLuContent.transform)
         ---@type BaccaratDaLuItem
         local item = BaccaratDaLuItem.New(obj,self);
@@ -99,7 +100,7 @@ function BaccaratRoad:InitDaLuTable()
 end
 ---初始化大路大眼路预制体表
 function BaccaratRoad:InitDaLuZiLuTable()
-    for i = 1, 240 do
+    for i = 1, 300 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem",self.DaluZiluContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);
@@ -114,7 +115,7 @@ function BaccaratRoad:InitDaLuZiLuTable()
 end
 ---初始化大路大眼路预制体表
 function BaccaratRoad:InitXiaoLuTable()
-    for i = 1, 240 do
+    for i = 1, 300 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem",self.XiaoLuContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);
@@ -129,7 +130,7 @@ function BaccaratRoad:InitXiaoLuTable()
 end
 ---初始化曱甴路预制体表
 function BaccaratRoad:InitYueYouLuTable()
-    for i = 1, 240 do
+    for i = 1, 300 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem",self.YueYouLuContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);
@@ -144,8 +145,9 @@ end
 
 ---刷新主盘路显示
 function BaccaratRoad:RefreshZhuPanShow(data,isFlicker)
-    if(#self.ZhuPanTable==48) then
-        for i = 1, 6 do
+    if(#self.ZhuPanObjTable>=48) then
+        local length = math.floor((#self.ZhuPanObjTable-48)/6) +1;
+        for i = 1, length*6 do
             self.ZhuPanObjTable[i]:SetActive(false);
         end
     end
@@ -444,7 +446,7 @@ function BaccaratRoad:AddYueYouLuTableShow()
         local CurIndex;
         if(#self.YueYouLuDataTable==0) then--刚开始走iao
             ---@type BaccaratAllChildLuItem
-            local item = YueYouLuTable[1];
+            local item = self.YueYouLuTable[1];
             item:RefreshShow(isEqual);
             IsGoL = false;
             dataTable[1] = isEqual;

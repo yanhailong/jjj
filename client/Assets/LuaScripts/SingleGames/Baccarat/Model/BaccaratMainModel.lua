@@ -18,8 +18,8 @@ end
 
 function BaccaratMainModel:AddEvent()
 	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummaryList, self.RespBaccaratTableSummaryList, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummary, self.ResBaccaratTableSummary, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespJoinRoom, self.RespJoinRoom, self)
+	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratTableSummary, self.NotifyBaccaratTableSummary, self)
+	WebNetEvent.AddListener(pb_Baccarat.RespJoinRoomInGame, self.RespJoinRoomInGame, self)
 	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableInfo, self.RespBaccaratTableInfo, self)
 end
 
@@ -52,25 +52,25 @@ function BaccaratMainModel:ReqBaccaratTableSummary(roomId,roundId)
 	look("请求百家乐游戏进入下一个阶段",data)
 	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableSummary,data)
 end
----响应百家乐游戏进入下一个阶段
-function BaccaratMainModel:ResBaccaratTableSummary(data)
-	look("请求百家乐游戏进入下一个阶段",data)
+---通知百家乐游戏进入下一个阶段
+function BaccaratMainModel:NotifyBaccaratTableSummary(data)
+	look("通知百家乐游戏进入下一个阶段",data)
 	self.ctrl:RefreshSelectModel(data)
 end
 ---请求进入百家乐房间
 ---@param roomId 房间ID
 ---@param gameType 游戏类型
 ---@param wareId 场次ID
-function BaccaratMainModel:ReqJoinRoom(roomId,gameType,wareId)
+function BaccaratMainModel:ReqJoinRoomInGame(roomId,gameType,wareId)
 	local data={}
 	data.roomId=roomId;
 	data.gameType=gameType;
 	data.wareId=wareId;
 	look("请求进入百家乐房间",data)
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqJoinRoom,data)
+	WebNetworkManager.SendMsg(pb_Baccarat.ReqJoinRoomInGame,data)
 end
 ---进入百家类房间返回
-function BaccaratMainModel:RespJoinRoom(msg)
+function BaccaratMainModel:RespJoinRoomInGame(msg)
 	if (msg.code == 200) then
 		look("进入百家类房间返回成功")
 		self:ReqBaccaratTableInfo()

@@ -49,11 +49,11 @@ local SelfBetBankerAllNum;
 local SelfBetPlayerAllNum;
 ---自己和区域总共下注了多少筹码
 local SelfBetTieAllNum;
----自己闲对区域总共下注了多少筹码
-local SelfBetBPairAllNum;
----筹码下注的集合表
-local SelfBetPPairAllNum;
 ---自己庄对区域总共下注了多少筹码
+local SelfBetBPairAllNum;
+---自己闲对区域总共下注了多少筹码
+local SelfBetPPairAllNum;
+------筹码下注的集合表
 local ChipTable={};
 ---庄家总共赢了多少局
 local BankerWinNumber;
@@ -84,16 +84,24 @@ local PlayerKingSpine;
 local BankerKingSpine;
 local AlarmClockSpine;--闹钟动画
 --endregion
+---下注的筹码面板集合
+local betInfoList={};
 ---筹码按钮所有子物体的Image集合
 local BottomNoteChildImages={};
----服务器发过来的房间数据
+---服务器发过来的房间桌面的数据
 local BaccaratTableInfo;
+---服务器发过来的场上结算信息
+local BaccaratSettlementInfo;
+---结算时玩家赢的金币值
+local PlayerChangedGolds;
 ---前6名玩家预支体集合
 local BestSixPlayerObjs={}
 ---玩家预支脚本集合
 local BaccaratPlayerItems={}
 ---筹码的集合
 local ChipItems = {};
+---筹码最大显示数量
+local ChipMaxNum = 50;
 
 ---构造函数
 function BaccaratGameCtrl:ctor(ctrlName,param)
@@ -133,7 +141,7 @@ function BaccaratGameCtrl:InitData()
 	
 	
 
-	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform);
+	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform,"SkeletonGraphic (VS)");
 	BeginBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BeginBet.transform);
 	StopBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_StopBet.transform);
 	ResultTieSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_HeWin.transform);
@@ -173,10 +181,6 @@ function BaccaratGameCtrl:InitData()
 		self.view.txt_Countdown.text = countDownTime;
 		if(countDownTime == 3) then
 			Tools.PlayerSpineAniByName(AlarmClockSpine,"action",true)
-		end
-		if(countDownTime<=0) then
-			curGameStage =gameStage.Deal;
-			self:RefreshGameStage();
 		end
 	end,1,countDownTime,true);
 end
@@ -233,12 +237,6 @@ function BaccaratGameCtrl:InitUIShow()
 	self.view.ator_PlayerCard2:Play("InitAnimator")
 	--self.view.ator_PlayerCard3:Play("New State")
 
-	self.view.tmp_SelfBetBankerNum.text = "0.00";
-	self.view.tmp_SelfBetBPairNum.text = "0.00";
-	self.view.tmp_SelfBetPlayerNum.text = "0.00";
-	self.view.tmp_SelfBetPPairNum.text = "0.00";
-	self.view.tmp_SelfBetTieNum.text = "0.00";
-
 	self.view.tmp_BankerBetNum.text = "0.00";
 	self.view.tmp_PlayerBetNum.text = "0.00";
 	self.view.tmp_PPairBetNum.text = "0.00";
@@ -254,34 +252,64 @@ function BaccaratGameCtrl:RefreshSelfBetNumShow()
 	self.view.obj_SelfBetTie:SetActive(SelfBetTieAllNum~=0);
 	self.view.obj_SelfBetBPair:SetActive(SelfBetBPairAllNum~=0);
 	self.view.obj_SelfBetPPair:SetActive(SelfBetPPairAllNum~=0);
+	self.view.tmp_SelfBetBankerNum.text = SelfBetBankerAllNum
+	self.view.tmp_SelfBetBPairNum.text = SelfBetBPairAllNum;
+	self.view.tmp_SelfBetPlayerNum.text = SelfBetPlayerAllNum;
+	self.view.tmp_SelfBetPPairNum.text = SelfBetPPairAllNum;
+	self.view.tmp_SelfBetTieNum.text = SelfBetTieAllNum;
 	
 end
+
 ---首次进入游戏刷新显示
 function BaccaratGameCtrl:FirstEntryGame(data)
-	self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == 5);
+	self.GamePhase = data.gamePhase;--游戏阶段信息
+	self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
+	betInfoList = data.betInfoList;
+	BaccaratTableInfo = data.baccaratTableInfo;
+	BaccaratSettlementInfo	 = data.baccaratSettlementInfo;
+	PlayerChangedGolds = data.playerChangedGolds;
 	--初始化筹码
-	for i = 1, #data.betInfoList do
+	for i = 1, #betInfoList do
 		local item =self.objPools:Spawn(nil,self.view.obj_chipItem,self.view.obj_ChipContent.transform)
 		item:SetActive(true);
 		---@type BaccaratChipItems
 		local chipItem = BaccaratChipItems.New(item,self);
-		chipItem:InitUIShow(i,data.betInfoList[i]);
+		chipItem:InitUIShow(i,betInfoList[i]);
 		table.insert(ChipItems,chipItem);
 	end
-	self:RefreshDataShow(data);
+	self:RefreshDataShow();
+	self:InitTableAreaInfos();
+end
+---推送百家乐通知新的一局开始
+function BaccaratGameCtrl:NotifyBaccaratRoundStart(data)
+	BaccaratTableInfo = data.baccaratTableInfo
+	self.GamePhase="START_GAME";
+	curGameStage = gameStage.Begin;
+	self:RefreshGameStage()
+	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
+end
+---推送百家乐结算信息
+function BaccaratGameCtrl:NotifyBaccaratSettlementInfo(data)
+	BaccaratSettlementInfo = data.baccaratSettlementInfo
+	BaccaratTableInfo = data.baccaratTableInfo
+	PlayerChangedGolds = data.playerChangedGolds;
+	curGameStage =gameStage.Deal;
+	self:RefreshGameStage();
+end
+---通知押注类房间玩家信息变化
+function BaccaratGameCtrl:NotifyTableRoomPlayerInfoChange(data)
+	BaccaratTableInfo = data.tableChangedPlayerInfos;
+	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
 end
 
 ---服务器数据返回刷新阶段显示
-function BaccaratGameCtrl:RefreshDataShow(data)
-	BaccaratTableInfo = data;
-	self.GamePhase = data.gamePhase;--游戏阶段信息
-	local ServerTime = ServerTimeSync:GetTimeStamp()
-	if(self.GamePhase==0) then--开始阶段
+function BaccaratGameCtrl:RefreshDataShow()
+	if(self.GamePhase=="START_GAME") then--开始阶段
 		curGameStage = gameStage.Begin;
-	elseif(self.GamePhase == 1) then --下注阶段
-		countDownTime =BaccaratTableInfo.baccaratTableInfo.tableCountDownTime - ServerTime;
+	elseif(self.GamePhase == "BET") then --下注阶段
 		curGameStage = gameStage.Bet;
-	elseif(self.GamePhase == 5) then --结算阶段
+	elseif(self.GamePhase == "GAME_ROUND_OVER_SETTLEMENT") then --结算阶段
+		local ServerTime = ServerTimeSync:GetTimeStamp()/1000
 		local endCountDown = BaccaratTableInfo.baccaratTableInfo.tableCountDownTime - ServerTime;
 		if(BaccaratTableInfo.baccaratTableInfo.totalTime == endCountDown) then --需要展示发牌
 			curGameStage = gameStage.Deal
@@ -290,14 +318,69 @@ function BaccaratGameCtrl:RefreshDataShow(data)
 		end
 	end
 	self:RefreshGameStage()
-	self:RefreshPlayerInfo(data.baccaratTableInfo.tablePlayerInfoList);
+	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
 end
 
 ---第一次进入游戏初始化区域下注信息
-function BaccaratGameCtrl:InitTableAreaInfos(tableAreaInfos)
-	for i, v in ipairs(tableAreaInfos) do
-		
+function BaccaratGameCtrl:InitTableAreaInfos()
+	local targetRect;
+	--下注区域，1: 庄对 2: 和 3: 闲对 4: 闲 5: 庄
+	for _, v in ipairs(BaccaratTableInfo.tableAreaInfos) do
+		if(v.betIdx==config.BetState.BPair) then --庄对
+			targetRect = self.view.obj_BetBPairRegion.transform:GetComponent("RectTransform")
+			self.view.tmp_BPairBetNum.text =  v.betIdxTotal;
+			SelfBetBPairAllNum =v.playerBetTotal;
+		elseif(v.betIdx==config.BetState.Tie) then --和
+			targetRect = self.view.obj_BetTieRegion.transform:GetComponent("RectTransform")
+			self.view.tmp_TieBetNum.text = v.betIdxTotal;
+			SelfBetTieAllNum =v.playerBetTotal;
+		elseif(v.betIdx==config.BetState.PPair) then --闲对
+			targetRect = self.view.obj_BetPPairRegion.transform:GetComponent("RectTransform")
+			self.view.tmp_PPairBetNum.text =  v.betIdxTotal;
+			SelfBetPPairAllNum =v.playerBetTotal;
+		elseif(v.betIdx==config.BetState.Player) then --闲
+			targetRect = self.view.obj_BetPlayerRegion.transform:GetComponent("RectTransform")
+			self.view.tmp_PlayerBetNum.text = v.betIdxTotal;
+			SelfBetPlayerAllNum =v.playerBetTotal;
+		elseif(v.betIdx==config.BetState.Banker) then --庄
+			targetRect = self.view.obj_BetBankerRegion.transform:GetComponent("RectTransform");
+			self.view.tmp_BankerBetNum.text = v.betIdxTotal;
+			SelfBetBankerAllNum =v.playerBetTotal;
+		end
+		for _, k in ipairs(v.betGoldList) do
+			local chipIndex = 0;
+			for _, j in pairs(ChipItems) do
+				---@type BaccaratChipItems
+				local item = j;
+				if(item:IsSelf(k)) then
+					chipIndex = item.index;
+					break
+				end
+			end
+			self:DirectGenerationChip(chipIndex,targetRect,k)
+		end
 	end
+	self:RefreshSelfBetNumShow();
+end
+---直接生成筹码到对应区域
+function BaccaratGameCtrl:DirectGenerationChip(chipIndex,targetRect,betIdxTotal)
+	if(#ChipTable>=ChipMaxNum) then -- 超过配置显示的数量后就不显示了
+		return
+	end
+	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,"BaccaratChip_"..chipIndex)
+	chip:SetActive(true)
+	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = betIdxTotal;
+	chip.transform:SetParent(targetRect.transform,false)
+	chip.transform.localScale =  Vector3.one*0.5
+	local corners = CS.System.Array.CreateInstance(typeof(Vector3),4)
+	targetRect:GetWorldCorners(corners)
+	--目标位置
+	local endPos= Vector3(UnityEngine.Random.Range(corners[0].x,corners[2].x), UnityEngine.Random.Range(corners[0].y,corners[2].y), 0)
+	chip.transform.position = endPos;
+	local chipNumTable = {}
+	chipNumTable.betIdxTotal = betIdxTotal;
+	chipNumTable.chip = chip;
+	table.insert(ChipTable,chipNumTable);
 end
 
 ---刷新前6的玩家显示
@@ -330,6 +413,8 @@ end
 
 ---进入开始阶段(显示VS)
 function BaccaratGameCtrl:EnterBegin()
+	local ServerTime = ServerTimeSync:GetTimeStamp()/1000
+	countDownTime =BaccaratTableInfo.baccaratTableInfo.tableCountDownTime/1000 - ServerTime;
 	self.view.obj_Countdown:SetActive(false);
 	self.view.obj_VS:SetActive(true);
 	Tools.PlayerSpineAniByName(vsSpine,"action",false)
@@ -520,26 +605,103 @@ function BaccaratGameCtrl:PlayResult(playerCardNum,BankerCardNum)
 	end
 	self:Flicker(playerCardNum,BankerCardNum);
 	coroutine.wait(3);
-	for _, v in ipairs(ChipTable)  do
-		self:PlayChipToPlayer(v)
-	end
+	self:PlayChipToPlayer()
 	BetRecord = CurBet;
 	coroutine.wait(2);
 	self:InitUIShow()
 	RoundNumber = RoundNumber+1;
 	self:RefreshUIDataShow()
-	self.BaccaratRoadScripts:RefreshData(BaccaratTableInfo.baccaratSettlementInfo.cardState,true)
+	self.BaccaratRoadScripts:RefreshData(BaccaratSettlementInfo.cardState,true,false)
 end
+
 ---飞筹码到对应玩家头像上
-function BaccaratGameCtrl:PlayChipToPlayer(chip)
-	self.PlayChipToPlayerSequence = chip.transform:DOMove(self.view.obj_Player.transform.position, 0.5);
+function BaccaratGameCtrl:PlayChipToPlayer()
+	---自己赢了多少金币（包含自己下注的）
+	local betInfoDescendingList =betInfoList;
+	table.sort(betInfoDescendingList, function(a, b) return a > b end);
+	
+	for _, v in ipairs(PlayerChangedGolds) do
+		if(v.playerId == PlayerInfo.playerId) then--自己赢钱了
+			local selfWinGold = v.playerWinGold+v.playerBetGold
+			self:ScreeningChip(betInfoDescendingList,selfWinGold,self.view.obj_Player.transform.position)
+		elseif(self:IsInScene(v.playerId)) then --前6名的玩家赢钱了
+			for _, k in pairs(BaccaratPlayerItems) do
+				---@type BaccaratPlayerItem
+				local item = k;
+				if(item:GetPlayerId() == v.playerId) then
+					local winGold = v.playerWinGold+v.playerBetGold
+					self:ScreeningChip(betInfoDescendingList,winGold,item.transform.position)
+				end
+			end
+		else
+			for _, value in pairs(ChipTable) do
+				self:PlayChipToPlayerTwo(value.chip,self.view.btn_AllOther.transform.position)
+			end
+		end
+	end
+	ChipTable = {}
+end
+---筛选筹码r
+function BaccaratGameCtrl:ScreeningChip(list,winGold,pos)
+	local result = self:GetChipAndNum(list,winGold);
+	local selfChip={}
+	for value, count in pairs(result) do
+		if(count>0) then
+			for j = 1, count do
+				local chip =self:FindChipNumObj(value)
+				table.insert(selfChip,chip);
+			end
+		end
+	end
+	for _, chipObj in pairs(selfChip) do
+		self:PlayChipToPlayerTwo(chipObj,pos)
+	end
+end
+
+---获取某个玩家需要回收多少筹码和数量
+function BaccaratGameCtrl:GetChipAndNum(betList,winGold)
+	local Result = {}
+	for _, value in ipairs(betList) do
+		Result[value] = math.floor(winGold / value)
+		winGold = winGold % value
+	end
+	return Result;
+end
+---飞筹码到对应玩家身上
+function BaccaratGameCtrl:PlayChipToPlayerTwo(chip,pos)
+	if(chip==nil) then
+		return;
+	end
+	self.PlayChipToPlayerSequence = chip.transform:DOMove(pos, 0.5);
 	self.PlayChipToPlayerSequence:SetEase(Ease.Linear)
 	-- 动画完成后回收筹码
 	self.PlayChipToPlayerSequence:OnComplete(function()
 	    --回收筹码
 		self.objPools:UnSpawnPrefab(chip)
-		chip = nil;
 	end)
+end
+---通过筹码数量找到场上下注的筹码预支体返回去
+function BaccaratGameCtrl:FindChipNumObj(num)
+	for i, v in ipairs(ChipTable) do
+		if(v.betIdxTotal == num) then
+			local chip =  v.chip;
+			table.remove(ChipTable,i);
+			return chip
+		end
+	end
+	return nil;
+end
+
+---判断玩家是不是在场上（前6名）
+function BaccaratGameCtrl:IsInScene(playerId)
+	for _, v in pairs(BaccaratPlayerItems) do
+		---@type BaccaratPlayerItem
+		local item = v;
+		if(item:GetPlayerId() == playerId) then
+			return true
+		end
+	end
+	return false
 end
 
 ---闪烁对应区域
@@ -725,8 +887,10 @@ function BaccaratGameCtrl:PlayChip(data,playerId)
 		end
 		chip.transform.position = player.transform.position;
 	end
-	
-	table.insert(ChipTable,chip);
+	local chipNumTable = {}
+	chipNumTable.betIdxTotal = data.betIdxTotal;
+	chipNumTable.chip = chip;
+	table.insert(ChipTable,chipNumTable);
 	-- 获取目标区域的矩形顶点
 	local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)
 	targetRect:GetWorldCorners(corners)

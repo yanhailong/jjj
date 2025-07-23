@@ -8,7 +8,7 @@ function NetworkPing:ctor(connect)
     ---@type WebNetworkManager
     self.connect = connect;
     self.sendTime = nil;
-
+    ServerTimeSync:Init()
     WebNetEvent.AddListener(pb_PlatformHall.ResHeartBeat, self.ResHeartBeat, self)
     self.timer = TimerManager.CreateTimer(self, function()
         self:SendPing();

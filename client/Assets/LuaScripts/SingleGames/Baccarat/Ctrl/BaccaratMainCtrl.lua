@@ -45,16 +45,19 @@ function BaccaratMainCtrl:InitSelectModel(data)
 		---@type BaccaratItemScripts
 		local item = BaccaratItemScripts.New(obj,self)
 		item:InitDataShow(i,v);
-		table.insert(BaccaratItem[v.roomId],item)
+		local itemData = {}
+		itemData.item = item;
+		itemData.roomId = v.roomId;
+		table.insert(BaccaratItem,itemData)
 	end
 end
 ---刷新单个显示
 function BaccaratMainCtrl:RefreshSelectModel(data)
-	for i, v in pairs(BaccaratItem) do
-		if(i == data.roomId) then
+	for _, v in pairs(BaccaratItem) do
+		if(v.roomId == data.tableSummary.baccaratBaseInfo.roomId) then
 			---@type BaccaratItemScripts
-			local item = v;
-			item:RefreshDataShow(data)
+			local item = v.item;
+			item:RefreshDataShow(data.tableSummary)
 		end
 	end
 end
@@ -88,9 +91,9 @@ end
 ---销毁UI
 function BaccaratMainCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
-	for i, v in ipairs(BaccaratItem) do
+	for _, v in pairs(BaccaratItem) do
 		---@type BaccaratItemScripts
-		local item =v;
+		local item =v.item;
 		item:Destroy();
 	end
 	BaccaratItem = {}

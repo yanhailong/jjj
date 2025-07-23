@@ -3,8 +3,7 @@ ServerTimeSync = {}
 
 function ServerTimeSync:Init()
     self.curTimeStamp = Util.GetTimeStamp()--默认获取本地
-    TimerManager.StartTimer(self, function
-    ()
+    TimerManager.StartTimer(self, function ()
         self:UpdateSecond()
     end, 1, -1, true)
 end

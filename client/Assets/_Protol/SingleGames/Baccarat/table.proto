@@ -6,7 +6,8 @@ message BaccaratBaseInfo {
   int32 totalCardNum = 4;  //总的牌数量
   EGamePhase eGamePhase = 5;  //游戏阶段信息
   int32 phaseTotalTime = 6;  //阶段总时间
-  int32 phaseRemainingTime = 7;  //阶段剩余时间
+  int64 phaseEndTimestamp = 7;  //阶段结束时间戳
+  int64 serverCurrentTime = 8;  //服务器当前时间
 }
 
 //百家乐牌型状态
@@ -19,6 +20,7 @@ message BaccaratCardState {
 message BaccaratPlayerChangedGold {
   int64 playerId = 1;  //玩家ID
   int64 playerWinGold = 2;  //玩家场上赢的金币
+  int64 playerBetGold = 3;  //玩家场上下注金币
 }
 
 //百家乐结算信息
@@ -66,6 +68,7 @@ message BetTableInfo {
   int64 playerBetTotal = 2;  //玩家总押注
   int64 betIdxTotal = 3;  //区域下标的总的押注数量
   int64 betValue = 4;  //玩家此次下注的金币数量
+  repeated int32 betGoldList = 5;  //区域押注金币列表
 }
 
 //牌桌玩家信息
@@ -79,11 +82,12 @@ message TablePlayerInfo {
   int32 winCount = 7;  //近20局赢的总局数
 }
 
-//请求,msgID=0x5082,desc=
+//响应,msgID=0x5082,desc=通知房间进入
 message NotifyRoomReadyWait {
   enum E_MsgID {def = 0; msgID = 20610;};
-  int64 roomId = 1;  //房间ID
-  int64 waitEndTime = 2;  //等待时间结束的时间戳
+  int32 code = 1;  //状态码
+  int64 roomId = 2;  //房间ID
+  int64 waitEndTime = 3;  //等待时间结束的时间戳
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
@@ -104,7 +108,15 @@ message ReqBaccaratTableInfo {
   enum E_MsgID {def = 0; msgID = 98308;};
 }
 
-//请求,msgID=0x18081,desc=断线重连 通知玩家百家乐牌桌信息
+//请求,msgID=0x18005,desc=在游戏中请求加入房间
+message ReqJoinRoomInGame {
+  enum E_MsgID {def = 0; msgID = 98309;};
+  int64 roomId = 1;  //房间ID
+  int32 gameType = 2;  //游戏类型
+  int32 wareId = 3;  //场次id
+}
+
+//响应,msgID=0x18081,desc=断线重连 通知玩家百家乐牌桌信息
 message NotifyBaccaratTableInfo {
   enum E_MsgID {def = 0; msgID = 98433;};
   EGamePhase gamePhase = 1;  //场上阶段信息
@@ -114,21 +126,21 @@ message NotifyBaccaratTableInfo {
   BaccaratSettlementInfo baccaratSettlementInfo = 5;  //场上结算信息，如果场上阶段不为结算，此值为空
 }
 
-//请求,msgID=0x18082,desc=返回房间摘要信息
+//响应,msgID=0x18082,desc=返回房间摘要信息
 message RespBaccaratTableSummaryList {
   enum E_MsgID {def = 0; msgID = 98434;};
   int32 code = 1;  //状态码
   repeated BaccaratTableSummary tableSummaryList = 2;  //房间摘要列表
 }
 
-//请求,msgID=0x18083,desc=返回房间单条摘要信息
-message RespBaccaratTableSummary {
+//响应,msgID=0x18083,desc=返回房间单条摘要信息
+message NotifyBaccaratTableSummary {
   enum E_MsgID {def = 0; msgID = 98435;};
   int32 code = 1;  //状态码
   BaccaratTableSingleRes tableSummary = 2;  //房间单条摘要信息
 }
 
-//请求,msgID=0x18084,desc=返回百家乐桌上信息 首次进入
+//响应,msgID=0x18084,desc=返回百家乐桌上信息 首次进入
 message RespBaccaratTableInfo {
   enum E_MsgID {def = 0; msgID = 98436;};
   int32 code = 1;  //状态码
@@ -140,14 +152,14 @@ message RespBaccaratTableInfo {
   repeated int32 betInfoList = 7;  //压分列表
 }
 
-//请求,msgID=0x18085,desc=百家乐通知新的一局开始
+//响应,msgID=0x18085,desc=百家乐通知新的一局开始
 message NotifyBaccaratRoundStart {
   enum E_MsgID {def = 0; msgID = 98437;};
   int32 code = 1;  //状态码
   BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
 }
 
-//请求,msgID=0x18086,desc=百家乐结算信息
+//响应,msgID=0x18086,desc=百家乐结算信息
 message NotifyBaccaratSettlementInfo {
   enum E_MsgID {def = 0; msgID = 98438;};
   int32 code = 1;  //状态码
@@ -156,18 +168,17 @@ message NotifyBaccaratSettlementInfo {
   repeated BaccaratPlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
 }
 
+//响应,msgID=0x18087,desc=在游戏中返回加入房间
+message RespJoinRoomInGame {
+  enum E_MsgID {def = 0; msgID = 98439;};
+  int32 code = 1;  //状态码
+  int32 roomCfgId = 2;  //房间配置ID
+}
+
 //请求,msgID=0x20001,desc=请求下注
 message ReqBet {
   enum E_MsgID {def = 0; msgID = 131073;};
   repeated ReqBetBean reqBetBeans = 1;  //请求押注和续押
-}
-
-//请求,msgID=0x20002,desc=在游戏中请求加入房间
-message ReqJoinRoom {
-  enum E_MsgID {def = 0; msgID = 131074;};
-  int64 roomId = 1;  //房间ID
-  int32 gameType = 2;  //游戏类型
-  int32 wareId = 3;  //场次id
 }
 
 //请求,msgID=0x20003,desc=请求获取百人牌桌的玩家信息
@@ -175,7 +186,7 @@ message ReqTablePlayerInfo {
   enum E_MsgID {def = 0; msgID = 131075;};
 }
 
-//请求,msgID=0x20081,desc=请求下注返回
+//响应,msgID=0x20081,desc=请求下注返回
 message NotifyPlayerBet {
   enum E_MsgID {def = 0; msgID = 131201;};
   int32 code = 1;  //状态码
@@ -184,17 +195,18 @@ message NotifyPlayerBet {
   repeated BetTableInfo betTableInfoList = 4;  //玩家押注信息列表
 }
 
-//请求,msgID=0x20082,desc=在游戏中返回加入房间
-message RespJoinRoom {
-  enum E_MsgID {def = 0; msgID = 131202;};
-  int32 code = 1;  //状态码
-  int32 roomCfgId = 2;  //房间配置ID
-}
-
-//请求,msgID=0x20083,desc=返回百人牌桌玩家列表的下注信息
+//响应,msgID=0x20083,desc=返回百人牌桌玩家列表的下注信息
 message RespTablePlayerInfo {
   enum E_MsgID {def = 0; msgID = 131203;};
   int32 code = 1;  //状态码
   repeated TablePlayerInfo tablePlayerInfo = 2;  //百人牌桌的玩家信息
+}
+
+//请求,msgID=0x20088,desc=通知押注类房间玩家信息变化
+message NotifyTableRoomPlayerInfoChange {
+  enum E_MsgID {def = 0; msgID = 131208;};
+  int32 code = 1;  //状态码
+  int64 changedPlayerId = 2;  //产生变化的玩家ID
+  repeated TablePlayerInfo tableChangedPlayerInfos = 3;  //变化后的场上玩家信息
 }
 
