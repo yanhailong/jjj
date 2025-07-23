@@ -1,12 +1,18 @@
-syntax = "proto3";
-
-//每个场次配置信息
+syntax = "proto3";//每个场次配置信息
 message WareHouseConfigInfo {
-  int32 wareId = 1;  //场次id
+  int32 wareId = 1;  //场次ID
   string name = 2;  //场次名称
   int64 pool = 3;  //奖池
   int32 limitVipMin = 4;  //进入vip最低等级
   int64 limitGoldMin = 5;  //进入最低金币数量
+  int64 defaultBet = 6;  //默认押注
+}
+
+//游戏列表配置
+message GameListConfig {
+  int32 sid = 1;  //配置id
+  string name = 2;  //名称
+  int32 status = 3;  //状态  0.开启  1.维护  2.关闭 
 }
 
 //请求,msgID=0x6003,desc=请求进入游戏
@@ -54,22 +60,3 @@ message ResLogin {
   repeated GameListConfig gameList = 7;  //游戏列表
 }
 
-message GameListConfig {
-  int32 sid = 1;  //配置id
-  string name = 2;
-  int32 status = 3;  //状态  0.开启  1.维护  2.关闭
-}
-
-//请求,msgID=0x6007
-message ReqJoinRoom {
-  enum E_MsgID {def = 0; msgID = 24583;};
-  int64 roomId = 1;  //房间ID
-  int32 gameType = 2;  //游戏类型
-  int32 wareId = 3;  //场次id
-}
-
-//请求,msgID=0x6008
-message RespJoinRoom {
-  enum E_MsgID {def = 0; msgID = 24584;};
-  int32 code = 1;  //状态码
-}

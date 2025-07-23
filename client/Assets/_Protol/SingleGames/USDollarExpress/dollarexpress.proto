@@ -3,7 +3,7 @@ message DollarsInfo {
   int32 coinIndexId = 1;  //美元符号图标坐标，如果有正确坐标，则说明触发了美元现金奖励
   repeated int32 dollarIndexIds = 2;  //钞票坐标
   repeated int64 dollarValueList = 3;  //钞票金额
-  int32 goldTrainCount = 4;  //黄金列车车厢节数
+  repeated int32 collectDollarIndexIds = 4;  //可收集的钞票坐标
 }
 
 //奖池信息

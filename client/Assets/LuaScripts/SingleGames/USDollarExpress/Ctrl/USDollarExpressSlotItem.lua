@@ -146,7 +146,7 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     txt_dollars.gameObject:SetActive(true)
                     --ComponentUtilGet.GameObject(dollar.transform,"effect_jinzhuan_trail"):SetActive(false)
                     txt_dollars.text=Tools.numberToStrKM(self.dollarValue)
-                    self:SetDollar(false)
+                    self.objDollers:SetActive(false)
                 end
             end
         else
@@ -179,7 +179,7 @@ function USDollarExpressSlotItem:DollarsFlyTo(pos)
             ()
                 ---@type  UnityEngine.GameObject
                 local effect_jinzhuan_trail_bd= self.ctrl.objPools:SpawnPrefab(nil, "SingleGames/USDollarExpress/effects/prefab/effect_jinzhuan_trail_bd","effect_jinzhuan_trail_bd", self.ctrl.buttomCtrl.view.effects)
-                effect_jinzhuan_trail_bd.transform.position=self.transform.position
+                effect_jinzhuan_trail_bd.transform.position=pos
                 coroutine.wait(1.3)
                 self.ctrl.objPools:UnSpawnPrefab(effect_jinzhuan_trail_bd)
             end)
