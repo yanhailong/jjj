@@ -21,5 +21,5 @@ end
 
 function PlayerManager:SetPlayerInfo(playerInfo)
     self.playerInfo=playerInfo
-    GlobalEvent.Dispatch(PlayerInfoEvent.playerInfoChange,self.playerInfo)
+    GlobalEvent.Notify(PlayerInfoEvent.playerInfoChange,self.playerInfo)
 end
