@@ -103,7 +103,7 @@ this.ABNames={
         [this.TrainColorType.RedTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/red",
         [this.TrainColorType.GoldTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/yellow",
     },
-    iconEffect="SingleGames/USDollarExpress/effects/prefab",
+    iconEffect="SingleGames/USDollarExpress/effects/chess",
     smallKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_small_liuguang",
     bigKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_su_liuguang",
     audios="SingleGames/USDollarExpress/audio/"

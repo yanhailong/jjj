@@ -91,6 +91,7 @@ public static class GenConfig
             typeof(UnityEngine.WaitForSecondsRealtime),
             typeof(UnityEngine.EventSystems.PointerEventData),
             typeof(UnityEngine.EventSystems.BaseEventData),
+            typeof(Animator),
             typeof(AssetManager),
             typeof(LocalData),
             typeof(Util),

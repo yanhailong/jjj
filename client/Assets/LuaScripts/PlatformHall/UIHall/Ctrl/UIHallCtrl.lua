@@ -40,8 +40,8 @@ function UIHallCtrl:AddUIEvent()
 	GlobalEvent.AddListener(PlayerInfoEvent.playerInfoChange,self.RefreshPlayerShow,self)
 	self.uiEventListener:AddClick(self.view.btn_shop, function
 	()
-		require("PlatformHall/UITestScroll/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.UITestScroll)
+		--require("PlatformHall/UITestScroll/MVCHead")
+		--CtrlManager.SingleShow(CtrlNames.UITestScroll)
 	end)
 	
 	self.isShowAll=false

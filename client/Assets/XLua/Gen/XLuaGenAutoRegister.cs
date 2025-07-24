@@ -245,6 +245,9 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(UnityEngine.EventSystems.BaseEventData), UnityEngineEventSystemsBaseEventDataWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(UnityEngine.Animator), UnityEngineAnimatorWrap.__Register);
+        
+        
             translator.DelayWrapLoader(typeof(AssetManager), AssetManagerWrap.__Register);
         
         
@@ -328,13 +331,13 @@ namespace XLua.CSObjectWrap
         
             translator.DelayWrapLoader(typeof(DG.Tweening.DOTweenCYInstruction.WaitForPosition), DGTweeningDOTweenCYInstructionWaitForPositionWrap.__Register);
         
-        
-            translator.DelayWrapLoader(typeof(DG.Tweening.DOTweenCYInstruction.WaitForStart), DGTweeningDOTweenCYInstructionWaitForStartWrap.__Register);
-        
         }
         
         static void wrapInit2(LuaEnv luaenv, ObjectTranslator translator)
         {
+        
+            translator.DelayWrapLoader(typeof(DG.Tweening.DOTweenCYInstruction.WaitForStart), DGTweeningDOTweenCYInstructionWaitForStartWrap.__Register);
+        
         
             translator.DelayWrapLoader(typeof(DG.Tweening.DOTweenModuleUtils.Physics), DGTweeningDOTweenModuleUtilsPhysicsWrap.__Register);
         
@@ -485,13 +488,13 @@ namespace XLua.CSObjectWrap
         
             translator.DelayWrapLoader(typeof(DG.Tweening.Plugins.Options.Vector3ArrayOptions), DGTweeningPluginsOptionsVector3ArrayOptionsWrap.__Register);
         
-        
-            translator.DelayWrapLoader(typeof(DG.Tweening.Plugins.Options.NoOptions), DGTweeningPluginsOptionsNoOptionsWrap.__Register);
-        
         }
         
         static void wrapInit3(LuaEnv luaenv, ObjectTranslator translator)
         {
+        
+            translator.DelayWrapLoader(typeof(DG.Tweening.Plugins.Options.NoOptions), DGTweeningPluginsOptionsNoOptionsWrap.__Register);
+        
         
             translator.DelayWrapLoader(typeof(DG.Tweening.Plugins.Options.ColorOptions), DGTweeningPluginsOptionsColorOptionsWrap.__Register);
         

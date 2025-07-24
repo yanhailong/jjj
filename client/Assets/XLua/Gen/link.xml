@@ -87,6 +87,7 @@
 
 	<assembly fullname="UnityEngine.AnimationModule">
 	    <type fullname="UnityEngine.AnimationClip" preserve="all"/>
+		<type fullname="UnityEngine.Animator" preserve="all"/>
 		
 	</assembly>
 

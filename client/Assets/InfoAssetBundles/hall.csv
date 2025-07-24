@@ -14,3 +14,7 @@ lang_english.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/alats/lang_en
 main.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/alats/main,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\alats\main,AssetBundle
 uilogin.unity3d,file,Assets/AssetsPackage/PlatformHall/UILogin/Prefabs/UILogin.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\Prefabs\UILogin.prefab,AssetBundle
 texture.unity3d,dir,Assets/AssetsPackage/PlatformHall/UILogin/texture,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UILogin\texture,AssetBundle
+alats.unity3d,dir,Assets/AssetsPackage/PlatformHall/UICommonSelection/alats,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UICommonSelection\alats,AssetBundle
+fonts.unity3d,dir,Assets/AssetsPackage/PlatformHall/UICommonSelection/fonts,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UICommonSelection\fonts,AssetBundle
+texture.unity3d,dir,Assets/AssetsPackage/PlatformHall/UICommonSelection/texture,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UICommonSelection\texture,AssetBundle
+uigm.unity3d,file,Assets/AssetsPackage/PlatformHall/UIHall/Prefabs/UIGM.prefab,D:\WorkSpcae\gameclient\client\Assets\AssetsPackage\PlatformHall\UIHall\Prefabs\UIGM.prefab,AssetBundle
