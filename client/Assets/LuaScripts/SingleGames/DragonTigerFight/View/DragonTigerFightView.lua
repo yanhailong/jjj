@@ -52,10 +52,7 @@ function DragonTigerFightView:InitComponents()
     self.xiazhuSelfNumsLabels[1] = ComponentUtilGet.TextMeshProUGUI(self.longClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[2] = ComponentUtilGet.TextMeshProUGUI(self.huClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[3] = ComponentUtilGet.TextMeshProUGUI(self.heClickArea,"yazhuNum/num")
-    
-    self.debugTxt = ComponentUtilGet.TextMeshProUGUI(self.transform,"content/top/debug/txt")
-    self.debugTime = ComponentUtilGet.TextMeshProUGUI(self.transform,"content/top/debug/time")
-    
+
     ---下注底注按钮
     self.chipInfos={}
     local ChouMaItem = ComponentUtilGet.GameObject(self.dizhu,"ChouMaItem")
@@ -407,6 +404,58 @@ function DragonTigerFightView:SettingFade()
     
 end
 
+function DragonTigerFightView:ResultStageTimer(stage)
+    if self.resultTimer then
+        TimerManager.StopTimer(self,self.resultTimer)
+        self.resultTimer = nil
+    end
+    self.resultTimer = TimerManager.StartTimer(self,function() 
+        self:ResultStage(stage)
+        if stage<#config.ResultStageTime then
+            self:ResultStageTimer(stage+1)
+        end
+    end,config.ResultStageTime[stage],0,false)
+end
+
+function DragonTigerFightView:ResultStage(stage)
+    local result = self.ctrl.model.Result
+    
+    if stage == 1 then --正在結算
+        self.tipsCenterTxt.gameObject:SetActive(true)
+    elseif stage == 2 then--开牌
+        self.tipsTimeEnd:SetActive(false)
+        self.resultCard1:ShowFront()
+    elseif stage == 3 then--开牌
+        self.resultCard2:ShowFront()
+    elseif stage == 4 then
+        if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
+            self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
+        elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
+            self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
+        else
+            self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
+        end
+        --结果动画
+    elseif stage==5 then
+        self.resultWinTrs.gameObject:SetActive(false)
+        ---金币回收动画
+        self:PlayCompeleCoinFLy(result.playerSettleInfos)
+        --- 更新获奖玩家金币
+        self:UpdatePlayers(result.playerInfos)
+        ---更新状态
+        self:OnGameStatus(4)
+    elseif stage==6 then
+        self.resultCard1:Hiden()
+        self.resultCard2:Hiden()
+        self.tipsCenterTxt.gameObject:SetActive(false)
+    elseif stage==7 then
+        self.resultTrs.gameObject:SetActive(false)
+        self.resultBgTrs.gameObject:SetActive(false)
+        -- 更新路信息
+        self:UpdateRoleView(self.ctrl.model.history)
+    end
+end
+
 ---显示牌面结果和播放动画
 function DragonTigerFightView:ResultEffect(result)
     local cards = {result.loongCard,result.tigerCard}
@@ -427,56 +476,63 @@ function DragonTigerFightView:ResultEffect(result)
     --等待开牌
     self.resultCard1:Approach(p2,p1)
     self.resultCard2:Approach(Vector3(-p2.x,p2.y),Vector3(-p1.x,p1.y))
-    --TimerManager.StopAllTimer(self)
-    TimerManager.StartTimer(self, function
-    ()
-        --正在結算
-        self.tipsCenterTxt.gameObject:SetActive(true)
-    end, 1, 0, true)
-    TimerManager.StartTimer(self, function
-    ()
-        self.tipsTimeEnd:SetActive(false)
-        --开牌
-        self.resultCard1:ShowFront()
-    end, 2, 0, true)
-    TimerManager.StartTimer(self, function
-    ()
-        self.resultCard2:ShowFront()
-    end, 3, 0, true)
-    --结果
-    TimerManager.StartTimer(self, function
-    ()
-        if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
-            self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
-        elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
-            self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
-        else
-            self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
-        end
-        --结果动画
-        
-    end, 4, 0, true)
+    self:ResultStageTimer(1)
     
-    TimerManager.StartTimer(self, function
-    ()
-        self.resultWinTrs.gameObject:SetActive(false)
-    end,6, 0, true)
-    TimerManager.StartTimer(self, function
-    ()
-        self.resultCard1:Hiden()
-        self.resultCard2:Hiden()
-        --等待开局提示
-        self.tipsCenterTxt.gameObject:SetActive(false)
-        --self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
-        
-    end,7, 0, true)
-    TimerManager.StartTimer(self, function
-    ()
-        self.resultTrs.gameObject:SetActive(false)
-        self.resultBgTrs.gameObject:SetActive(false)
-        -- 更新路信息
-        self:UpdateRoleView(self.ctrl.model.history)
-    end,8, 0, true)
+    --TimerManager.StartTimer(self, function
+    --()
+    --    --正在結算
+    --    self.tipsCenterTxt.gameObject:SetActive(true)
+    --end, 1, 0, true)
+    --TimerManager.StartTimer(self, function
+    --()
+    --    --开牌
+    --    self.tipsTimeEnd:SetActive(false)
+    --    self.resultCard1:ShowFront()
+    --end, 2, 0, true)
+    --TimerManager.StartTimer(self, function
+    --()
+    --    self.resultCard2:ShowFront()
+    --end, 3, 0, true)
+    ----结果
+    --TimerManager.StartTimer(self, function
+    --()
+    --    if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
+    --        self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
+    --    elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
+    --        self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
+    --    else
+    --        self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
+    --    end
+    --    --结果动画
+    --    
+    --end, 4, 0, true)
+    --
+    --TimerManager.StartTimer(self, function
+    --()
+    --    self.resultWinTrs.gameObject:SetActive(false)
+    --    ---金币回收动画
+    --    self:PlayCompeleCoinFLy(result.playerSettleInfos)
+    --    --- 更新获奖玩家金币
+    --    self:UpdatePlayers(result.playerInfos)
+    --    ---更新状态
+    --    self:OnGameStatus(4)
+    --end,6, 0, true)
+    --TimerManager.StartTimer(self, function
+    --()
+    --    self.resultCard1:Hiden()
+    --    self.resultCard2:Hiden()
+    --    --等待开局提示
+    --    self.tipsCenterTxt.gameObject:SetActive(false)
+    --    --self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
+    --    
+    --end,7, 0, true)
+    --TimerManager.StartTimer(self, function
+    --()
+    --    self.resultTrs.gameObject:SetActive(false)
+    --    self.resultBgTrs.gameObject:SetActive(false)
+    --    -- 更新路信息
+    --    self:UpdateRoleView(self.ctrl.model.history)
+    --end,8, 0, true)
     
 end
 
@@ -592,20 +648,17 @@ function DragonTigerFightView:UpdateRoomInfo(model)
         self:UpdateXiaZhuLabel()
     end
 
-    -- 5. 刷新当前游戏状态和倒计时
+    -- 5. 刷新当前游戏状态和倒计时 
+    -- 在亮牌和结算阶段进来，就从亮牌开始播，直至下一局开始
+    -- 如果播不完就立即结束动画，可以直接中断，需要回收金币表现奖励那些可以都不播，直接消失
     local lessTime = Tools.CacStageLessTime(model.status,ServerTimeSync:GetTimeStamp(),model.endTime,config.StageTime)
     look("当前阶段剩余时间（毫秒）："..lessTime)
     if lessTime<=0 then
-        if model.status<4 then
-            --进行下一阶段
-            self:OnGameStatus(model.status+1)
-            --else本轮游戏已结束 等待重新开始 
-        end
-    elseif model.status==3 then
-        -- 当前阶段还未结束
-        self:OnGameStatus(model.status,Mathf.Round(lessTime/1000))
+        --进行下一阶段
+        if model.status<4 then self:OnGameStatus(model.status+1) end
+    else--更新当前阶段
+        self:OnGameStatus(model.status)
     end
-    
 end
 
 
@@ -624,30 +677,21 @@ function DragonTigerFightView:ShowAreaChouMa(sideInfo)
     end
 end
 
-function DragonTigerFightView:NextStage(time)
-    if self.nextTimer then
-        TimerManager.StopTimer(self,self.nextTimer)
-        self.nextTimer = nil
-    end
-
-    if time<=0 then
-        self:OnGameStatus(self.ctrl.model.status+1)
-        return
-    end
-    
-    self.nextTimer = TimerManager.StartTimer(self, function()
-        self:OnGameStatus(self.ctrl.model.status+1)
-        self.nextTimer = nil
-    end,time,0,false)
-end
-
 -- 切换状态
-function DragonTigerFightView:OnGameStatus(status,time)
-    logError("OnGameStatus:"..status.." time:"..(time or ""))
+function DragonTigerFightView:OnGameStatus(status)
+    logError("OnGameStatus:"..status)
     -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
     self.ctrl.model.status = status
-    config.lessSeconds = time or Mathf.Round(config.StageTime[status]/1000)
+    config.lessSeconds = Mathf.Round(config.StageTime[status]/1000)
     config.allow= status==2
+
+    -- 结算阶段 特殊处理
+    if status == 4 then
+        self:UpdateDiZhuBtnState()
+        self:RepeatInit()
+        self:InitXiaZhuLabel()
+        return
+    end
     
     -- 隐藏所有阶段相关UI
     self.tipsStartXiaZhu:SetActive(false)
@@ -664,8 +708,11 @@ function DragonTigerFightView:OnGameStatus(status,time)
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil
     end
-    --self.debugTxt.text = "status："..status..config.allow
-    --self.debugTime.text = os.date("%Y-%m-%d %H:%M:%S", ServerTimeSync:GetTimeStamp()/1000) 
+    if self.resultTimer then
+        TimerManager.StopTimer(self,self.resultTimer)
+        self.resultTimer = nil
+    end
+
     if status == 1 then -- 准备阶段
         self.ctrl.model:ResetConfig()
         self:UpdateDiZhuBtnState()
@@ -697,18 +744,7 @@ function DragonTigerFightView:OnGameStatus(status,time)
         self.tipsCenterTxt.gameObject:SetActive(true)
         self.resultTrs.gameObject:SetActive(true)
         self.resultBgTrs.gameObject:SetActive(true)
-    elseif status == 4 then -- 结算阶段
-        self:UpdateDiZhuBtnState()
-        self:RepeatInit()
-        self:InitXiaZhuLabel()
-    end
-
-    if status==3 then
-        local nextTime = Mathf.Round(config.StageTime[status+1]/1000)
-        if time and nextTime>0 then
-            nextTime = nextTime - config.StageTime[status] + time --时间差补偿
-        end
-        self:NextStage(nextTime)
+    
     end
 end
 

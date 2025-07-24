@@ -134,15 +134,10 @@ function DragonTigerFightModel:OnGameResult(msg)
     self:ShowResult()
 end
 
-
 function DragonTigerFightModel:ShowResult()
     self.players = self.Result.playerInfos --前6玩家信息
     ---显示牌面结果
     self.ctrl.view:ResultEffect(self.Result)
-    ---金币回收动画
-    self.ctrl.view:PlayCompeleCoinFLy(self.Result.playerSettleInfos)
-    --- 更新获奖玩家金币
-    self.ctrl.view:UpdatePlayers(self.players)
 end
 --玩家列表信息返回 
 function DragonTigerFightModel:UpdateAllPlayers(msg)

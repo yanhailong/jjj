@@ -11,6 +11,8 @@ local this = DragonTigerFightConfig;
 this.gameID = 200101
 ---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 this.StageTime = {2000,13000,13000,0}
+---结算各动画阶段时间
+this.ResultStageTime = {1,1,1,1,2,1,1}
 
 ---当前选中的底注
 this.dizhuIndex = 0
