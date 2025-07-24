@@ -156,6 +156,11 @@ end
 
 ---清空组件
 function FishPrawnCrabGameView:ClearComponents()
+    self.selfPlayer:OnDestroy()
+    for i = 1, #self.AllOtherPlayerHeads do
+        self.AllOtherPlayerHeads[i]:OnDestroy()
+    end
+    
     self.btn_1=nil;
     self.btn_recharge=nil;
     self.btn_repeat=nil;

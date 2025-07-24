@@ -241,7 +241,7 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 	self.view.tipsStopBetting:SetActive(false)
 	TimerManager.StartTimer(self,function()
 		self.view.tipsStartToBet:SetActive(false)
-	end,1.5,1,false)
+	end,1.5,1,true)
 
 	--倒计时
 	self.view.colockStateTimePrepare:SetActive(false)
@@ -258,7 +258,7 @@ function FishPrawnCrabGameCtrl:SwitchToBetState(message)
 			self.view.colockStateTimeTrs.gameObject:SetActive(false)
 			self.view:PlayDaoJiShiEffect()
 		end
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
 end
 
 ---进入到结算阶段
@@ -277,7 +277,7 @@ function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
 	self.view.tipsStopBetting:SetActive(true)
 	TimerManager.StartTimer(self,function()
 		self.view.tipsStopBetting:SetActive(false)
-	end,1.5,1,false)
+	end,1.5,1,true)
 
 	--倒计时
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
@@ -289,7 +289,7 @@ function FishPrawnCrabGameCtrl:SwitchToSettlementState(message)
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
 		self.view.colockStateTimeNum.text = math.max(0, math.floor(self.statusRemainingSeconds + 0.1))
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
 end
 
 ---游戏结算数据

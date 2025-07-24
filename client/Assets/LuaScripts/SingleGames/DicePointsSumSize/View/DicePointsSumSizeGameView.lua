@@ -37,8 +37,7 @@ function DicePointsSumSizeGameView:InitComponents()
     self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/bottom/btn_AllOther");
     self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_AllOther/tmp_AllOtherNumber");
     self.obj_ChipContent=ComponentUtilGet.GameObject(self.transform,"content/bottom/ChipScrollView/Viewport/obj_ChipContent");
-    self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/bottom/ChipScrollView/Viewport/obj_ChipContent/obj_chipItem");
-    self.obj_chipItem_bottom=ComponentUtilGet.GameObject(self.transform,"content/bottom/obj_chipItem");
+    self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/bottom/obj_chipItem");
     self.btn_Chipleft=ComponentUtilGet.Button(self.transform,"content/bottom/Image/btn_Chipleft");
     self.btn_ChipRight=ComponentUtilGet.Button(self.transform,"content/bottom/Image (1)/btn_ChipRight");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
@@ -48,10 +47,17 @@ function DicePointsSumSizeGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/setting/mask/trans_menu_panel/btn_close");
+    self.obj_Countdown=ComponentUtilGet.GameObject(self.transform,"content/tips/obj_Countdown");
+    self.txt_Countdown=ComponentUtilGet.Text(self.transform,"content/tips/obj_Countdown/txt_Countdown");
 end
 
 ---清空组件
 function DicePointsSumSizeGameView:ClearComponents()
+    self.selfPlayer:OnDestroy()
+    for i = 1, #self.AllOtherPlayerHeads do
+        self.AllOtherPlayerHeads[i]:OnDestroy()
+    end
+    
     self.btn_1=nil;
     self.btn_recharge=nil;
     self.trans_bet_btns=nil;
@@ -70,6 +76,8 @@ function DicePointsSumSizeGameView:ClearComponents()
     self.btn_setting=nil;
     self.btn_help=nil;
     self.btn_close=nil;
+    self.obj_Countdown=nil;
+    self.txt_Countdown=nil;
 end
 
 ---下注底注按钮
@@ -91,18 +99,17 @@ function DicePointsSumSizeGameView:InitTips()
     self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
     self.tipsStopBetting = ComponentUtilGet.GameObject(self.tipsTrs,"tips_stop_betting")
     self.tipsStartToBet = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_to_bet")
-    self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
     self.tipsGameStart = ComponentUtilGet.GameObject(self.tipsTrs, "game_start")
 
-    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
-    self.colockStateTimeNum = ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
-    self.colockStateTimePrepare = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"prepare") --准备倒计时文字
-    self.colockStateTimeBet = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"bet") --下注倒计时文字
-    self.colockStateTimeSettlement = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"settlement") --结算倒计时文字
+    self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center")
+    self.colockStateTimePrepare = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_prepare") --准备倒计时Root
+    self.colockStateTimeNumPrepare = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_prepare/time") --准备倒计时
+    self.colockStateTimeBet = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_bet") --下注倒计时Root
+    self.colockStateTimeNumBet = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_bet/time") --下注倒计时
+    self.colockStateTimeSettlement = ComponentUtilGet.GameObject(self.colockStateTimeTrs,"colock_state_settlement") --结算倒计时Root
+    self.colockStateTimeNumSettlement = ComponentUtilGet.Text(self.colockStateTimeTrs,"colock_state_settlement/time") --结算倒计时
     self.colockNumTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/count_down")
     self.colockNumTime = ComponentUtilGet.Text(self.colockNumTrs,"time")
-
-    self.three = ComponentUtilGet.Transform(self.tipsTrs,"three")
 end
 
 ---所有玩家
@@ -114,6 +121,7 @@ function DicePointsSumSizeGameView:InitPalyers()
     end
 
     self.selfPlayerRoot  = ComponentUtilGet.GameObject(self.transform,"content/bottom/SelfHead")
+    ---@type DicePointsSumSizePlayerItem
     self.selfPlayer = DicePointsSumSizePlayerItem.New(self.selfPlayerRoot)
 end
 
@@ -154,6 +162,9 @@ function DicePointsSumSizeGameView:InitGameResult()
     for i = 1, DicePointsSumSizeConfig.diceCount do
         self.bigDiceImages[i] = ComponentUtilGet.Image(bigDiceResultTrans, "dices/dice" .. i)
     end
+    self.bigDiceResultOriginalPos = bigDiceResultTrans.position
+    self.bigDiceResultOriginalScale = bigDiceResultTrans.localScale
+    self.bigDiceLidImage = ComponentUtilGet.Image(bigDiceResultTrans, "lid")
 
     -- 小骰子结果
     local smallDiceResultTrans = ComponentUtilGet.Transform(self.transform, "content/result/small")
@@ -164,6 +175,9 @@ function DicePointsSumSizeGameView:InitGameResult()
     for i = 1, DicePointsSumSizeConfig.diceCount do
         self.smallDiceImages[i] = ComponentUtilGet.Image(smallDiceResultTrans, "dices/dice" .. i)
     end
+    self.smallDiceResultOriginalPos = smallDiceResultTrans.position
+    self.smallDiceResultOriginalScale = smallDiceResultTrans.localScale
+    self.shakePos = ComponentUtilGet.Transform(self.transform, "content/result/shake_pos").position
 end
 
 --游戏记录
@@ -212,6 +226,8 @@ function DicePointsSumSizeGameView:InitPanelData(args)
         self.betTotalNumLabels[i].text = "0"
         self.betSelfNumLabels[i].text = "0"
     end
+
+    self.obj_Countdown:SetActive(false)
 end
 
 ---关闭界面

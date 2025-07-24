@@ -3,7 +3,7 @@
 --{paramdesc} 
 --@desc 
 --
----@class
+---@class DicePointsSumSizeConfig
 local DicePointsSumSizeConfig = Class("DicePointsSumSizeConfig")
 local this = DicePointsSumSizeConfig;
 
@@ -21,7 +21,7 @@ this.GameEventName = {
     SYNC_TOTAL_BETS = "SYNC_TOTAL_BETS",
     NOTIFY_PLAYER_BET = "NOTIFY_PLAYER_BET",
     REQUEST_RANKLIST = "REQUEST_RANKLIST",
-    RES_RANKLIST = "RES_RANKLIST",
+    RES_RANLKIST = "RES_RANKLIST",
 }
 
 ---游戏阶段
@@ -38,7 +38,7 @@ this.DiceSumType = {
     TypeCount = 2,
 }
 
-this.prepareStateDuration = 3      ---准备阶段持续时间
+this.prepareStateDuration = 5      ---准备阶段持续时间
 this.betStateDuration = 14         ---下注阶段持续时间
 this.settlementStateDuration = 11  ---结算阶段持续时间
 this.selfTestPlayerId = 1314       ---测试用自己的ID
@@ -54,9 +54,9 @@ this.Bet_Limit_Info = {100000000,100000000,100000000,100000000,100000000,1000000
 
 this.ABNames={
     ChipPool="SingleGames/DicePointsSumSize/prefabs/Pool",--筹码
-    diceRecordsIcon="SingleGames/DicePointsSumSize/alats/dice/1",--游戏记录的骰子icon
-    diceResultIcon="SingleGames/DicePointsSumSize/alats/dice/2",--游戏结果的骰子icon
-    mainIcon="SingleGames/DicePointsSumSize/alats/main",--资源主路径
+    diceRecordsIcon="SingleGames/DicePointsSumSize/atlas/dice/1",--游戏记录的骰子icon
+    diceResultIcon="SingleGames/DicePointsSumSize/atlas/dice/2",--游戏结果的骰子icon
+    mainIcon="SingleGames/DicePointsSumSize/atlas/main",--资源主路径
     commonMain = "Common/GameArtsCommon/GameFight/alats/main",--通用资源主路径
 }
 
@@ -68,6 +68,7 @@ end
 this.diceCount = 3  --每局骰子数量
 this.diceSideCount = 6  --每个骰子面数
 this.showRecordCount = 3  --显示记录条数
+this.chipItemShowCount = 5 --下注的时候显示可选筹码数量
 
 --点数之和类型对应的点数和的字体颜色
 this.diceSumShowData = {{ r = 0.8196079, g = 0.3372549, b = 0.3372549, a = 1}, 
