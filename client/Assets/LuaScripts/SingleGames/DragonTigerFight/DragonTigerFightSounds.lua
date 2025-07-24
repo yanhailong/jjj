@@ -57,7 +57,7 @@ end
 
 --牌型声音
 function DragonTigerFightSounds.PlaySoundCard(cardId)
-    local index = cardId
+    local index = cardId%13
     local soundName = SOUND_CARD[index]
     SoundManager:PlayClip(soundPath..soundName)
 end
@@ -67,10 +67,20 @@ function DragonTigerFightSounds.PlaySoundWin(result,isEF)
     if isEF then soundName = SOUND_WIN_EF[result] end
     SoundManager:PlayClip(soundPath..soundName)
 end
+--其余玩家筹码下注飞行音效
+function DragonTigerFightSounds.OtherFlyBet()
+    local index = Tools.RandomInt(1,4)
+    local soundName = SOUND_BET_ROM[index]
+    SoundManager:PlayClip(soundPath..soundName)
+end
 --背景音乐
 function DragonTigerFightSounds.PlaySoundMusic()
     local soudName = "bgm_sound"
     SoundManager:ChangeBg(soundPath..soudName)
+end
+--关闭背景音乐
+function DragonTigerFightSounds.StopSoundMusic()
+    SoundManager:CloseBg()
 end
 
 return DragonTigerFightSounds;

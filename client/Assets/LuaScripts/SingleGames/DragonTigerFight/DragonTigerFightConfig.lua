@@ -12,7 +12,7 @@ this.gameID = 200101
 ---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 this.StageTime = {2000,13000,13000,0}
 ---结算各动画阶段时间
-this.ResultStageTime = {1,1,1,1,2,1,1}
+this.ResultStageTime = {1,0.5,1,1,2,2,1,1}
 
 ---当前选中的底注
 this.dizhuIndex = 0
@@ -40,6 +40,17 @@ this.selfXiaZhuInfo = {}
 ---本局是否使用了复投
 this.isRepeat = false
 
+this.AUDIO_KEY = {
+    ADD_CHIP=1,  --玩家下注筹码飞行音效
+    BET_READY=2,  --准备阶段音效
+    BET_END =3,  --下注阶段结束音效
+    BET_START=4,  --下注阶段开始音效
+    DJS_NUM =5,  --倒计时音效
+    DJS_END=6,  --倒计时结束音效
+    DEAL=7,  --发牌音效
+    END_COIN_FLY=8,  --结算阶段分筹码音效
+    FLIP_CARD=9,--翻牌音效
+}
 ---龙虎斗结果值定义
 DRAGON_TIGER_FIGHT_WIN_SIDE = {
     LONG = 1,

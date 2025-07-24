@@ -7,9 +7,10 @@ local DragonTigerFightView=Class("DragonTigerFightView",BaseView)
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
 local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 local PlayerItem = require("SingleGames/DragonTigerFight/View/Item/PlayerItem")
-local ClockStateItem = require("SingleGames/DragonTigerFight/View/Item/ClockState")
 local RoadView = require("SingleGames/DragonTigerFight/View/RoadView")
 local CardItem = require("SingleGames/DragonTigerFight/View/Item/CardItem")
+local DragonTigerFightSounds = require("SingleGames/DragonTigerFight/DragonTigerFightSounds")
+
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
@@ -36,7 +37,6 @@ function DragonTigerFightView:InitComponents()
     self.heClickArea = ComponentUtilGet.Transform(self.transform,"content/clickRect/heClick")
     self.selfPlayerRoot  = ComponentUtilGet.Transform(self.transform,"content/bottom/SelfHead")
     ---下注数量
-    ---@type  TMPro.TextMeshProUGUI[]
     self.xiazhuNumLabels = {}
     self.xiazhuNumLabels[1] = ComponentUtilGet.TextMeshProUGUI(self.xiazhuArea,"Center/Long/title/num")
     self.xiazhuNumLabels[2] = ComponentUtilGet.TextMeshProUGUI(self.xiazhuArea,"Center/Hu/title/num")
@@ -47,7 +47,6 @@ function DragonTigerFightView:InitComponents()
     self.xiazhuStarAreas[2] = ComponentUtilGet.RectTransform(self.huClickArea,"Star")
     self.xiazhuStarAreas[3] = ComponentUtilGet.RectTransform(self.heClickArea,"Star")
     ---个人下注数量
-    ---@type  TMPro.TextMeshProUGUI[]
     self.xiazhuSelfNumsLabels = {}
     self.xiazhuSelfNumsLabels[1] = ComponentUtilGet.TextMeshProUGUI(self.longClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[2] = ComponentUtilGet.TextMeshProUGUI(self.huClickArea,"yazhuNum/num")
@@ -92,6 +91,7 @@ function DragonTigerFightView:InitComponents()
     self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
     self.colockNumTrs=ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_num")
     self.colockNumTime=ComponentUtilGet.Text(self.colockNumTrs,"time")
+    self.tipsEnterWait=ComponentUtilGet.Transform(self.tipsTrs,"tips_enter_wait")
     
     self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
     
@@ -108,7 +108,7 @@ function DragonTigerFightView:InitComponents()
     ---结果信息
     self.effectsTrs=ComponentUtilGet.Transform(self.transform,"content/effects")
     self.resultTrs=ComponentUtilGet.Transform(self.effectsTrs,"resoult")
-    self.resultBgTrs=ComponentUtilGet.Transform(self.transform,"Background/resoult/bg")
+    self.resultBgTrs=ComponentUtilGet.Transform(self.transform,"Background/resoult")
     self.resultWinTrs=ComponentUtilGet.Transform(self.resultTrs,"win")
     ---@type CardItem
     self.resultCard1=CardItem.New(ComponentUtilGet.GameObject(self.resultTrs,"card/left"))
@@ -233,6 +233,7 @@ end
 function DragonTigerFightView:PayXiaZhuCoinFly(side)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side],
             self.ctrl.model.betPointList[config.dizhuIndex])
+    DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.ADD_CHIP)
 end
 ---通过id找到TOP6玩家
 function DragonTigerFightView:FindPlayerByID(id)
@@ -276,6 +277,7 @@ function DragonTigerFightView:PayOtherXiaZhuCoinFly(data)
                 data.betValue)
     end
     areaTotal[data.side] = areaTotal[data.side] + 1
+    DragonTigerFightSounds.OtherFlyBet()
 end
 
 
@@ -316,6 +318,7 @@ function DragonTigerFightView:PlayCompeleCoinFLy(results)
         ratios = {0,1}
     end
     ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
+    DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.END_COIN_FLY)
 end
 
 function DragonTigerFightView:InitChouMa()
@@ -340,6 +343,7 @@ end
 
 ---初始界面
 function DragonTigerFightView:InitUI()
+    DragonTigerFightSounds.PlaySoundMusic()
     ---续押
     self:SetRepeatState(false)
     ---其他玩家信息
@@ -361,6 +365,9 @@ function DragonTigerFightView:InitUI()
     self.tipsTimeEnd:SetActive(false)
     self.tipsTimeThree:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
+    self.resultWinTrs.gameObject:SetActive(false)
+    self.resultCard1:Hiden()
+    self.resultCard2:Hiden()
     self:InitXiaZhuLabel()
     
 end
@@ -419,24 +426,38 @@ end
 
 function DragonTigerFightView:ResultStage(stage)
     local result = self.ctrl.model.Result
-    
-    if stage == 1 then --正在結算
+
+    if stage == 1 then --发牌
+        --等待开牌
+        local p1 = self.ctr_dot_p1.position
+        local p2 = self.ctr_dot_p2.position
+        self.resultCard1:Approach(p2,p1)
+        self.resultCard2:Approach(Vector3(-p2.x,p2.y),Vector3(-p1.x,p1.y))
+    elseif stage == 2 then --正在結算
         self.tipsCenterTxt.gameObject:SetActive(true)
-    elseif stage == 2 then--开牌
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.DEAL)
+    elseif stage == 3 then--开牌
         self.tipsTimeEnd:SetActive(false)
         self.resultCard1:ShowFront()
-    elseif stage == 3 then--开牌
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.FLIP_CARD)
+    elseif stage == 4 then--开牌
         self.resultCard2:ShowFront()
-    elseif stage == 4 then
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.FLIP_CARD)
+    elseif stage == 5 then
         if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
+            --结果动画
+            DragonTigerFightSounds.PlaySoundWin(result.winState,true)
         elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
             self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
+            --结果动画
+            DragonTigerFightSounds.PlaySoundWin(result.winState,true)
         else
             self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
         end
-        --结果动画
-    elseif stage==5 then
+        DragonTigerFightSounds.PlaySoundWin(result.winState)
+        
+    elseif stage==6 then
         self.resultWinTrs.gameObject:SetActive(false)
         ---金币回收动画
         self:PlayCompeleCoinFLy(result.playerSettleInfos)
@@ -444,11 +465,11 @@ function DragonTigerFightView:ResultStage(stage)
         self:UpdatePlayers(result.playerInfos)
         ---更新状态
         self:OnGameStatus(4)
-    elseif stage==6 then
+    elseif stage==7 then
         self.resultCard1:Hiden()
         self.resultCard2:Hiden()
         self.tipsCenterTxt.gameObject:SetActive(false)
-    elseif stage==7 then
+    elseif stage==8 then
         self.resultTrs.gameObject:SetActive(false)
         self.resultBgTrs.gameObject:SetActive(false)
         -- 更新路信息
@@ -467,73 +488,12 @@ function DragonTigerFightView:ResultEffect(result)
     self.resultBgTrs.gameObject:SetActive(true)
     self.resultCard1:LoadCard(cards[1])
     self.resultCard2:LoadCard(cards[2])
-    local p1 = self.ctr_dot_p1.position
-    local p2 = self.ctr_dot_p2.position
     
     --下注结束
     self.tipsTimeEnd:SetActive(true)
+    DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_END)
     
-    --等待开牌
-    self.resultCard1:Approach(p2,p1)
-    self.resultCard2:Approach(Vector3(-p2.x,p2.y),Vector3(-p1.x,p1.y))
     self:ResultStageTimer(1)
-    
-    --TimerManager.StartTimer(self, function
-    --()
-    --    --正在結算
-    --    self.tipsCenterTxt.gameObject:SetActive(true)
-    --end, 1, 0, true)
-    --TimerManager.StartTimer(self, function
-    --()
-    --    --开牌
-    --    self.tipsTimeEnd:SetActive(false)
-    --    self.resultCard1:ShowFront()
-    --end, 2, 0, true)
-    --TimerManager.StartTimer(self, function
-    --()
-    --    self.resultCard2:ShowFront()
-    --end, 3, 0, true)
-    ----结果
-    --TimerManager.StartTimer(self, function
-    --()
-    --    if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
-    --        self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
-    --    elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
-    --        self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
-    --    else
-    --        self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
-    --    end
-    --    --结果动画
-    --    
-    --end, 4, 0, true)
-    --
-    --TimerManager.StartTimer(self, function
-    --()
-    --    self.resultWinTrs.gameObject:SetActive(false)
-    --    ---金币回收动画
-    --    self:PlayCompeleCoinFLy(result.playerSettleInfos)
-    --    --- 更新获奖玩家金币
-    --    self:UpdatePlayers(result.playerInfos)
-    --    ---更新状态
-    --    self:OnGameStatus(4)
-    --end,6, 0, true)
-    --TimerManager.StartTimer(self, function
-    --()
-    --    self.resultCard1:Hiden()
-    --    self.resultCard2:Hiden()
-    --    --等待开局提示
-    --    self.tipsCenterTxt.gameObject:SetActive(false)
-    --    --self.tipsCenterTxt.text = LocalManager.GetStrById(200101004)
-    --    
-    --end,7, 0, true)
-    --TimerManager.StartTimer(self, function
-    --()
-    --    self.resultTrs.gameObject:SetActive(false)
-    --    self.resultBgTrs.gameObject:SetActive(false)
-    --    -- 更新路信息
-    --    self:UpdateRoleView(self.ctrl.model.history)
-    --end,8, 0, true)
-    
 end
 
 ---开始动画播放
@@ -563,9 +523,10 @@ function DragonTigerFightView:StartEffect()
         TimerManager.StartTimer(self,function()
             self.tipsStartXiaZhu:SetActive(false)
         end,1.5,0,false)
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_START)
     end)
     sequence:Play()
-    
+    DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_READY)
 end
 
 ---倒计时3秒
@@ -623,7 +584,6 @@ end
 
 -- 更新房间信息
 function DragonTigerFightView:UpdateRoomInfo(model)
-    Debug.Log("更新房间信息")
     -- 1. 初始化UI状态
     self:InitUI()
     
@@ -658,6 +618,23 @@ function DragonTigerFightView:UpdateRoomInfo(model)
         if model.status<4 then self:OnGameStatus(model.status+1) end
     else--更新当前阶段
         self:OnGameStatus(model.status)
+    end
+    
+    -- 提示 等待本对局结束
+    if model.Result then
+        self.tipsEnterWait.gameObject:SetActive(true)
+        self.colockNumTrs.gameObject:SetActive(true)
+        local lessSeconds = Mathf.Round((model.endTime - ServerTimeSync:GetTimeStamp())/1000)
+        self.colockNumTime.text = tostring(lessSeconds)
+        TimerManager.StartTimer(self,function()
+            lessSeconds = lessSeconds - 1
+            self.colockNumTime.text = tostring(lessSeconds)
+            logError("tipsEnterWait:"..lessSeconds)
+            if lessSeconds<=0 then
+                self.tipsEnterWait.gameObject:SetActive(false)
+                self.colockNumTrs.gameObject:SetActive(false)
+            end
+        end,1, lessSeconds,false)
     end
 end
 
@@ -703,7 +680,11 @@ function DragonTigerFightView:OnGameStatus(status)
     self.resultWinTrs.gameObject:SetActive(false)
     self.tipsCenterTxt.gameObject:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
-
+    self.tipsEnterWait.gameObject:SetActive(false)
+    self.colockNumTrs.gameObject:SetActive(false)
+    self.resultCard1:Hiden()
+    self.resultCard2:Hiden()
+    
     if self.statusTimer then
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil
@@ -735,6 +716,10 @@ function DragonTigerFightView:OnGameStatus(status)
             if config.lessSeconds <= 0 then
                 TimerManager.StopTimer(self,self.statusTimer)
                 self.statusTimer = nil
+                return
+            end
+            if config.lessSeconds<=3 then
+                DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.DJS_NUM)
             end
         end, 1, config.lessSeconds, true)
     elseif status == 3 then -- 亮牌阶段
@@ -744,7 +729,7 @@ function DragonTigerFightView:OnGameStatus(status)
         self.tipsCenterTxt.gameObject:SetActive(true)
         self.resultTrs.gameObject:SetActive(true)
         self.resultBgTrs.gameObject:SetActive(true)
-    
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.DJS_END)
     end
 end
 
@@ -766,6 +751,7 @@ end
 function DragonTigerFightView:Close()
     ChouMaFlyUtil:Destroy()
     TimerManager.StopAllTimer(self)
+    DragonTigerFightSounds.StopSoundMusic()
     self.super.Close(self);
 end
 
