@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: kaishijieshuxiazhu_SkeletonData
   m_EditorClassIdentifier: 
   atlasAssets:
-  - {fileID: 11400000, guid: e6d4827673723504c8523d93af349ef3, type: 2}
+  - {fileID: 11400000, guid: 01950fce1b85f6140a83c8f919c6e139, type: 2}
   scale: 0.01
-  skeletonJSON: {fileID: 4900000, guid: 394898ad2a8d40747b8e2e11b64c86f5, type: 3}
+  skeletonJSON: {fileID: 4900000, guid: 3873a6757945e30419e6a334a02d5210, type: 3}
   isUpgradingBlendModeMaterials: 0
   blendModeMaterials:
     requiresBlendModeMaterials: 0
-    applyAdditiveMaterial: 0
+    applyAdditiveMaterial: 1
     additiveMaterials: []
     multiplyMaterials: []
     screenMaterials: []
@@ -28,4 +28,4 @@ MonoBehaviour:
   toAnimation: []
   duration: []
   defaultMix: 0.2
-  controller: {fileID: 9100000, guid: 11ade0604ca385a4eac4c64b4e8d964b, type: 2}
+  controller: {fileID: 9100000, guid: 6438512124e64ab4abd84edee97a5455, type: 2}
