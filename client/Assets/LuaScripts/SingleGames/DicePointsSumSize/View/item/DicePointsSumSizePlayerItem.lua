@@ -19,6 +19,7 @@ function DicePointsSumSizePlayerItem:ctor(go)
     self.resultNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"result")
     self.resultNum.gameObject:SetActive(false)
     self.chipInfo = {{}, {}, {}, {}, {}, {}}
+    self.winSequence = nil
 end
 
 ---
@@ -41,14 +42,19 @@ function DicePointsSumSizePlayerItem:ShowResultCount(num)
     self.resultNum.text = symbol..num
     self.resultNum.transform.localPosition = Vector3(x,0,0)
     self.resultNum.alpha = 1
-    local sequence = DOTween.Sequence()
-    sequence:Append(self.resultNum.transform:DOLocalMoveY(60,1))
-    sequence:Insert(0.6,self.resultNum:DOFade(1,0.4))
-    sequence:OnComplete(function()
-        sequence:Kill(false)
+    if self.winSequence then
+        self.winSequence:Kill(false)
+        self.winSequence = nil
+    end
+    self.winSequence = DOTween.Sequence()
+    self.winSequence:Append(self.resultNum.transform:DOLocalMoveY(60,1))
+    self.winSequence:Insert(0.6,self.resultNum:DOFade(1,0.4))
+    self.winSequence:OnComplete(function()
+        self.winSequence:Kill(false)
         self.resultNum.gameObject:SetActive(false)
+        self.winSequence = nil
     end)
-    sequence:Play()
+    self.winSequence:Play()
 end
 
 
@@ -76,6 +82,13 @@ end
 function DicePointsSumSizePlayerItem:AddChip(area, chipObj)
     if area > 0 and area <= #self.chipInfo and chipObj ~= nil then
         table.insert(self.chipInfo[area], chipObj)
+    end
+end
+
+function DicePointsSumSizePlayerItem:OnDestroy()
+    if self.winSequence then
+        self.winSequence:Kill(false)
+        self.winSequence = nil
     end
 end
 

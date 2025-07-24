@@ -38,7 +38,7 @@ this.DiceSumType = {
     TypeCount = 2,
 }
 
-this.prepareStateDuration = 3      ---准备阶段持续时间
+this.prepareStateDuration = 5      ---准备阶段持续时间
 this.betStateDuration = 14         ---下注阶段持续时间
 this.settlementStateDuration = 11  ---结算阶段持续时间
 this.selfTestPlayerId = 1314       ---测试用自己的ID

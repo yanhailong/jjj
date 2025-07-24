@@ -33,6 +33,8 @@ end
 
 ---初始化数据
 function DicePointsSumSizeGameCtrl:InitData()
+	self.alarmClockSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_Countdown.transform);
+	
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
 	---当前选中的底注
@@ -65,6 +67,9 @@ function DicePointsSumSizeGameCtrl:InitData()
 	self.recordData = {}
 	--桌面所有的筹码
 	self.tabelChipItems = {}
+	
+	self.diceSequence = nil
+	self.stateCor = nil
 
 	self.view.selfPlayer:UpdatePlayer({ id = DicePointsSumSizeConfig.selfTestPlayerId, coin = self.goldRealNum})
 	
@@ -78,6 +83,25 @@ function DicePointsSumSizeGameCtrl:InitData()
 	--self.view:ChangeAnte(self.betIndex)
 	self.view:UpdateTotalBetAreaInfo(-1)
 	self.view:UpdateSelfBetAreaInfo(-1)
+
+	--self.beginTimer = TimerManager.CreateTimer(self,function()
+	--	self.view.obj_BeginBet:SetActive(false);
+	--	self.view.obj_Countdown:SetActive(true);
+	--	Tools.PlayerSpineAniByName(self.alarmClockSpine,"idle",true)
+	--	self.betCountDownTimer:Start();
+	--	self:SetBetButtonInteractable(true);
+	--end,1,1,true);
+	--
+	--self.betCountDownTimer = TimerManager.CreateTimer(self,function()
+	--	self.statusRemainingSeconds = self.statusRemainingSeconds - 1;
+	--	self.view.txt_Countdown.text = self.statusRemainingSeconds;
+	--	if(self.statusRemainingSeconds == 3) then
+	--		Tools.PlayerSpineAniByName(self.alarmClockSpine,"action",true)
+	--	end
+	--	if(self.statusRemainingSeconds <= 0) then
+	--		self.betCountDownTimer:Stop()
+	--	end
+	--end,1,-1,true);
 end
 
 function DicePointsSumSizeGameCtrl:Close()
@@ -259,12 +283,14 @@ function DicePointsSumSizeGameCtrl:SwitchToPrepareState(message)
 	--tip
 	self.view.tipsStartToBet:SetActive(false)
 	self.view.tipsStopBetting:SetActive(false)
+	self.view.tipsGameStart:SetActive(true)
 
 	--骰子
 	self.view.bigDiceLid:SetActive(true)
 	self.view.smallDiceLid:SetActive(true)
 
 	--倒计时
+	self.view.obj_Countdown:SetActive(false);
 	self.view.colockStateTimePrepare:SetActive(true)
 	self.view.colockStateTimeBet:SetActive(false)
 	self.view.colockStateTimeSettlement:SetActive(false)
@@ -275,7 +301,17 @@ function DicePointsSumSizeGameCtrl:SwitchToPrepareState(message)
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
 		self.view.colockStateTimeNumPrepare.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
+
+	if self.stateCor then
+		coroutine.stop(self.stateCor)
+		self.stateCor = nil
+	end
+	self.stateCor = CorManager.StartCor(self, function()
+		coroutine.wait(1.5)
+		self.view.tipsGameStart:SetActive(false)
+		self:PlayDiceStartAnimation()
+	end)
 end
 
 function DicePointsSumSizeGameCtrl:AllowRepeatBet()
@@ -306,9 +342,12 @@ function DicePointsSumSizeGameCtrl:SwitchToBetState(message)
 	--tip
 	self.view.tipsStartToBet:SetActive(true)
 	self.view.tipsStopBetting:SetActive(false)
+	self.view.tipsGameStart:SetActive(false)
 	TimerManager.StartTimer(self,function()
 		self.view.tipsStartToBet:SetActive(false)
-	end,1.5,1,false)
+		self.view.obj_Countdown:SetActive(true);
+		Tools.PlayerSpineAniByName(self.alarmClockSpine,"idle",true)
+	end,1,1,true)
 
 	--倒计时
 	self.view.colockStateTimePrepare:SetActive(false)
@@ -326,7 +365,14 @@ function DicePointsSumSizeGameCtrl:SwitchToBetState(message)
 		--	self.view.colockStateTimeTrs.gameObject:SetActive(false)
 		--	self.view:PlayDaoJiShiEffect()
 		--end
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+		self.view.txt_Countdown.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1)));
+		if(math.abs(self.statusRemainingSeconds - 3) <= 0.1) then
+			Tools.PlayerSpineAniByName(self.alarmClockSpine,"action",true)
+		end
+		if(self.statusRemainingSeconds <= 0) then
+			--self.betCountDownTimer:Stop()
+		end
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
 end
 
 ---进入到结算阶段
@@ -338,16 +384,16 @@ function DicePointsSumSizeGameCtrl:SwitchToSettlementState(message)
 	self.view.btn_repeat.interactable = false
 	self.view:UpdateBetBtnStatus()
 
-	self.view.three.gameObject:SetActive(false)
-
 	--tip
 	self.view.tipsStartToBet:SetActive(false)
 	self.view.tipsStopBetting:SetActive(true)
+	self.view.tipsGameStart:SetActive(false)
 	TimerManager.StartTimer(self,function()
 		self.view.tipsStopBetting:SetActive(false)
-	end,1.5,1,false)
+	end,1.5,1,true)
 
 	--倒计时
+	self.view.obj_Countdown:SetActive(false);
 	self.view.colockStateTimeTrs.gameObject:SetActive(true)
 	self.view.colockStateTimePrepare:SetActive(false)
 	self.view.colockStateTimeBet:SetActive(false)
@@ -358,7 +404,7 @@ function DicePointsSumSizeGameCtrl:SwitchToSettlementState(message)
 	TimerManager.StartTimer(self,function()
 		self.statusRemainingSeconds = self.statusRemainingSeconds - timeInterval
 		self.view.colockStateTimeNumSettlement.text = tostring(math.max(0, math.floor(self.statusRemainingSeconds + 0.1))) .. "s"
-	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),false)
+	end, timeInterval, math.floor(self.statusRemainingSeconds / timeInterval),true)
 end
 
 ---游戏结算数据
@@ -370,14 +416,14 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 		return
 	end
 
-	CorManager.StartCor(self, function()
+	if self.stateCor then
+		coroutine.stop(self.stateCor)
+		self.stateCor = nil
+	end
+	self.stateCor = CorManager.StartCor(self, function()
 		coroutine.wait(1.5)
-		--播放骰子动画
-		self.view.bigDiceResultObj:SetActive(true)
-		self.view.smallDiceResultObj:SetActive(true)
-		self.view.bigDiceLid:SetActive(true)
-		self.view.smallDiceLid:SetActive(true)
-		coroutine.wait(1.5)
+		--播放显示结果的骰子动画
+		self:PlayShowResultAnimation()
 		--设置结果
 		for i = 1, DicePointsSumSizeConfig.diceCount do
 			local diceSideIndex = message.dices[i]
@@ -390,7 +436,8 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 		end
 		self.view.smallDiceLid:SetActive(false)
 		self.view.bigDiceLid:SetActive(false)
-		coroutine.wait(0.5)
+		coroutine.wait(3)
+		
 		--高亮中奖区域
 		for i = 1, #message.dice_result do
 			local index = message.dice_result[i].anim_index
@@ -399,23 +446,31 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 				self.view.winHighLights[index].gameObject:SetActive(false)
 			end)
 		end
+		coroutine.wait(1)
+		
 		--添加记录
 		self:AddNewRecord(message.dices)
 		self:UpdateRecordUI()
 		coroutine.wait(1)
 		
 		--把桌面上的筹码分到对应的人身上
+		local betInfoDescendingList = {}
+		for i = #DicePointsSumSizeConfig.betValuesArr, 1, -1 do
+			table.insert(betInfoDescendingList, DicePointsSumSizeConfig.betValuesArr[i])
+		end
+		--print(table.concat(betInfoDescendingList, ", "))  -- 输出: 5, 4, 3, 2, 1
+		--table.sort(betInfoDescendingList, function(a, b) return a > b end);
 		for playerIndex = 1, #message.win_info do
 			local playerWinInfo = message.win_info[playerIndex]
 			local targetChipArr = nil
 			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
 			if targetPlayer ~= nil then
-				self:ScreeningChip(DicePointsSumSizeConfig.betValuesArr, playerWinInfo.winAmount, targetPlayer.transform.position)
+				self:ScreeningChip(betInfoDescendingList, playerWinInfo.winAmount, targetPlayer.transform.position)
 			end
 		end
 		--剩下的筹码飞到其他玩家按钮那里
 		for _, value in pairs(self.tabelChipItems) do
-			DicePointsSumSizeChipManager:DestroyChipFly(value.chip, self.view.btn_players.transform.position)
+			DicePointsSumSizeChipManager:DestroyChipFly(value.chip, self.view.btn_AllOther.transform.position)
 		end
 		self.tabelChipItems = {}
 
@@ -423,14 +478,86 @@ function DicePointsSumSizeGameCtrl:OnGameSettlementMsg(message)
 		--显示结果
 		for playerIndex = 1, #message.win_info do
 			local playerWinInfo = message.win_info[playerIndex]
-			local targetChipArr = nil
+			---@type DicePointsSumSizePlayerItem
 			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
-			if targetPlayer ~= nil then
+			if targetPlayer ~= nil and targetPlayer.player then
 				targetPlayer:ShowResultCount(playerWinInfo.winAmount)
-			else
+				targetPlayer.player.coin = targetPlayer.player.coin + playerWinInfo.winAmount
+				if targetPlayer.id == DicePointsSumSizeConfig.selfTestPlayerId then
+					targetPlayer.player.coin = targetPlayer.player.coin
+				end
+			end
+		end
+		coroutine.wait(1)
+		--更新钱
+		for playerIndex = 1, #message.win_info do
+			local playerWinInfo = message.win_info[playerIndex]
+			---@type DicePointsSumSizePlayerItem
+			local targetPlayer = self.view:FindPlayer(playerWinInfo.playerid)
+			if targetPlayer ~= nil and targetPlayer.player ~= nil then
+				targetPlayer:UpdateGoldCount(targetPlayer.player.coin)
 			end
 		end
 	end)
+end
+
+--播放摇骰子动画
+function DicePointsSumSizeGameCtrl:PlayDiceStartAnimation()
+	self.view.bigDiceResultObj:SetActive(true)
+	self.view.smallDiceResultObj:SetActive(false)
+	self.view.bigDiceLid:SetActive(true)
+	self.view.bigDiceResultObj.transform.position = self.view.smallDiceResultOriginalPos
+	self.view.bigDiceResultObj.transform.localScale = self.view.smallDiceResultOriginalScale
+	self.view.bigDiceLid.transform.localPosition = Vector3.New(0, 1000, 0)
+	Tools.SetColorAlpha_Float(self.view.bigDiceLidImage, 1)
+	
+	if self.diceSequence then
+		self.diceSequence:Kill(false)
+		self.diceSequence = nil
+	end
+	self.diceSequence = DOTween.Sequence()
+	local shakePos = Vector3.New(self.view.bigDiceResultOriginalPos.x, self.view.bigDiceResultOriginalPos.y + 100, self.view.bigDiceResultOriginalPos.z)
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOMove(self.view.shakePos, 0.3):SetEase(Ease.OutQuad))
+	self.diceSequence:Insert(0, self.view.bigDiceResultObj.transform:DOScale(self.view.bigDiceResultOriginalScale, 0.3):SetEase(Ease.OutQuad))
+	self.diceSequence:Insert(0, self.view.bigDiceLid.transform:DOLocalMoveY(0, 0.2))
+	--震动
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOShakePosition(1.7, Vector3.New(0, 400, 0)))
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOLocalMoveY(400, 0.2):SetEase(Ease.InOutBack))
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOMove(self.view.bigDiceResultOriginalPos, 0.1):SetEase(Ease.InOutBack))
+	self.diceSequence:AppendInterval(0.2)
+	--縮小回到桌子上
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOMove(self.view.smallDiceResultOriginalPos, 0.3):SetEase(Ease.InQuad))
+	self.diceSequence:Insert(2.4, self.view.bigDiceResultObj.transform:DOScale(self.view.smallDiceResultOriginalScale, 0.3):SetEase(Ease.InQuad))
+	self.diceSequence:Play()
+end
+
+--播放显示结果的骰子动画
+function DicePointsSumSizeGameCtrl:PlayShowResultAnimation()
+	self.view.bigDiceResultObj:SetActive(true)
+	self.view.smallDiceResultObj:SetActive(false)
+	self.view.bigDiceLid:SetActive(true)
+	self.view.bigDiceResultObj.transform.position = self.view.smallDiceResultOriginalPos
+	self.view.bigDiceResultObj.transform.localScale = self.view.smallDiceResultOriginalScale
+	self.view.bigDiceLid.transform.localPosition = Vector3.Zero()
+	Tools.SetColorAlpha_Float(self.view.bigDiceLidImage, 1)
+
+	if self.diceSequence then
+		self.diceSequence:Kill(false)
+		self.diceSequence = nil
+	end 
+	self.diceSequence = DOTween.Sequence()
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOMove(self.view.bigDiceResultOriginalPos, 0.3):SetEase(Ease.OutQuad))
+	self.diceSequence:Insert(0, self.view.bigDiceResultObj.transform:DOScale(self.view.bigDiceResultOriginalScale, 0.3):SetEase(Ease.OutQuad))
+	self.diceSequence:Append(self.view.bigDiceLid.transform:DOLocalMoveY(1000, 0.2):OnComplete(
+			function()
+				self.view.bigDiceLid:SetActive(false)
+			end
+	))
+	self.diceSequence:Insert(0.3, ComponentUtilGet.Image(self.view.bigDiceLid.transform):DOFade(0, 0.2))
+	self.diceSequence:AppendInterval(1)
+	self.diceSequence:Append(self.view.bigDiceResultObj.transform:DOMove(self.view.smallDiceResultOriginalPos, 0.3):SetEase(Ease.InQuad))
+	self.diceSequence:Insert(1.5, self.view.bigDiceResultObj.transform:DOScale(self.view.smallDiceResultOriginalScale, 0.3):SetEase(Ease.InQuad))
+	self.diceSequence:Play()
 end
 
 ---筛选筹码r
@@ -438,15 +565,15 @@ function DicePointsSumSizeGameCtrl:ScreeningChip(list, winGold, pos)
 	local result = self:GetChipAndNum(list,winGold);
 	local selfChip={}
 	for value, count in pairs(result) do
-		if(count>0) then
+		if(count > 0) then
 			for j = 1, count do
-				local chip =self:FindChipNumObj(value)
-				table.insert(selfChip,chip);
+				local chip = self:FindChipNumObj(value)
+				table.insert(selfChip, chip);
 			end
 		end
 	end
 	for _, chipObj in pairs(selfChip) do
-		DicePointsSumSizeChipManager:DestroyChipFly(chipObj,pos)
+		DicePointsSumSizeChipManager:DestroyChipFly(chipObj, pos)
 	end
 end
 
@@ -634,7 +761,16 @@ function DicePointsSumSizeGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
 	DicePointsSumSizeChipManager:Destroy()
 	TimerManager.StopAllTimer(self)
+	--if self.stateCor then
+	--	coroutine.stop(self.stateCor)
+	--	self.stateCor = nil
+	--end
+	if self.diceSequence then
+		self.diceSequence:Kill(false)
+		self.diceSequence = nil
+	end
 	CorManager.StopAll(self)
+	
 	GlobalEvent.Notify(DicePointsSumSizeConfig.GameEventName.STOP_SIMULATION_SERVER)
 end
 
