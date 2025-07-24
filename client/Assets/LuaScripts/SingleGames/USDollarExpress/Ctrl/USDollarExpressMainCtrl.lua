@@ -29,6 +29,7 @@ function USDollarExpressMainCtrl:CtrlInit(args)
 	self:InitData()
 	config.InitIconPic()--初始化icon图片
 	self:InitFirstSlotPics()
+	SoundManager:ChangeBg(config.ABNames.audios.."bgm_base")
 end
 
 function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
@@ -113,6 +114,8 @@ function USDollarExpressMainCtrl:InitData()
 	end
 	self.rollData=self.rollNormalData
 	self.dollarCount=0
+	
+	self.sound_award5=false--播放中5个图片音效
 	
 end
 -- 初始化第一批展示用的SlotPics
@@ -218,6 +221,7 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 			end
 			self:StartCirle(i)
 		end
+		SoundManager:PlayClip(config.ABNames.audios.."reel_roll")
 	end)
 end
 
@@ -286,6 +290,7 @@ function USDollarExpressMainCtrl:ReSetData()
 	self.isArrpos=true
 	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
 	
+	config.aboradCount=0
 end
 
 --旋转
@@ -428,7 +433,9 @@ end
 ---@param wheelId number 轴数
 ---@param curCirle number 当前圈数
 function USDollarExpressMainCtrl:RestWheelPos(wheelid,isEnd)
-
+	if isEnd and isEnd==true then
+		SoundManager:PlayClip(config.ABNames.audios.."reel_stop")
+	end
 	local nCircels = #self.childsList[wheelid]
 	for j = 1,nCircels do
 		if(j >= 1 and j <= 6) then
@@ -564,6 +571,8 @@ end
 
 --展示结果
 function USDollarExpressMainCtrl:ShowResoult()
+	local soundIndex=Tools.RandomInt(1,13)
+	SoundManager:PlayClip(config.ABNames.audios.."nearmiss"..soundIndex)
 	if self.resoultCor then
 		coroutine.stop(self.resoultCor)
 		self.resoultCor=nil
@@ -637,6 +646,12 @@ function USDollarExpressMainCtrl:ShowDollarProgress()
 	local targetFillAmount = self.model.totalDollars / self.proTarget
 	-- 确保数值在合理范围内
 	targetFillAmount = math.max(0, math.min(1, targetFillAmount))
+	if targetFillAmount<1 then
+		SoundManager:PlayClip(config.ABNames.audios.."meter_collect")
+	else
+		SoundManager:PlayClip(config.ABNames.audios.."meter_completed")
+	end
+	
 	 self.dollarProgressTween = DOTween.To(
 	     function() return self.view.img_slider.fillAmount end,
 	     function(x) self.view.img_slider.fillAmount = x end,
@@ -691,6 +706,14 @@ end
 
 function USDollarExpressMainCtrl:SetIconEffect(lineInfo)
 	local awardPos=lineInfo.iconIndexs
+	if self.sound_award5==false then
+		if #awardPos==5 then
+			self.sound_award5=true
+			local sindex=Tools.RandomInt(1,10)
+			SoundManager:PlayClip(config.ABNames.audios.."winvo"..sindex)
+		end
+	end
+
 	for i=1,#awardPos do
 		---@type USDollarExpressSlotItem
 		local item=self.showChildsList[awardPos[i]]
@@ -724,20 +747,36 @@ function USDollarExpressMainCtrl:DollarFly()
 			self:DollarFlyTo(pos,0.5)
 		else
 			local isHasHuangjinlieche=false
+			local isNormlieche=false
 			local trainInfoList= self.model.trainInfoList
 			if #trainInfoList>0 then
-				local train=trainInfoList[1]
-				if train.type==15 then
+				if #trainInfoList==1 and trainInfoList[1].type==15 then
 					isHasHuangjinlieche=true
+				else
+					isNormlieche=true
 				end
 			end
-			if isHasHuangjinlieche==true then
-				self.view.obj_top1:SetActive(false)
-				self.view.obj_top2:SetActive(true)
-				self.view.txt_repeatWin.text=""
-				self.dollarCount=0
-				local pos=self.view.txt_repeatWin.transform.position
-				self:DollarFlyTo(pos,0.5)
+			if isHasHuangjinlieche==true or isNormlieche==true then
+				if isHasHuangjinlieche==true then
+					self.view.obj_top1:SetActive(false)
+					self.view.obj_top2:SetActive(true)
+					self.view.txt_repeatWin.text=""
+					self.dollarCount=0
+					local pos=self.view.txt_repeatWin.transform.position
+					self:DollarFlyTo(pos,0.5)
+				end
+				if isNormlieche==true then
+					--普通旋转进入拉火车
+					CorManager.StartCor(self, function
+					()
+						coroutine.wait(1)
+						local args={}
+						args.enterType=5
+						args.trainInfoList=self.model.trainInfoList
+						CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,args)
+					end)
+				end
+
 			else
 				logError("正常状态")
 				config.showStep=config.showStep+1
@@ -771,6 +810,7 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 
 	elseif self.model.status==3 then--进入普通列车
 		config.gameTypeState=3
+		self:payerTranisnSounds()
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
@@ -781,6 +821,7 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 		end)
 	elseif self.model.status==4 then--进入黄金列车
 		config.gameTypeState=4
+		self:payerTranisnSounds()
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
@@ -794,8 +835,18 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 	end
 end
 
+function USDollarExpressMainCtrl:payerTranisnSounds()
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear")
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear_vo1")
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear_vo2")
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear_vo3")
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear_vo4")
+	SoundManager:PlayClip(config.ABNames.audios.."train_appear_vo5")
+end
+
 ---各种模式小游戏完成后返回
 function USDollarExpressMainCtrl:EndSmallGame()
+	SoundManager:ChangeBg(config.ABNames.audios.."bgm_base")
 	self:AddShowStep()
 	if self.model.status==1 then--普通二选1
 		CorManager.StartCor(self, function
@@ -816,7 +867,11 @@ function USDollarExpressMainCtrl:EndSmallGame()
 			self.model:ReqStartGame()---请求旋转一次
 		end)
 	elseif self.model.status==3 or self.model.status==4 then
-		logError("开火车模式完成！")
+		if self.model.status==3 then
+			logError("普通开火车模式完毕！")
+			SoundManager:PlayClip(config.ABNames.audios.."board_dollarexpress_exit")
+			SoundManager:PlayClip(config.ABNames.audios.."board_dollarexpress_exit_vo")
+		end
 	end
 end
 
@@ -829,6 +884,7 @@ function USDollarExpressMainCtrl:EnterFreeGame()
 	if self.model.remainFreeCount>0 then
 		logError("进入免费模式")
 		config.gameTypeState=5
+		SoundManager:ChangeBg(config.ABNames.audios.."bgm_free")
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.FreeState)
 		CorManager.StartCor(self,function()
 			coroutine.wait(1)
@@ -842,26 +898,38 @@ function USDollarExpressMainCtrl:SetStateLast()
 	logError("结束=====》")
 	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,self.model.allWinGold)
 	self.isOnclickStart=false
-	local freeCount=self.model.remainFreeCount
-	if freeCount>0 then
-		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.FreeState)
-	elseif config.selfMotionNum>0 then
-		logError("自动旋转模式")
-		config.selfMotionNum=config.selfMotionNum-1
-		GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
-		if config.selfMotionNum==0 then
-			logError("自动旋转停止")
-			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+	if config.gameTypeState==5 then
+		local freeCount=self.model.remainFreeCount
+		if freeCount>0 then
+			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.FreeState)
+		else
+			logError("免费结束")
+			SoundManager:PlayClip(config.ABNames.audios.."board_free_exit")
+			SoundManager:PlayClip(config.ABNames.audios.."board_free_exit_vo")
+			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+			self:CheckEnterInvestGame()
 		end
-		self.model:ReqStartGame()
-		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
-	elseif config.gameTypeState==1 or config.gameTypeState==2 then
-		logError("二选一模式---》")
- 	else
-		---正常模式
-		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
-		self:CheckEnterInvestGame()
+	else
+		if config.selfMotionNum>0 then
+			logError("自动旋转模式")
+			config.selfMotionNum=config.selfMotionNum-1
+			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
+			if config.selfMotionNum==0 then
+				logError("自动旋转停止")
+				GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+			end
+			self.model:ReqStartGame()
+			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
+		elseif config.gameTypeState==1 or config.gameTypeState==2 then
+			logError("二选一模式---》")
+		else
+			---正常模式
+			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+			self:CheckEnterInvestGame()
+		end
 	end
+	
+
 	
 end
 

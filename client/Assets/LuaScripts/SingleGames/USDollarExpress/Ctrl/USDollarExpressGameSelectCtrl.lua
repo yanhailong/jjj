@@ -4,7 +4,8 @@
 ---
 ---@class USDollarExpressGameSelectCtrl:BaseCtrl
 local USDollarExpressGameSelectCtrl=Class("USDollarExpressGameSelectCtrl",BaseCtrl)
-
+---@type USDollarExpressConfig
+local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 ---构造函数
 function USDollarExpressGameSelectCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -22,7 +23,8 @@ function USDollarExpressGameSelectCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
 	self.type=args
-	look("二选一模式",self.type)
+	--look("二选一模式",self.type)
+	SoundManager:PlayClip(config.ABNames.audios.."board_choosefeature")
 	self:InitAnimator()
 	self.waitCor= CorManager.StartCor(self, function
 	()
@@ -65,6 +67,8 @@ function USDollarExpressGameSelectCtrl:AddUIEvent()
 			CorManager.StopCor(self,self.waitCor)
 		end
 		self:SelectLeft()
+		local index=Tools.RandomInt(1,2)
+		SoundManager:PlayClip(config.ABNames.audios.."board_choosefeature_vo"..index)
 	end)
 	self.uiEventListener:AddClick(self.view.btn_SelectFree, function
 	()
@@ -72,6 +76,8 @@ function USDollarExpressGameSelectCtrl:AddUIEvent()
 			CorManager.StopCor(self,self.waitCor)
 		end
 		self:SelectRight()
+		local index=Tools.RandomInt(1,2)
+		SoundManager:PlayClip(config.ABNames.audios.."trans_free_vo"..index)
 	end)
 end
 
@@ -79,6 +85,7 @@ function USDollarExpressGameSelectCtrl:SelectLeft()
 	CorManager.StartCor(self, function
 	()
 		self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanzuo")
+		SoundManager:PlayClip(config.ABNames.audios.."trans_dollarexpress")
 		coroutine.wait(0.6)
 		if self.type==1 then
 			self.model:ReqChooseFreeModel(3)
@@ -93,6 +100,7 @@ function USDollarExpressGameSelectCtrl:SelectRight()
 	CorManager.StartCor(self, function
 	()
 		self.stateAnimator:Play("USDollarExpressGameSelect_chuchang_xuanyou")
+		SoundManager:PlayClip(config.ABNames.audios.."trans_free")
 		coroutine.wait(0.6)
 		if self.type==1 then
 			self.model:ReqChooseFreeModel(5)

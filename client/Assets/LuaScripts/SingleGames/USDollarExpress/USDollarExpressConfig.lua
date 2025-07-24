@@ -20,6 +20,7 @@ this.curchipInfo=0
 this.iscarhasjackpot=false
 this.iscarjackpotvalue=0
 this.allAreaUnLock=false
+this.aboradCount=0
 
 ---@火车颜色
 this.TrainColorType={
@@ -105,6 +106,7 @@ this.ABNames={
     iconEffect="SingleGames/USDollarExpress/effects/prefab",
     smallKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_small_liuguang",
     bigKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_su_liuguang",
+    audios="SingleGames/USDollarExpress/audio/"
 }
 
 

@@ -148,6 +148,13 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     txt_dollars.text=Tools.numberToStrKM(self.dollarValue)
                     self.objDollers:SetActive(false)
                 end
+                if self.iconIndex==17 then
+                    --SoundManager:PlayClip(config.ABNames.audios.."reel_notify1")
+                    config.aboradCount=config.aboradCount+1
+                    if config.aboradCount<=5 then
+                        SoundManager:PlayClip(config.ABNames.audios.."scatter_appear"..config.aboradCount)
+                    end
+                end
             end
         else
             if self.iconEffect then

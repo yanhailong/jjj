@@ -15,7 +15,7 @@ function main:init(lancher)
     ---@type UnityEngine.Canvas
     local canvas=GameObject.Find("Global/Canvas").transform:GetComponent("Canvas")
     canvas.pixelPerfect=true
-    Application.targetFrameRate=60
+    Application.targetFrameRate=60 
     require("PlatformHall/UILogin/MVCHead")
     require("PlatformHall/UIHall/MVCHead")
     require("PlatformHall/UICommonSelection/MVCHead")

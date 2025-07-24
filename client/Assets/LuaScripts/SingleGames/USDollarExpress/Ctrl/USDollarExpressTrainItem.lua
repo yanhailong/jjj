@@ -92,7 +92,8 @@ end
 --end
 
 function USDollarExpressTrainItem:DOPlayerAni()
-    
+
+    SoundManager:PlayClip(config.ABNames.audios.."train_collect")
     local ani= ComponentUtilGet.Animator(self.transform,"chesuofang")
     ani:Play("chexiang_xuanzhong",0)
     self.twObj.transform:SetParent(self.transform.parent.parent)

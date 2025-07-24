@@ -25,24 +25,7 @@ end
 ---初始化
 function USDollarExpressCarCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
-	--local da={
-	--	[1] =
-	--	{
-	--		["poolId"] = 100100104,
-	--		["goldList"] =
-	--		{
-	--			[1] = 1040,
-	--			[2] = 880,
-	--			[3] = 320,
-	--			[4] = 1200,
-	--			[5] = 640,
-	--			[6] = 400,
-	--			[7] = 320,
-	--			[8] = 111111111,
-	--		},
-	--		["type"] = 22,
-	--	},
-	--}
+	SoundManager:ChangeBg(config.ABNames.audios.."bgm_train")
 	self.enterType=args.enterType
 	self.trainInfoList=args.trainInfoList
 	--look("拉火车数据",self.trainInfoList)
@@ -264,6 +247,8 @@ function USDollarExpressCarCtrl:InitTrainComponent(goldList,carType)
 
 
 	self.isCanUpdate=true
+	SoundManager:PlayClip(config.ABNames.audios.."reel_notify2")
+	SoundManager:ChangeBg(config.ABNames.audios.."train_move")
 end
 
 function USDollarExpressCarCtrl:Update()

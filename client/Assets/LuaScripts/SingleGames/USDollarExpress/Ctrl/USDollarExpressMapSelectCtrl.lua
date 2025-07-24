@@ -26,6 +26,8 @@ function USDollarExpressMapSelectCtrl:CtrlInit(args)
 	self:InitData()
 	self.areaIndex=args
 	self:InitMaps()
+	local soundIndex=Tools.RandomInt(1,8)
+	SoundManager:PlayClip(config.ABNames.audios.."pick_invest_vo"..soundIndex)
 end
 
 ---初始化数据
@@ -47,12 +49,14 @@ function USDollarExpressMapSelectCtrl:InitMaps()
 				logError("已经包含了")
 				return
 			end
+			SoundManager:PlayClip(config.ABNames.audios.."pick_click_states")
 			self.view.txt_leftNum.text=3-1
 			local count= table.getCount(self.selectMapIds)
 			if count<3 then
 				table.insert(self.selectMapIds,self.selectMapItem.cItem[i])
 				self.view.redCirle[count+1].transform.position=self.selectMapItem.cItem[i].obj.transform.position
 				self.view.redCirle[count+1]:SetActive(true)
+				SoundManager:PlayClip(config.ABNames.audios.."pick_draw")
 				self.selectMapItem.cItem[i].light:SetActive(true)
 				if table.getCount(self.selectMapIds)==3 then
 					self.view.redCirle[count+1].transform.position=self.selectMapItem.cItem[i].obj.transform.position
@@ -74,6 +78,7 @@ function USDollarExpressMapSelectCtrl:ResInvestArea(msg)
 	CorManager.StartCor(self, function
 	()
 		self.view.obj_zhang:SetActive(true)
+		SoundManager:PlayClip(config.ABNames.audios.."pick_invest")
 		coroutine.wait(1)
 		local goldList=msg.goldList
 		local totalWin=0
@@ -89,11 +94,13 @@ function USDollarExpressMapSelectCtrl:ResInvestArea(msg)
 				txt_dollars.gameObject:SetActive(false)
 				local sp=ComponentUtilGet.SkeletonGraphic(self.alleffects[i].transform,"Spine_Chess")
 				Tools.PlayerSpineAniByName(sp,"keepup",false)
+				SoundManager:PlayClip(config.ABNames.audios.."pick_success")
 				coroutine.wait(1)
 				txt_dollars.gameObject:SetActive(true)
 				coroutine.wait(1)
 			else
 				logError("这个区域没有中奖")
+				SoundManager:PlayClip(config.ABNames.audios.."pick_fail")
 			end
 
 		end
@@ -104,6 +111,7 @@ function USDollarExpressMapSelectCtrl:ResInvestArea(msg)
 		config.allAreaUnLock=self.allAreaUnLock
 		if allWinTrainInfo and allWinTrainInfo.type==15 then
 			logError("进入黄金列车")
+			SoundManager:PlayClip(config.ABNames.audios.."trans_goldtrain")
 			self.view:SetTopState(3)
 			local pos=self.view.txt_repeatWin.transform.position
 			coroutine.wait(0.5)

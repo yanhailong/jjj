@@ -22,8 +22,11 @@ end
 function USDollarExpressMapMainCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
+	SoundManager:ChangeBg(config.ABNames.audios.."bgm_pick")
+	SoundManager:PlayClip(config.ABNames.audios.."pick_vo")
 	self.USDollarExpresszhuanchang=ComponentUtilGet.GameObject(self.view.transform,"USDollarExpresszhuanchang")
 	self.USDollarExpresszhuanchang:SetActive(true)
+	SoundManager:PlayClip(config.ABNames.audios.."trans_pick")
 	self.canvasGroup=ComponentUtilGet.CanvasGroup(self.view.transform,"USDollarExpresszhuanchang")
 	self.objspine=ComponentUtilGet.GameObject(self.USDollarExpresszhuanchang.transform,"eff_zhuanchang/SkeletonGraphic (guochang)")
 	CorManager.StartCor(self, function
@@ -88,6 +91,7 @@ end
 ---区域全解锁返回
 function USDollarExpressMapMainCtrl:allAreaUnLock()
 	logError("所有区域都解锁触发黄金列车2")
+	SoundManager:PlayClip(config.ABNames.audios.."trans_superfree")
 	config.allAreaUnLock=false
 	for i = 1, 8 do
 		Tools.SetActive(self.view.maps[i].obj,false)

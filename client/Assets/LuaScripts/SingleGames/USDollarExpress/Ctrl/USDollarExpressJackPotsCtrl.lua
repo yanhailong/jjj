@@ -60,15 +60,19 @@ function USDollarExpressJackPotsCtrl:SetJackPotAwards(jackpotId)
 	self:HideAll()
 	if jackpotId==config.jackpotIds.grand then
 		self.view.obj_eff_tc_grand_red.gameObject:SetActive(true)
+		SoundManager:PlayClip(config.ABNames.audios.."Jackpot_Grand")
 	end
 	if jackpotId==config.jackpotIds.major then
 		self.view.obj_eff_tc_mejor_violet.gameObject:SetActive(true)
+		SoundManager:PlayClip(config.ABNames.audios.."Jackpot_Major")
 	end
 	if jackpotId==config.jackpotIds.minni then
 		self.view.obj_eff_tc_mini_green.gameObject:SetActive(true)
+		SoundManager:PlayClip(config.ABNames.audios.."Jackpot_Mini")
 	end
 	if jackpotId==config.jackpotIds.minori then
 		self.view.obj_eff_tc_minor_blue.gameObject:SetActive(true)
+		SoundManager:PlayClip(config.ABNames.audios.."Jackpot_Minor")
 	end
 	self:UpDateValueByIndex()
 end
