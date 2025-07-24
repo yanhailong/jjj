@@ -81,9 +81,10 @@ function BirdsAnimalsGameCtrl:RepeatBet()
 		config.isRepeat = true
 		for _, info in ipairs(config.lastXiaZhuInfo) do
 			if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
-				break
+				goto continue
 			end
 			self:Bet(info.side,config.dizhuNumArr[info.index])
+			::continue::
 		end
 		self.view.btn_repeat.interactable = false
 	end

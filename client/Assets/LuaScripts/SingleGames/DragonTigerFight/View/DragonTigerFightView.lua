@@ -52,7 +52,10 @@ function DragonTigerFightView:InitComponents()
     self.xiazhuSelfNumsLabels[1] = ComponentUtilGet.TextMeshProUGUI(self.longClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[2] = ComponentUtilGet.TextMeshProUGUI(self.huClickArea,"yazhuNum/num")
     self.xiazhuSelfNumsLabels[3] = ComponentUtilGet.TextMeshProUGUI(self.heClickArea,"yazhuNum/num")
- 
+    
+    self.debugTxt = ComponentUtilGet.TextMeshProUGUI(self.transform,"content/top/debug/txt")
+    self.debugTime = ComponentUtilGet.TextMeshProUGUI(self.transform,"content/top/debug/time")
+    
     ---下注底注按钮
     self.chipInfos={}
     local ChouMaItem = ComponentUtilGet.GameObject(self.dizhu,"ChouMaItem")
@@ -122,7 +125,7 @@ function DragonTigerFightView:InitComponents()
     self.startRightTrs=ComponentUtilGet.Transform(self.startTrs,"right")
     self.startVsTrs=ComponentUtilGet.Transform(self.startTrs,"vs")
     self.startVsImg=ComponentUtilGet.Image(self.startVsTrs)
-    
+
 end
 
 ---清空组件
@@ -216,7 +219,7 @@ end
 ---启用/禁用下注按钮
 function DragonTigerFightView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<=PlayerManager:GetPlayerInfo().goldNum
+        self.chipInfos[i].button.interactable = config.allow and self.ctrl.model.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
     end
 end
 
@@ -246,11 +249,11 @@ end
 ---其他玩家下注动画
 function DragonTigerFightView:PayOtherXiaZhuCoinFly(data)
     -- 更新总押注金额
-    config.totalDiZhuNums[data.side] = config.totalDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+    config.totalDiZhuNums[data.side] = data.betIdxTotal
     -- 自己下注
     local selfId = PlayerManager:GetPlayerInfo().playerId
     if selfId==data.playerId then
-        config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+        config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + data.betValue
         PlayerManager:GetPlayerInfo().goldNum = data.currency or 0; -- 更新金币
         table.insert(config.selfXiaZhuInfo,data)
         self:PayXiaZhuCoinFly(data.side)
@@ -265,14 +268,14 @@ function DragonTigerFightView:PayOtherXiaZhuCoinFly(data)
     if playerItem ~= nil then
         playerItem:UpdateGoldCount(data.currency or 0) --更新数值
     end
-    if areaTotal[data.side] >= config.OtherPlayer_ChouMaLimit[data.side] then
+    if areaTotal[data.side] >= config.AreaChouMaLimit[data.side] then
         return
     end
     if playerItem ~= nil then
-        ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.amounts,playerItem.transform.position,self.xiazhuStarAreas[data.side],
+        ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.index,playerItem.transform.position,self.xiazhuStarAreas[data.side],
                 data.betValue)
     else
-        ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.amounts,self.btn_players.transform.position,self.xiazhuStarAreas[data.side],
+        ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.index,self.btn_players.transform.position,self.xiazhuStarAreas[data.side],
                 data.betValue)
     end
     areaTotal[data.side] = areaTotal[data.side] + 1
@@ -290,20 +293,22 @@ function DragonTigerFightView:PlayCompeleCoinFLy(results)
     for i=1,#results do
         local player = results[i]
         --跳过没有赢钱的玩家
-        if player.amount == 0 then break end 
+        if player.playerWinGold == 0 then goto continue end 
         local playerItem = self:FindPlayerByID(player.playerId)
-        totalCurrency = totalCurrency + player.amount
+        totalCurrency = totalCurrency + player.playerWinGold
         if player.playerId == PlayerManager:GetPlayerInfo().playerId then
-            winCurrency[1] = player.amount
-            self.selfPlayer:ShowResultCount( player.amount)
+            winCurrency[1] = player.playerWinGold
+            self.selfPlayer:ShowResultCount( player.playerWinGold)
+            PlayerManager:GetPlayerInfo().goldNum = PlayerManager:GetPlayerInfo().goldNum + player.playerWinGold; 
+            self:UpdateSelfGoldCount() -- 更新金币
         elseif  playerItem ~= nil then
             targetPos[#targetPos+1] = playerItem.transform.position
-            winCurrency[#winCurrency+1] =  player.amount
-            playerItem:ShowResultCount(player.amount)
+            winCurrency[#winCurrency+1] =  player.playerWinGold
+            playerItem:ShowResultCount(player.playerWinGold)
         else
-            winCurrency[2] = winCurrency[2] + player.amount
+            winCurrency[2] = winCurrency[2] + player.playerWinGold
         end
-
+        ::continue::
     end
     --按比例回收
     local ratios = {}
@@ -332,6 +337,8 @@ function DragonTigerFightView:InitChouMa()
             self.chipInfos[i].obj:SetActive(false)
         end
     end
+    --默认选中第一个
+    self:ChangeDiZhu(1)
 end
 
 ---初始界面
@@ -401,7 +408,8 @@ function DragonTigerFightView:SettingFade()
 end
 
 ---显示牌面结果和播放动画
-function DragonTigerFightView:ResultEffect(cards)
+function DragonTigerFightView:ResultEffect(result)
+    local cards = {result.loongCard,result.tigerCard}
     for i=1,3 do
         self.resultWinTrs:GetChild(i-1).gameObject:SetActive(false)
     end
@@ -438,16 +446,11 @@ function DragonTigerFightView:ResultEffect(cards)
     --结果
     TimerManager.StartTimer(self, function
     ()
-        local longCar = cards[1]%13
-        local huCar = cards[2]%13
-        if longCar>huCar then
-            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.LONG
+        if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
-        elseif longCar<huCar then
-            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HU
+        elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
             self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
         else
-            config.side = DRAGON_TIGER_FIGHT_WIN_SIDE.HE
             self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
         end
         --结果动画
@@ -529,30 +532,28 @@ end
 ---其他玩家信息更新
 function DragonTigerFightView:UpdatePlayers(players)
     if players ~= nil and #players > 0 then
-        -- 排除自己
-        local selfId = PlayerManager:GetPlayerInfo().playerId
-        local others = {}
-        for _, p in ipairs(players) do
-            if p.id ~= selfId then
-                table.insert(others, p)
-            else
-                --更新自己
-                self:UpdateSelf(p)
-            end
-        end
-        -- 按currency降序排序
-        table.sort(others, function(a, b)
-            return (a.currency or 0) > (b.currency or 0)
-        end)
         -- 只取前6名
-        for i = 1, #self.AllOtherPlayerHeads do
-            if others[i] then
-                self.AllOtherPlayerHeads[i]:UpdatePlayer(others[i])
-            else
-                self.AllOtherPlayerHeads[i]:UpdatePlayer(nil)
+        local total = Mathf.Max(6,#players)
+        local index = 1
+        for i = 1, total do
+            if players[i] and players[i].playerId == PlayerManager:GetPlayerInfo().playerId then
+                self:UpdateSelf(players[i])
+                goto continue
             end
+            if index >= 6 then
+                goto continue
+            end
+            if players[i] then
+                self.AllOtherPlayerHeads[index]:UpdatePlayer(players[i])
+            else
+                self.AllOtherPlayerHeads[index]:UpdatePlayer(nil)
+            end
+            index = index + 1
+            ::continue::
         end
     end
+    --更新房间玩家总数
+    self.tmp_totalPlayerNum.text = self.ctrl.model.playersNum
 end
 
 ---更新路信息
@@ -570,54 +571,55 @@ function DragonTigerFightView:UpdateRoomInfo(model)
     -- 1. 初始化UI状态
     self:InitUI()
     
+    -- 2.更新玩家
+    self:UpdatePlayers(model.players)
+    self:UpdateSelf(PlayerManager:GetPlayerInfo())
+    
     -- 3. 刷新路信息
     self:UpdateRoleView(model.history)
 
     -- 4. 刷新押注池信息
     if model.sideBetInfos then
-        -- sideBetInfos: {SideBetInfo}
-        for i = 1, 3 do
-            local sideInfo = model.sideBetInfos[i]
-            if sideInfo then
-                -- 更新总押注金额
-                config.totalDiZhuNums[sideInfo.side] = sideInfo.amounts or 0
-                -- 更新区域筹码显示
-                self:ShowAreaChouMa(sideInfo)
-            else
-                config.totalDiZhuNums[i] = 0
-            end
+        for k,value in pairs(model.sideBetInfos) do
+            local side = value.betIdx-config.gameID*100
+            -- 更新总押注金额
+            config.totalDiZhuNums[side] = value.betIdxTotal
+            -- 更新玩家区域押注金额
+            config.selfDiZhuNums[side] = value.betValue
+            -- 更新区域筹码显示
+            self:ShowAreaChouMa(value)
         end
         self:UpdateXiaZhuLabel()
     end
 
     -- 5. 刷新当前游戏状态和倒计时
     local lessTime = Tools.CacStageLessTime(model.status,ServerTimeSync:GetTimeStamp(),model.endTime,config.StageTime)
-    look("当前阶段剩余时间（毫秒）：", lessTime)
+    look("当前阶段剩余时间（毫秒）："..lessTime)
     if lessTime<=0 then
         if model.status<4 then
             --进行下一阶段
             self:OnGameStatus(model.status+1)
             --else本轮游戏已结束 等待重新开始 
         end
-    else
+    elseif model.status==3 then
         -- 当前阶段还未结束
         self:OnGameStatus(model.status,Mathf.Round(lessTime/1000))
     end
+    
 end
 
 
 -- 直接显示区域筹码 SideBetInfo
 function DragonTigerFightView:ShowAreaChouMa(sideInfo)
+    if not sideInfo.betGoldList then return end
     local areaTotal = self.ctrl.model.AreaChipTotals
-    for ix=1,#sideInfo.BetInfos do
-        local chip = sideInfo.BetInfos[ix]
-        if areaTotal[chip.side] < config.OtherPlayer_ChouMaLimit[chip.side] then
-            areaTotal[chip.side]=areaTotal[chip.side]+1
-            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,chip.side,self.xiazhuStarAreas[chip.side],self.ctrl.model.betPointList[chip.side])
-        end
-        -- 更新自己的筹码
-        if chip.playerId == PlayerManager:GetPlayerInfo().playerId then
-            config.selfDiZhuNums[chip.side] = config.selfDiZhuNums[chip.side] + chip.amounts
+    local side = sideInfo.betIdx-config.gameID*100
+    for ix=1,#sideInfo.betGoldList do
+        local value = sideInfo.BetInfos[ix]
+        local index = self.ctrl.model:FindBetIndex(value)
+        if areaTotal[side] < config.AreaChouMaLimit[side] then
+            areaTotal[side]=areaTotal[side]+1
+            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,index,self.xiazhuStarAreas[side],value)
         end
     end
 end
@@ -628,21 +630,22 @@ function DragonTigerFightView:NextStage(time)
         self.nextTimer = nil
     end
 
-    if time==0 then
-        self:OnGameStatus(self.model.status+1)
+    if time<=0 then
+        self:OnGameStatus(self.ctrl.model.status+1)
         return
     end
     
     self.nextTimer = TimerManager.StartTimer(self, function()
-        self:OnGameStatus(self.model.status+1)
+        self:OnGameStatus(self.ctrl.model.status+1)
         self.nextTimer = nil
     end,time,0,false)
 end
 
 -- 切换状态
 function DragonTigerFightView:OnGameStatus(status,time)
+    logError("OnGameStatus:"..status.." time:"..(time or ""))
     -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
-    self.model.status = status
+    self.ctrl.model.status = status
     config.lessSeconds = time or Mathf.Round(config.StageTime[status]/1000)
     config.allow= status==2
     
@@ -661,7 +664,8 @@ function DragonTigerFightView:OnGameStatus(status,time)
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil
     end
-
+    --self.debugTxt.text = "status："..status..config.allow
+    --self.debugTime.text = os.date("%Y-%m-%d %H:%M:%S", ServerTimeSync:GetTimeStamp()/1000) 
     if status == 1 then -- 准备阶段
         self.ctrl.model:ResetConfig()
         self:UpdateDiZhuBtnState()
@@ -669,7 +673,7 @@ function DragonTigerFightView:OnGameStatus(status,time)
         self:StartEffect()
     elseif status == 2 then -- 押分阶段
         self:UpdateDiZhuBtnState()
-        self:SetRepeatState(config.isRepeat)
+        self:SetRepeatState(#config.lastXiaZhuInfo > 0 and not config.isRepeat)
         
         self.colockStateTimeTrs.gameObject:SetActive(true)
         self.colockStateTimeNum.text = tostring(config.lessSeconds)
@@ -699,19 +703,25 @@ function DragonTigerFightView:OnGameStatus(status,time)
         self:InitXiaZhuLabel()
     end
 
-    if status<4 then
-        self:NextStage(Mathf.Floor(config.StageTime[status+1]/1000))
+    if status==3 then
+        local nextTime = Mathf.Round(config.StageTime[status+1]/1000)
+        if time and nextTime>0 then
+            nextTime = nextTime - config.StageTime[status] + time --时间差补偿
+        end
+        self:NextStage(nextTime)
     end
 end
 
 ---复投功能
 function DragonTigerFightView:RepeatInit()
+    logError("复投功能 RepeatInit")
     if config.isRepeat then
         config.lastXiaZhuInfo={}
     else
         config.lastXiaZhuInfo = config.selfXiaZhuInfo
     end
     config.selfXiaZhuInfo = {}
+    config.isRepeat = false
     
     self:SetRepeatState(false)
 end
@@ -719,6 +729,7 @@ end
 ---关闭界面
 function DragonTigerFightView:Close()
     ChouMaFlyUtil:Destroy()
+    TimerManager.StopAllTimer(self)
     self.super.Close(self);
 end
 

@@ -14,9 +14,15 @@ local ImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
 local scale = 0.5
 ---桌面上的底注
 local coins = {}
-DOTween:SetTweensCapacity(1000, 250); 
+DOTween:SetTweensCapacity(1000, 250);
 ---
 ---金币抛到桌面上
+---@param coin筹码对象
+---@param coin_type筹码类型
+---@param start_pos起点position
+---@param target目标区域
+---@param dizhuNum筹码数值
+---@param parent显示到指定父节点可选
 function ChouMaFlyUtil:AnimateCoin(coin,coin_type,start_pos,target,dizhuNum,parent)
     local coinObj = GameObject.Instantiate(coin)
     
@@ -60,6 +66,10 @@ function ChouMaFlyUtil:AnimateCoin(coin,coin_type,start_pos,target,dizhuNum,pare
 end
 
 ---创建底注到区域
+---@param coin筹码对象
+---@param coin_type筹码类型
+---@param target目标区域
+---@param dizhuNum筹码数值
 function ChouMaFlyUtil:CreatCoinInArea(coin,coin_type,target,dizhuNum)
     local coinObj = GameObject.Instantiate(coin)
 

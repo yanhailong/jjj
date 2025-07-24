@@ -17,6 +17,7 @@ function DragonTigerFight:EnterGame()
     if CtrlManager.IsOpen(CtrlNames.DragonTigerFight) then
         self.super.EnterGame(self);
     else
+        ---@type BaseCtrl
         local ctrl=CtrlManager.SingleShow(CtrlNames.DragonTigerFight);
         ctrl:AddAsyncOpenCallback(function ()
             self.super.EnterGame(self);
