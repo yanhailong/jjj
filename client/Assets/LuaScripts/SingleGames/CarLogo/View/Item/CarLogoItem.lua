@@ -16,14 +16,14 @@ function CarLogoItem:ctor(trs)
     
     self.choose.gameObject:SetActive(true)
     self.huoChe.gameObject:SetActive(false)
-    self.image.transform.localScale = Vector3(0.55,0.55,1)
+    self.image.transform.localScale = Vector3(0.56,0.56,1)
     self:ShowChoose(false)
 end
 
 function CarLogoItem:FlyLogoHistory(result,target)
     local gameObj = Tools.Instance(self.image.gameObject)
     gameObj.transform:SetParent(result)
-    gameObj.transform.localScale = Vector3(0.55,0.55,1);
+    gameObj.transform.localScale = Vector3(0.56,0.56,1);
     gameObj.transform.position = self.transform.position;
     gameObj.transform:DOMove(target,1):SetEase(Ease.InOutQuad):OnComplete(function ()
         Tools.Destroy(gameObj)

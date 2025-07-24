@@ -42,7 +42,7 @@ function DragonTigerFightCtrl:AddFunctionButtons()
     self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.DragonTigerFightRule) end)
     self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
     self.uiEventListener:AddClick(self.view.btn_players, function()
-        --CtrlManager.SingleShow(CtrlNames.DragonTigerFightPlayerRank)
+        self.model:ReqRoomPlayers()
     end)
     self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
     self.uiEventListener:AddClick(self.view.btn_prev,function()  self.view:DizhuPrev(false) end)
@@ -55,7 +55,7 @@ function DragonTigerFightCtrl:AddBetButtons()
         self.uiEventListener:AddClick(chipInfo.button, function()
             if config.allow then
                 self.view:ChangeDiZhu(i)
-                look("btn 抵住数值" .. config.dizhuNumArr[config.dizhuIndex])
+                look("btn 抵住数值" .. config.dizhuIndex)
             end
         end)
     end
@@ -73,10 +73,11 @@ function DragonTigerFightCtrl:RepeatBet()
         config.isRepeat = true
         local ReqBet = { reqBetBeans = {} }
         for _, info in ipairs(config.lastXiaZhuInfo) do
-            if not config.allow or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
-                break
+            if not config.allow or self.model.betPointList[info.index] > PlayerManager:GetPlayerInfo().goldNum then
+                goto continue
             end
             table.insert(ReqBet.reqBetBeans, {betValue = self.model.betPointList[info.index],betAreaIdx=config.gameID*100+info.side} )
+            ::continue::
         end
         self.view.btn_repeat.interactable = false
         self.model:Bet(ReqBet)

@@ -4,12 +4,6 @@ CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFight].ctrl =require "SingleGam
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFight].view=require "SingleGames/DragonTigerFight/View/DragonTigerFightView";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFight].model=require "SingleGames/DragonTigerFight/Model/DragonTigerFightModel";
 
-CtrlNames.DragonTigerFightPlayerRank="DragonTigerFightPlayerRank";
-CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightPlayerRank]={};
-CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightPlayerRank].ctrl =require "SingleGames/DragonTigerFight/Ctrl/PlayerRankCtrl";
-CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightPlayerRank].view=require "SingleGames/DragonTigerFight/View/PlayerRankView";
-CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightPlayerRank].model=require "SingleGames/DragonTigerFight/Model/PlayerRankModel";
-
 CtrlNames.DragonTigerFightRule="DragonTigerFightRule";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule]={};
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFightRule].ctrl =require "SingleGames/DragonTigerFight/Ctrl/RuleCtrl";

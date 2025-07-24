@@ -211,7 +211,6 @@ function RoadView:UpdateDaLuInfo()
             table.insert(self.daLuRecods[index],{side,heTimes})
         end
     end
-    look(self.daLuRecods)
 
     ---更新UI
     if self.daLuRecods then

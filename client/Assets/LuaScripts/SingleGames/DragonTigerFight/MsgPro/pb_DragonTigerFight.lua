@@ -49,6 +49,8 @@ pb_DragonTigerFight.NotifyPlayerBet = 131201
 pb_DragonTigerFight.RespTablePlayerInfo = 131203
 --- 响应,msgID=0x20088,desc=通知押注类房间玩家信息变化
 pb_DragonTigerFight.NotifyTableRoomPlayerInfoChange = 131208
+--- 响应,msgID=0x20089
+pb_DragonTigerFight.NotifyPhaseChangInfo = 131209
 
 
 PbMsg[20610] = 'NotifyRoomReadyWait'
@@ -75,6 +77,7 @@ PbMsg[131076] = 'ReqRoomBaseInfo'
 PbMsg[131201] = 'NotifyPlayerBet'
 PbMsg[131203] = 'RespTablePlayerInfo'
 PbMsg[131208] = 'NotifyTableRoomPlayerInfoChange'
+PbMsg[131209] = 'NotifyPhaseChangInfo'
 
 PBHelper.LoadPB('SingleGames/DragonTigerFight/Protol','room')
 PBHelper.LoadPB('SingleGames/DragonTigerFight/Protol','table')
