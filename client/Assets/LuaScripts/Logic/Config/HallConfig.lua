@@ -49,6 +49,9 @@ GameNames = {
 	USDollarExpress="USDollarExpress",--美元快递
 	BaccaratSessionSelect="BaccaratGame",--百家乐
 	DragonTigerFight="DragonTigerFight",--龙虎斗
+	VietnamChess="VietnamChess",--越南色碟
+	CarLogo="CarLogo",--豪车俱乐部
+	BirdsAnimals="BirdsAnimals",--飞禽走兽
 }
 
 ---游戏选择场景配置
@@ -56,6 +59,9 @@ GameSortID={
 	[1]=GameNames.USDollarExpress,--美元快递
 	[2]=GameNames.BaccaratSessionSelect,--百家乐
 	[3]=GameNames.DragonTigerFight,--龙虎斗
+	[4]=GameNames.VietnamChess,--越南色碟
+	[5]=GameNames.CarLogo,--豪车俱乐部
+	[6]=GameNames.BirdsAnimals,--飞禽走兽
 }
 
 -- 游戏的配置
@@ -70,9 +76,22 @@ GameConfig = {
 		Manager = "SingleGames/Baccarat/Baccarat",
 		EnterCtrlName = CtrlNames.BaccaratMain, --游戏入口界面
 	},[GameNames.DragonTigerFight] = {
-		gameType = 200100,
-		Manager = "SingleGames/DragonTigerFight/MVCHead",
+		gameType = 200101,
+		Manager = "SingleGames/DragonTigerFight/DragonTigerFight",
 		EnterCtrlName = CtrlNames.DragonTigerFight, --游戏入口界面
+	},[GameNames.VietnamChess] = {
+		gameType = 200700,
+		Manager = "SingleGames/VietnamChess/VietnamChess",
+		EnterCtrlName = CtrlNames.VietnamChessGame, --游戏入口界面
+	},[GameNames.CarLogo] = {
+		gameType = 200400,
+		Manager = "SingleGames/CarLogo/CarLogo",
+		EnterCtrlName = CtrlNames.CarLogoGame, --游戏入口界面
+	},[GameNames.CarLogo] = {
+		gameType = 200300,
+		Manager = "SingleGames/BirdsAnimals/BirdsAnimals",
+		EnterCtrlName = CtrlNames.BirdsAnimalsGame, --游戏入口界面
 	},
+	
 }
 

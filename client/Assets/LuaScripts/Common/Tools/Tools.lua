@@ -1252,3 +1252,30 @@ function this.numberToStrKM(number)
         return string.format("%.1fT", number / 1000000000000)
     end
 end
+
+
+---获取当前时段的剩余时间
+---@param current_status当前时段
+---@param current_time_ms当前服务器时间
+---@param game_end_time_ms游戏结束时间
+---@param phase_times时段时间ms
+function this.CacStageLessTime(current_status,current_time_ms,game_end_time_ms,phase_times)
+    -- 计算当前阶段开始时间
+    local phase_start_time_ms = game_end_time_ms
+    for i = 1, current_status - 1 do
+        phase_start_time_ms = phase_start_time_ms - phase_times[i]
+    end
+
+    -- 计算当前阶段结束时间
+    local phase_end_time_ms = phase_start_time_ms - phase_times[current_status]
+
+    -- 计算当前阶段剩余时间
+    local remaining_time_ms = phase_end_time_ms - current_time_ms
+
+    -- 如果剩余时间小于0，说明阶段已经结束
+    if remaining_time_ms < 0 then
+        remaining_time_ms = 0
+    end
+    
+    return remaining_time_ms
+end

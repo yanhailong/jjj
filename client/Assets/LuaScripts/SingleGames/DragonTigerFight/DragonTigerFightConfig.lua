@@ -7,14 +7,6 @@
 local DragonTigerFightConfig=Class("DragonTigerFightConfig")
 local this = DragonTigerFightConfig;
 
----玩家信息
-this.selfPlayer = {
-     playerId = 9999,
-     nickName = "9999",
-     gold = 9999,
-     diamond = 9999,
-     vipLevel = 1,
-}
 ---游戏ID
 this.gameID = 200101
 ---当前选中的底注
@@ -38,7 +30,7 @@ this.goldRealNum = 100000
 ---流程状态信息 当前房间阶段 1=等待押注,2=押注冻结，等待开牌,3=本局结束
 this.currStatus = 1
 ---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
-this.StageTime = {3000,15000,5000,5000}
+this.StageTime = {2000,13000,13000,0}
 ---当前状态剩余秒数 13
 this.lessSeconds = 13
 ---房间总人数

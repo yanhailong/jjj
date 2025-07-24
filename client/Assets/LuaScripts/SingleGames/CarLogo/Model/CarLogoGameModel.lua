@@ -4,41 +4,18 @@
 ---
 ---@class CarLogoGameModel:BaseModel
 local CarLogoGameModel=Class("CarLogoGameModel",BaseModel)
-local CarLogoConfig =require("SingleGames/CarLogo/CarLogoConfig")
-
---GameStatus:当前牌局状态,1=等待押注,2=押注冻结，等待开牌,3=本局结束
-CarLogoGameModel.GameStatus = {
-	WaitBet = 1,
-	WaitResult = 2,
-	GameEnd = 3,
-}
---玩家列表
-CarLogoGameModel.playerList = {};
---历史记录
-CarLogoGameModel.historyList = {};
---状态，默认为游戏结束
-CarLogoGameModel.status = CarLogoGameModel.GameStatus.GameEnd;
---上局下注信息
-CarLogoGameModel.isXuYaing = false;
---续押列表
-CarLogoGameModel.lastBetList = {}
--- 当前轮压注列表
-CarLogoGameModel.curBetList = {}
---最低携带可玩金额
-CarLogoGameModel.minBetMoney = 10;
---最大下注金额
-CarLogoGameModel.maxBetMoney = 100000;
---是否需要刷新房间
-CarLogoGameModel.refreshRoom = false
--- 是否播放历史动画
-CarLogoGameModel.isPlayingHistory = false
--- 历史记录最大显示50条
-CarLogoGameModel.HistoryListMax = 50
+local config =require("SingleGames/CarLogo/CarLogoConfig")
 
 function CarLogoGameModel:Awake()
 	self.super.Awake(self);
 	---@type CarLogoGameCtrl
 	self.ctrl=self.ctrl
+
+	self.players = {}
+	self.sideBetInfos={}
+	self.history = {}
+	self.Result = {}
+	self.AreaChipTotals = {0,0,0,0,0,0,0,0}
 end
 
 function CarLogoGameModel:Close()
@@ -46,16 +23,108 @@ function CarLogoGameModel:Close()
 end
 
 function CarLogoGameModel:AddEvent()
-	GlobalEvent.AddListener(CarLogoConfig.EventBinner.XIAZHU,self.PlayerXiaZhu,self)
-	GlobalEvent.AddListener(CarLogoConfig.EventBinner.XIAZHU_END,self.OnXiaZhuComplete,self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoEnterRoom, self.OnEnterRoom, self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoBetting, self.OnBetting, self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoGameStatus, self.OnGameStatus, self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoPlayerEnterRoom, self.OnPlayerEnterRoom, self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoPlayerLeaveRoom, self.OnPlayerLeaveRoom, self)
+	WebNetEvent.AddListener(pb_CarLogo.ResCarLogoGameResult, self.OnGameResult, self)
 end
 
 function CarLogoGameModel:RemoveEvent()
-	GlobalEvent.Remove(CarLogoConfig.EventBinner.XIAZHU,self.PlayerXiaZhu,self)
-	GlobalEvent.Remove(CarLogoConfig.EventBinner.XIAZHU_END,self.OnXiaZhuComplete,self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoEnterRoom, self.OnEnterRoom, self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoBetting, self.OnBetting, self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoGameStatus, self.OnGameStatus, self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoPlayerEnterRoom, self.OnPlayerEnterRoom, self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoPlayerLeaveRoom, self.OnPlayerLeaveRoom, self)
+	WebNetEvent.Remove(pb_CarLogo.ResCarLogoGameResult, self.OnGameResult, self)
 end
 
 --region 事件方法
+-- 进入房间返回
+function CarLogoGameModel:OnEnterRoom(msg)
+	self.roomId = msg.roomId
+	self.config = msg.config
+	self.sideBetInfos = msg.sideBetInfos
+	self.players = msg.players
+	self.history = msg.history
+	self.status = msg.status
+	self.seconds = msg.seconds
+	if self.ctrl and self.ctrl.view and self.ctrl.view.UpdateRoomInfo then
+		self.ctrl.view:UpdateRoomInfo(self)
+	end
+end
+
+-- 广播玩家押注信息
+function CarLogoGameModel:OnBetting(msg)
+	-- msg.betList: {BetInfo}
+	if self.ctrl and self.ctrl.view and self.ctrl.view.PayOtherXiaZhuCoinFly then
+		for _, bet in ipairs(msg.betList or {}) do
+			self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+		end
+	end
+end
+
+-- 广播切换状态
+function CarLogoGameModel:OnGameStatus(msg)
+	self.status = msg.status
+	self.seconds = msg.seconds
+	if self.ctrl and self.ctrl.view and self.ctrl.view.OnGameStatus then
+		self.ctrl.view:OnGameStatus(msg.status, msg.seconds)
+	end
+end
+
+-- 广播玩家进入房间
+function CarLogoGameModel:OnPlayerEnterRoom(msg)
+	if msg.player then
+		for _, p in ipairs(msg.player) do
+			table.insert(self.players, p)
+		end
+		if self.ctrl and self.ctrl.view and self.ctrl.view.UpdatePlayers then
+			self.ctrl.view:UpdatePlayerTotal(#self.players)
+		end
+	end
+end
+
+-- 广播玩家离开房间
+function CarLogoGameModel:OnPlayerLeaveRoom(msg)
+	if msg.userId then
+		for i, p in ipairs(self.players) do
+			if p.id == msg.userId then
+				table.remove(self.players, i)
+				break
+			end
+		end
+		if self.ctrl and self.ctrl.view and self.ctrl.view.UpdatePlayers then
+			self.ctrl.view:UpdatePlayerTotal(#self.players)
+		end
+	end
+end
+
+-- 广播结算信息
+function CarLogoGameModel:OnGameResult(msg)
+	self.Result = msg;
+	if #self.history>=50 then
+		self.history = {}
+	end
+	table.insert(self.history,msg.winSide)
+	if self.ctrl and self.ctrl.view and self.ctrl.view.ResultEffect then
+		---显示结果
+		self.ctrl.view:ResultEffect(msg)
+	end
+end
+
+function CarLogoGameModel:ResetConfig()
+	for i=1,#config.selfDiZhuNums do
+		config.selfDiZhuNums[i]=0
+		config.totalDiZhuNums[i]=0
+	end
+	self.sideBetInfos={}
+	self.Result = {}
+	self.AreaChipTotals = {0,0,0,0,0,0,0,0}
+end
+
+---------------
 ---收到玩家下注消息
 function CarLogoGameModel:PlayerXiaZhu()
 	local data  = {id=Tools.RandomInt(1,30),dizhuType=Tools.RandomInt(1,5),areaType=Tools.RandomInt(1,8)}

@@ -68,6 +68,28 @@ CarLogoConfig.LOGO_RESULT = {
     [this.LOGO_TYPE.LOGO8] = "Car_kdlk"
 }
 
+CarLogoConfig.LOGO_HISTORY = {
+    this.LOGO_TYPE.LOGO1,
+    this.LOGO_TYPE.LOGO2,
+    this.LOGO_TYPE.LOGO3,
+    this.LOGO_TYPE.LOGO4,
+    this.LOGO_TYPE.LOGO5,
+    this.LOGO_TYPE.LOGO6,
+    this.LOGO_TYPE.LOGO7,
+    this.LOGO_TYPE.LOGO8
+}
+
+CarLogoConfig.AUDIO_KEY = {
+    KaiShiXiaZhu=1,  --开始下注
+    StopXiaZhu=2,  --停止下注
+    Running =3,  --旋转
+    DaoJiShi=4,  --倒计时音效
+    StopXiaZhuEnd =5,  --停止下注吹哨
+    KaiShiXiaZhuEnd=6,  --开始下注播放完毕播放该音效
+    Bet=7,  --筹码音效
+    WinBet=8,  --筹码赢奖
+}
+
 ---曲线关键帧
 CarLogoConfig.CURVE_KEYS = {
     {0, 0},
@@ -119,12 +141,21 @@ CarLogoConfig.XiaZhu_Limit_Num = 2000000
 --每一个区域场外玩家扔筹码的数量限制
 CarLogoConfig.EveryArea_OtherPlayer_ThrowChouMa_Limit = 40
 
+---玩家信息
+this.selfPlayer = {
+    playerId = 9999,
+    nickName = "9999",
+    gold = 9999,
+    diamond = 9999,
+    vipLevel = 1,
+}
+
 ---游戏ID
 this.gameID = 200400
 ---当前选中的底注
 this.dizhuIndex = 1
 ---底注数值
-this.dizhuNumArr = {1,10,50,100,500}
+this.dizhuNumArr = {1,10,50,100,500,1000,2000}
 ---当前是否可以下注
 this.allow = false
 ---本局结果

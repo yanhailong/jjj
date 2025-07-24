@@ -86,8 +86,6 @@ local AlarmClockSpine;--闹钟动画
 --endregion
 ---下注的筹码面板集合
 local betInfoList={};
----筹码按钮所有子物体的Image集合
-local BottomNoteChildImages={};
 ---服务器发过来的房间桌面的数据
 local BaccaratTableInfo;
 ---服务器发过来的场上结算信息
@@ -139,8 +137,13 @@ function BaccaratGameCtrl:InitData()
 		BaccaratPlayerItems[i]=BaccaratPlayerItem.New(BestSixPlayerObjs[i],self)
 		BestSixPlayerObjs[i]:SetActive(false);
 	end
-	
-	
+	self.view.tmp_SelfName.text = PlayerManager:GetPlayerInfo().playerName;
+	self:RefreshSelfGoldNumShow();
+	self.ChipContentRect = ComponentUtilGet.RectTransform(self.view.obj_ChipContent.transform);
+	self.ChipContentRect.anchoredPosition.x = 0
+	self:RefreshChipLeftRightBtnShow()
+	self.BuFaXianAni = ComponentUtilGet.Animator(self.view.obj_PlayerCardRoot.transform);
+	self.BuFaZhuangAni = ComponentUtilGet.Animator(self.view.obj_BankerCardRoot.transform);
 
 	vsSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_VS.transform,"SkeletonGraphic");
 	BeginBetSpine = ComponentUtilGet.SkeletonGraphic(self.view.obj_BeginBet.transform,"SkeletonGraphic");
@@ -264,6 +267,10 @@ function BaccaratGameCtrl:RefreshSelfBetNumShow()
 	self.view.tmp_SelfBetTieNum.text = SelfBetTieAllNum;
 	
 end
+---刷新自己的金币数量显示
+function BaccaratGameCtrl:RefreshSelfGoldNumShow()
+	self.view.tmp_SelfGoldNumber.text = PlayerManager:GetPlayerInfo().goldNum
+end
 
 ---首次进入游戏刷新显示
 function BaccaratGameCtrl:FirstEntryGame(data)
@@ -281,7 +288,6 @@ function BaccaratGameCtrl:FirstEntryGame(data)
 		local chipItem = BaccaratChipItems.New(item,self);
 		chipItem:InitUIShow(i,betInfoList[i]);
 		table.insert(ChipItems,chipItem);
-		table.insert(BottomNoteChildImages,chipItem.icon)
 	end
 	--BottomNoteChildImages = self.view.obj_ChipContent.transform:GetComponentsInChildren(UnityEngine.UI.Image,true)
 	self:SetBetButtonInteractable(false);
@@ -440,11 +446,14 @@ end
 
 ---设置按钮的显示状态
 function BaccaratGameCtrl:SetBetButtonInteractable(state)
-	for _, v in pairs(BottomNoteChildImages) do
+	for _, v in pairs(ChipItems) do
+		---@type BaccaratChipItems
+		local item = v;
+		item.btn.enabled = state;
 		if state then
-			v.material = nil;
+			item.icon.material = nil;
 		else
-			v.material = config.GetUIImageGray();
+			item.icon.material = config.GetUIImageGray();
 		end
 	end
 	--if state then
@@ -478,9 +487,10 @@ function BaccaratGameCtrl:EnterDeal()
 		--显示发牌区域
 		self.view.obj_DealCardBg:SetActive(true);
 		self.view.ator_DealCards:Play("dealAnim")
+		local playerCardNum =BaccaratSettlementInfo.playerPointId;
+		local BankerCardNum = BaccaratSettlementInfo.bankerPointId;
 		coroutine.wait(1)
 		self.view.obj_StopBet:SetActive(false);
-		coroutine.wait(1)
 		local playerCard1 = BaccaratSettlementInfo.playerCardIds[1];
 		ComponentUtilGet.Image(self.view.ator_PlayerCard1.transform,"CardImage").sprite = config.GetCardPic("card_"..playerCard1);
 		self.view.ator_PlayerCard1:Play("FlipCards");
@@ -495,13 +505,11 @@ function BaccaratGameCtrl:EnterDeal()
 		ComponentUtilGet.Image(self.view.ator_PlayerCard2.transform,"CardImage").sprite = config.GetCardPic("card_"..playerCard2);
 		self.view.ator_PlayerCard2:Play("FlipCards");
 		playerIsPairing =BaccaratSettlementInfo.cardState.cardTypeWinState == 2 or BaccaratSettlementInfo.cardState.cardTypeWinState == 3;
-		local playerCardNum =BaccaratSettlementInfo.playerPointId;
 		if(playerIsKing) then
 			self.view.txt_PlayerPoint.text = playerCardNum;
 			self.view.obj_PlayerPoints:SetActive(true);
 			coroutine.wait(1.5)
 		end
-		
 		coroutine.wait(0.5)
 		local BankerIsKing =BaccaratSettlementInfo.extraBankerCardId ==0 and (BankerCardNum == 8 or BankerCardNum == 9);
 		local BankerCard1 =  BaccaratSettlementInfo.bankerCardIds[1];
@@ -516,14 +524,13 @@ function BaccaratGameCtrl:EnterDeal()
 		ComponentUtilGet.Image(self.view.ator_BankerCard2.transform,"CardImage").sprite = config.GetCardPic("card_"..BankerCard2);
 		self.view.ator_BankerCard2:Play("FlipCards");
 		BankerIsPairing =BaccaratSettlementInfo.cardState.cardTypeWinState == 1 or BaccaratSettlementInfo.cardState.cardTypeWinState == 3;
-		local BankerCardNum = BaccaratSettlementInfo.bankerPointId;
+	
 		self.view.obj_BankerKing:SetActive(BankerIsKing)
 		if(BankerIsKing) then
 			self.view.txt_BankerPoint.text = BankerCardNum;
 			self.view.obj_BankerPoints:SetActive(true);
 			coroutine.wait(1.5)
 		end
-		
 		coroutine.wait(0.5)
 		if(playerIsKing or BankerIsKing) then
 			KingNumber=KingNumber+1;
@@ -536,7 +543,7 @@ function BaccaratGameCtrl:EnterDeal()
 			if(BaccaratSettlementInfo.extraPlayerCardId ~=0 ) then
 				local playerCard3 = BaccaratSettlementInfo.extraPlayerCardId
 				ComponentUtilGet.Image(self.view.ator_PlayerCard3.transform,"CardImage").sprite = config.GetCardPic("card_"..playerCard3);
-				self.view.ator_DealCards:Play("Bufaxian");
+				self.BuFaXianAni:Play("Bufaxian");
 				coroutine.wait(1)
 				self.view.ator_PlayerCard3:Play("FlipCards")
 				coroutine.wait(0.5)
@@ -545,7 +552,7 @@ function BaccaratGameCtrl:EnterDeal()
 			if BaccaratSettlementInfo.extraBankerCardId ~=0   then--庄家也补牌
 				local BankerCard3 =  BaccaratSettlementInfo.extraBankerCardId
 				ComponentUtilGet.Image(self.view.ator_BankerCard3.transform,"CardImage").sprite = config.GetCardPic("card_"..BankerCard3);
-				self.view.ator_DealCards:Play("Bufazhuang");
+				self.BuFaZhuangAni:Play("Bufazhuang");
 				coroutine.wait(1)
 				self.view.ator_BankerCard3:Play("FlipCards")
 				coroutine.wait(0.5)
@@ -647,7 +654,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 	table.sort(betInfoDescendingList, function(a, b) return a > b end);
 	
 	for _, v in ipairs(PlayerChangedGolds) do
-		if(v.playerId == PlayerInfo.playerId) then--自己赢钱了
+		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--自己赢钱了
 			local selfWinGold = v.playerWinGold+v.playerBetGold
 			self:ScreeningChip(betInfoDescendingList,selfWinGold,self.view.obj_Player.transform.position)
 		elseif(self:IsInScene(v.playerId)) then --前6名的玩家赢钱了
@@ -777,9 +784,31 @@ end
 function BaccaratGameCtrl:Close()
     self.super.Close(self);
 end
+---刷新筹码左右选择按钮的显示
+function BaccaratGameCtrl:RefreshChipLeftRightBtnShow()
+	self.view.btn_Chipleft.gameObject:SetActive(self.ChipContentRect.anchoredPosition.x == 0)
+	self.view.btn_ChipRight.gameObject:SetActive(self.ChipContentRect.anchoredPosition.x == -410)
+end
+	
 
 ---添加UI事件
 function BaccaratGameCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_Chipleft,function()
+		if(self.ChipContentRect.anchoredPosition.x == 0) then
+			return;
+		end
+		self.ChipContentRect.anchoredPosition.x = 0
+		self:RefreshChipLeftRightBtnShow();
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_ChipRight,function()
+		if(self.ChipContentRect.anchoredPosition.x == -410) then
+			return;
+		end
+		self.ChipContentRect.anchoredPosition.x = -410
+		self:RefreshChipLeftRightBtnShow();
+	end)
+	
 	self.uiEventListener:AddClick(self.view.btn_Menu,function()
 		self:RefreshMenuShow()
 	end)
@@ -827,7 +856,7 @@ function BaccaratGameCtrl:SetCheckedShow(BaccaratChipItem)
 end
 
 function BaccaratGameCtrl:PlayerBet(data)
-	if(PlayerInfo.GetPlayerId() == data.playerId) then--自己下注
+	if(PlayerManager:GetPlayerInfo().playerId == data.playerId) then--自己下注
 		self.view.tmp_SelfGoldNumber.text = data.playerCurGold;
 	else
 		for _, v in pairs(BaccaratPlayerItems) do
@@ -840,7 +869,7 @@ function BaccaratGameCtrl:PlayerBet(data)
 	end
 
 	for _, v in pairs(data.betTableInfoList) do
-		if(PlayerInfo.GetPlayerId() == data.playerId) then--自己下注
+		if(PlayerManager:GetPlayerInfo().playerId == data.playerId) then--自己下注
 			local bet = {}
 			bet.betValue = v.betValue;
 			bet.betAreaIdx = v.betIdx;
@@ -853,7 +882,7 @@ end
 ---筹码飞行到指定区域
 ---@param data 服务器发过来的数据结构
 function BaccaratGameCtrl:PlayChip(data,playerId)
-	local isSelf = playerId ==PlayerInfo.GetPlayerId();
+	local isSelf = playerId ==PlayerManager:GetPlayerInfo().playerId;
     local targetRect;
 	if(data.betIdx == config.BetState.Banker) then -- 下注的庄家
 		targetRect = self.view.obj_BetBankerRegion.transform:GetComponent("RectTransform");

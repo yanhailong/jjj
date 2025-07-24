@@ -40,7 +40,7 @@ end
 function BaccaratGameModel:NotifyPlayerBet(data)
 	if(data.code == 200) then
 		look("推送下注信息成功",data)
-		self.ctrl:PlayerBet()
+		self.ctrl:PlayerBet(data)
 	else
 		look("推送下注信息失败",data.code)
 	end

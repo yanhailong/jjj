@@ -1,5 +1,3 @@
-require("SingleGames/DragonTigerFight/MsgPro/pb_DragonTigerFight")
-
 CtrlNames.DragonTigerFight="DragonTigerFight";
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFight]={};
 CtrlManager.CtrlsCollection[CtrlNames.DragonTigerFight].ctrl =require "SingleGames/DragonTigerFight/Ctrl/DragonTigerFightCtrl";

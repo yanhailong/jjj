@@ -22,7 +22,7 @@ end
 function BirdsAnimalsGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	TimerManager.StartTimer(self,function()    self:EnterRoom(args and args[1] or 1)  end,1,0)
+	TimerManager.StartTimer(self,function()    self:EnterRoom(args or 1)  end,1,0)
 end
 
 ---初始化数据
@@ -80,7 +80,7 @@ function BirdsAnimalsGameCtrl:RepeatBet()
 	if #config.lastXiaZhuInfo > 0 and not config.isRepeat then
 		config.isRepeat = true
 		for _, info in ipairs(config.lastXiaZhuInfo) do
-			if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > config.goldRealNum then
+			if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
 				break
 			end
 			self:Bet(info.side,config.dizhuNumArr[info.index])

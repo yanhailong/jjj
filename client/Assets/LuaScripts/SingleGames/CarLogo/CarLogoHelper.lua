@@ -19,6 +19,16 @@ function CarLogoHelper.LoadLogoNameSprite(index)
     return resMgr:LoadSprite(atlasPath.."/txt",CarLogoConfig.LOGO_RESULT[index]);
 end
 
+--获取id对应点击区域index
+function CarLogoHelper.FindIndexById(logo_id)
+    for i=1,#CarLogoConfig.LOGO_HISTORY do
+        if CarLogoConfig.LOGO_HISTORY[i]==logo_id then
+            return i
+        end
+    end
+    return nil
+end
+
 --是否为特殊效果
 function CarLogoHelper.IsSpecialResult(result)
     return result.spec_show_info ~= nil and result.spec_show_info.spec_id ~= 0;
