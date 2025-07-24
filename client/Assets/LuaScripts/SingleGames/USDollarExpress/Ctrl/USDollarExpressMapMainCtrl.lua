@@ -4,7 +4,8 @@
 ---
 ---@class USDollarExpressMapMainCtrl:BaseCtrl
 local USDollarExpressMapMainCtrl=Class("USDollarExpressMapMainCtrl",BaseCtrl)
-
+---@type USDollarExpressConfig
+local config=require"SingleGames/USDollarExpress/USDollarExpressConfig"
 ---构造函数
 function USDollarExpressMapMainCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -61,9 +62,14 @@ end
 
 ---添加UI事件
 function USDollarExpressMapMainCtrl:AddUIEvent()
+	self.isClick = false
 	for i = 1, 8 do
 		self.uiEventListener:AddClick(self.view.maps[i].obj, function
 		()
+			if self.isClick==true then
+				return
+			end
+			self.isClick=true
 			CorManager.StartCor(self, function
 			()
 				self.view.maps[i].objSelect:SetActive(true)
@@ -79,9 +85,19 @@ function USDollarExpressMapMainCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 end
 
---region UI事件方法
-
---endregion
+---区域全解锁返回
+function USDollarExpressMapMainCtrl:allAreaUnLock()
+	logError("所有区域都解锁触发黄金列车2")
+	config.allAreaUnLock=false
+	for i = 1, 8 do
+		Tools.SetActive(self.view.maps[i].obj,false)
+	end
+	---走二选一后的逻辑
+	local ctrl=CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+	config.gameTypeState=2
+	ctrl.model.status=2
+	ctrl:EndSmallGame()
+end
 
 
 ---销毁UI

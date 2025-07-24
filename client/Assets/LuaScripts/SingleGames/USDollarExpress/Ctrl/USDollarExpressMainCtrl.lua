@@ -595,7 +595,7 @@ function USDollarExpressMainCtrl:ShowResoult()
 end
 
 function USDollarExpressMainCtrl:EnterInvestGame()
-	if #self.model.choosableAreas>0 then
+	if #self.model.choosableAreas>0 and self.model.status==0 then
 		logError("进入投资小游戏--->")
 		CorManager.StartCor(self, function
 		()
@@ -609,10 +609,40 @@ function USDollarExpressMainCtrl:EnterInvestGame()
 	end
 end
 
+---其他模式结束后检测是否进入投资小游戏
+function USDollarExpressMainCtrl:CheckEnterInvestGame()
+	if #self.model.choosableAreas>0 and self.model.status~=0 then
+		logError("进入投资小游戏--->")
+		CorManager.StartCor(self, function
+		()
+			coroutine.wait(0.5)
+			self:SetAllChildItemMask(true)
+			coroutine.wait(0.5)
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressMapMain,self.model.choosableAreas)
+		end)
+	end
+end
 
 ---收集进度值
+--function USDollarExpressMainCtrl:ShowDollarProgress()
+--	self.view.img_slider.fillAmount=self.model.totalDollars/self.proTarget
+--end
+
 function USDollarExpressMainCtrl:ShowDollarProgress()
-	self.view.img_slider.fillAmount=self.model.totalDollars/self.proTarget
+	-- 停止之前的补间动画（如果存在）
+	if self.dollarProgressTween then
+		self.dollarProgressTween:Kill()
+	end
+
+	local targetFillAmount = self.model.totalDollars / self.proTarget
+	-- 确保数值在合理范围内
+	targetFillAmount = math.max(0, math.min(1, targetFillAmount))
+	 self.dollarProgressTween = DOTween.To(
+	     function() return self.view.img_slider.fillAmount end,
+	     function(x) self.view.img_slider.fillAmount = x end,
+	     targetFillAmount,
+	     0.5
+	 ):SetEase(DG.Tweening.Ease.OutQuad)
 end
 
 function USDollarExpressMainCtrl:ShowAwardEffect()
@@ -744,14 +774,20 @@ function USDollarExpressMainCtrl:EnterSmallGame()
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
-			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+			local args={}
+			args.enterType=3
+			args.trainInfoList=self.model.trainInfoList
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,args)
 		end)
 	elseif self.model.status==4 then--进入黄金列车
 		config.gameTypeState=4
 		CorManager.StartCor(self, function
 		()
 			coroutine.wait(1)
-			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,self.model.trainInfoList)
+			local args={}
+			args.enterType=4
+			args.trainInfoList=self.model.trainInfoList
+			CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,args)
 		end)
 	else
 		self:AddShowStep()
@@ -824,20 +860,8 @@ function USDollarExpressMainCtrl:SetStateLast()
  	else
 		---正常模式
 		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+		self:CheckEnterInvestGame()
 	end
-	
-	--CorManager.StartCor(self,function()
-	--	if config.curGameState==SlotGlobal.gameState.AutoState and config.selfMotionNum>0 then
-	--		config.selfMotionNum=config.selfMotionNum-1
-	--		GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
-	--		if config.selfMotionNum==0 then
-	--			logError("自动旋转停止")
-	--			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
-	--		end
-	--		self.model:ReqStartGame()
-	--	end
-	--end)
-
 	
 end
 

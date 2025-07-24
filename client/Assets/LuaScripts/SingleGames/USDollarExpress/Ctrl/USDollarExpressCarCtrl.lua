@@ -43,8 +43,8 @@ function USDollarExpressCarCtrl:CtrlInit(args)
 	--		["type"] = 22,
 	--	},
 	--}
-	
-	self.trainInfoList=args
+	self.enterType=args.enterType
+	self.trainInfoList=args.trainInfoList
 	--look("拉火车数据",self.trainInfoList)
 	self:InitData()
 	UpdateManager.AddUpdate(self,self.Update)
@@ -89,8 +89,13 @@ function USDollarExpressCarCtrl:InitCars()
 		()
 			self.view.ani:Play("USDollarExpressCar_chuchang")
 			coroutine.wait(1)
-			local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
-			ctrl:EndSmallGame()
+			if self.enterType==102 then
+				local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMapMain)
+				ctrl:allAreaUnLock()
+			else
+				local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+				ctrl:EndSmallGame()
+			end
 			self:Close()
 		end)
 	else
@@ -369,8 +374,15 @@ end
 function USDollarExpressCarCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_skip, function
 	()
-		local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
-		ctrl:EndSmallGame()
+		if self.enterType==102 then
+			local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMapMain)
+			if ctrl then
+				ctrl:allAreaUnLock()
+			end
+		else
+			local ctrl= CtrlManager.GetCtrl(CtrlNames.USDollarExpressMain)
+			ctrl:EndSmallGame()
+		end
 		self:Close()
 	end)
 end
