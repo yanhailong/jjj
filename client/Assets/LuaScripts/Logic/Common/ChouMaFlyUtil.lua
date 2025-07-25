@@ -96,21 +96,20 @@ end
 ---
 ---targetPos 目标 {v3,v3,v3...}
 ---ratios 比例 {0.1,0.3,0.6}
-function ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
-    local results = distributeCoins(#coins,ratios)
-    local index = 1
-    local next = 0
-    local delay = 0
-    for i=1,#coins do
-        if results[index] == nil then break end
-        if next + results[index] >= i then
-            self:DestroyCoinFly(coins[i],targetPos[index],delay)
-            delay = delay + 0.15
-        else
-            next = next + results[index]
-            index = index + 1
-            delay = 0
-            self:DestroyCoinFly(coins[i],targetPos[index],delay)
+---duration 总动画时长（秒），可选，默认2秒
+function ChouMaFlyUtil:DestroyCoin(targetPos, ratios, duration)
+    duration = duration or 2 -- 默认2秒
+    local results = distributeCoins(#coins, ratios)
+    local groupStart = 1
+    for i = 1, #results do
+        local groupCount = results[i]
+        if groupCount > 0 then
+            local groupEnd = groupStart + groupCount - 1
+            for j = groupStart, groupEnd do
+                local delay = groupCount > 1 and ((j - groupStart) / (groupCount - 1)) * duration or 0
+                self:DestroyCoinFly(coins[j], targetPos[i], delay)
+            end
+            groupStart = groupEnd + 1
         end
     end
     coins = {}
