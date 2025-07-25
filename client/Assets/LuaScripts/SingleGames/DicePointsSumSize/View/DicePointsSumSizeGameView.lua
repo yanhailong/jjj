@@ -36,6 +36,7 @@ function DicePointsSumSizeGameView:InitComponents()
     self.btn_repeat=ComponentUtilGet.Button(self.transform,"content/bottom/btn_repeat");
     self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/bottom/btn_AllOther");
     self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_AllOther/tmp_AllOtherNumber");
+    self.chipListView=ComponentUtilGet.ScrollRect(self.transform,"content/bottom/ChipScrollView");
     self.obj_ChipContent=ComponentUtilGet.GameObject(self.transform,"content/bottom/ChipScrollView/Viewport/obj_ChipContent");
     self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/bottom/obj_chipItem");
     self.btn_Chipleft=ComponentUtilGet.Button(self.transform,"content/bottom/Image/btn_Chipleft");

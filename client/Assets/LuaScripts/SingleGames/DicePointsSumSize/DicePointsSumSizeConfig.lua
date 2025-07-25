@@ -69,6 +69,7 @@ this.diceCount = 3  --每局骰子数量
 this.diceSideCount = 6  --每个骰子面数
 this.showRecordCount = 3  --显示记录条数
 this.chipItemShowCount = 5 --下注的时候显示可选筹码数量
+this.chipItemScrollTime = 0.3 --筹码滚动到指定位置时间
 
 --点数之和类型对应的点数和的字体颜色
 this.diceSumShowData = {{ r = 0.8196079, g = 0.3372549, b = 0.3372549, a = 1}, 
