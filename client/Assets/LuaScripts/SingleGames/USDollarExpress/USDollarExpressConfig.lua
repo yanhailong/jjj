@@ -97,11 +97,11 @@ this.rollTime={
 this.ABNames={
     icon="SingleGames/USDollarExpress/alats/icons",--icon
     train={
-        [this.TrainColorType.GreenTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/green",
-        [this.TrainColorType.BlueTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/blue",
-        [this.TrainColorType.VioletTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/violet",
-        [this.TrainColorType.RedTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/red",
-        [this.TrainColorType.GoldTrain]="SingleGames/USDollarExpress/effects/prefab/huoche/yellow",
+        [this.TrainColorType.GreenTrain]="SingleGames/USDollarExpress/effects/huoche/green",
+        [this.TrainColorType.BlueTrain]="SingleGames/USDollarExpress/effects/huoche/blue",
+        [this.TrainColorType.VioletTrain]="SingleGames/USDollarExpress/effects/huoche/violet",
+        [this.TrainColorType.RedTrain]="SingleGames/USDollarExpress/effects/huoche/red",
+        [this.TrainColorType.GoldTrain]="SingleGames/USDollarExpress/effects/huoche/yellow",
     },
     iconEffect="SingleGames/USDollarExpress/effects/chess",
     smallKuang="SingleGames/USDollarExpress/effects/prefab/effect_biankuang_small_liuguang",
