@@ -91,15 +91,30 @@ end
 -- 广播玩家押注信息 NotifyPlayerBet 
 function DragonTigerFightModel:OnBetting(msg)
     if msg and msg.code == 200 and self.initState then
+        --自己的直接显示
+        if msg.playerId == PlayerManager:GetPlayerInfo().playerId then
+            for _, value in ipairs(msg.betTableInfoList or {}) do
+                local bet = {
+                    side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
+                    index = self:FindBetIndex(value.betValue),
+                    currency = msg.playerCurGold,
+                    playerId = msg.playerId,
+                    betValue = value.betValue,
+                    betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
+                }
+                self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+            end
+            return
+        end
+        --其他玩家批量更新
         msg.handled = false
-        if self.bettingDataMap[msg.playerId] and not self.bettingDataMap[msg.playerId].handled and msg.playerId == PlayerManager:GetPlayerInfo().playerId  then
-            --自己的数据需要统计所以必须完整
+        if self.bettingDataMap[msg.playerId] and not self.bettingDataMap[msg.playerId].handled then
             for i = 1, #msg.betTableInfoList do
                 table.insert(self.bettingDataMap[msg.playerId].betTableInfoList, msg.betTableInfoList[i])
             end
             msg.betTableInfoList = self.bettingDataMap[msg.playerId].betTableInfoList
             self.bettingDataMap[msg.playerId] = msg
-        else--其他玩家直接用最新数据 允许丢掉几个筹码
+        else
             self.bettingDataMap[msg.playerId] = msg
         end
     end
@@ -111,6 +126,7 @@ function DragonTigerFightModel:OnGameStatus(msg)
     self.status = 1
     self.endTime = msg.waitEndTime
     self.ctrl.view:OnGameStatus(self.status)
+    self.bettingDataMap = {}
 end
 --收到开始下注消息
 function DragonTigerFightModel:OnStartXiaZhu(msg)
@@ -140,7 +156,7 @@ function DragonTigerFightModel:OnGameResult(msg)
     --切换状态
     self.status = 3
     self.ctrl.view:OnGameStatus(self.status)
-    
+
     self:ShowResult()
 end
 

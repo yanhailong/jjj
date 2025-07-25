@@ -83,8 +83,11 @@ function DragonTigerFightView:InitComponents()
     self.selfPlayer = PlayerItem.New(self.selfPlayerRoot)
     ---提示信息
     self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/tips")
-    self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_end")
-    self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"tips_start_xiazhu")
+    self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_EndOfBetting")
+    self.tipsTimeEndSp=ComponentUtilGet.SkeletonGraphic(self.tipsTimeEnd.transform,"SkeletonGraphic (kaishijieshuxiazhu)")
+    self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_StartBetting")
+    self.tipsStartXiaZhuSp=ComponentUtilGet.SkeletonGraphic(self.tipsStartXiaZhu.transform,"SkeletonGraphic (kaishijieshuxiazhu)")
+    
     self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
     -- 结算中
     self.tipsCenterTxt = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/tips_center_txt")
@@ -97,7 +100,8 @@ function DragonTigerFightView:InitComponents()
     self.tipsEnterWaitTime=ComponentUtilGet.Text(self.tipsEnterWait,"naozhong/time")
     
     self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
-    
+    self.huWo=ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_hu_won/eff_DragonTigerFight_hu_won"):GetComponent("ParticleSystem")
+    self.longWo=ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_long_won/eff_DragonTigerFight_long_won"):GetComponent("ParticleSystem")
     ---路单信息
     ---@type RoadView
     self.roadView=RoadView.New(ComponentUtilGet.GameObject(self.transform,"Background/RoadView"))
@@ -120,11 +124,8 @@ function DragonTigerFightView:InitComponents()
     self.ctr_dot_p1=ComponentUtilGet.Transform(self.effectsTrs,"dot/p1")
     self.ctr_dot_p2=ComponentUtilGet.Transform(self.effectsTrs,"dot/p2")
 
-    self.startTrs=ComponentUtilGet.Transform(self.effectsTrs,"start")
-    self.startLeftTrs=ComponentUtilGet.Transform(self.startTrs,"left")
-    self.startRightTrs=ComponentUtilGet.Transform(self.startTrs,"right")
-    self.startVsTrs=ComponentUtilGet.Transform(self.startTrs,"vs")
-    self.startVsImg=ComponentUtilGet.Image(self.startVsTrs)
+    self.startTrs=ComponentUtilGet.Transform(self.effectsTrs,"eff_DragonTigerFight_VS")
+    self.startSp=ComponentUtilGet.SkeletonGraphic(self.startTrs,"SkeletonGraphic (vs)")
 
 end
 
@@ -203,7 +204,7 @@ function DragonTigerFightView:ChangeDiZhu(index)
         -- 先设置缩放动画
         newChip.rectTrans:DOScale(1.1, 0.15):SetEase(Ease.OutBack)
         -- 再设置位置动画
-        newChip.rectTrans:DOLocalMoveY(13.0, 0.15):SetEase(Ease.OutQuad)
+        newChip.rectTrans:DOLocalMoveY(15.0, 0.15):SetEase(Ease.OutQuad)
         newChip.effects:SetActive(true)
     end
     
@@ -216,6 +217,7 @@ function DragonTigerFightView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
         self.chipInfos[i].button.interactable = config.allow and self.ctrl.model.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
     end
+    if self.chipInfos[config.dizhuIndex] then self.chipInfos[config.dizhuIndex].effects:SetActive(config.allow) end
 end
 
 ---设置续投按钮是否可以点击 当前局已经手动投注或者上局未投注不能点 其他可点
@@ -370,8 +372,10 @@ function DragonTigerFightView:InitUI()
     self.tipsEnterWait.gameObject:SetActive(false)
     self.resultCard1:Hiden()
     self.resultCard2:Hiden()
+    self.roadView.gameObject:SetActive(true)
     self:InitXiaZhuLabel()
     UpdateManager.AddUpdate(self,self.UpdateBetting)
+    GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
 end
 ---初始化View数据
 function DragonTigerFightView:InitPanelData(args)
@@ -449,10 +453,18 @@ function DragonTigerFightView:ResultStage(stage)
         if result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.LONG  then
             self.resultWinTrs:GetChild(0).gameObject:SetActive(true)
             --结果动画
+            self.longWo.gameObject:SetActive(true)
+            if self.longWo.isStopped then
+                self.longWo:Play()
+            end
             DragonTigerFightSounds.PlaySoundWin(result.winState,true)
         elseif result.winState == DRAGON_TIGER_FIGHT_WIN_SIDE.HU then
             self.resultWinTrs:GetChild(1).gameObject:SetActive(true)
             --结果动画
+            self.huWo.gameObject:SetActive(true)
+            if self.huWo.isStopped then
+                self.huWo:Play()
+            end
             DragonTigerFightSounds.PlaySoundWin(result.winState,true)
         else
             self.resultWinTrs:GetChild(2).gameObject:SetActive(true)
@@ -460,6 +472,8 @@ function DragonTigerFightView:ResultStage(stage)
         DragonTigerFightSounds.PlaySoundWin(result.winState)
         
     elseif stage==6 then
+        self.huWo.gameObject:SetActive(false)
+        self.longWo.gameObject:SetActive(false)
         self.resultWinTrs.gameObject:SetActive(false)
         ---金币回收动画
         self:PlayCompeleCoinFLy(result.playerSettleInfos)
@@ -476,6 +490,7 @@ function DragonTigerFightView:ResultStage(stage)
     elseif stage==8 then
         self.resultTrs.gameObject:SetActive(false)
         self.resultBgTrs.gameObject:SetActive(false)
+        self.roadView.gameObject:SetActive(true)
         -- 更新路信息
         self:UpdateRoleView(self.ctrl.model.history)
     end
@@ -492,9 +507,10 @@ function DragonTigerFightView:ResultEffect(result)
     self.resultBgTrs.gameObject:SetActive(true)
     self.resultCard1:LoadCard(cards[1])
     self.resultCard2:LoadCard(cards[2])
-    
+    self.roadView.gameObject:SetActive(false)
     --下注结束
     self.tipsTimeEnd:SetActive(true)
+    Tools.PlayerSpineAniByName(self.tipsTimeEndSp,"jieshuxiazhu",false)
     DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_END)
     
     self:ResultStageTimer(1)
@@ -503,26 +519,7 @@ end
 ---开始动画播放 2s
 function DragonTigerFightView:StartEffect()
     self.startTrs.gameObject:SetActive(true)
-    
-    self.startLeftTrs.localPosition = Vector3(-3000,self.startLeftTrs.localPosition.y,0)
-    self.startRightTrs.localPosition = Vector3(3000,self.startRightTrs.localPosition.y,0)
-    self.startVsTrs.localScale=Vector3(20,20,1)
-    local sequence = DOTween.Sequence()
-    sequence:Insert(0,self.startLeftTrs:DOLocalMoveX(-540, 0.8):SetEase(Ease.InOutBounce))
-    sequence:Insert(0,self.startRightTrs:DOLocalMoveX(540, 0.8):SetEase(Ease.InOutBounce))
-    sequence:Append(self.startVsTrs:DOScale(Vector3(0.5,0.5,1),0.4))
-    sequence:Join(self.startVsImg:DOFade(1,0.3))
-    sequence:Append(self.startVsTrs:DOScale(Vector3(1,1,1),0.2))
-    sequence:AppendInterval(0.5)
-    sequence:Append(self.startLeftTrs:DOLocalMoveX(-3000, 0.6))
-    sequence:Join(self.startRightTrs:DOLocalMoveX(3000, 0.6))
-    sequence:Join(self.startVsImg:DOFade(0, 0.6))
-    
-    sequence:OnComplete(function()
-        sequence:Kill(false)
-        self.startTrs.gameObject:SetActive(false)
-    end)
-    sequence:Play()
+    Tools.PlayerSpineAniByName(self.startSp,"action",false)
     DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_READY)
 end
 
@@ -694,6 +691,7 @@ function DragonTigerFightView:OnGameStatus(status)
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
     self.tipsTimeThree:SetActive(false)
+    self.startTrs.gameObject:SetActive(true)
     self.colockStateTimeTrs.gameObject:SetActive(false)
     self.resultTrs.gameObject:SetActive(false)
     self.resultBgTrs.gameObject:SetActive(false)
@@ -703,6 +701,9 @@ function DragonTigerFightView:OnGameStatus(status)
     self.daojishiParticles.gameObject:SetActive(false)
     self.tipsEnterWait.gameObject:SetActive(false)
     self.colockNumTrs.gameObject:SetActive(false)
+    self.roadView.gameObject:SetActive(true)
+    self.huWo.gameObject:SetActive(false)
+    self.longWo.gameObject:SetActive(false)
     self.resultCard1:Hiden()
     self.resultCard2:Hiden()
     
@@ -725,6 +726,7 @@ function DragonTigerFightView:OnGameStatus(status)
         self:SetRepeatState(#config.lastXiaZhuInfo > 0 and not config.isRepeat)
         --开始下注提示
         self.tipsStartXiaZhu:SetActive(true)
+        Tools.PlayerSpineAniByName(self.tipsStartXiaZhuSp,"kaishixiazhu",false)
         DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_START)
         
         self.colockStateTimeTrs.gameObject:SetActive(true)
@@ -760,7 +762,6 @@ end
 
 ---复投功能
 function DragonTigerFightView:RepeatInit()
-    logError("复投功能 RepeatInit")
     if config.isRepeat then
         config.lastXiaZhuInfo={}
     else

@@ -59,6 +59,10 @@ end
 function DragonTigerFightSounds.PlaySoundCard(cardId)
     local index = cardId%13
     local soundName = SOUND_CARD[index]
+    if not soundName then
+        logError(cardId)
+        return
+    end
     SoundManager:PlayClip(soundPath..soundName)
 end
 --结果音效
