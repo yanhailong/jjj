@@ -30,6 +30,7 @@ this.ABNames={
     chipPool="SingleGames/Baccarat/prefabs/Pool",--筹码
     prefabsItem = "SingleGames/Baccarat/prefabs" ,--预支item路径
     commonMain = "Common/GameArtsCommon/GameFight/alats/main",--通用资源主路径
+    audios="SingleGames/Baccarat/audio/"
 }
 ---通用资源
 this.commonMain_Pics = {}

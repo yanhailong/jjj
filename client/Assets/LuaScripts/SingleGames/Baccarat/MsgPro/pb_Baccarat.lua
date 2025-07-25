@@ -41,6 +41,8 @@ pb_Baccarat.RespExitRoomInGame = 98440
 pb_Baccarat.ReqBet = 131073
 --- 请求,msgID=0x20003,desc=请求获取百人牌桌的玩家信息
 pb_Baccarat.ReqTablePlayerInfo = 131075
+--- 请求,msgID=0x20004
+pb_Baccarat.ReqRoomBaseInfo = 131076
 --- 响应,msgID=0x20081,desc=请求下注返回
 pb_Baccarat.NotifyPlayerBet = 131201
 --- 响应,msgID=0x20083,desc=返回牌桌玩家列表的下注信息
@@ -69,6 +71,7 @@ PbMsg[98439] = 'RespJoinRoomInGame'
 PbMsg[98440] = 'RespExitRoomInGame'
 PbMsg[131073] = 'ReqBet'
 PbMsg[131075] = 'ReqTablePlayerInfo'
+PbMsg[131076] = 'ReqRoomBaseInfo'
 PbMsg[131201] = 'NotifyPlayerBet'
 PbMsg[131203] = 'RespTablePlayerInfo'
 PbMsg[131208] = 'NotifyTableRoomPlayerInfoChange'

@@ -22,7 +22,10 @@ function BaccaratPlayerItem:RefreshPlayerInfoShow(info)
 end
 ---获取当前玩家的id
 function BaccaratPlayerItem:GetPlayerId()
-    return self.info.playerId;
+    if(self.gameObject.activeSelf) then
+        return self.info.playerId;
+    end
+    return 0;
 end
 ---修改玩家金币数量显示
 function BaccaratPlayerItem:ChangeGoldNum(goldNum)

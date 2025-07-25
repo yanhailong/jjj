@@ -86,7 +86,7 @@ end
 
 ---初始化大路预制体表
 function BaccaratRoad:InitDaLuTable()
-    for i = 1, 300 do
+    for i = 1, 6*70 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem",self.DaLuContent.transform)
         ---@type BaccaratDaLuItem
         local item = BaccaratDaLuItem.New(obj,self);
@@ -100,7 +100,7 @@ function BaccaratRoad:InitDaLuTable()
 end
 ---初始化大路大眼路预制体表
 function BaccaratRoad:InitDaLuZiLuTable()
-    for i = 1, 300 do
+    for i = 1, 6*70 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem",self.DaluZiluContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);
@@ -115,7 +115,7 @@ function BaccaratRoad:InitDaLuZiLuTable()
 end
 ---初始化大路大眼路预制体表
 function BaccaratRoad:InitXiaoLuTable()
-    for i = 1, 300 do
+    for i = 1, 6*70 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem",self.XiaoLuContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);
@@ -130,7 +130,7 @@ function BaccaratRoad:InitXiaoLuTable()
 end
 ---初始化曱甴路预制体表
 function BaccaratRoad:InitYueYouLuTable()
-    for i = 1, 300 do
+    for i = 1, 6*70 do
         local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem",self.YueYouLuContent.transform)
         ---@type BaccaratAllChildLuItem
         local item = BaccaratAllChildLuItem.New(obj,self);

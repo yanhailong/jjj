@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-18 16:07:27
+---DateTime: 2025-07-24 17:08:12
 ---
 ---@class BaccaratGameView:BaseView
 local BaccaratGameView=Class("BaccaratGameView",BaseView)
@@ -50,8 +50,8 @@ function BaccaratGameView:InitComponents()
     self.txt_PlayerPoint=ComponentUtilGet.Text(self.transform,"content/TopRoot/ator_DealCards/obj_PlayerCardRoot/PlayerCardType/obj_PlayerPoints/txt_PlayerPoint");
     self.obj_Result=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/ator_DealCards/obj_Result");
     self.obj_HeWin=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/ator_DealCards/obj_Result/obj_HeWin");
-    self.obj_ZWin=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/ator_DealCards/obj_Result/obj_ZWin");
     self.obj_XWin=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/ator_DealCards/obj_Result/obj_XWin");
+    self.obj_ZWin=ComponentUtilGet.GameObject(self.transform,"content/TopRoot/ator_DealCards/obj_Result/obj_ZWin");
     self.obj_BankerWin=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BankerRoot/obj_BankerWin");
     self.tmp_BankerBetNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/BetBg/BankerRoot/bg/tmp_BankerBetNum");
     self.obj_SelfBetBanker=ComponentUtilGet.GameObject(self.transform,"content/BetBg/BankerRoot/obj_SelfBetBanker");
@@ -83,6 +83,8 @@ function BaccaratGameView:InitComponents()
     self.obj_VS=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_VS");
     self.obj_BeginBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_BeginBet");
     self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_StopBet");
+    self.obj_WaitEndGame=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_WaitEndGame");
+    self.txt_WaitCountDown=ComponentUtilGet.Text(self.transform,"content/Process/obj_WaitEndGame/naoZhong/txt_WaitCountDown");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
     self.rect_ChipParent=ComponentUtilGet.RectTransform(self.transform,"content/rect_ChipParent");
     self.obj_ChipContent=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/ChipScrollView/Viewport/obj_ChipContent");
@@ -102,6 +104,7 @@ function BaccaratGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_close");
+    self.txt_UpWinNum=ComponentUtilGet.Text(self.transform,"content/txt_UpWinNum");
 end
 
 ---清空组件
@@ -142,8 +145,8 @@ function BaccaratGameView:ClearComponents()
     self.txt_PlayerPoint=nil;
     self.obj_Result=nil;
     self.obj_HeWin=nil;
-    self.obj_ZWin=nil;
     self.obj_XWin=nil;
+    self.obj_ZWin=nil;
     self.obj_BankerWin=nil;
     self.tmp_BankerBetNum=nil;
     self.obj_SelfBetBanker=nil;
@@ -175,6 +178,8 @@ function BaccaratGameView:ClearComponents()
     self.obj_VS=nil;
     self.obj_BeginBet=nil;
     self.obj_StopBet=nil;
+    self.obj_WaitEndGame=nil;
+    self.txt_WaitCountDown=nil;
     self.obj_PlayerRoot=nil;
     self.rect_ChipParent=nil;
     self.obj_ChipContent=nil;
@@ -194,6 +199,7 @@ function BaccaratGameView:ClearComponents()
     self.btn_setting=nil;
     self.btn_help=nil;
     self.btn_close=nil;
+    self.txt_UpWinNum=nil;
 end
 
 ---初始化View数据
