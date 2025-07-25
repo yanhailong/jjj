@@ -1,117 +1,78 @@
-﻿[2] = 81921,
-[3] = 
-{
-    [tableAreaInfos] = 
-    {
-    },
-    [gamePhase] = WAIT_READY,
-    [tableCountDownTime] = 1753325525280,
-    [playerInfos] = 
+﻿
+    [totalPlayerNum] = 7,
+    [changedPlayerId] = 1000338,
+    [tableChangedPlayerInfos] = 
     {
         [1] = 
         {
-            [winCount] = 0,
             [totalBet] = 0,
-            [vipLevel] = 100,
-            [goldNum] = 1100000,
-            [playerId] = 1000331,
-            [playerName] = player1000331,
-            [local] = 192.168.3.66,
-        },
-    },
-    [histories] = 
-    {
-    },
-    [totalPlayerNum] = 1,
-    [code] = 200,
-    [betPointList] = 
-    {
-        [1] = 10,
-        [2] = 50,
-        [3] = 100,
-        [4] = 500,
-        [5] = 1000,
-        [6] = 5000,
-        [7] = 10000,
-    },
-},
-
-
-
-[2] = 81921,
-[3] = 
-{
-    [playerInfos] = 
-    {
-        [1] = 
-        {
-            [playerId] = 1000331,
-            [playerName] = player1000331,
-            [vipLevel] = 100,
             [winCount] = 0,
-            [goldNum] = 1100000,
+            [goldNum] = 214236,
+            [vipLevel] = 0,
+            [playerName] = ,
+            [local] = ,
+            [playerId] = 1077341,
+        },
+        [2] = 
+        {
             [totalBet] = 0,
-            [local] = 192.168.3.66,
+            [winCount] = 1,
+            [goldNum] = 100291,
+            [vipLevel] = 10,
+            [playerName] = player1000201,
+            [local] = 192.168.3.7,
+            [playerId] = 1000201,
+        },
+        [3] = 
+        {
+            [totalBet] = 0,
+            [winCount] = 1,
+            [goldNum] = 100194,
+            [vipLevel] = 10,
+            [playerName] = player1000198,
+            [local] = 192.168.3.7,
+            [playerId] = 1000198,
+        },
+        [4] = 
+        {
+            [totalBet] = 0,
+            [winCount] = 1,
+            [goldNum] = 100194,
+            [vipLevel] = 10,
+            [playerName] = player1000257,
+            [local] = 192.168.3.7,
+            [playerId] = 1000257,
+        },
+        [5] = 
+        {
+            [totalBet] = 0,
+            [winCount] = 1,
+            [goldNum] = 100194,
+            [vipLevel] = 10,
+            [playerName] = player1000218,
+            [local] = 192.168.3.7,
+            [playerId] = 1000218,
+        },
+        [6] = 
+        {
+            [totalBet] = 0,
+            [winCount] = 1,
+            [goldNum] = 100194,
+            [vipLevel] = 10,
+            [playerName] = player1000210,
+            [local] = 192.168.3.7,
+            [playerId] = 1000210,
+        },
+        [7] = 
+        {
+            [totalBet] = 0,
+            [winCount] = 1,
+            [goldNum] = 100194,
+            [vipLevel] = 10,
+            [playerName] = player1000175,
+            [local] = 192.168.3.7,
+            [playerId] = 1000175,
         },
     },
     [code] = 200,
-    [tableCountDownTime] = 13000,
-    [totalPlayerNum] = 1,
-    [gamePhase] = GAME_ROUND_OVER_SETTLEMENT,
-    [settleInfos] = 
-    {
-        [loongCard] = 28,
-        [code] = 200,
-        [playerSettleInfos] = 
-        {
-        },
-        [tigerCard] = 14,
-        [playerInfos] = 
-        {
-            [1] = 
-            {
-                [playerId] = 1000331,
-                [playerName] = player1000331,
-                [vipLevel] = 100,
-                [winCount] = 0,
-                [goldNum] = 1100000,
-                [totalBet] = 0,
-                [local] = 192.168.3.66,
-            },
-        },
-        [winState] = 1,
-    },
-    [histories] = 
-    {
-        [1] = 2,
-        [2] = 1,
-        [3] = 2,
-        [4] = 1,
-        [5] = 1,
-        [6] = 3,
-        [7] = 1,
-        [8] = 1,
-        [9] = 1,
-        [10] = 1,
-        [11] = 2,
-        [12] = 1,
-        [13] = 1,
-        [14] = 3,
-        [15] = 2,
-        [16] = 3,
-        [17] = 1,
-    },
-    [betPointList] = 
-    {
-        [1] = 10,
-        [2] = 50,
-        [3] = 100,
-        [4] = 500,
-        [5] = 1000,
-        [6] = 5000,
-        [7] = 10000,
-    },
-    [tableAreaInfos] = 
-    {
-    },
 },
