@@ -47,7 +47,7 @@ end
 -- 子游戏的名字
 GameNames = {
 	USDollarExpress="USDollarExpress",--美元快递
-	BaccaratSessionSelect="BaccaratGame",--百家乐
+	Baccarat="Baccarat",--百家乐
 	DragonTigerFight="DragonTigerFight",--龙虎斗
 	VietnamChess="VietnamChess",--越南色碟
 	CarLogo="CarLogo",--豪车俱乐部
@@ -57,7 +57,7 @@ GameNames = {
 ---游戏选择场景配置
 GameSortID={
 	[1]=GameNames.USDollarExpress,--美元快递
-	[2]=GameNames.BaccaratSessionSelect,--百家乐
+	[2]=GameNames.Baccarat,--百家乐
 	[3]=GameNames.DragonTigerFight,--龙虎斗
 	[4]=GameNames.VietnamChess,--越南色碟
 	[5]=GameNames.CarLogo,--豪车俱乐部
@@ -71,10 +71,10 @@ GameConfig = {
 		Manager = "SingleGames/USDollarExpress/USDollarExpress",
 		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
 	},
-	[GameNames.BaccaratSessionSelect] = {
+	[GameNames.Baccarat] = {
 		gameType = 200500,
 		Manager = "SingleGames/Baccarat/Baccarat",
-		EnterCtrlName = CtrlNames.BaccaratMain, --游戏入口界面
+		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
 	},[GameNames.DragonTigerFight] = {
 		gameType = 200101,
 		Manager = "SingleGames/DragonTigerFight/DragonTigerFight",

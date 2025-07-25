@@ -77,6 +77,7 @@ message ResStartGame {
   int32 remainFreeCount = 9;  //剩余免费次数
   repeated int32 choosableAreas = 10;  //投资可选区域，只有当触发投资游戏后才会有值
   int64 allGold = 11;  //玩家当前金币
+  int64 bigWinShow = 12;  //大奖展示  1.sweet   2.big   3.mega  4.epic  5.legendary
 }
 
 //请求,msgID=0x7007,desc=请求配置信息

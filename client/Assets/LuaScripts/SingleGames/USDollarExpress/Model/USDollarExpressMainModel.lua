@@ -79,6 +79,7 @@ function USDollarExpressMainModel:ResStartGame(msg)
 	self.remainFreeCount=msg.remainFreeCount
 	self.totalDollars=msg.totalDollars--//累计的美元数量，进度条
 	self.choosableAreas=msg.choosableAreas
+	self.bigWinShow=msg.bigWinShow--//大奖展示  1.sweet   2.big   3.mega  4.epic  5.legendary
 
 	local dollarsInfo={}
 	self.isHasDollars=false
@@ -150,6 +151,19 @@ function USDollarExpressMainModel:InitCardPos(pos)
 	look("处理后的数据",self.CardPos)
 
 end
+
+---判断某一列是否存在对应Icon
+function USDollarExpressMainModel:IsHasIconEffect(wheeId,iconIndex)
+	local data=self.CardPos[wheeId]
+	for j = 1, #data do
+		if data[j]==iconIndex then
+			return true
+		end
+	end
+	return false
+end
+
+
 
 function USDollarExpressMainModel:InitDollars(dollarsInfo)
 	local rows, cols = 4, 5

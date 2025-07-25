@@ -6,7 +6,7 @@ require("PlatformHall/MsgPro/pb_PlatformHall")
 require("Logic/Config/HallConfig")
 require("Logic/SubGame/GameCenter")
 require("Logic/MainState/MainStateCtrl")
-
+--
 --require "Debug/EmmyLuaDebugger"
 
 main = {}
@@ -25,5 +25,5 @@ function main:init(lancher)
     ()
         lancher:PreLoadingClose()
     end)
+    GlobalListener:AddListener()
 end
-

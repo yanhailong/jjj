@@ -36,7 +36,6 @@ end
 --region 事件方法
 function UILoginModel:Login()
 	local deviceId = LocalData:GetJsonByKey("jjqdeviceId")
-	local deviceId = 1753340788063
 	if deviceId=="" then
 		deviceId=Util.GetTimeStamp(true)
 	end

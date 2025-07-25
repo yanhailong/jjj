@@ -116,7 +116,8 @@ function USDollarExpressMainCtrl:InitData()
 	self.dollarCount=0
 	
 	self.sound_award5=false--播放中5个图片音效
-	
+	self.isSpecialIcons1={}
+	self.isSpecialRollState={false,false,false,false,false}
 end
 -- 初始化第一批展示用的SlotPics
 function USDollarExpressMainCtrl:InitFirstSlotPics()
@@ -190,9 +191,15 @@ function USDollarExpressMainCtrl:InitBigKuang()
 	end
 	self.eff_choose_a_freature_bd=ComponentUtilGet.GameObject(self.view.transform,"content/effects/eff_choose_a_freature_bd")
 	self.eff_choose_a_freature_bd:SetActive(false)
+	self.effect_biankuang_su_liuguang_2_bxg=ComponentUtilGet.GameObject(self.view.transform,"content/effects/effect_biankuang_su_liuguang_2_bxg")
+	self.effect_biankuang_su_liuguang_2_bxg:SetActive(false)
 end
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
+	if self.isSpecialRollState[wheelId]==true then
+		return
+	end
+	self.isSpecialRollState[wheelId]=true
 	if config.gameTypeState==1 or config.gameTypeState==2 then
 		for i = 1, 5 do
 			if wheelId==i then
@@ -200,9 +207,39 @@ function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
 			else
 				Tools.SetActive(self.bigKuangEffects[i],false)
 			end
-
 		end
+	else
+		if wheelId==0 then
+		else
+			for i = 1, wheelId do
+				if i<wheelId then
+					local has= self.model:IsHasIconEffect(i,17)
+					if has and not table.contains(self.isSpecialIcons1,i) then
+						table.insert(self.isSpecialIcons1, i)
+					end
+				end
+			end
+
+			if #self.isSpecialIcons1>=2 then
+				logError("当前增加的wheelId："..wheelId)
+				self.rollCircles[wheelId] = self.rollCircles[wheelId]+8
+				for i = 1, 5 do
+					if wheelId==i then
+						Tools.SetActive(self.bigKuangEffects[i],true)
+					else
+						Tools.SetActive(self.bigKuangEffects[i],false)
+					end
+
+				end
+			end
+		end
+
 	end
+end
+
+---展示最右边的特效----
+function USDollarExpressMainCtrl:ShowRightKuang(isShow)
+	self.effect_biankuang_su_liuguang_2_bxg:SetActive(isShow)
 end
 
 --开始抽奖旋转
@@ -291,6 +328,7 @@ function USDollarExpressMainCtrl:ReSetData()
 	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
 	
 	config.aboradCount=0
+	self.isSpecialIcons1={}
 end
 
 --旋转
