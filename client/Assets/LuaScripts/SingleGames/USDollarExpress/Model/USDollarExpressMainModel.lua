@@ -55,6 +55,7 @@ function USDollarExpressMainModel:ReqStartGame(_dataSpin)
 	data.stakeVlue=self.dataSpin.betInfo
 	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
 	
+	--self:ResStartGame({})
 end
 
 function USDollarExpressMainModel:RollStop()
@@ -67,6 +68,121 @@ end
 
 function USDollarExpressMainModel:ResStartGame(msg)
 	look("收到请求开始游戏返回",msg)
+
+	--msg =
+	--{
+	--	["allWinGold"] = 29640,
+	--	["code"] = 200,
+	--	["status"] = 4,
+	--	["remainFreeCount"] = 0,
+	--	["iconList"] =
+	--	{
+	--		[1] = 18,
+	--		[2] = 5,
+	--		[3] = 5,
+	--		[4] = 5,
+	--		[5] = 18,
+	--		[6] = 18,
+	--		[7] = 18,
+	--		[8] = 18,
+	--		[9] = 18,
+	--		[10] = 18,
+	--		[11] = 18,
+	--		[12] = 18,
+	--		[13] = 18,
+	--		[14] = 18,
+	--		[15] = 18,
+	--		[16] = 18,
+	--		[17] = 6,
+	--		[18] = 6,
+	--		[19] = 15,
+	--		[20] = 5,
+	--	},
+	--	["dollarsInfo"] =
+	--	{
+	--		["coinIndexId"] = 0,
+	--		["dollarIndexIds"] =
+	--		{
+	--			[1] = 1,
+	--			[2] = 5,
+	--			[3] = 6,
+	--			[4] = 7,
+	--			[5] = 8,
+	--			[6] = 9,
+	--			[7] = 10,
+	--			[8] = 11,
+	--			[9] = 12,
+	--			[10] = 13,
+	--			[11] = 14,
+	--			[12] = 15,
+	--			[13] = 16,
+	--		},
+	--		["collectDollarIndexIds"] =
+	--		{
+	--			[1] = 1,
+	--			[2] = 5,
+	--			[3] = 6,
+	--			[4] = 7,
+	--			[5] = 8,
+	--			[6] = 9,
+	--			[7] = 10,
+	--			[8] = 11,
+	--			[9] = 12,
+	--			[10] = 13,
+	--			[11] = 14,
+	--			[12] = 15,
+	--			[13] = 16,
+	--		},
+	--		["dollarValueList"] =
+	--		{
+	--			[1] = 760,
+	--			[2] = 760,
+	--			[3] = 760,
+	--			[4] = 760,
+	--			[5] = 760,
+	--			[6] = 760,
+	--			[7] = 760,
+	--			[8] = 760,
+	--			[9] = 760,
+	--			[10] = 760,
+	--			[11] = 760,
+	--			[12] = 760,
+	--			[13] = 760,
+	--		},
+	--	},
+	--	["bigWinShow"] = 0,
+	--	["totalDollars"] = 5,
+	--	["resultLineInfoList"] =
+	--	{
+	--	},
+	--	["choosableAreas"] =
+	--	{
+	--		[1] = 1,
+	--		[2] = 2,
+	--		[3] = 3,
+	--		[4] = 6,
+	--		[5] = 7,
+	--		[6] = 8,
+	--	},
+	--	["allGold"] = 17663800,
+	--	["trainInfoList"] =
+	--	{
+	--		[1] =
+	--		{
+	--			["type"] = 15,
+	--			["poolId"] = 0,
+	--			["goldList"] =
+	--			{
+	--				[1] = 9880,
+	--				[2] = 9880,
+	--				[3] = 9880,
+	--			},
+	--		},
+	--	},
+	--}
+	
+	
+	
 
 	self:InitCardPos(msg.iconList)
 
@@ -163,7 +279,28 @@ function USDollarExpressMainModel:IsHasIconEffect(wheeId,iconIndex)
 	return false
 end
 
+function USDollarExpressMainModel:IsHasIconEffect1922(wheeId)
+	local data=self.CardPos[wheeId]
+	for j = 1, #data do
+		if data[j]==19 or data[j]==20 or data[j]==21 or data[j]==22 then
+			return true
+		end
+	end
+	return false
+end
 
+function USDollarExpressMainModel:IsIconEffect18Count()
+	local num=0
+	for i = 1, 4 do
+		local data=self.CardPos[i]
+		for j = 1, #data do
+			if data[j]==18  then
+				num=num+1
+			end
+		end
+	end
+	return num
+end
 
 function USDollarExpressMainModel:InitDollars(dollarsInfo)
 	local rows, cols = 4, 5

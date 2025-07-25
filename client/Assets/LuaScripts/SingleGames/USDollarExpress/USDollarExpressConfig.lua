@@ -68,6 +68,14 @@ this.rollCircles1={
     [4]=32,
     [5]=40,
 }
+---特殊玩法旋转圈数
+this.rollCircles2={
+    [1]=4,
+    [2]=5,
+    [3]=8,
+    [4]=16,
+    [5]=32,
+}
 
 
 this.trainAssetName={
