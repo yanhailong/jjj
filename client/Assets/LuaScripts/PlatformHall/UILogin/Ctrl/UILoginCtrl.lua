@@ -69,7 +69,6 @@ function UILoginCtrl:InitLogin(serverInfo)
 end
 function UILoginCtrl:CreateSocket()
 	local uri=self.serverInfo.gameserver
-	uri = "ws://172.16.3.65:8090"
 	log("uri:"..uri)
 	WebNetworkManager.CreateWebSocket(uri)
 	

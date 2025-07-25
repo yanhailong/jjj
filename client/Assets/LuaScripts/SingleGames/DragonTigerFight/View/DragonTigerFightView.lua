@@ -87,11 +87,13 @@ function DragonTigerFightView:InitComponents()
     self.tipsTimeThree = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_three")
     -- 结算中
     self.tipsCenterTxt = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/tips_center_txt")
+    self.tipsWaitopenTxt = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/tips_waitopen_txt") 
     self.colockStateTimeTrs = ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_state_time")
     self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"time") --倒计时
     self.colockNumTrs=ComponentUtilGet.Transform(self.tipsTrs,"tips_center/colock_num")
     self.colockNumTime=ComponentUtilGet.Text(self.colockNumTrs,"time")
     self.tipsEnterWait=ComponentUtilGet.Transform(self.tipsTrs,"tips_enter_wait")
+    self.tipsEnterWaitTime=ComponentUtilGet.Text(self.tipsEnterWait,"naozhong/time")
     
     self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
     
@@ -361,11 +363,14 @@ function DragonTigerFightView:InitUI()
     self.tmp_totalPlayerNum.text="0"
     self.colockStateTimeTrs.gameObject:SetActive(false)
     self.tipsCenterTxt.gameObject:SetActive(false)
+    self.tipsWaitopenTxt.gameObject:SetActive(false)
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
     self.tipsTimeThree:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
     self.resultWinTrs.gameObject:SetActive(false)
+    self.colockNumTrs.gameObject:SetActive(false)
+    self.tipsEnterWait.gameObject:SetActive(false)
     self.resultCard1:Hiden()
     self.resultCard2:Hiden()
     self:InitXiaZhuLabel()
@@ -469,6 +474,8 @@ function DragonTigerFightView:ResultStage(stage)
         self.resultCard1:Hiden()
         self.resultCard2:Hiden()
         self.tipsCenterTxt.gameObject:SetActive(false)
+        --等待开局
+        self.tipsWaitopenTxt.gameObject:SetActive(true)
     elseif stage==8 then
         self.resultTrs.gameObject:SetActive(false)
         self.resultBgTrs.gameObject:SetActive(false)
@@ -496,7 +503,7 @@ function DragonTigerFightView:ResultEffect(result)
     self:ResultStageTimer(1)
 end
 
----开始动画播放
+---开始动画播放 2s
 function DragonTigerFightView:StartEffect()
     self.startTrs.gameObject:SetActive(true)
     
@@ -509,7 +516,7 @@ function DragonTigerFightView:StartEffect()
     sequence:Append(self.startVsTrs:DOScale(Vector3(0.5,0.5,1),0.4))
     sequence:Join(self.startVsImg:DOFade(1,0.3))
     sequence:Append(self.startVsTrs:DOScale(Vector3(1,1,1),0.2))
-    sequence:AppendInterval(1.2)
+    sequence:AppendInterval(0.5)
     sequence:Append(self.startLeftTrs:DOLocalMoveX(-3000, 0.6))
     sequence:Join(self.startRightTrs:DOLocalMoveX(3000, 0.6))
     sequence:Join(self.startVsImg:DOFade(0, 0.6))
@@ -517,13 +524,6 @@ function DragonTigerFightView:StartEffect()
     sequence:OnComplete(function()
         sequence:Kill(false)
         self.startTrs.gameObject:SetActive(false)
-        --开始下注提示
-        self.tipsStartXiaZhu:SetActive(true)
-        self:UpdateXiaZhuLabel()
-        TimerManager.StartTimer(self,function()
-            self.tipsStartXiaZhu:SetActive(false)
-        end,1.5,0,false)
-        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_START)
     end)
     sequence:Play()
     DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_READY)
@@ -621,20 +621,20 @@ function DragonTigerFightView:UpdateRoomInfo(model)
     end
     
     -- 提示 等待本对局结束
-    if model.Result then
-        self.tipsEnterWait.gameObject:SetActive(true)
-        self.colockNumTrs.gameObject:SetActive(true)
+    if model.Result or (lessTime<=0 and model.status==2) then--有结果 或者 发消息的时候还没结束但是收到消息已结束
         local lessSeconds = Mathf.Round((model.endTime - ServerTimeSync:GetTimeStamp())/1000)
-        self.colockNumTime.text = tostring(lessSeconds)
-        TimerManager.StartTimer(self,function()
-            lessSeconds = lessSeconds - 1
-            self.colockNumTime.text = tostring(lessSeconds)
-            logError("tipsEnterWait:"..lessSeconds)
-            if lessSeconds<=0 then
-                self.tipsEnterWait.gameObject:SetActive(false)
-                self.colockNumTrs.gameObject:SetActive(false)
-            end
-        end,1, lessSeconds,false)
+        if lessSeconds>1 then--时间太少不展示
+            self.tipsEnterWait.gameObject:SetActive(true)
+            self.tipsEnterWaitTime.text = tostring(lessSeconds)
+            TimerManager.StartTimer(self,function()
+                lessSeconds = lessSeconds - 1
+                self.tipsEnterWaitTime.text = tostring(lessSeconds)
+                logError("tipsEnterWait:"..lessSeconds)
+                if lessSeconds<=0 then
+                    self.tipsEnterWait.gameObject:SetActive(false)
+                end
+            end,1, lessSeconds,false)
+        end
     end
 end
 
@@ -679,6 +679,7 @@ function DragonTigerFightView:OnGameStatus(status)
     self.resultBgTrs.gameObject:SetActive(false)
     self.resultWinTrs.gameObject:SetActive(false)
     self.tipsCenterTxt.gameObject:SetActive(false)
+    self.tipsWaitopenTxt.gameObject:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
     self.tipsEnterWait.gameObject:SetActive(false)
     self.colockNumTrs.gameObject:SetActive(false)
@@ -702,6 +703,9 @@ function DragonTigerFightView:OnGameStatus(status)
     elseif status == 2 then -- 押分阶段
         self:UpdateDiZhuBtnState()
         self:SetRepeatState(#config.lastXiaZhuInfo > 0 and not config.isRepeat)
+        --开始下注提示
+        self.tipsStartXiaZhu:SetActive(true)
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_START)
         
         self.colockStateTimeTrs.gameObject:SetActive(true)
         self.colockStateTimeNum.text = tostring(config.lessSeconds)
@@ -718,15 +722,16 @@ function DragonTigerFightView:OnGameStatus(status)
                 self.statusTimer = nil
                 return
             end
-            if config.lessSeconds<=3 then
+            if config.lessSeconds<=3 then--倒计时音效
                 DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.DJS_NUM)
+            end
+            if config.lessSeconds == 11 then--关闭开始下注提示
+                self.tipsStartXiaZhu:SetActive(false)
             end
         end, 1, config.lessSeconds, true)
     elseif status == 3 then -- 亮牌阶段
         self:UpdateDiZhuBtnState()
         self:SetRepeatState(false)
-        self.tipsTimeEnd:SetActive(true)
-        self.tipsCenterTxt.gameObject:SetActive(true)
         self.resultTrs.gameObject:SetActive(true)
         self.resultBgTrs.gameObject:SetActive(true)
         DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.DJS_END)
