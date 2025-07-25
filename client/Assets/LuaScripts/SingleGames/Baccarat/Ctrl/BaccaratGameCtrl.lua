@@ -786,12 +786,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 			end
 		end
 	end
-	--local obj =self.objPools:Spawn(nil,self.view.txt_UpWinNum,target)
-	--obj:SetActive(true);
-	--obj.text =string.format("+"..winGold) ;
-	--obj.transform:DOMoveY(5,1):OnComplete(function()
-	--	self.objPools:UnSpawnPrefab(obj)
-	--end);
+	
 	for _, value in pairs(ChipTable) do
 		self.objPools:UnSpawnPrefab(value.chip)
 	end
@@ -813,7 +808,13 @@ function BaccaratGameCtrl:ScreeningChip(list,winGold,target)
 	for _, chipObj in pairs(selfChip) do
 		self:PlayChipToPlayerTwo(chipObj,target)
 	end
-
+	local obj =self.objPools:Spawn(nil,self.view.obj_UpWin,target)
+	obj:SetActive(true);
+	local txtNum = ComponentUtilGet.Text(obj.transform,"Num");
+	txtNum.text =string.format("+"..winGold) ;
+	obj.transform:DOLocalMoveY(50,1):OnComplete(function()
+		self.objPools:UnSpawnPrefab(obj)
+	end);
 	
 end
 
