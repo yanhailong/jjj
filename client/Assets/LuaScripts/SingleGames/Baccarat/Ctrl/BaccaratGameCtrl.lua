@@ -682,8 +682,7 @@ function BaccaratGameCtrl:EnterSettlement()
 		self.view.ator_PlayerCard2:Play("FlipCards",0,1)
 		self.view.ator_BankerCard2:Play("FlipCards",0,1)
 		if BaccaratSettlementInfo.extraBankerCardId ==0 and BaccaratSettlementInfo.extraPlayerCardId ==0 then--不用补牌
-			logError("不用补牌");
-			self.view.ator_DealCards:Play("dealIdel",0,1);
+			self.view.ator_DealCards:Play("dealAnim_idle",0,1);
 		else
 			if(BaccaratSettlementInfo.extraPlayerCardId ~=0 ) then
 				local playerCard3 = BaccaratSettlementInfo.extraPlayerCardId
@@ -696,16 +695,13 @@ function BaccaratGameCtrl:EnterSettlement()
 			end
 
 			if(BaccaratSettlementInfo.extraBankerCardId ~=0 and BaccaratSettlementInfo.extraPlayerCardId ~=0) then
-				logError("庄闲都补牌");
 				self.view.ator_PlayerCard3:Play("FlipCards",0,1)
 				self.view.ator_BankerCard3:Play("FlipCards",0,1)
 				self.view.ator_DealCards:Play("BufaZhuangxian",0,1);
 			elseif(BaccaratSettlementInfo.extraPlayerCardId ~=0 ) then
-				logError("闲家补牌");
 				self.view.ator_PlayerCard3:Play("FlipCards",0,1)
 				self.view.ator_DealCards:Play("Bufaxian",0,1);
 			elseif(BaccaratSettlementInfo.extraBankerCardId ~=0 ) then
-				logError("庄家补牌");
 				self.view.ator_BankerCard3:Play("FlipCards",0,1)
 				self.view.ator_DealCards:Play("Bufazhuang",0,1);
 			end
