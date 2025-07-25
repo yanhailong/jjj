@@ -548,28 +548,28 @@ function DragonTigerFightView:UpdateSelfGoldCount()
 end
 ---其他玩家信息更新
 function DragonTigerFightView:UpdatePlayers(players)
-    if players ~= nil and #players > 0 then
-        -- 只取前6名
-        local total = Mathf.Max(6,#players)
-        local index = 1
-        for i = 1, total do
-            if players[i] and players[i].playerId == PlayerManager:GetPlayerInfo().playerId then
-                self:UpdateSelf(players[i])
-                goto continue
-            end
-            if index >= 6 then
-                goto continue
-            end
-            if players[i] then
-                self.AllOtherPlayerHeads[index]:UpdatePlayer(players[i])
+    local idx = 1
+    local selfId = PlayerManager:GetPlayerInfo().playerId
+
+    -- 先把有数据的头像更新
+    if players then
+        for _, player in ipairs(players) do
+            if player.playerId == selfId then
+                self:UpdateSelf(player)
             else
-                self.AllOtherPlayerHeads[index]:UpdatePlayer(nil)
+                if idx <= 6 then
+                    self.AllOtherPlayerHeads[idx]:UpdatePlayer(player)
+                    idx = idx + 1
+                end
             end
-            index = index + 1
-            ::continue::
         end
     end
-    --更新房间玩家总数
+
+    -- 剩下的头像没有数据，才隐藏
+    for i = idx, 6 do
+        self.AllOtherPlayerHeads[i]:UpdatePlayer(nil)
+    end
+
     self.tmp_totalPlayerNum.text = self.ctrl.model.playersNum
 end
 
