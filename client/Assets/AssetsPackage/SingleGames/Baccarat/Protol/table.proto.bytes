@@ -1,4 +1,12 @@
-syntax = "proto3";import "room.proto";//百家乐基础信息
+syntax = "proto3";import "room.proto";//结算信息
+message AnimalsSettlementInfo {
+  int32 rewardAreaIdx = 1;  //中奖区域ID
+  repeated BetTableInfo betTableInfos = 2;  //玩家场上押注数据
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated PlayerChangedGold playerChangedGolds = 4;  //玩家金币变化列表
+}
+
+//百家乐基础信息
 message BaccaratBaseInfo {
   int64 roomId = 1;  //房间ID,房间唯一ID
   int32 wareId = 2;  //场次ID
@@ -149,6 +157,27 @@ message NotifyLoongTigerWarSettleInfo {
   repeated PlayerChangedGold playerSettleInfos = 6;  //玩家结算信息
 }
 
+//响应,msgID=0x16081,desc=飞禽走兽桌面信息，下注，结算，断线重连
+message NotifyAnimalsTableInfo {
+  enum E_MsgID {def = 0; msgID = 90241;};
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 4;  //区域下注信息
+  repeated int32 betPointList = 5;  //押分分值列表
+  TablePlayerInfo playerInfo = 6;  //当前玩家信息
+  int32 totalPlayerNum = 7;  //房间总人数
+  repeated int32 settlementHistory = 8;  //结算历史，首次进入时发送，下注区域id列表
+  AnimalsSettlementInfo settlementInfo = 9;  //结算信息，当阶段为结算时发送
+}
+
+//响应,msgID=0x16082,desc=通知飞禽走兽结算信息
+message NotifyAnimalsSettlement {
+  enum E_MsgID {def = 0; msgID = 90242;};
+  int32 code = 1;  //状态码
+  AnimalsSettlementInfo settlementInfo = 2;  //结算信息
+}
+
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
 message ReqBaccaratTableSummaryList {
   enum E_MsgID {def = 0; msgID = 98305;};
@@ -285,5 +314,13 @@ message NotifyTableRoomPlayerInfoChange {
   int64 changedPlayerId = 2;  //产生变化的玩家ID
   int32 totalPlayerNum = 3;  //总人数
   repeated TablePlayerInfo tableChangedPlayerInfos = 4;  //变化后的场上玩家信息
+}
+
+//响应,msgID=0x20089
+message NotifyPhaseChangInfo {
+  enum E_MsgID {def = 0; msgID = 131209;};
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //当前阶段
+  int64 endTime = 3;  //结束时间戳
 }
 

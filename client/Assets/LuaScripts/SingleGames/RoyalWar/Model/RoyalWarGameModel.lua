@@ -13,16 +13,34 @@ end
 
 function RoyalWarGameModel:Close()
     self.super.Close(self);
+	WebNetEvent.RemoveAllTo(self)
 end
 
 function RoyalWarGameModel:AddEvent()
-
+	WebNetEvent.AddListener(pb_RoyalWar.NotifyPhaseChangInfo, self.NotifyPhaseChangInfo, self)
+	WebNetEvent.AddListener(pb_RoyalWar.NotifyRedBlackWarInfo, self.NotifyRedBlackWarInfo, self)
 end
 
 function RoyalWarGameModel:RemoveEvent()
 
 end
+---请求红黑大战房间信息
+function RoyalWarGameModel:ReqRoomBaseInfo()
+	look("请求红黑大战房间信息")
+	WebNetworkManager.SendMsg(pb_RoyalWar.ReqRoomBaseInfo)
+end
 
+---通知红黑大战桌上信息
+function RoyalWarGameModel:NotifyRedBlackWarInfo(msg)
+	if(msg.code == 200) then
+		look("通知红黑大战桌上信息成功")
+	end
+end
+
+---红黑大战阶段变化通知
+function RoyalWarGameModel:NotifyPhaseChangInfo(msg)
+	
+end
 --region 事件方法
 
 --endregion

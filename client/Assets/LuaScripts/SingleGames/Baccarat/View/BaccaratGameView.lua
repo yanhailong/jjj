@@ -104,7 +104,7 @@ function BaccaratGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_close");
-    self.txt_UpWinNum=ComponentUtilGet.Text(self.transform,"content/txt_UpWinNum");
+    self.obj_UpWin=ComponentUtilGet.GameObject(self.transform,"content/obj_UpWin");
 end
 
 ---清空组件
@@ -199,7 +199,7 @@ function BaccaratGameView:ClearComponents()
     self.btn_setting=nil;
     self.btn_help=nil;
     self.btn_close=nil;
-    self.txt_UpWinNum=nil;
+    self.obj_UpWin=nil;
 end
 
 ---初始化View数据
