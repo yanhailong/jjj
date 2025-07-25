@@ -21,6 +21,7 @@ function BaccaratGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratBetStart, self.NotifyBaccaratBetStart, self)
 	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
 	WebNetEvent.AddListener(pb_Baccarat.RespExitRoomInGame, self.RespExitRoomInGame, self)
+	WebNetEvent.AddListener(pb_Baccarat.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
 end
 
 function BaccaratGameModel:RemoveEvent()
@@ -76,6 +77,19 @@ function BaccaratGameModel:RespExitRoomInGame(data)
 	if(data.code == 200) then
 		look("返回推出房间成功")
 		self.ctrl:Close();
+	end
+end
+---请求百家乐房间的玩家列表信息
+function BaccaratGameModel:ReqTablePlayerInfo()
+	look("请求百家乐房间的玩家列表信息")
+	WebNetworkManager.SendMsg(pb_Baccarat.ReqTablePlayerInfo)
+end
+---返回百家乐房间的玩家列表信息
+function BaccaratGameModel:RespTablePlayerInfo(data)
+	if(data.code == 200) then
+		look("返回百家乐房间的玩家列表信息成功")
+		require("Logic/Common/PlayerRankPanel/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.PlayerRankPanel,data.tablePlayerInfo)
 	end
 end
 

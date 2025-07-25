@@ -14,6 +14,7 @@ message BaccaratBaseInfo {
 message BaccaratCardState {
   uint32 winState = 1;  //输赢状态, 1：庄赢，2：闲赢，3：和
   uint32 cardTypeWinState = 2;  //牌型的输赢状态, 0：默认状态，1：庄对，2：闲对，3：庄和闲都有对子
+  bool hasKingCard = 3;  //是否是天王牌
 }
 
 //百家乐结算信息
@@ -105,7 +106,7 @@ message NotifyRedBlackWarSettleInfo {
   repeated int32 blackCards = 4;  //黑方牌
   int32 blackCardType = 5;  //黑方牌型
   int32 winState = 6;  //获胜状态(1红方胜 2黑方胜)
-  int64 getGold = 7;  //玩家获得的金币数
+  repeated TablePlayerInfo playerInfos = 7;  //前6玩家信息
   repeated PlayerChangedGold playerSettleInfos = 8;  //玩家结算信息
 }
 
@@ -119,6 +120,8 @@ message NotifyRedBlackWarInfo {
   repeated RedBlackWarHistory redBlackHistories = 5;  //当前房间的历史记录
   NotifyRedBlackWarSettleInfo settleInfos = 6;  //结算信息
   repeated int32 betPointList = 7;  //押分列表
+  repeated TablePlayerInfo playerInfos = 8;  //前6玩家信息
+  int32 totalPlayerNum = 9;  //房间总人数
 }
 
 //响应,msgID=0x14001,desc=通知龙虎斗桌上信息
@@ -131,6 +134,8 @@ message NotifyLoongTigerWarInfo {
   repeated int32 histories = 5;  //当前房间的历史记录
   NotifyLoongTigerWarSettleInfo settleInfos = 6;  //结算信息
   repeated int32 betPointList = 7;  //押分列表
+  repeated TablePlayerInfo playerInfos = 8;  //前6玩家信息
+  int32 totalPlayerNum = 9;  //房间总人数
 }
 
 //响应,msgID=0x14002,desc=龙虎斗结算信息
@@ -140,7 +145,8 @@ message NotifyLoongTigerWarSettleInfo {
   int32 loongCard = 2;  //龙方牌
   int32 tigerCard = 3;  //虎方牌
   int32 winState = 4;  //获胜状态(1龙胜 2虎胜 3和)
-  repeated PlayerChangedGold playerSettleInfos = 5;  //玩家结算信息
+  repeated TablePlayerInfo playerInfos = 5;  //前6玩家信息
+  repeated PlayerChangedGold playerSettleInfos = 6;  //玩家结算信息
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
@@ -251,6 +257,11 @@ message ReqTablePlayerInfo {
   enum E_MsgID {def = 0; msgID = 131075;};
 }
 
+//请求,msgID=0x20004
+message ReqRoomBaseInfo {
+  enum E_MsgID {def = 0; msgID = 131076;};
+}
+
 //响应,msgID=0x20081,desc=请求下注返回
 message NotifyPlayerBet {
   enum E_MsgID {def = 0; msgID = 131201;};
@@ -272,6 +283,7 @@ message NotifyTableRoomPlayerInfoChange {
   enum E_MsgID {def = 0; msgID = 131208;};
   int32 code = 1;  //状态码
   int64 changedPlayerId = 2;  //产生变化的玩家ID
-  repeated TablePlayerInfo tableChangedPlayerInfos = 3;  //变化后的场上玩家信息
+  int32 totalPlayerNum = 3;  //总人数
+  repeated TablePlayerInfo tableChangedPlayerInfos = 4;  //变化后的场上玩家信息
 }
 
