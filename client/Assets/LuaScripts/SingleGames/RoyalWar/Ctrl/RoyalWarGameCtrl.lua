@@ -5,16 +5,12 @@
 ---@class RoyalWarGameCtrl:BaseCtrl
 local RoyalWarGameCtrl=Class("RoyalWarGameCtrl",BaseCtrl)
 local config = require("SingleGames/RoyalWar/RoyalWarConfig")
----@type RoyalWarZhuPanItem
-local RoyalWarZhuPanItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarZhuPanItem"
----@type RoyalWarDaLuItem
-local RoyalWarDaLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarDaLuItem"
----@type RoyalWarAllChildLuItem
-local RoyalWarAllChildLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarAllChildLuItem"
 ---@type RoyalWarCardTypeItem
 local RoyalWarCardTypeItem = require("SingleGames/RoyalWar/Ctrl/RoyalWarCardTypeItem")
 ---@type RoyalWarRoad
 local RoyalWarRoad = require("SingleGames/RoyalWar/Ctrl/RoyalWarRoad")
+---@type RoyalWarPlayerItem
+local RoyalWarPlayerItem = require("SingleGames/RoyalWar/Ctrl/RoyalWarPlayerItem")
 local CurWhoWin;
 local Vector2 = CS.UnityEngine.Vector2
 local Vector3 = CS.UnityEngine.Vector3
@@ -45,6 +41,20 @@ local CardTypeTable={};
 ---牌型Obj
 local CardTypeObjTable={};
 
+---前6名玩家预支体集合
+local BestSixPlayerObjs={}
+---玩家预支脚本集合
+local RoyalWarPlayerItems={}
+---红方赢了多少局
+local RedWinNumber;
+---黑方赢了多少局
+local BlackWinNumber;
+---幸运一击次数
+local LuckyWinNumber;
+---局数
+local RoundNumber;
+---下注的筹码面板集合
+local betInfoList={};
 ---构造函数
 function RoyalWarGameCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -60,6 +70,30 @@ end
 ---初始化
 function RoyalWarGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
+	self.model:ReqRoomBaseInfo();
+	self:InitData()
+end
+
+---请求房间数据返回
+function RoyalWarGameCtrl:NotifyRedBlackWarInfo(data)
+	self.GamePhase = data.gamePhase;--游戏阶段信息
+	betInfoList = data.betPointList
+	--初始化筹码
+	for i = 1, #betInfoList do
+		local item =self.objPools:Spawn(nil,self.view.obj_chipItem,self.view.obj_ChipContent.transform)
+		item:SetActive(true);
+		---@type RoyalWarChipItem
+		local chipItem = RoyalWarChipItem.New(item,self);
+		chipItem:InitUIShow(i,betInfoList[i]);
+		table.insert(ChipItems,chipItem);
+	end
+	self.RoyalWarScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
+	self:RefreshPlayerInfo(data.playerInfos);
+	self:InitDataShow(data.redBlackHistories)
+end
+
+---初始化数据
+function RoyalWarGameCtrl:InitData()
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
 	---@type BaccaratRoad
@@ -69,33 +103,31 @@ function RoyalWarGameCtrl:CtrlInit(args)
 	config.InitIconPic();
 	config.InitCardTypePic();
 	config.InitCardPic();
+	self:InitUIShow()
+	---@type RoyalWarPlayerItem
+	for i = 1,self.view.obj_PlayerRoot.transform.childCount do
+		BestSixPlayerObjs[i] = self.view.obj_PlayerRoot.transform:GetChild(i-1).gameObject;
+		RoyalWarPlayerItems[i]=RoyalWarPlayerItem.New(BestSixPlayerObjs[i],self)
+		BestSixPlayerObjs[i]:SetActive(false);
+	end
 	CurSelectChip = 0;
-	self:InitZhuPanTable()
+	self:RefreshChipLeftRightBtnShow(false)
 	self:InitCardTypeData()
-	self:InitDaLuTable()
-	self:InitDaLuZiLuTable()
-	self:InitXiaoLuTable()
-	self:InitYueYouLuTable()
-	self:InitData()
 end
 
----初始化数据
-function RoyalWarGameCtrl:InitData()
-	countDownTime =13;
-	curGameStage = config.GameSate.Start;
+function RoyalWarGameCtrl:InitUIShow()
 	BetRedAllNum =0;
 	BetBlackAllNum =0;
 	BetLuckyAllNum =0;
 
-	self.view.ator_CardRoot:Play("New State")
 	self.view.obj_CardBg:SetActive(false);
+	self.view.ator_CardRoot:Play("New State")
 	self.view.obj_RoadRoot:SetActive(true)
-	self.view.obj_WhoWin:SetActive(false);
 	self.view.obj_SelfBetBlack:SetActive(false)
 	self.view.obj_SelfBetRed:SetActive(false)
 	self.view.obj_SelfBetLucky:SetActive(false)
 	self.view.obj_Settlement:SetActive(false);
-	
+
 	self.view.tmp_RedBetNum.text="0.00"
 	self.view.tmp_BlackBetNum.text="0.00"
 	self.view.tmp_LuckyBetNum.text="0.00"
@@ -103,34 +135,21 @@ function RoyalWarGameCtrl:InitData()
 	self.view.tmp_SelfBetRedNum.text="0.00"
 	self.view.tmp_SelfBetBlackNum.text="0.00"
 	self.view.tmp_SelfBetLuckyNum.text="0.00"
-	
-	self.beginTimer = TimerManager.CreateTimer(self,function()
-		self.view.obj_VS:SetActive(false);
-		curGameStage =  config.GameSate.Bet;
-		self:RefreshGameStage();
-	end,1,1,true);
-
-	self.beginTimer2 = TimerManager.CreateTimer(self,function()
-		self.view.obj_BeginBet:SetActive(false);
-	end,1,1,true);
 
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.txt_Countdown.text = countDownTime;
-		if(countDownTime <= 3) then
+		if(countDownTime == 3) then
 			self.view.obj_Countdown:SetActive(false);
 			self.view.obj_AboutEnd:SetActive(true);
-			self.view.txt_AboutEnd.text = countDownTime;
+			--self.view.txt_AboutEnd.text = countDownTime;
 		end
 		if(countDownTime<=0) then
-			curGameStage =config.GameSate.Settlement;
-			self:RefreshGameStage();
+			self.betCountDownTimer:Stop()
 		end
-	end,1,countDownTime,true);
-	curGameStage = config.GameSate.Start
-	self:SetCheckedShow()
-	self:RefreshGameStage()
+	end,1,-1,true);
 end
+
 ---同步游戏当前在哪个阶段
 function RoyalWarGameCtrl:RefreshGameStage()
 	if self.GameStageCor then
@@ -146,8 +165,6 @@ function RoyalWarGameCtrl:RefreshGameStage()
 			self:EnterSettlement();
 		end
 	end)
-
-
 	
 end
 
@@ -155,33 +172,71 @@ end
 function RoyalWarGameCtrl:EnterBegin()
 	self.view.obj_Countdown:SetActive(false);
 	self.view.obj_VS:SetActive(true);
-	self.beginTimer:Start();
+	coroutine.wait(1)
+	self.view.obj_VS:SetActive(false);
+	curGameStage =  config.GameSate.Bet;
+	self:EnterBetGame();
 end
 ---进入下注阶段
 function RoyalWarGameCtrl:EnterBetGame()
 	self.view.txt_Countdown.text = countDownTime;
-	self:SetBetButtonInteractable(true);
 	self.view.obj_Countdown:SetActive(true);
 	self.view.obj_BeginBet:SetActive(true);
-	self.beginTimer2:Start();
+	coroutine.wait(1);
+	self.view.obj_BeginBet:SetActive(false);
 	self.betCountDownTimer:Start();
 end
 
----设置按钮的显示状态
-function RoyalWarGameCtrl:SetBetButtonInteractable(state)
-	self.view.btn_One.interactable = state;
-	self.view.btn_Ten.interactable = state;
-	self.view.btn_Fifty.interactable = state;
-	self.view.btn_OneHundred.interactable = state;
-	self.view.btn_FiveHundred.interactable = state;
+---初始化要显示的数据（接入服务器数据要，要赋值服务器那边的数据显示）
+function RoyalWarGameCtrl:InitDataShow(data)
+	RedWinNumber=0;
+	BlackWinNumber=0;
+	LuckyWinNumber=0;
+	RoundNumber=#data;
+	for _, v in ipairs(data) do
+		if(v.winner ==  1) then
+			RedWinNumber = RedWinNumber+1
+		elseif(v.winState==2) then
+			BlackWinNumber = BlackWinNumber+1
+		end
+
+		if(v.cardType>1)then
+			LuckyWinNumber = LuckyWinNumber+1
+		end
+	end
+	self:RefreshUIDataShow()
 end
 
+---刷新前6的玩家显示
+---@param playerInfoList 前6的玩家列表信息
+function RoyalWarGameCtrl:RefreshPlayerInfo(playerInfoList)
+	local keysToRemove=0;
+	for i, v in ipairs(playerInfoList) do
+		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--删除自己
+			keysToRemove = i;
+		end
+	end
+
+	if(keysToRemove~=0) then
+		table.remove(playerInfoList,keysToRemove);
+	end
+
+	for i, v in ipairs(BestSixPlayerObjs) do
+		v:SetActive(#playerInfoList>=i);
+	end
+	for i, v in ipairs(playerInfoList) do
+		if(i>=7) then
+			break;
+		end
+		---@type RoyalWarPlayerItem
+		local item = RoyalWarPlayerItems[i];
+		item:RefreshPlayerInfoShow(v);
+	end
+end
 
 ---进入结算阶段
 function RoyalWarGameCtrl:EnterSettlement()
 	self.view.obj_StopBet:SetActive(true);
-	self:SetBetButtonInteractable(false);
-	
 	self.view.obj_AboutEnd:SetActive(false);
 	self.view.obj_CardBg:SetActive(true);
 	self.view.obj_RoadRoot:SetActive(false)
@@ -236,7 +291,6 @@ function RoyalWarGameCtrl:EnterSettlement()
 		coroutine.wait(1)
 		self.view.ator_CardRoot:Play("RoyalWarDealCard")
 		coroutine.wait(3)
-		self.view.obj_WhoWin:SetActive(true)
 		self:ShowWin(self.RedCardType > self.BlackCardType)
 		self.IsLucky = self.RedCardType~=config.CardType.DanZhang or self.BlackCardType~=config.CardType.DanZhang;
 		self:Flicker();
@@ -286,12 +340,6 @@ function RoyalWarGameCtrl:PlayFlicker(image,isInitData)
 	self.flickerSequence = DOTween.Sequence()
 	self.flickerSequence:Append(image:DOFade(1,0.5))
 	self.flickerSequence:SetLoops(8,loopType.Yoyo)
-	self.flickerSequence:OnComplete(function()
-		if(isInitData) then
-			self:InitData();
-		end
-	end)
-
 	self.flickerSequence:Play();
 end
 
@@ -321,14 +369,7 @@ end
 function RoyalWarGameCtrl:GetRandomColour()
 	return math.random(1,4)
 end
----选中哪个筹码
-function RoyalWarGameCtrl:SetCheckedShow()
-	self.view.obj_checkedOne:SetActive(CurSelectChip == config.ChipState.One);
-	self.view.obj_checkedTen:SetActive(CurSelectChip == config.ChipState.Ten);
-	self.view.obj_checkedFifty:SetActive(CurSelectChip == config.ChipState.Fifty);
-	self.view.obj_checkedOneHundred:SetActive(CurSelectChip == config.ChipState.OneHundred);
-	self.view.obj_checkedFiveHundred:SetActive(CurSelectChip == config.ChipState.FiveHundred);
-end
+
 
 
 ---初始化牌型数据显示
@@ -372,9 +413,26 @@ end
 function RoyalWarGameCtrl:Close()
     self.super.Close(self);
 end
-
+---刷新筹码左右选择按钮的显示
+function RoyalWarGameCtrl:RefreshChipLeftRightBtnShow(state)
+	self.view.btn_Chipleft.gameObject:SetActive(state)
+	self.view.btn_ChipRight.gameObject:SetActive(not  state)
+end
 ---添加UI事件
 function RoyalWarGameCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_Chipleft,function()
+		self.view.obj_ChipContent.transform:DOLocalMoveX(0,0.5):OnComplete(function()
+			self:RefreshChipLeftRightBtnShow(false);
+		end)
+
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_ChipRight,function()
+		self.view.obj_ChipContent.transform:DOLocalMoveX(-410,0.5):OnComplete(function()
+			self:RefreshChipLeftRightBtnShow(true);
+		end)
+	end)
+	
 	self.uiEventListener:AddClick(self.view.btn_Menu,function()
 		self:RefreshMenuShow()
 	end)
@@ -389,43 +447,42 @@ function RoyalWarGameCtrl:AddUIEvent()
 		self:Close();
 	end)
 
-	self.uiEventListener:AddClick(self.view.btn_One,function()
-		CurSelectChip = config.ChipState.One;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_Ten,function()
-		CurSelectChip = config.ChipState.Ten;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_Fifty,function()
-		CurSelectChip = config.ChipState.Fifty;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_OneHundred,function()
-		CurSelectChip = config.ChipState.OneHundred;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_FiveHundred,function()
-		CurSelectChip = config.ChipState.FiveHundred;
-		self:SetCheckedShow();
-	end)
-	
-
 	self.uiEventListener:AddClick(self.view.btn_BetBlack,function()
-		--下注庄家区域
-		self:PlayChip(config.BetState.Black,CurSelectChip)
+		--下注黑方区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetRed,function()
-		--下注和区域
-		self:PlayChip(config.BetState.Red,CurSelectChip)
+		--下注红方区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetLucky,function()
-		--下注闲对区域
-		self:PlayChip(config.BetState.Lucky,CurSelectChip)
+		--下注幸运一击区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
+	self.uiEventListener:AddClick(self.view.btn_AllOther,function()
+		self.model:ReqTablePlayerInfo()--请求百家乐房间的玩家列表信息
+	end)
 end
 
 ---筹码飞行到指定区域

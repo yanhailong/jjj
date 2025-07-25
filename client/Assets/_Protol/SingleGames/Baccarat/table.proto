@@ -244,6 +244,7 @@ message RespBaccaratTableInfo {
   repeated PlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
   BaccaratSettlementInfo baccaratSettlementInfo = 6;  //场上结算信息，如果场上阶段不为结算，此值为空
   repeated int32 betInfoList = 7;  //压分列表
+  int32 playerTotalNum = 8;  //玩家总人数
 }
 
 //响应,msgID=0x18085,desc=百家乐通知下注开始

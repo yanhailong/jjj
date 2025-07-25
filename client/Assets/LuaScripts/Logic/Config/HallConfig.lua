@@ -52,6 +52,7 @@ GameNames = {
 	VietnamChess="VietnamChess",--越南色碟
 	CarLogo="CarLogo",--豪车俱乐部
 	BirdsAnimals="BirdsAnimals",--飞禽走兽
+	RoyalWar="RoyalWar",--红黑大战
 }
 
 ---游戏选择场景配置
@@ -62,6 +63,7 @@ GameSortID={
 	[4]=GameNames.VietnamChess,--越南色碟
 	[5]=GameNames.CarLogo,--豪车俱乐部
 	[6]=GameNames.BirdsAnimals,--飞禽走兽
+	[7]=GameNames.RoyalWar,--红黑大战
 }
 
 -- 游戏的配置
@@ -91,6 +93,10 @@ GameConfig = {
 		gameType = 200300,
 		Manager = "SingleGames/BirdsAnimals/BirdsAnimals",
 		EnterCtrlName = CtrlNames.BirdsAnimalsGame, --游戏入口界面
+	},[GameNames.RoyalWar] = {
+		gameType = 200100,
+		Manager = "SingleGames/RoyalWar/RoyalWar",
+		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
 	},
 	
 }

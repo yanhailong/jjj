@@ -68,7 +68,7 @@ end
 this.ABNames = {
     icons="SingleGames/RoyalWar/atlas",--icon
     cardType_Pics="SingleGames/RoyalWar/atlas/cardType",--牌型资源名
-    prefabsItem = "SingleGames/RoyalWar/prefabs" ,--预支item路径
+    prefabsItem = "SingleGames/RoyalWar/prefabs/main" ,--预支item路径
     chipPool = "SingleGames/RoyalWar/prefabs/Pool",--筹码
     Card="Common/GameArtsCommon/GameFight/alats/card",--牌
 }

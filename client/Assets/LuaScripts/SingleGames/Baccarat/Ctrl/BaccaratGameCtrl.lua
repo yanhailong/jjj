@@ -298,6 +298,7 @@ function BaccaratGameCtrl:FirstEntryGame(data)
 	self:SetBetButtonInteractable(false);
 	self:RefreshDataShow();
 	self:InitTableAreaInfos();
+	self.view.tmp_AllOtherNumber.text = data.playerTotalNum
 end
 ---推送百家乐通知新的一局开始
 function BaccaratGameCtrl:NotifyBaccaratRoundStart(data)
@@ -337,6 +338,7 @@ end
 function BaccaratGameCtrl:NotifyTableRoomPlayerInfoChange(data)
 	BaccaratTableInfo = data.tableChangedPlayerInfos;
 	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
+	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
 end
 
 ---服务器数据返回刷新阶段显示
@@ -368,6 +370,7 @@ function BaccaratGameCtrl:RefreshDataShow()
 	end
 	self:RefreshGameStage()
 	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
+	
 end
 
 ---第一次进入游戏初始化区域下注信息
