@@ -7,17 +7,19 @@ local Vector3 = CS.UnityEngine.Vector3
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
-function BirdsAnimalsItem:ctor(trs)
+function BirdsAnimalsItem:ctor(trs,luaClass)
     self.transform=trs
+    self.luaClass = luaClass
     self.bg = ComponentUtilGet.Image(self.transform, "LogoBg")
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
-    self.choose = ComponentUtilGet.Image(self.transform,"Choose");
+    self.light = ComponentUtilGet.GameObject(self.transform,"Choose/effect_BirdsAnimals_xz_bk"):GetComponent("ParticleSystem")
+    self.choose = ComponentUtilGet.GameObject(self.transform,"Choose/effect_BirdsAnimals_ts_bk_qiang"):GetComponent("ParticleSystem")
     self.Rate = ComponentUtilGet.Image(self.transform,"Rate")
     self.Text = ComponentUtilGet.Text(self.transform,"Text")
     self.choose.gameObject:SetActive(true)
+    self.light.gameObject:SetActive(false)
     self.Rate.gameObject:SetActive(false)
     self.Text.gameObject:SetActive(false)
-    self:ShowChoose(false)
 end
 
 function BirdsAnimalsItem:FlyLogoHistory(result,target)
@@ -52,11 +54,14 @@ end
 function BirdsAnimalsItem:ShowChoose(state, doTween)
     if state then
         if doTween then
-            Tools.SetColorAlpha_Float(self.choose, 0)
+            self.choose.gameObject:SetActive(false)
             -- 选中的图标由大变小效果
             self:DOFade(false)
         else
-            Tools.SetColorAlpha_Float(self.choose, 1)
+            self.choose.gameObject:SetActive(true)
+            if self.choose.isStopped  then
+                self.choose:Play();
+            end
             -- 选中的图标由大变小效果
             self:DOFade(true)
         end
@@ -68,8 +73,16 @@ end
 
 ---閃燈
 function BirdsAnimalsItem:FlashLight(time,fadeTimes,delayTime)
-    self:ShowChoose(false)
-    Tools.DOFade_Repeat(self.choose,time,fadeTimes,delayTime,function() self:ShowChoose(false) end)
+    --self:ShowChoose(false)
+    --Tools.DOFade_Repeat(self.choose,time,fadeTimes,delayTime,function() self:ShowChoose(false) end)
+    local t = time*fadeTimes+(fadeTimes-1)*delayTime
+    if self.light.isStopped  then
+        self.light:Play();
+    end
+    TimerManager.StartTimer(self.luaClass,function()
+        self.light:Stop();
+        self.light.gameObject:SetActive(false)
+    end,t)
 end
 
 --- 选中的图标由大变小效果

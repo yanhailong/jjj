@@ -18,6 +18,7 @@ function DragonTigerFightModel:Awake()
     self.sideBetInfos={}
     self.history = {}
     self.Result = {}
+    self.bettingDataMap = {}
     self.AreaChipTotals = {0,0,0}
     self.playersNum=0
     --请求进入房间
@@ -77,20 +78,29 @@ function DragonTigerFightModel:OnEnterRoom(msg)
     end
 end
 
+
+function updateUI()
+    for playerId, info in pairs(playerDataMap) do
+        if not info.handled then
+            print("刷新玩家", playerId, "数据", info.data)
+            -- updatePlayerUI(playerId, info.data)
+            info.handled = true
+        end
+    end
+end
 -- 广播玩家押注信息 NotifyPlayerBet 
 function DragonTigerFightModel:OnBetting(msg)
     if msg and msg.code == 200 and self.initState then
-        for _, value in ipairs(msg.betTableInfoList or {}) do
-            local bet = {
-                side = value.betIdx-config.gameID*100,
-                index = self:FindBetIndex(value.betValue),
-                currency = msg.playerCurGold,
-                playerId = msg.playerId,
-                betValue = value.betValue,
-                betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
-            }
-            if  bet.side<0 then bet.side = value.betIdx end
-            self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+        msg.handled = false
+        if self.bettingDataMap[msg.playerId] and not self.bettingDataMap[msg.playerId].handled and msg.playerId == PlayerManager:GetPlayerInfo().playerId  then
+            --自己的数据需要统计所以必须完整
+            for i = 1, #msg.betTableInfoList do
+                table.insert(self.bettingDataMap[msg.playerId].betTableInfoList, msg.betTableInfoList[i])
+            end
+            msg.betTableInfoList = self.bettingDataMap[msg.playerId].betTableInfoList
+            self.bettingDataMap[msg.playerId] = msg
+        else--其他玩家直接用最新数据 允许丢掉几个筹码
+            self.bettingDataMap[msg.playerId] = msg
         end
     end
 end
@@ -155,6 +165,7 @@ function DragonTigerFightModel:ResetConfig()
     self.sideBetInfos={}
     self.Result = {}
     self.AreaChipTotals = {0,0,0}
+    self.bettingDataMap = {}
 end
 
 --endregion

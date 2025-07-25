@@ -22,7 +22,6 @@ end
 function BirdsAnimalsGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	TimerManager.StartTimer(self,function()    self:EnterRoom(args or 1)  end,1,0)
 end
 
 ---初始化数据
@@ -48,7 +47,7 @@ function BirdsAnimalsGameCtrl:AddFunctionButtons()
 	self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.BirdsAnimalsRule) end)
 	self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
 	self.uiEventListener:AddClick(self.view.btn_players, function()
-		--CtrlManager.SingleShow(CtrlNames.BirdsAnimalsRule)
+		self.model:ReqRoomPlayers()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_trend,function() CtrlManager.SingleShow(CtrlNames.BirdsAnimalsTrend,self.model.history) end)
 	self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
@@ -79,14 +78,16 @@ end
 function BirdsAnimalsGameCtrl:RepeatBet()
 	if #config.lastXiaZhuInfo > 0 and not config.isRepeat then
 		config.isRepeat = true
+		local ReqBet = { reqBetBeans = {} }
 		for _, info in ipairs(config.lastXiaZhuInfo) do
-			if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
+			if not config.allow or self.model.betPointList[info.index] > PlayerManager:GetPlayerInfo().goldNum then
 				goto continue
 			end
-			self:Bet(info.side,config.dizhuNumArr[info.index])
+			table.insert(ReqBet.reqBetBeans, {betValue = self.model.betPointList[info.index],betAreaIdx=config.gameID*100+info.side} )
 			::continue::
 		end
 		self.view.btn_repeat.interactable = false
+		self.model:Bet(ReqBet)
 	end
 end
 
@@ -95,22 +96,17 @@ function BirdsAnimalsGameCtrl:OnClickCenterYaZhuSide(area)
 	if config.allow == false then
 		return
 	end
-	--local amount = config.dizhuNumArr[config.dizhuIndex]
-	self:Bet(area, config.dizhuIndex)
-end
-
--- 进入房间
-function BirdsAnimalsGameCtrl:EnterRoom(roomType)
-	WebNetworkManager.SendMsg(pb_BirdsAnimals.ReqBirdsAnimalsEnterRoom, {roomType = roomType})
-end
-
--- 押注
-function BirdsAnimalsGameCtrl:Bet(side, amount)
-	WebNetworkManager.SendMsg(pb_BirdsAnimals.ReqBirdsAnimalsBetting, {side = side, amount = amount})
+	local ReqBet = {
+		reqBetBeans = {
+			{betValue = self.model.betPointList[config.dizhuIndex],betAreaIdx=config.gameID*100+area}
+		}
+	}
+	self.model:Bet(ReqBet)
 end
 
 ---移除UI事件
 function BirdsAnimalsGameCtrl:RemoveEvent()
+	self.model:ExitRoom()
 	self.super.RemoveEvent(self);
 end
 

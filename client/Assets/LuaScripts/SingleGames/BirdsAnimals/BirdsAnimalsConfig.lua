@@ -5,9 +5,6 @@ local  this = BirdsAnimalsConfig;
 ---车标数量
 BirdsAnimalsConfig.ANIMAL_MAX=28;
 
----筹码配置,必须从小到大排列
-BirdsAnimalsConfig.CHOUMAS = {1,10,50,100,500};
-
 --飞禽走兽类型
 BirdsAnimalsConfig.ANIMAL_TYPE={
     YINGWU = 1, --鹦鹉
@@ -154,93 +151,33 @@ BirdsAnimalsConfig.CURVE_KEYS = {
     {1, 1}
 }
 
-
---基础时间
-BirdsAnimalsConfig.BaseTime = 17;
-
---上庄
-BirdsAnimalsConfig.UpBanker = {
-    maxBetTimes = 3,--最大下注倍数
-    maxRemainBankerTimes = 10,--最大连庄次数
-    minBetMoney = 10,--最低携带可玩金额
-}
-
----@see 每个押注区域直接显示筹码数限制
-BirdsAnimalsConfig.Side_Show_Chouma_Num = 30
-
----@see 押注倒計時特別提醒
-BirdsAnimalsConfig.COUNTDOWN = 3
-
---每一个区域场外玩家扔筹码的数量限制
-BirdsAnimalsConfig.EveryArea_OtherPlayer_ThrowChouMa_Limit = 40
-
 this.dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
-this.dizhuColor = {"yx_ph_cm_red","yx_ph_cm_blue","yx_ph_cm_org","yx_ph_cm_gree","yx_ph_cm_pro","yx_ph_cm_cheng","yx_ph_cm_black"}
 
----玩家信息
-this.selfPlayer = {
-    playerId = 9999,
-    nickName = "9999",
-    gold = 9999,
-    diamond = 9999,
-    vipLevel = 1,
-}
 ---游戏ID
 this.gameID = 200300
 ---当前选中的底注
 this.dizhuIndex = 1
 ---底注数值
 this.dizhuNumArr = {1,10,50,100,500,1000,2000}
+---结算各动画阶段时间
+this.ResultStageTime = {1,0.5,1,1,2,3,2.5,1}
 ---当前是否可以下注
 this.allow = false
----本局结果
-this.side = 0
 ---当前总底注
 this.totalDiZhuNums = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 ---当前个人底注
 this.selfDiZhuNums = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 this.selfXiaZhuInfo = {}
----玩家真实金币数量
-this.goldRealNum = 100000
----流程状态信息 当前房间阶段 1=等待押注,2=押注冻结，等待开牌,3=本局结束
-this.currStatus = 1
 ---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 this.StageTime = {0,15000,16000,0 }
 ---当前状态剩余秒数 13
 this.lessSeconds = 13
----房间总人数
-this.totalPlayerNum = 66
-
---- 每个押注区域直接显示筹码数限制
-this.Side_Show_Chouma_Num = 60
-
---- 每局下注限制金额
-this.XiaZhu_Limit_Info = {1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000} 
-
----闪烁时间
-this.fadeTime = 0.5
----闪烁次数
-this.fadeTimes = 1
-
----要押注最小金额
-this.GameMinMoney = 5000
-
 --- 其他玩家下注显示筹码数限制
-this.OtherPlayer_ChouMaLimit = {60,60,60,60,60,60,60,60,60,60,60,60,60,60}
+this.AreaChouMaLimit = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}
 
 ---复投
 this.lastXiaZhuInfo = {}
 ---本局是否使用了复投
 this.isRepeat = false
----本局下注数据
-this.allXiaZhuData = {}
-
----下注时间
-BIRDS_ANIMALS_GAME_TIME = 5
-
-this.EventBinner = {
-    XIAZHU = "BIRDS_ANIMALS_XIAZHU",
-    XIAZHU_END = "BIRDS_ANIMALS_XIAZHU_END",
-}
 
 return this

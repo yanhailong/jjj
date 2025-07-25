@@ -22,7 +22,6 @@ end
 function CarLogoGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
-	TimerManager.StartTimer(self,function()    self:EnterRoom(args or 1)  end,1,0)
 end
 
 ---初始化数据
@@ -47,7 +46,7 @@ function CarLogoGameCtrl:AddFunctionButtons()
 	self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.CarLogoRule) end)
 	self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
 	self.uiEventListener:AddClick(self.view.btn_players, function()
-		--CtrlManager.SingleShow(CtrlNames.BirdsAnimalsRule)
+		self.model:ReqRoomPlayers()
 	end)
 	self.uiEventListener:AddClick(self.view.btn_trend,function() CtrlManager.SingleShow(CtrlNames.CarLogoTrend,self.model.history) end)
 	self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
@@ -78,13 +77,16 @@ end
 function CarLogoGameCtrl:RepeatBet()
 	if #config.lastXiaZhuInfo > 0 and not config.isRepeat then
 		config.isRepeat = true
+		local ReqBet = { reqBetBeans = {} }
 		for _, info in ipairs(config.lastXiaZhuInfo) do
-			if not config.allow or config.currStatus ~= 1 or config.dizhuNumArr[info.index] > PlayerManager:GetPlayerInfo().goldNum then
-				break
+			if not config.allow or self.model.betPointList[info.index] > PlayerManager:GetPlayerInfo().goldNum then
+				goto continue
 			end
-			self:Bet(info.side,config.dizhuNumArr[info.index])
+			table.insert(ReqBet.reqBetBeans, {betValue = self.model.betPointList[info.index],betAreaIdx=config.gameID*100+info.side} )
+			::continue::
 		end
 		self.view.btn_repeat.interactable = false
+		self.model:Bet(ReqBet)
 	end
 end
 
@@ -93,79 +95,19 @@ function CarLogoGameCtrl:OnClickCenterYaZhuSide(area)
 	if config.allow == false then
 		return
 	end
-	--local amount = config.dizhuNumArr[config.dizhuIndex]
-	self:Bet(area, config.dizhuIndex)
+	local ReqBet = {
+		reqBetBeans = {
+			{betValue = self.model.betPointList[config.dizhuIndex],betAreaIdx=config.gameID*100+area}
+		}
+	}
+	self.model:Bet(ReqBet)
 end
 
--- 进入房间
-function CarLogoGameCtrl:EnterRoom(roomType)
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqCarLogoEnterRoom, {roomType = roomType})
-end
-
--- 押注
-function CarLogoGameCtrl:Bet(side, amount)
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqCarLogoBetting, {side = side, amount = amount})
-end
 
 ---移除UI事件
 function CarLogoGameCtrl:RemoveEvent()
+	self.model:ExitRoom()
 	self.super.RemoveEvent(self);
-end
-
----模拟测试游戏流程
-function CarLogoGameCtrl:Test()
-	self.view:InitUI()
-	
-	CarLogoConfig.allow=true
-	CarLogoConfig.currStatus=1
-	CarLogoConfig.selfXiaZhuInfo = {}
-	--CarLogoConfig.isRepeat = false
-	self.view:UpdateDiZhuBtnState()
-	self.view:SetRepeatState(CarLogoConfig.isRepeat)
-	--复投功能
-	self.view.btn_repeat.interactable = #CarLogoConfig.lastXiaZhuInfo>0
-
-	--准备
-	self.view:StartEffect(function()
-
-		--下注
-		local times= Tools.RandomInt(3,5)
-		TimerManager.StartTimer(self, function
-		()
-			self.view:ChangeDiZhu(Tools.RandomInt(1,5))
-			self:OnClickCenterYaZhuSide(Tools.RandomInt(1,8))
-		end, 1, 3, true)
-		--其他玩家下注消息
-		TimerManager.StartTimer(self, function
-		()
-			GlobalEvent.Notify(CarLogoConfig.EventBinner.XIAZHU,{})
-		end, 0.2, times, true)
-		--下注结束结算
-		TimerManager.StartTimer(self, function
-		()
-			local logo_id=Tools.RandomInt(1,8)
-			local logo_index=CarLogoConfig.LOGO_IDX[logo_id][Tools.RandomInt(1,#CarLogoConfig.LOGO_IDX[logo_id])]
-			local result = {win_carlogo={logo_index=logo_index,logo_id=logo_id},last_carlogo={logo_index=4,logo_id=4}}
-			self.view:PlayResultAnimation(result)
-
-			TimerManager.StartTimer(self, function
-			()
-				-- 播放赢的区域闪动
-				self.view.areaViews[result.win_carlogo.logo_id]:ShowWinFlashAnim()
-				---回收
-				GlobalEvent.Notify(CarLogoConfig.EventBinner.XIAZHU_END,{})
-			end,7,0,false)
-
-			---复投功能
-			if CarLogoConfig.isRepeat then
-				CarLogoConfig.lastXiaZhuInfo={}
-			else
-				CarLogoConfig.lastXiaZhuInfo = CarLogoConfig.selfXiaZhuInfo
-			end
-			CarLogoConfig.selfXiaZhuInfo = {}
-		end, CAR_LOGO_GAME_TIME+0.5, 0, true)
-
-	end)
 end
 --endregion
 

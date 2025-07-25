@@ -18,6 +18,7 @@ local Ease = CS.DG.Tweening.Ease
 function DragonTigerFightView:InitView()
 	---@type DragonTigerFightCtrl
     self.ctrl=self.ctrl
+    self.bettingTime = 0
 	self:InitComponents()
 end
 
@@ -132,11 +133,6 @@ function DragonTigerFightView:ClearComponents()
     self.btn_close=nil;
     self.btn_repeat=nil;
     self.btn_players=nil;
-    self.img_1=nil;
-    self.img_10=nil;
-    self.img_50=nil;
-    self.img_100=nil;
-    self.img_500=nil;
     self.dizhu=nil;
     self.chipInfos=nil;
     self.longClickArea=nil;
@@ -235,6 +231,7 @@ end
 function DragonTigerFightView:PayXiaZhuCoinFly(side)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side],
             self.ctrl.model.betPointList[config.dizhuIndex])
+    --下注音效
     DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.ADD_CHIP)
 end
 ---通过id找到TOP6玩家
@@ -374,7 +371,7 @@ function DragonTigerFightView:InitUI()
     self.resultCard1:Hiden()
     self.resultCard2:Hiden()
     self:InitXiaZhuLabel()
-    
+    UpdateManager.AddUpdate(self,self.UpdateBetting)
 end
 ---初始化View数据
 function DragonTigerFightView:InitPanelData(args)
@@ -597,7 +594,7 @@ function DragonTigerFightView:UpdateRoomInfo(model)
     -- 4. 刷新押注池信息
     if model.sideBetInfos then
         for k,value in pairs(model.sideBetInfos) do
-            local side = value.betIdx-config.gameID*100
+            local side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100
             -- 更新总押注金额
             config.totalDiZhuNums[side] = value.betIdxTotal
             -- 更新玩家区域押注金额
@@ -643,13 +640,36 @@ end
 function DragonTigerFightView:ShowAreaChouMa(sideInfo)
     if not sideInfo.betGoldList then return end
     local areaTotal = self.ctrl.model.AreaChipTotals
-    local side = sideInfo.betIdx-config.gameID*100
+    local side = sideInfo.betIdx<config.gameID and sideInfo.betIdx or sideInfo.betIdx-config.gameID*100
     for ix=1,#sideInfo.betGoldList do
         local value = sideInfo.BetInfos[ix]
         local index = self.ctrl.model:FindBetIndex(value)
         if areaTotal[side] < config.AreaChouMaLimit[side] then
             areaTotal[side]=areaTotal[side]+1
             ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,index,self.xiazhuStarAreas[side],value)
+        end
+    end
+end
+
+--单独飞筹码处理 防止频繁UI更新卡住
+function DragonTigerFightView:UpdateBetting()
+    if  not config.allow or Time.realtimeSinceStartup - self.bettingTime < 0.1 then return end
+    self.bettingTime = Time.realtimeSinceStartup
+
+    for playerId, msg in pairs(self.ctrl.model.bettingDataMap) do
+        if not msg.handled then
+            for _, value in ipairs(msg.betTableInfoList) do
+                local bet = {
+                    side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
+                    index = self.ctrl.model:FindBetIndex(value.betValue),
+                    currency = msg.playerCurGold,
+                    playerId = msg.playerId,
+                    betValue = value.betValue,
+                    betIdxTotal = value.betIdxTotal,--区域总的押注数量
+                }
+                self:PayOtherXiaZhuCoinFly(bet)
+            end
+            msg.handled = true
         end
     end
 end
@@ -756,6 +776,7 @@ end
 function DragonTigerFightView:Close()
     ChouMaFlyUtil:Destroy()
     TimerManager.StopAllTimer(self)
+    UpdateManager.ReMoveAll(self)
     DragonTigerFightSounds.StopSoundMusic()
     self.super.Close(self);
 end

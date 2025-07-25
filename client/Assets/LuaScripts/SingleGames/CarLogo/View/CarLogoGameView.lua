@@ -145,10 +145,13 @@ function CarLogoGameView:InitChouMa()
             self.chipInfos[i].obj:SetActive(false)
         end
     end
+    --默认选中第一个
+    self:ChangeDiZhu(1)
 end
 
 
 function CarLogoGameView:InitUI()
+    CarLogoSounds.PlaySoundMusic()
     ---续押
     self:SetRepeatState(false)
     self:InitChouMa()
@@ -350,7 +353,23 @@ function CarLogoGameView:PlayCarEffectView(logo_id,callFunc)
     end,1.2)
 end
 
+function CarLogoGameView:ResultStageTimer(stage)
+    if self.resultTimer then
+        TimerManager.StopTimer(self,self.resultTimer)
+        self.resultTimer = nil
+    end
+    self.resultTimer = TimerManager.StartTimer(self,function()
+        self:ResultStage(stage)
+        if stage<#config.ResultStageTime then
+            self:ResultStageTimer(stage+1)
+        end
+    end,config.ResultStageTime[stage],0,false)
+end
 
+function CarLogoGameView:ResultStage(stage)
+    local result = self.ctrl.model.Result
+    
+end
 --播放结算动画
 function CarLogoGameView:ResultEffect(result)
     --播放奔跑动画
@@ -432,7 +451,7 @@ end
 
 function CarLogoGameView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = config.allow and config.dizhuNumArr[i]<= PlayerManager:GetPlayerInfo().goldNum
+        self.chipInfos[i].button.interactable = config.allow and self.ctrl.model.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
     end
 end
 ---更新自己信息
@@ -442,24 +461,24 @@ end
 function CarLogoGameView:UpdateSelfGoldCount()
     self.selfPlayer:UpdateGoldCount(PlayerManager:GetPlayerInfo().goldNum)
 end
-function CarLogoGameView:UpdatePlayerTotal(total)
-    self.tmp_totalPlayerNum.text = total
+function CarLogoGameView:UpdatePlayerTotal()
+    self.tmp_totalPlayerNum.text = self.ctrl.model.playersNum
 end
 ---本玩家下注动画
 function CarLogoGameView:PayXiaZhuCoinFly(side)
-    ChouMaFlyUtil:AnimateCoin(self.dizhuNode, config.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
-            self.ctrl.model.config.betList[config.dizhuIndex])
-    
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
+            self.ctrl.model.betPointList[config.dizhuIndex])
+    --下注音效
     CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
 end
 ---其他玩家下注动画
 function CarLogoGameView:PayOtherXiaZhuCoinFly(data)
     -- 更新总押注金额
-    config.totalDiZhuNums[data.side] = config.totalDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+    config.totalDiZhuNums[data.side] = data.betIdxTotal
     -- 自己下注
     local selfId = PlayerManager:GetPlayerInfo().playerId
     if selfId==data.playerId then
-        config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + config.dizhuNumArr[data.amounts]
+        config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + data.betValue
         PlayerManager:GetPlayerInfo().goldNum = data.currency or 0; -- 更新金币
         table.insert(config.selfXiaZhuInfo,data)
         self:PayXiaZhuCoinFly(data.side)
@@ -470,18 +489,16 @@ function CarLogoGameView:PayOtherXiaZhuCoinFly(data)
     -- 其他玩家下注
     local areaTotal = self.ctrl.model.AreaChipTotals
     self:UpdateXiaZhuLabel()
-    if areaTotal[data.side] >= config.OtherPlayer_ChouMaLimit[data.side] then
+    if areaTotal[data.side] >= config.AreaChouMaLimit[data.side] then
         return
     end
-    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.amounts,self.btn_players.transform.position,self.areaViews[data.side].noteRoot,
-            self.ctrl.model.config.betList[data.amounts])
+    ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.index,self.btn_players.transform.position,self.areaViews[data.side].noteRoot, data.betValue)
     areaTotal[data.side] = areaTotal[data.side] + 1
     CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
 end
 
 ---金币回收动画
-function CarLogoGameView:PlayCompeleCoinFLy()
-    local results = self.ctrl.model.players
+function CarLogoGameView:PlayCompeleCoinFLy(results)
     --数据处理 winCurrency
     local targetPos = {}
     local winCurrency = {0,0}
@@ -491,20 +508,19 @@ function CarLogoGameView:PlayCompeleCoinFLy()
     for i=1,#results do
         local player = results[i]
         --跳过没有赢钱的玩家
-        if player.winCurrency == 0 then break end
-        totalCurrency = totalCurrency + player.winCurrency
-        if player.id == PlayerManager:GetPlayerInfo().playerId then
-            winCurrency[1] = player.winCurrency
-            self.selfPlayer:ShowResultCount( player.winCurrency)
-            -- 更新金币
-            PlayerManager:GetPlayerInfo().goldNum = player.currency or 0;
-            self:UpdateSelfGoldCount()
+        if player.playerWinGold == 0 then goto continue end
+        totalCurrency = totalCurrency + player.playerWinGold
+        if player.playerId == PlayerManager:GetPlayerInfo().playerId then
+            winCurrency[1] = player.playerWinGold
+            self.selfPlayer:ShowResultCount( player.playerWinGold)
+            PlayerManager:GetPlayerInfo().goldNum = PlayerManager:GetPlayerInfo().goldNum + player.playerWinGold;
+            self:UpdateSelfGoldCount() -- 更新金币
             -- 播放得奖音效
             CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.WinBet)
         else
-            winCurrency[2] = winCurrency[2] + player.winCurrency
+            winCurrency[2] = winCurrency[2] + player.playerWinGold
         end
-
+        ::continue::
     end
     --按比例回收
     local ratios = {}
@@ -565,70 +581,92 @@ end
 
 -- 更新房间信息
 function CarLogoGameView:UpdateRoomInfo(model)
-    Debug.Log("更新房间信息")
     -- 1. 初始化UI状态
     self:InitUI()
 
     -- 2. 刷新玩家信息
     ------------------
-    local player = model.players[#model.players]
-    PlayerManager:GetPlayerInfo().playerId = player.id;
+    self:UpdatePlayerTotal()
+    self:UpdateSelf(PlayerManager:GetPlayerInfo())
     ------------------
-    -- 更新玩家信息
-    self:UpdateSelf(player)
-    self.tmp_totalPlayerNum.text = #model.players
 
     -- 3. 刷新历史信息
     self.history:UpdateCarLogo(model.history)
 
     -- 4. 刷新押注池信息
     if model.sideBetInfos then
-        -- sideBetInfos: {SideBetInfo}
-        for i = 1, 12 do
-            local sideInfo = model.sideBetInfos[i]
-            if sideInfo then
-                -- 更新总押注金额
-                config.totalDiZhuNums[sideInfo.side] = sideInfo.amounts or 0
-                -- 更新区域筹码显示
-                self:ShowAreaChouMa(sideInfo)
-            else
-                config.totalDiZhuNums[i] = 0
-            end
+        for k,value in pairs(model.sideBetInfos) do
+            local side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100
+            -- 更新总押注金额
+            config.totalDiZhuNums[side] = value.betIdxTotal
+            -- 更新玩家区域押注金额
+            config.selfDiZhuNums[side] = value.betValue
+            -- 更新区域筹码显示
+            self:ShowAreaChouMa(value)
         end
         self:UpdateXiaZhuLabel()
     end
 
     -- 5. 刷新当前游戏状态和倒计时
-    if model.status then
-        self:OnGameStatus(model.status, model.seconds or 0)
+    local lessTime = Tools.CacStageLessTime(model.status,ServerTimeSync:GetTimeStamp(),model.endTime,config.StageTime)
+    look("当前阶段剩余时间（毫秒）："..lessTime)
+    if lessTime<=0 then
+        --进行下一阶段
+        if model.status<4 then self:OnGameStatus(model.status+1) end
+    else--更新当前阶段
+        self:OnGameStatus(model.status)
     end
 
+    -- 提示 等待本对局结束
+    if model.Result or (lessTime<=0 and model.status==2) then--有结果 或者 发消息的时候还没结束但是收到消息已结束
+        local lessSeconds = Mathf.Round((model.endTime - ServerTimeSync:GetTimeStamp())/1000)
+        if lessSeconds>1 then--时间太少不展示
+            self.tipsEnterWait.gameObject:SetActive(true)
+            self.tipsEnterWaitTime.text = tostring(lessSeconds)
+            TimerManager.StartTimer(self,function()
+                lessSeconds = lessSeconds - 1
+                self.tipsEnterWaitTime.text = tostring(lessSeconds)
+                logError("tipsEnterWait:"..lessSeconds)
+                if lessSeconds<=0 then
+                    self.tipsEnterWait.gameObject:SetActive(false)
+                end
+            end,1, lessSeconds,false)
+        end
+    end
 end
-
 
 
 -- 直接显示区域筹码 SideBetInfo
 function CarLogoGameView:ShowAreaChouMa(sideInfo)
+    if not sideInfo.betGoldList then return end
     local areaTotal = self.ctrl.model.AreaChipTotals
-    for ix=1,#sideInfo.BetInfos do
-        local chip = sideInfo.BetInfos[ix]
-        if areaTotal[chip.side] < config.OtherPlayer_ChouMaLimit[chip.side] then
-            areaTotal[chip.side]=areaTotal[chip.side]+1
-            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,chip.amounts,self.areaViews[chip.side].noteRoot,self.ctrl.model.config.betList[chip.side])
-        end
-        -- 更新自己的筹码
-        if chip.playerId == PlayerManager:GetPlayerInfo().playerId then
-            config.selfDiZhuNums[chip.side] = config.selfDiZhuNums[chip.side] + chip.amounts
+    local side = sideInfo.betIdx<config.gameID and sideInfo.betIdx or sideInfo.betIdx-config.gameID*100
+    for ix=1,#sideInfo.betGoldList do
+        local value = sideInfo.BetInfos[ix]
+        local index = self.ctrl.model:FindBetIndex(value)
+        if areaTotal[side] < config.AreaChouMaLimit[side] then
+            areaTotal[side]=areaTotal[side]+1
+            ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,index,self.areaViews[side].noteRoot,value)
         end
     end
 end
 
 -- 切换状态
-function CarLogoGameView:OnGameStatus(status, seconds)
+function CarLogoGameView:OnGameStatus(status)
     -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
-    config.currStatus = status
-    config.lessSeconds = Mathf.Floor(seconds/1000)
+    self.ctrl.model.status = status
+    config.lessSeconds = Mathf.Round(config.StageTime[status]/1000)
     config.allow= status==2
+    -- 结算阶段 特殊处理
+    if status == 4 then
+        self:UpdateDiZhuBtnState()
+        self:RepeatInit()
+        self:InitXiaZhuLabel()
+        ---金币回收动画
+        self:PlayCompeleCoinFLy()
+        return
+    end
+    
     -- 隐藏所有阶段相关UI
     self.tipsTimeEnd:SetActive(false)
     self.resultCar:SetActive(false)
@@ -637,6 +675,10 @@ function CarLogoGameView:OnGameStatus(status, seconds)
     if self.statusTimer then
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil
+    end
+    if self.resultTimer then
+        TimerManager.StopTimer(self,self.resultTimer)
+        self.resultTimer = nil
     end
 
     if status == 1 then -- 准备阶段
@@ -647,7 +689,7 @@ function CarLogoGameView:OnGameStatus(status, seconds)
         self:InitXiaZhuLabel()
     elseif status == 2 then -- 押分阶段
         self:UpdateDiZhuBtnState()
-        self:SetRepeatState(config.isRepeat)
+        self:SetRepeatState(#config.lastXiaZhuInfo > 0 and not config.isRepeat)
 
         self.colockStateTimeNum.text = tostring(config.lessSeconds)
         -- 启动倒计时
@@ -680,11 +722,6 @@ function CarLogoGameView:OnGameStatus(status, seconds)
                 self.statusTimer = nil
             end
         end, 1, config.lessSeconds,true)
-    elseif status == 4 then -- 结算阶段
-        self:UpdateDiZhuBtnState()
-        self:RepeatInit()
-        ---金币回收动画
-        self.ctrl.view:PlayCompeleCoinFLy()
     end
 end
 
@@ -696,13 +733,17 @@ function CarLogoGameView:RepeatInit()
         config.lastXiaZhuInfo = config.selfXiaZhuInfo
     end
     config.selfXiaZhuInfo = {}
+    config.isRepeat = false
 
     self:SetRepeatState(false)
 end
 
 
 ---关闭界面
-function CarLogoGameView:Close()   
+function CarLogoGameView:Close()
+    ChouMaFlyUtil:Destroy()
+    TimerManager.StopAllTimer(self)
+    CarLogoSounds.StopSoundMusic()
     self.super.Close(self);
 end
 

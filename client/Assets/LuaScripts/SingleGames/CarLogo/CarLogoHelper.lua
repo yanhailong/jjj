@@ -29,18 +29,4 @@ function CarLogoHelper.FindIndexById(logo_id)
     return nil
 end
 
---是否为特殊效果
-function CarLogoHelper.IsSpecialResult(result)
-    return result.spec_show_info ~= nil and result.spec_show_info.spec_id ~= 0;
-end
-
---获取结算时间
-function CarLogoHelper.GetSettlementTime(result)
-    if(CarLogoHelper.IsSpecialResult(result)) then
-        return CarLogoConfig.BaseTime + CarLogoConfig.SpecTimes[result.spec_show_info.spec_id]
-    else
-        return CarLogoConfig.BaseTime;
-    end
-end
-
 return CarLogoHelper;
