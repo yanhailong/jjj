@@ -53,12 +53,10 @@ end
 
 ---加载错误调用
 local function LoadError()
-    CorManager.ToMainTread(function ()
-        CorManager.StopAll(this);
-        if errorFunc~=nil then
-            errorFunc();
-        end
-    end);
+    if errorFunc~=nil then
+        errorFunc();
+    end
+    CorManager.StopAll(this);
 end
 
 ---加载完成调用，maxCorCount次加载完成后才是所有资源加载完成
