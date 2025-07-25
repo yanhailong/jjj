@@ -11,7 +11,7 @@ function CarLogoItem:ctor(trs)
     self.bg = ComponentUtilGet.Image(self.transform, "LogoBg")
     self.light = ComponentUtilGet.Image(self.transform, "Light")
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
-    self.choose = ComponentUtilGet.Image(self.transform,"Choose");
+    self.choose = ComponentUtilGet.Transform(self.transform,"Choose");
     self.huoChe = ComponentUtilGet.Image(self.transform,"HuoChe");
     
     self.choose.gameObject:SetActive(true)

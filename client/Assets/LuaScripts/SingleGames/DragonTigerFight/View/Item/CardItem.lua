@@ -8,6 +8,7 @@ local CardItem=Class("CardItem")
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 local Vector3 = CS.UnityEngine.Vector3
+local DragonTigerFightSounds = require("SingleGames/DragonTigerFight/DragonTigerFightSounds")
 
 function CardItem:ctor(go)
     self.gameObject = go
@@ -23,7 +24,7 @@ end
 function CardItem:LoadCard(carIndex)
     
     if carIndex<1 or carIndex>52 then return end
-    
+    self.carIndex = carIndex
     local assetName =  "card_"..carIndex
     local cardsPath = "Common/GameArtsCommon/GameFight/alats/card"
 
@@ -47,6 +48,8 @@ function CardItem:ShowFront()
     :Append(self.transform:DOScale(Vector3(1, 1, 1), 0.3):SetEase(Ease.OutQuad))
     seq:OnComplete(function()
         seq:Kill(false)
+        --翻盘音效
+        DragonTigerFightSounds.PlaySoundCard(self.carIndex or 1)
     end)
     :Play()
 end

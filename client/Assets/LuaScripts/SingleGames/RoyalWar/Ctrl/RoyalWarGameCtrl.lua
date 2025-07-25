@@ -5,14 +5,12 @@
 ---@class RoyalWarGameCtrl:BaseCtrl
 local RoyalWarGameCtrl=Class("RoyalWarGameCtrl",BaseCtrl)
 local config = require("SingleGames/RoyalWar/RoyalWarConfig")
----@type RoyalWarZhuPanItem
-local RoyalWarZhuPanItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarZhuPanItem"
----@type RoyalWarDaLuItem
-local RoyalWarDaLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarDaLuItem"
----@type RoyalWarAllChildLuItem
-local RoyalWarAllChildLuItem = require"SingleGames/RoyalWar/Ctrl/RoyalWarAllChildLuItem"
 ---@type RoyalWarCardTypeItem
 local RoyalWarCardTypeItem = require("SingleGames/RoyalWar/Ctrl/RoyalWarCardTypeItem")
+---@type RoyalWarRoad
+local RoyalWarRoad = require("SingleGames/RoyalWar/Ctrl/RoyalWarRoad")
+---@type RoyalWarPlayerItem
+local RoyalWarPlayerItem = require("SingleGames/RoyalWar/Ctrl/RoyalWarPlayerItem")
 local CurWhoWin;
 local Vector2 = CS.UnityEngine.Vector2
 local Vector3 = CS.UnityEngine.Vector3
@@ -42,31 +40,21 @@ local CardTypeData={};
 local CardTypeTable={};
 ---牌型Obj
 local CardTypeObjTable={};
----主盘表
-local ZhuPanTable = {};
-local ZhuPanObjTable = {};
----主盘数据表(进入游戏向服务器拿到数据后打开界面刷新主盘数据显示)
-local ZhuPanDataTable = {};
----大路表
-local DaLuTable = {};
-local DaLuObjTable = {};
----大路数据表
-local DaLuDataTable = {};
----大路大眼路表
-local DaYanZaiLuTable ={};
-local DaYanZaiLuObjTable ={};
----大路大眼路数据表
-local DaYanZaiLuDataTable ={};
----小路表
-local xiaoLuTable ={};
-local xiaoLuObjTable ={};
----小路数据表
-local xiaoLuDataTable ={};
----曱甴路表
-local YueYouLuTable = {};
-local YueYouLuObjTable = {};
----曱甴路数据表
-local YueYouLuDataTable = {};
+
+---前6名玩家预支体集合
+local BestSixPlayerObjs={}
+---玩家预支脚本集合
+local RoyalWarPlayerItems={}
+---红方赢了多少局
+local RedWinNumber;
+---黑方赢了多少局
+local BlackWinNumber;
+---幸运一击次数
+local LuckyWinNumber;
+---局数
+local RoundNumber;
+---下注的筹码面板集合
+local betInfoList={};
 ---构造函数
 function RoyalWarGameCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -82,38 +70,64 @@ end
 ---初始化
 function RoyalWarGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
-	---@type ObjectPoolUtil
-	self.objPools=ObjectPoolUtil.New()
-	config.InitIconPic();
-	config.InitCardTypePic();
-	config.InitCardPic();
-	CurSelectChip = 0;
-	self:InitZhuPanTable()
-	self:InitCardTypeData()
-	self:InitDaLuTable()
-	self:InitDaLuZiLuTable()
-	self:InitXiaoLuTable()
-	self:InitYueYouLuTable()
+	self.model:ReqRoomBaseInfo();
 	self:InitData()
+end
+
+---请求房间数据返回
+function RoyalWarGameCtrl:NotifyRedBlackWarInfo(data)
+	self.GamePhase = data.gamePhase;--游戏阶段信息
+	betInfoList = data.betPointList
+	--初始化筹码
+	for i = 1, #betInfoList do
+		local item =self.objPools:Spawn(nil,self.view.obj_chipItem,self.view.obj_ChipContent.transform)
+		item:SetActive(true);
+		---@type RoyalWarChipItem
+		local chipItem = RoyalWarChipItem.New(item,self);
+		chipItem:InitUIShow(i,betInfoList[i]);
+		table.insert(ChipItems,chipItem);
+	end
+	self.RoyalWarScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
+	self:RefreshPlayerInfo(data.playerInfos);
+	self:InitDataShow(data.redBlackHistories)
 end
 
 ---初始化数据
 function RoyalWarGameCtrl:InitData()
-	countDownTime =13;
-	curGameStage = config.GameSate.Start;
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
+	---@type BaccaratRoad
+	self.RoyalWarScripts =RoyalWarRoad.New()
+	self.RoyalWarScripts:Init(self.view.obj_ZhuPanContent,self.view.obj_DaLuContent,
+			self.view.obj_DaluZiluContent,self.view.obj_XiaoLuContent,self.view.obj_YueYouLuContent);
+	config.InitIconPic();
+	config.InitCardTypePic();
+	config.InitCardPic();
+	self:InitUIShow()
+	---@type RoyalWarPlayerItem
+	for i = 1,self.view.obj_PlayerRoot.transform.childCount do
+		BestSixPlayerObjs[i] = self.view.obj_PlayerRoot.transform:GetChild(i-1).gameObject;
+		RoyalWarPlayerItems[i]=RoyalWarPlayerItem.New(BestSixPlayerObjs[i],self)
+		BestSixPlayerObjs[i]:SetActive(false);
+	end
+	CurSelectChip = 0;
+	self:RefreshChipLeftRightBtnShow(false)
+	self:InitCardTypeData()
+end
+
+function RoyalWarGameCtrl:InitUIShow()
 	BetRedAllNum =0;
 	BetBlackAllNum =0;
 	BetLuckyAllNum =0;
 
-	self.view.ator_CardRoot:Play("New State")
 	self.view.obj_CardBg:SetActive(false);
+	self.view.ator_CardRoot:Play("New State")
 	self.view.obj_RoadRoot:SetActive(true)
-	self.view.obj_WhoWin:SetActive(false);
 	self.view.obj_SelfBetBlack:SetActive(false)
 	self.view.obj_SelfBetRed:SetActive(false)
 	self.view.obj_SelfBetLucky:SetActive(false)
 	self.view.obj_Settlement:SetActive(false);
-	
+
 	self.view.tmp_RedBetNum.text="0.00"
 	self.view.tmp_BlackBetNum.text="0.00"
 	self.view.tmp_LuckyBetNum.text="0.00"
@@ -121,76 +135,108 @@ function RoyalWarGameCtrl:InitData()
 	self.view.tmp_SelfBetRedNum.text="0.00"
 	self.view.tmp_SelfBetBlackNum.text="0.00"
 	self.view.tmp_SelfBetLuckyNum.text="0.00"
-	
-	self.beginTimer = TimerManager.CreateTimer(self,function()
-		self.view.obj_VS:SetActive(false);
-		curGameStage =  config.GameSate.Bet;
-		self:RefreshGameStage();
-	end,1,1,true);
-
-	self.beginTimer2 = TimerManager.CreateTimer(self,function()
-		self.view.obj_BeginBet:SetActive(false);
-	end,1,1,true);
 
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.txt_Countdown.text = countDownTime;
-		if(countDownTime <= 3) then
+		if(countDownTime == 3) then
 			self.view.obj_Countdown:SetActive(false);
 			self.view.obj_AboutEnd:SetActive(true);
-			self.view.txt_AboutEnd.text = countDownTime;
+			--self.view.txt_AboutEnd.text = countDownTime;
 		end
 		if(countDownTime<=0) then
-			curGameStage =config.GameSate.Settlement;
-			self:RefreshGameStage();
+			self.betCountDownTimer:Stop()
 		end
-	end,1,countDownTime,true);
-	curGameStage = config.GameSate.Start
-	self:SetCheckedShow()
-	self:RefreshGameStage()
+	end,1,-1,true);
 end
+
 ---同步游戏当前在哪个阶段
 function RoyalWarGameCtrl:RefreshGameStage()
-	if curGameStage ==  config.GameSate.Start then
-		self:EnterBegin();
-	elseif curGameStage == config.GameSate.Bet then
-		self:EnterBetGame();
-	elseif curGameStage == config.GameSate.Settlement then
-		self:EnterSettlement();
+	if self.GameStageCor then
+		coroutine.stop(self.GameStageCor)
+		self.GameStageCor=nil
 	end
+	self.GameStageCor=	CorManager:StartCor(function()
+		if curGameStage ==  config.GameSate.Start then
+			self:EnterBegin();
+		elseif curGameStage == config.GameSate.Bet then
+			self:EnterBetGame();
+		elseif curGameStage == config.GameSate.Settlement then
+			self:EnterSettlement();
+		end
+	end)
+	
 end
 
 ---进入开始阶段(显示VS)
 function RoyalWarGameCtrl:EnterBegin()
 	self.view.obj_Countdown:SetActive(false);
 	self.view.obj_VS:SetActive(true);
-	self.beginTimer:Start();
+	coroutine.wait(1)
+	self.view.obj_VS:SetActive(false);
+	curGameStage =  config.GameSate.Bet;
+	self:EnterBetGame();
 end
 ---进入下注阶段
 function RoyalWarGameCtrl:EnterBetGame()
 	self.view.txt_Countdown.text = countDownTime;
-	self:SetBetButtonInteractable(true);
 	self.view.obj_Countdown:SetActive(true);
 	self.view.obj_BeginBet:SetActive(true);
-	self.beginTimer2:Start();
+	coroutine.wait(1);
+	self.view.obj_BeginBet:SetActive(false);
 	self.betCountDownTimer:Start();
 end
 
----设置按钮的显示状态
-function RoyalWarGameCtrl:SetBetButtonInteractable(state)
-	self.view.btn_One.interactable = state;
-	self.view.btn_Ten.interactable = state;
-	self.view.btn_Fifty.interactable = state;
-	self.view.btn_OneHundred.interactable = state;
-	self.view.btn_FiveHundred.interactable = state;
+---初始化要显示的数据（接入服务器数据要，要赋值服务器那边的数据显示）
+function RoyalWarGameCtrl:InitDataShow(data)
+	RedWinNumber=0;
+	BlackWinNumber=0;
+	LuckyWinNumber=0;
+	RoundNumber=#data;
+	for _, v in ipairs(data) do
+		if(v.winner ==  1) then
+			RedWinNumber = RedWinNumber+1
+		elseif(v.winState==2) then
+			BlackWinNumber = BlackWinNumber+1
+		end
+
+		if(v.cardType>1)then
+			LuckyWinNumber = LuckyWinNumber+1
+		end
+	end
+	self:RefreshUIDataShow()
 end
 
+---刷新前6的玩家显示
+---@param playerInfoList 前6的玩家列表信息
+function RoyalWarGameCtrl:RefreshPlayerInfo(playerInfoList)
+	local keysToRemove=0;
+	for i, v in ipairs(playerInfoList) do
+		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--删除自己
+			keysToRemove = i;
+		end
+	end
+
+	if(keysToRemove~=0) then
+		table.remove(playerInfoList,keysToRemove);
+	end
+
+	for i, v in ipairs(BestSixPlayerObjs) do
+		v:SetActive(#playerInfoList>=i);
+	end
+	for i, v in ipairs(playerInfoList) do
+		if(i>=7) then
+			break;
+		end
+		---@type RoyalWarPlayerItem
+		local item = RoyalWarPlayerItems[i];
+		item:RefreshPlayerInfoShow(v);
+	end
+end
 
 ---进入结算阶段
 function RoyalWarGameCtrl:EnterSettlement()
 	self.view.obj_StopBet:SetActive(true);
-	self:SetBetButtonInteractable(false);
-	
 	self.view.obj_AboutEnd:SetActive(false);
 	self.view.obj_CardBg:SetActive(true);
 	self.view.obj_RoadRoot:SetActive(false)
@@ -245,7 +291,6 @@ function RoyalWarGameCtrl:EnterSettlement()
 		coroutine.wait(1)
 		self.view.ator_CardRoot:Play("RoyalWarDealCard")
 		coroutine.wait(3)
-		self.view.obj_WhoWin:SetActive(true)
 		self:ShowWin(self.RedCardType > self.BlackCardType)
 		self.IsLucky = self.RedCardType~=config.CardType.DanZhang or self.BlackCardType~=config.CardType.DanZhang;
 		self:Flicker();
@@ -295,19 +340,6 @@ function RoyalWarGameCtrl:PlayFlicker(image,isInitData)
 	self.flickerSequence = DOTween.Sequence()
 	self.flickerSequence:Append(image:DOFade(1,0.5))
 	self.flickerSequence:SetLoops(8,loopType.Yoyo)
-	self.flickerSequence:OnComplete(function()
-		if(isInitData) then
-			self:InitData();
-			if(#ZhuPanDataTable>=50) then
-				self:CloseLuTable()
-			end
-			local data = {};
-			data[1] = self.isRedWin
-			self:RefreshZhuPanShow(data,true)
-			table.insert(ZhuPanDataTable,data);
-		end
-	end)
-
 	self.flickerSequence:Play();
 end
 
@@ -337,66 +369,9 @@ end
 function RoyalWarGameCtrl:GetRandomColour()
 	return math.random(1,4)
 end
----选中哪个筹码
-function RoyalWarGameCtrl:SetCheckedShow()
-	self.view.obj_checkedOne:SetActive(CurSelectChip == config.ChipState.One);
-	self.view.obj_checkedTen:SetActive(CurSelectChip == config.ChipState.Ten);
-	self.view.obj_checkedFifty:SetActive(CurSelectChip == config.ChipState.Fifty);
-	self.view.obj_checkedOneHundred:SetActive(CurSelectChip == config.ChipState.OneHundred);
-	self.view.obj_checkedFiveHundred:SetActive(CurSelectChip == config.ChipState.FiveHundred);
-end
----清空所有路表
-function RoyalWarGameCtrl:CloseLuTable()
-	for _, v in ipairs(ZhuPanObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
-	ZhuPanTable = {}
-	ZhuPanDataTable ={}
 
-	for _, v in ipairs(CardTypeObjTable) do
-		self.objPools:UnSpawnPrefab(v);
-	end
-	CardTypeTable = {}
-	CardTypeData = {}
-	
-	for _, v in ipairs(DaLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(DaLuObjTable) do
-		v:SetActive(true)
-	end
-	DaLuDataTable = {}
 
-	for _, v in ipairs(DaYanZaiLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(DaYanZaiLuObjTable) do
-		v:SetActive(true)
-	end
-	DaYanZaiLuDataTable = {}
 
-	for _, v in ipairs(xiaoLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(xiaoLuObjTable) do
-		v:SetActive(true)
-	end
-	xiaoLuDataTable = {}
-
-	for _, v in ipairs(YueYouLuTable) do
-		v:InitState()
-	end
-	for _, v in ipairs(YueYouLuObjTable) do
-		v:SetActive(true)
-	end
-	YueYouLuDataTable = {}
-end
----初始化主盘预制体
-function RoyalWarGameCtrl:InitZhuPanTable()
-	for _, v in ipairs(ZhuPanDataTable) do
-		self:RefreshZhuPanShow(v,false)
-	end
-end
 ---初始化牌型数据显示
 function RoyalWarGameCtrl:InitCardTypeData()
 	for _, v in ipairs(CardTypeData) do
@@ -421,402 +396,7 @@ function RoyalWarGameCtrl:RefreshCardTypeData(type)
 	table.insert(CardTypeTable,item);
 end
 
----初始化大路预制体表
-function RoyalWarGameCtrl:InitDaLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaLuItem",self.view.obj_DaLuContent.transform)
-		---@type RoyalWarDaLuItem
-		local item = RoyalWarDaLuItem.New(obj,self);
-		obj:SetActive(true);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(DaLuObjTable,obj);
-		table.insert(DaLuTable,item);
-	end
-end
----初始化大路大眼路预制体表
-function RoyalWarGameCtrl:InitDaLuZiLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"DaluZiluItem",self.view.obj_DaluZiluContent.transform)
-		---@type RoyalWarAllChildLuItem
-		local item = RoyalWarAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(DaYanZaiLuObjTable,obj);
-		table.insert(DaYanZaiLuTable,item);
-	end
 
-end
----初始化大路大眼路预制体表
-function RoyalWarGameCtrl:InitXiaoLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"XiaoLuItem",self.view.obj_XiaoLuContent.transform)
-		---@type RoyalWarAllChildLuItem
-		local item = RoyalWarAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(xiaoLuObjTable,obj);
-		table.insert(xiaoLuTable,item);
-	end
-end
-
-
----初始化曱甴路预制体表
-function RoyalWarGameCtrl:InitYueYouLuTable()
-	for i = 1, 240 do
-		local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"YueYouLuItem",self.view.obj_YueYouLuContent.transform)
-		---@type RoyalWarAllChildLuItem
-		local item = RoyalWarAllChildLuItem.New(obj,self);
-		obj:SetActive(true);
-		obj.transform.localScale = Vector3.one;
-		item:InitState();
-		item:InitIndex(i);
-		table.insert(YueYouLuObjTable,obj);
-		table.insert(YueYouLuTable,item);
-	end
-end
-
----刷新主盘显示
-function RoyalWarGameCtrl:RefreshZhuPanShow(data,isFlicker)
-	if(#ZhuPanTable==48) then
-		for i = 1, 6 do
-			ZhuPanObjTable[i]:SetActive(false);
-		end
-	end
-	local obj = self.objPools:SpawnPrefab(nil,config.ABNames.prefabsItem,"ZhuPanItem",self.view.obj_ZhuPanContent.transform)
-	---@type RoyalWarZhuPanItem
-	local item = RoyalWarZhuPanItem.New(obj,self);
-	obj:SetActive(true);
-	--obj.transform:SetParent(self.view.obj_ZhuPanContent.transform);
-	obj.transform.localScale = Vector3.one;
-	table.insert(ZhuPanObjTable,obj);
-	item:RefreshShow(data,isFlicker)
-	table.insert(ZhuPanTable,item);
-	self:AddDaLuTableShow(data);
-end
----大路新增显示
-function RoyalWarGameCtrl:AddDaLuTableShow(data)
-	local curIndex = 0; --当前的索引
-	local curList = 0;--当前是第几列
-	local dataTable = {};--缓存的需要加入到数据结构里面的表
-	local IsGoL; --是否走了L型了
-	if(#DaLuDataTable==0) then--刚开始
-		local item = DaLuTable[1];
-		item:RefreshShow(data[1]);
-		curList = 1;
-		DaLuDataTable[curList] ={};
-		dataTable[1] = data[1];
-		dataTable[2] = item;
-		dataTable[3] = false;
-		table.insert(DaLuDataTable[curList],dataTable)
-	else
-		curList = #DaLuDataTable;
-		local lastPiece= DaLuDataTable[curList]
-		if(lastPiece[#lastPiece][1] == data[1]) then --如果和上一次的一样就往后面加
-			IsGoL = lastPiece[#lastPiece][3];
-			local lastItem = lastPiece[#lastPiece][2];
-			if(IsGoL) then -- 已经开始走L型了
-				curIndex = lastItem:GetIndex()+6;
-			else
-				curIndex = lastItem:GetIndex()+1;
-				---@type RoyalWarDaLuItem
-				local item = DaLuTable[curIndex];
-				if(item:IsActive()or (curIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-					curIndex = lastItem:GetIndex()+6;
-					IsGoL = true;
-				end
-			end
-			---@type RoyalWarDaLuItem
-			local item = DaLuTable[curIndex];
-			dataTable[1] = data[1];
-			dataTable[2] = item;
-			dataTable[3] = IsGoL;
-			item:RefreshShow(data[1])
-			table.insert(DaLuDataTable[curList],dataTable)
-			self:AddDaYanZiLuTableShow();
-			self:AddXiaoLuTableShow();
-			self:AddYueYouLuTableShow();
-		elseif(lastPiece[#lastPiece][1] ~= data[1]) then --如果和上一次的不一样就往另外开一列
-			if(#DaLuDataTable>=24) then--超出列表了，需要隐藏前面
-				for i = 1, (#DaLuDataTable-23)*6 do
-					DaLuObjTable[i]:SetActive(false);
-				end
-			end
-			curList = #DaLuDataTable+1;
-			curIndex = #DaLuDataTable*6+1;
-			---@type RoyalWarDaLuItem
-			local item = DaLuTable[curIndex];
-			dataTable[1] =  data[1];
-			dataTable[2] = item;
-			dataTable[3] = IsGoL;
-			item:RefreshShow(data[1])
-			DaLuDataTable[curList] ={};
-			table.insert(DaLuDataTable[curList],dataTable)
-			self:AddDaYanZiLuTableShow();
-			self:AddXiaoLuTableShow();
-			self:AddYueYouLuTableShow();
-		end
-	end
-
-end
-
----大眼路刷新显示
-function RoyalWarGameCtrl:AddDaYanZiLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type RoyalWarDaLuItem
-	local lastItem = lastPiece[#lastPiece][2];
-	local index = lastItem:GetIndex();
-	if(index>=8) then--开始演化大眼路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-2;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-6;
-			local index2 = index-7;
-			---@type RoyalWarDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#DaYanZaiLuDataTable==0) then--刚开始走
-			---@type RoyalWarAllChildLuItem
-			local item = DaYanZaiLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			DaYanZaiLuDataTable[1] = {}
-			table.insert(DaYanZaiLuDataTable[1],dataTable);
-		else
-			local ListCur = #DaYanZaiLuDataTable;
-			local childList = DaYanZaiLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type RoyalWarAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type RoyalWarAllChildLuItem
-					local item = DaYanZaiLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type RoyalWarAllChildLuItem
-				local item = DaYanZaiLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(DaYanZaiLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#DaYanZaiLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#DaYanZaiLuDataTable-23)*6 do
-						DaYanZaiLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #DaYanZaiLuDataTable+1
-				CurIndex = #DaYanZaiLuDataTable*6+1;
-				---@type RoyalWarAllChildLuItem
-				local item = DaYanZaiLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				DaYanZaiLuDataTable[ListCur] ={};
-				table.insert(DaYanZaiLuDataTable[ListCur],dataTable)
-			end
-		end
-	end
-end
-
----小路刷新显示
-function RoyalWarGameCtrl:AddXiaoLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type RoyalWarDaLuItem
-	local lastItem = lastPiece[#lastPiece][2];
-	local index = lastItem:GetIndex();
-	if(index>=14) then--开始演化小路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-3;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-12;
-			local index2 = index-13;
-			---@type RoyalWarDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#xiaoLuDataTable==0) then--刚开始走iao
-			---@type RoyalWarAllChildLuItem
-			local item = xiaoLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			xiaoLuDataTable[1] = {}
-			table.insert(xiaoLuDataTable[1],dataTable);
-		else
-			local ListCur = #xiaoLuDataTable;
-			local childList = xiaoLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type RoyalWarAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type RoyalWarAllChildLuItem
-					local item = xiaoLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type RoyalWarAllChildLuItem
-				local item = xiaoLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(xiaoLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#xiaoLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#xiaoLuDataTable-23)*6 do
-						xiaoLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #xiaoLuDataTable+1
-				CurIndex = #xiaoLuDataTable*6+1;
-				---@type RoyalWarAllChildLuItem
-				local item = xiaoLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				xiaoLuDataTable[ListCur] ={};
-				table.insert(xiaoLuDataTable[ListCur],dataTable)
-			end
-		end
-
-	end
-end
----曱甴刷新显示
-function RoyalWarGameCtrl:AddYueYouLuTableShow()
-	local curList = #DaLuDataTable;
-	local lastPiece= DaLuDataTable[curList]
-	---@type RoyalWarDaLuItem
-	local lastItem = lastPiece[#lastPiece][2];
-	local index = lastItem:GetIndex();
-	if(index>=20) then--开始演化小路的走向
-		local isEqual;
-		if((index-1)%6==0)then--在第一行对比前面2列的数量是否相等
-			local list1 = curList-1;
-			local list2 = curList-4;
-			local lastItems1 = DaLuDataTable[list1]
-			local lastItems2 = DaLuDataTable[list2]
-			isEqual = #lastItems1==#lastItems2;
-		else --不在第一行
-			local index1 = index-18;
-			local index2 = index-19;
-			---@type RoyalWarDaLuItem
-			local item1 =  DaLuTable[index1];
-			local item2 =  DaLuTable[index2];
-			isEqual = item1:IsActive()==item2:IsActive();
-		end
-
-		local dataTable = {};--缓存的需要加入到数据结构里面的表
-		local IsGoL; --是否走了L型了
-		local CurIndex;
-		if(#YueYouLuDataTable==0) then--刚开始走iao
-			---@type RoyalWarAllChildLuItem
-			local item = YueYouLuTable[1];
-			item:RefreshShow(isEqual);
-			IsGoL = false;
-			dataTable[1] = isEqual;
-			dataTable[2] = IsGoL;
-			dataTable[3] = item;
-			YueYouLuDataTable[1] = {}
-			table.insert(YueYouLuDataTable[1],dataTable);
-		else
-			local ListCur = #YueYouLuDataTable;
-			local childList = YueYouLuDataTable[ListCur];
-			local child = childList[#childList];
-			---@type RoyalWarAllChildLuItem
-			local listItem2 = child[3];
-			if(isEqual == child[1])then -- 如果相等就往后面加
-				IsGoL = child[2];
-				if(IsGoL) then -- 已经开始走L型了
-					CurIndex = listItem2:GetIndex()+6;
-				else
-					CurIndex =  listItem2:GetIndex()+1;
-					---@type RoyalWarAllChildLuItem
-					local item = YueYouLuTable[CurIndex];
-					if(item:IsActive()or (CurIndex-1)%6==0) then --如果下一个索引的物体已经被激活了就走L型
-						CurIndex = listItem2:GetIndex()+6;
-						IsGoL = true;
-					end
-				end
-				---@type RoyalWarAllChildLuItem
-				local item = YueYouLuTable[CurIndex];
-				item:RefreshShow(isEqual);
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				table.insert(YueYouLuDataTable[ListCur],dataTable);
-			else -- 不等就另外开一列
-				if(#YueYouLuDataTable>=24) then--超出列表了，需要隐藏前面
-					for i = 1, (#YueYouLuDataTable-23)*6 do
-						YueYouLuObjTable[i]:SetActive(false);
-					end
-				end
-				ListCur = #YueYouLuDataTable+1
-				CurIndex = #YueYouLuDataTable*6+1;
-				---@type RoyalWarAllChildLuItem
-				local item = YueYouLuTable[CurIndex];
-				item:RefreshShow(isEqual)
-				dataTable[1] = isEqual;
-				dataTable[2] = IsGoL;
-				dataTable[3] = item;
-				YueYouLuDataTable[ListCur] ={};
-				table.insert(YueYouLuDataTable[ListCur],dataTable)
-			end
-		end
-
-	end
-end
 
 ---刷新菜单显示隐藏
 function RoyalWarGameCtrl:RefreshMenuShow()
@@ -833,9 +413,26 @@ end
 function RoyalWarGameCtrl:Close()
     self.super.Close(self);
 end
-
+---刷新筹码左右选择按钮的显示
+function RoyalWarGameCtrl:RefreshChipLeftRightBtnShow(state)
+	self.view.btn_Chipleft.gameObject:SetActive(state)
+	self.view.btn_ChipRight.gameObject:SetActive(not  state)
+end
 ---添加UI事件
 function RoyalWarGameCtrl:AddUIEvent()
+	self.uiEventListener:AddClick(self.view.btn_Chipleft,function()
+		self.view.obj_ChipContent.transform:DOLocalMoveX(0,0.5):OnComplete(function()
+			self:RefreshChipLeftRightBtnShow(false);
+		end)
+
+	end)
+
+	self.uiEventListener:AddClick(self.view.btn_ChipRight,function()
+		self.view.obj_ChipContent.transform:DOLocalMoveX(-410,0.5):OnComplete(function()
+			self:RefreshChipLeftRightBtnShow(true);
+		end)
+	end)
+	
 	self.uiEventListener:AddClick(self.view.btn_Menu,function()
 		self:RefreshMenuShow()
 	end)
@@ -850,43 +447,42 @@ function RoyalWarGameCtrl:AddUIEvent()
 		self:Close();
 	end)
 
-	self.uiEventListener:AddClick(self.view.btn_One,function()
-		CurSelectChip = config.ChipState.One;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_Ten,function()
-		CurSelectChip = config.ChipState.Ten;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_Fifty,function()
-		CurSelectChip = config.ChipState.Fifty;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_OneHundred,function()
-		CurSelectChip = config.ChipState.OneHundred;
-		self:SetCheckedShow();
-	end)
-	self.uiEventListener:AddClick(self.view.btn_FiveHundred,function()
-		CurSelectChip = config.ChipState.FiveHundred;
-		self:SetCheckedShow();
-	end)
-	
-
 	self.uiEventListener:AddClick(self.view.btn_BetBlack,function()
-		--下注庄家区域
-		self:PlayChip(config.BetState.Black,CurSelectChip)
+		--下注黑方区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetRed,function()
-		--下注和区域
-		self:PlayChip(config.BetState.Red,CurSelectChip)
+		--下注红方区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetLucky,function()
-		--下注闲对区域
-		self:PlayChip(config.BetState.Lucky,CurSelectChip)
+		--下注幸运一击区域
+		--请求下注
+		local bet = {}
+		bet.betValue = CurSelectChip.num;
+		bet.betAreaIdx = i;
+		local betData = {}
+		table.insert(betData,bet)
+		self.model:ReqBet(betData);
 	end)
 
+	self.uiEventListener:AddClick(self.view.btn_AllOther,function()
+		self.model:ReqTablePlayerInfo()--请求百家乐房间的玩家列表信息
+	end)
 end
 
 ---筹码飞行到指定区域
@@ -962,24 +558,6 @@ function RoyalWarGameCtrl:RealCloseDestroy()
 	if self.PlayChipToPlayerSequence~=nil then
 		self.PlayChipToPlayerSequence:Kill();
 	end
-	for _, v in ipairs(ZhuPanTable) do
-		---@type RoyalWarZhuPanItem
-		local item =v;
-		item:Destroy();
-	end
-	self.objPools:DestroyAll();
-	ZhuPanObjTable = {}
-	ZhuPanTable ={}
-	ZhuPanDataTable ={}
-
-	for _, v in ipairs(DaLuTable) do
-		---@type RoyalWarDaLuItem
-		local item =v;
-		item:Destroy();
-	end
-	DaLuObjTable ={};
-	DaLuTable ={}
-	DaLuDataTable ={}
 
 	for _, v in ipairs(CardTypeTable) do
 		---@type RoyalWarCardTypeItem
@@ -989,39 +567,7 @@ function RoyalWarGameCtrl:RealCloseDestroy()
 	CardTypeObjTable ={};
 	CardTypeData ={}
 	CardTypeTable ={}
-
-
-	for _, v in ipairs(DaYanZaiLuTable) do
-		---@type RoyalWarAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-	DaYanZaiLuObjTable = {}
-	DaYanZaiLuTable = {}
-	DaYanZaiLuDataTable = {}
-
-	for _, v in ipairs(xiaoLuTable) do
-		---@type RoyalWarAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-
-	xiaoLuObjTable ={}
-	xiaoLuTable = {}
-	xiaoLuDataTable ={}
-
-	for _, v in ipairs(YueYouLuTable) do
-		---@type RoyalWarAllChildLuItem
-		local item =v;
-		item:Destroy();
-	end
-
-	YueYouLuObjTable = {}
-	YueYouLuTable ={}
-	YueYouLuDataTable ={}
+	self.RoyalWarScripts:Destroy()
 end
-
-
---function RoyalWarGameCtrl:
 
 return RoyalWarGameCtrl

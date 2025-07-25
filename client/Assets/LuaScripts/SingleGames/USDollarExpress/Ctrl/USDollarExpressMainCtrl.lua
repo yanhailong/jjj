@@ -34,9 +34,12 @@ end
 
 function USDollarExpressMainCtrl:ResConfigInfo(betInfos)
 	---@type UICommonSlotBtnsCtrl
-	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,betInfos)
-	---@type UICommonSlotTopCtrl
-	self.topCtrl=CtrlManager.SingleShow(CtrlNames.UICommonSlotTop)
+	self.buttomCtrl= CtrlManager.SingleShow(CtrlNames.UICommonSlotBtns,betInfos):AddAsyncOpenCallback(function
+	()
+		---@type UICommonSlotTopCtrl
+		self.topCtrl=CtrlManager.SingleShow(CtrlNames.UICommonSlotTop)
+	end)
+
 	
 	self.poolList=betInfos.poolList
 	for i = 1, #self.poolList do
@@ -116,7 +119,62 @@ function USDollarExpressMainCtrl:InitData()
 	self.dollarCount=0
 	
 	self.sound_award5=false--播放中5个图片音效
+	self.isSpecialIcons1={}
 	
+	self.isHasQdeffeffects=false
+end
+
+
+---重置数据
+function USDollarExpressMainCtrl:ReSetData()
+	self.isAllRoate=false
+	if self.cor001~=nil then
+		CorManager.StopCor(self,self.cor001)
+		self.cor001=nil
+	end
+
+	---默认都转3圈结束转动
+	self.rollCircles={}
+	if config.gameTypeState==1 or config.gameTypeState==2  then
+		self:SetAllChildItemMask(true)
+		--二选1模式
+		for i = 1,5 do
+			self.rollCircles[i] = config.rollCircles1[i]
+		end
+	else
+		self:SetAllChildItemMask(false)
+		for i = 1,5 do
+			self.rollCircles[i] = config.rollCircles[i]
+		end
+	end
+
+	self:HideAllDollars()
+
+
+	if self.lineShowCor~=nil then
+		coroutine.stop(self.lineShowCor)
+	end
+	for i = 1, 20 do
+		self.showChildsList[i]:SetIsAward(false)
+	end
+	self:HideAllAwardSmallKuangEffects()
+
+	self.curRollData={}
+	for i = 1, 5 do
+		self.curRollData[i]=0
+		self.fastStop[i]=false
+		self.allendPos[i]=false
+	end
+	self.isArrpos=true
+	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
+
+	config.aboradCount=0
+	self.isShowSpecialIcon={false,false,false,false,false}
+	self.isSpecialIcons1={}
+	self:IsHasSpecialIcons17()
+	self.lastShowEffect=false
+	self:IsHasSpecialIcons1922()
+
 end
 -- 初始化第一批展示用的SlotPics
 function USDollarExpressMainCtrl:InitFirstSlotPics()
@@ -190,19 +248,121 @@ function USDollarExpressMainCtrl:InitBigKuang()
 	end
 	self.eff_choose_a_freature_bd=ComponentUtilGet.GameObject(self.view.transform,"content/effects/eff_choose_a_freature_bd")
 	self.eff_choose_a_freature_bd:SetActive(false)
+	self.effect_biankuang_su_liuguang_2_bxg=ComponentUtilGet.GameObject(self.view.transform,"content/effects/effect_biankuang_su_liuguang_2_bxg")
+	self.effect_biankuang_su_liuguang_2_bxg:SetActive(false)
 end
+
+function USDollarExpressMainCtrl:HideAllBigKuang()
+	for i = 1, 5 do
+		Tools.SetActive(self.bigKuangEffects[i],false)
+	end
+end
+
+
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
+	logError("wheelId:"..wheelId)
 	if config.gameTypeState==1 or config.gameTypeState==2 then
 		for i = 1, 5 do
 			if wheelId==i then
 				Tools.SetActive(self.bigKuangEffects[i],true)
+				self.isHasQdeffeffects=true
 			else
 				Tools.SetActive(self.bigKuangEffects[i],false)
 			end
-
 		end
 	end
+	if self.isShowSpecialIcon[wheelId]==true then
+		for i = 1, 5 do
+			if wheelId==i then
+				Tools.SetActive(self.bigKuangEffects[i],true)
+				self.isHasQdeffeffects=true
+			else
+				Tools.SetActive(self.bigKuangEffects[i],false)
+			end
+		end
+	end
+	if wheelId==0 then
+		for i = 1, 5 do
+			Tools.SetActive(self.bigKuangEffects[i],false)
+		end
+		self:ShowRightKuang(false)
+	end
+	if wheelId==4 then
+		if self.lastShowEffect==true then
+			self:ShowRightKuang(true)
+			self.isHasQdeffeffects=true
+		end
+	end
+end
+---
+function USDollarExpressMainCtrl:IsHasSpecialIcons17()
+	for i = 1, 4 do
+		local has= self.model:IsHasIconEffect(i,17)
+		if has==true then
+			self.isSpecialIcons1[i]=true
+		end
+	end
+	for i = 2, 5 do
+		local has17={}
+		self:AddEffectBigKuang(i)
+	end
+end
+
+function USDollarExpressMainCtrl:AddEffectBigKuang(wheelId)
+		local has17={}
+		for i = 1, wheelId do
+			if i<wheelId then
+				local has= self.isSpecialIcons1[i]
+				if has==true then
+					table.insert(has17,1)
+				end
+			end
+		end
+
+		if #has17>=2 then
+			self.rollCircles[wheelId] = config.rollCircles2[wheelId]
+			self.isShowSpecialIcon[wheelId]=true
+		end
+end
+
+---特殊玩法实现
+function USDollarExpressMainCtrl:ShowBigKuangSpecail(wheelId)
+	for i = 1, 5 do
+		if wheelId==i then
+			Tools.SetActive(self.bigKuangEffects[i],true)
+		else
+			Tools.SetActive(self.bigKuangEffects[i],false)
+		end
+	end
+end
+
+---判断最后一列是否播放特效
+function USDollarExpressMainCtrl:IsHasSpecialIcons1922()
+	for i = 1, 4 do
+		local has= self.model:IsHasIconEffect1922(i)
+		if has==true then
+			self.lastShowEffect=true
+		end
+	end
+	local goldNum=self.model:IsIconEffect18Count()
+	if goldNum>=6 then
+		self.lastShowEffect=true
+	end
+	if self.lastShowEffect==true then
+		local numww= self.rollCircles[5]
+		if numww>=config.rollCircles2[5] then
+		else
+			self.rollCircles[5]= config.rollCircles2[5]
+		end
+	end
+	
+	
+end
+
+---展示最右边的特效----
+function USDollarExpressMainCtrl:ShowRightKuang(isShow)
+	self.effect_biankuang_su_liuguang_2_bxg:SetActive(isShow)
 end
 
 --开始抽奖旋转
@@ -214,15 +374,13 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 	GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange, SlotGlobal.gameState.RollState)
 	self:ReSetData()
 	self.realCard=self.model.CardPos
-	CorManager.StartCor(self,function()
-		for i = 1,5 do
-			if config.gameTypeState==1 then
-				self:ShowBigKuang(1)
-			end
-			self:StartCirle(i)
+	for i = 1,5 do
+		if config.gameTypeState==1 then
+			self:ShowBigKuang(1)
 		end
-		SoundManager:PlayClip(config.ABNames.audios.."reel_roll")
-	end)
+		self:StartCirle(i)
+	end
+	SoundManager:PlayClip(config.ABNames.audios.."reel_roll")
 end
 
 function USDollarExpressMainCtrl:SetRealIndex(wheelId)
@@ -247,51 +405,7 @@ end
 
 
 
----重置数据
-function USDollarExpressMainCtrl:ReSetData()
-	self.isAllRoate=false
-	if self.cor001~=nil then
-		CorManager.StopCor(self,self.cor001)
-		self.cor001=nil
-	end
 
-	---默认都转3圈结束转动
-	self.rollCircles={}
-	if config.gameTypeState==1 or config.gameTypeState==2  then
-		self:SetAllChildItemMask(true)
-		--二选1模式
-		for i = 1,5 do
-			self.rollCircles[i] = config.rollCircles1[i]
-		end
-	else
-		self:SetAllChildItemMask(false)
-		for i = 1,5 do
-			self.rollCircles[i] = config.rollCircles[i]
-		end
-	end
-	
-	self:HideAllDollars()
-
-
-	if self.lineShowCor~=nil then
-		coroutine.stop(self.lineShowCor)
-	end
-	for i = 1, 20 do
-		self.showChildsList[i]:SetIsAward(false)
-	end
-	self:HideAllAwardSmallKuangEffects()
-
-	self.curRollData={}
-	for i = 1, 5 do
-		self.curRollData[i]=0
-		self.fastStop[i]=false
-		self.allendPos[i]=false
-	end
-	self.isArrpos=true
-	GlobalEvent.Notify(SlotGlobal.gameEventName.AwardValue,"")
-	
-	config.aboradCount=0
-end
 
 --旋转
 function USDollarExpressMainCtrl:StartCirle(wheelId)
@@ -316,6 +430,7 @@ function USDollarExpressMainCtrl:StartCirle(wheelId)
 			return
 		end
 		if self.rollCircles[wheelId]==0 then
+			
 			self.tweener1[wheelId]=parent_newObj.transform:DOLocalMove(endpos, config.rollTime.rebackTime[wheelId])
 			self.tweener1[wheelId]:SetEase(DG.Tweening.Ease.OutQuart);
 			self.tweener1[wheelId].onComplete=function()
@@ -567,12 +682,17 @@ function USDollarExpressMainCtrl:CheckWheelIdAndPlayAni(wheelId)
 	end
 end
 
+function USDollarExpressMainCtrl:play5Lost()
+	if self.isHasQdeffeffects==true then
+		local soundIndex=Tools.RandomInt(1,13)
+		SoundManager:PlayClip(config.ABNames.audios.."nearmiss"..soundIndex)
+	end
 
+end
 
 --展示结果
 function USDollarExpressMainCtrl:ShowResoult()
-	local soundIndex=Tools.RandomInt(1,13)
-	SoundManager:PlayClip(config.ABNames.audios.."nearmiss"..soundIndex)
+	self:play5Lost()
 	if self.resoultCor then
 		coroutine.stop(self.resoultCor)
 		self.resoultCor=nil
@@ -734,7 +854,7 @@ function USDollarExpressMainCtrl:HideAllAwardSmallKuangEffects()
 end
 
 function USDollarExpressMainCtrl:DollarFly()
-	if  #self.model.collectDollarIndexIds>0 then
+	if  #self.model.collectDollarIndexIds>0 then--收集
 		local pos=self.view.trans_gold.transform.position
 		self:DollarFlyTo(pos,0, function
 		()

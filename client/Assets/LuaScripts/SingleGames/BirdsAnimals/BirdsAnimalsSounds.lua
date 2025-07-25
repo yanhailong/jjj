@@ -47,4 +47,10 @@ function BirdsAnimalsSounds.PlaySoundMusic()
     SoundManager:ChangeBg(soundPath..soudName)
 end
 
+--关闭背景音乐
+function BirdsAnimalsSounds.StopSoundMusic()
+    SoundManager:CloseBg()
+end
+
+
 return BirdsAnimalsSounds;

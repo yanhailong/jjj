@@ -28,6 +28,7 @@ function DicePointsSumSizeGameCtrl:CtrlInit(args)
 	self.super.CtrlInit(self,args);
 	self:InitData()
 	self:FirstEntryGame(args)
+	self:InitChipScrollowData()
 	self:UpdateChipPageBtns()
 end
 
@@ -104,22 +105,34 @@ function DicePointsSumSizeGameCtrl:InitData()
 	--end,1,-1,true);
 end
 
+function DicePointsSumSizeGameCtrl:InitChipScrollowData()
+	local chipSpacing = ComponentUtilGet.HorizontalLayoutGroup(self.view.obj_ChipContent.transform).spacing
+	local chipWidth = ComponentUtilGet.RectTransform(self.view.obj_chipItem.transform).sizeDelta.x
+	self.showChipMaxIndex = table.getCount(self.chipItems) - DicePointsSumSizeConfig.chipItemShowCount + 1
+	local chipScrollTrans = ComponentUtilGet.RectTransform(self.view.chipListView)
+	local contentWidth = chipWidth * DicePointsSumSizeConfig.chipItemShowCount + (DicePointsSumSizeConfig.chipItemShowCount - 1) * chipSpacing
+	chipScrollTrans.sizeDelta = Vector2.New(contentWidth, chipScrollTrans.sizeDelta.y)
+	
+	self.chipCenterPosXArr = {}
+	self.chipStartPosXArr = {}
+	if self.showChipMaxIndex > 1 then
+		local scrollWidth = (chipWidth + chipSpacing) * (self.showChipMaxIndex - 1)
+		for i = 1, #DicePointsSumSizeConfig.betValuesArr do
+			local centerX = (chipWidth / 2.0 + (i - 1) * (chipWidth + chipSpacing)) / scrollWidth
+			local startX = (i - 1) * (chipWidth + chipSpacing) / scrollWidth
+			table.insert(self.chipCenterPosXArr, centerX)
+			table.insert(self.chipStartPosXArr, startX)
+		end
+	end
+end
+
 function DicePointsSumSizeGameCtrl:Close()
     self.super.Close(self);
 end
 
 function DicePointsSumSizeGameCtrl:UpdateChipPageBtns()
 	self.view.btn_Chipleft.gameObject:SetActive(self.showChipIndex > 1)
-	self.view.btn_ChipRight.gameObject:SetActive(self.showChipIndex < table.getCount(self.chipItems) - DicePointsSumSizeConfig.chipItemShowCount + 1)
-
-	local curIndex = 1
-	for _, v in pairs(self.chipItems) do
-		---@type DicePointsSumSizeChipItem
-		local item = v;
-		item.gameObject:SetActive(curIndex >= self.showChipIndex)
-		
-		curIndex = curIndex + 1
-	end
+	self.view.btn_ChipRight.gameObject:SetActive(self.showChipIndex < self.showChipMaxIndex)
 end
 
 ---选中哪个筹码
@@ -173,12 +186,14 @@ function DicePointsSumSizeGameCtrl:AddUIEvent()
 		if self.showChipIndex > 1 then
 			self.showChipIndex = self.showChipIndex - 1
 			self:UpdateChipPageBtns()
+			self:ChipItemsScrollToTarget(self.chipStartPosXArr[self.showChipIndex], DicePointsSumSizeConfig.chipItemScrollTime)
 		end
 	end)
 	self.uiEventListener:AddClick(self.view.btn_ChipRight,function(obj)
-		if self.showChipIndex < table.getCount(self.chipItems) - DicePointsSumSizeConfig.chipItemShowCount + 1 then
+		if self.showChipIndex < self.showChipMaxIndex then
 			self.showChipIndex = self.showChipIndex + 1
 			self:UpdateChipPageBtns()
+			self:ChipItemsScrollToTarget(self.chipStartPosXArr[self.showChipIndex], DicePointsSumSizeConfig.chipItemScrollTime)
 		end
 	end)
 
@@ -220,6 +235,54 @@ function DicePointsSumSizeGameCtrl:AddUIEvent()
 			self.view.btn_repeat.interactable = false
 		end
 	end)
+	
+	self.uiEventListener:AddEndDrag(self.view.chipListView.gameObject, function(eventData)
+		--look("Scroll EndDrag")
+		local scrollPosX = self.view.chipListView.horizontalNormalizedPosition
+		--look("Scroll pos:" .. "x:" .. scrollPosX)
+		if scrollPosX <= 0 then
+			if self.showChipIndex ~= 1 then
+				self.showChipIndex = 1
+				self:ChipItemsScrollToTarget(0, DicePointsSumSizeConfig.chipItemScrollTime)
+				self:UpdateChipPageBtns()
+			end
+		elseif scrollPosX >= 1 then
+			if self.showChipIndex ~= self.showChipMaxIndex then
+				self.showChipIndex = self.showChipMaxIndex
+				self:ChipItemsScrollToTarget(1, DicePointsSumSizeConfig.chipItemScrollTime)
+				self:UpdateChipPageBtns()
+			end
+		else
+			for i = 1, #self.chipStartPosXArr do
+				local startX = self.chipStartPosXArr[i]
+				if i > 1 then 
+					startX = self.chipCenterPosXArr[i - 1]
+				end
+				if scrollPosX >= startX and scrollPosX <= self.chipCenterPosXArr[i] then
+					local modifyNormalizeX = self.chipStartPosXArr[i]
+					self:ChipItemsScrollToTarget(modifyNormalizeX, DicePointsSumSizeConfig.chipItemScrollTime)
+					self.showChipIndex = i
+					self:UpdateChipPageBtns()
+					break
+				elseif scrollPosX < startX then
+					break
+				end
+			end
+		end
+	end)
+end
+
+function DicePointsSumSizeGameCtrl:ChipItemsScrollToTarget(normalizedPosX, time)
+	self.view.chipListView:StopMovement()
+	if self.chipScrollTween then
+		self.chipScrollTween:Kill()
+	end
+	self.chipScrollTween = DOTween.To(
+			function() return self.view.chipListView.horizontalNormalizedPosition end,
+			function(x) self.view.chipListView.horizontalNormalizedPosition = x end,
+			normalizedPosX,
+			time
+	):SetEase(DG.Tweening.Ease.OutQuad)
 end
 
 ---移除UI事件
@@ -768,6 +831,10 @@ function DicePointsSumSizeGameCtrl:RealCloseDestroy()
 	if self.diceSequence then
 		self.diceSequence:Kill(false)
 		self.diceSequence = nil
+	end
+	if self.chipScrollTween then
+		self.chipScrollTween:Kill()
+		self.chipScrollTween = nil
 	end
 	CorManager.StopAll(self)
 	

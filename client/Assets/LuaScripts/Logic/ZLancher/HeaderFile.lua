@@ -25,6 +25,7 @@ require("Logic/Common/SuspensionTipsUtil")
 require("Logic/Common/commonSlots/SlotGlobal")
 require("Logic/CfgManager/ConfigManager")
 require("Logic/Common/TMPTipsCall")
+require("Logic/ZLancher/GlobalListener")
 
 
 

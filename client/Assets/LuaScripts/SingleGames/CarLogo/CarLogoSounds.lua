@@ -42,5 +42,9 @@ function CarLogoSounds.PlaySoundMusic()
     local soudName = "bgm_sound"
     SoundManager:ChangeBg(soundPath..soudName)
 end
+--关闭背景音乐
+function CarLogoSounds.StopSoundMusic()
+    SoundManager:CloseBg()
+end
 
 return CarLogoSounds;

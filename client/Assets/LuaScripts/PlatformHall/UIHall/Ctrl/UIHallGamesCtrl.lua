@@ -73,11 +73,11 @@ function UIHallGamesCtrl:OnClickGameItem(index)
 	--elseif index == 7 then
 	--	require("SingleGames/VietnamChess/MVCHead")
 	--	CtrlManager.SingleShow(CtrlNames.VietnamChessGame)
-	--elseif index == 8 then
-	--	require("SingleGames/FishPrawnCrab/MVCHead")
-	--	CtrlManager.SingleShow(CtrlNames.FishPrawnCrabGame)
-		--require("SingleGames/DicePointsSumSize/MVCHead")
-		--CtrlManager.SingleShow(CtrlNames.DicePointsSumSizeGame)
+	--if index == 8 then
+	--	--require("SingleGames/FishPrawnCrab/MVCHead")
+	--	--CtrlManager.SingleShow(CtrlNames.FishPrawnCrabGame)
+	--	require("SingleGames/DicePointsSumSize/MVCHead")
+	--	CtrlManager.SingleShow(CtrlNames.DicePointsSumSizeGame)
 	--end
 	if index == 8 then
 		require("SingleGames/MahjongWays/MVCHead")

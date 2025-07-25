@@ -11,6 +11,10 @@ pb_Baccarat.NotifyRedBlackWarInfo = 77953
 pb_Baccarat.NotifyLoongTigerWarInfo = 81921
 --- 响应,msgID=0x14002,desc=龙虎斗结算信息
 pb_Baccarat.NotifyLoongTigerWarSettleInfo = 81922
+--- 响应,msgID=0x16081,desc=飞禽走兽桌面信息，下注，结算，断线重连
+pb_Baccarat.NotifyAnimalsTableInfo = 90241
+--- 响应,msgID=0x16082,desc=通知飞禽走兽结算信息
+pb_Baccarat.NotifyAnimalsSettlement = 90242
 --- 请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
 pb_Baccarat.ReqBaccaratTableSummaryList = 98305
 --- 请求,msgID=0x18002,desc=请求获取百家乐房间摘要信息
@@ -41,12 +45,16 @@ pb_Baccarat.RespExitRoomInGame = 98440
 pb_Baccarat.ReqBet = 131073
 --- 请求,msgID=0x20003,desc=请求获取百人牌桌的玩家信息
 pb_Baccarat.ReqTablePlayerInfo = 131075
+--- 请求,msgID=0x20004
+pb_Baccarat.ReqRoomBaseInfo = 131076
 --- 响应,msgID=0x20081,desc=请求下注返回
 pb_Baccarat.NotifyPlayerBet = 131201
 --- 响应,msgID=0x20083,desc=返回牌桌玩家列表的下注信息
 pb_Baccarat.RespTablePlayerInfo = 131203
 --- 响应,msgID=0x20088,desc=通知押注类房间玩家信息变化
 pb_Baccarat.NotifyTableRoomPlayerInfoChange = 131208
+--- 响应,msgID=0x20089
+pb_Baccarat.NotifyPhaseChangInfo = 131209
 
 
 PbMsg[20610] = 'NotifyRoomReadyWait'
@@ -54,6 +62,8 @@ PbMsg[77827] = 'NotifyRedBlackWarSettleInfo'
 PbMsg[77953] = 'NotifyRedBlackWarInfo'
 PbMsg[81921] = 'NotifyLoongTigerWarInfo'
 PbMsg[81922] = 'NotifyLoongTigerWarSettleInfo'
+PbMsg[90241] = 'NotifyAnimalsTableInfo'
+PbMsg[90242] = 'NotifyAnimalsSettlement'
 PbMsg[98305] = 'ReqBaccaratTableSummaryList'
 PbMsg[98306] = 'ReqBaccaratTableSummary'
 PbMsg[98308] = 'ReqBaccaratTableInfo'
@@ -69,9 +79,11 @@ PbMsg[98439] = 'RespJoinRoomInGame'
 PbMsg[98440] = 'RespExitRoomInGame'
 PbMsg[131073] = 'ReqBet'
 PbMsg[131075] = 'ReqTablePlayerInfo'
+PbMsg[131076] = 'ReqRoomBaseInfo'
 PbMsg[131201] = 'NotifyPlayerBet'
 PbMsg[131203] = 'RespTablePlayerInfo'
 PbMsg[131208] = 'NotifyTableRoomPlayerInfoChange'
+PbMsg[131209] = 'NotifyPhaseChangInfo'
 
 PBHelper.LoadPB('SingleGames/Baccarat/Protol','room')
 PBHelper.LoadPB('SingleGames/Baccarat/Protol','table')
