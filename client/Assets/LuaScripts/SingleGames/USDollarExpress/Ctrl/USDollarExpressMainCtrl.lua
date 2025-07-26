@@ -870,41 +870,45 @@ function USDollarExpressMainCtrl:DollarFly()
 			local pos=self.buttomCtrl.view.txt_win.transform.position
 			self:DollarFlyTo(pos,0.5)
 		else
-			local isHasHuangjinlieche=false
-			local isNormlieche=false
-			local trainInfoList= self.model.trainInfoList
-			if #trainInfoList>0 then
-				if #trainInfoList==1 and trainInfoList[1].type==15 then
-					isHasHuangjinlieche=true
-				else
-					isNormlieche=true
+			if self.model.status==0 then--普通模式中黄金或者火车
+				local isHasHuangjinlieche=false
+				local isNormlieche=false
+				local trainInfoList= self.model.trainInfoList
+				if #trainInfoList>0 then
+					if #trainInfoList==1 and trainInfoList[1].type==15 then
+						isHasHuangjinlieche=true
+					else
+						isNormlieche=true
+					end
 				end
-			end
-			if isHasHuangjinlieche==true or isNormlieche==true then
-				if isHasHuangjinlieche==true then
-					self.view.obj_top1:SetActive(false)
-					self.view.obj_top2:SetActive(true)
-					self.view.txt_repeatWin.text=""
-					self.dollarCount=0
-					local pos=self.view.txt_repeatWin.transform.position
-					self:DollarFlyTo(pos,0.5)
-				end
-				if isNormlieche==true then
-					--普通旋转进入拉火车
-					CorManager.StartCor(self, function
-					()
-						coroutine.wait(1)
-						local args={}
-						args.enterType=5
-						args.trainInfoList=self.model.trainInfoList
-						CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,args)
-					end)
-				end
+				if isHasHuangjinlieche==true or isNormlieche==true then
+					if isHasHuangjinlieche==true then
+						self.view.obj_top1:SetActive(false)
+						self.view.obj_top2:SetActive(true)
+						self.view.txt_repeatWin.text=""
+						self.dollarCount=0
+						local pos=self.view.txt_repeatWin.transform.position
+						self:DollarFlyTo(pos,0.5)
+					end
+					if isNormlieche==true then
+						--普通旋转进入拉火车
+						CorManager.StartCor(self, function
+						()
+							coroutine.wait(1)
+							local args={}
+							args.enterType=5
+							args.trainInfoList=self.model.trainInfoList
+							CtrlManager.SingleShow(CtrlNames.USDollarExpressCar,args)
+						end)
+					end
 
+				else
+					config.showStep=config.showStep+1
+				end
 			else
-				logError("正常状态")
 				config.showStep=config.showStep+1
 			end
+
 		end
 	end
 	
