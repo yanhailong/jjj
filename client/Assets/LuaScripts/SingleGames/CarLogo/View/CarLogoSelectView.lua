@@ -17,9 +17,9 @@ function CarLogoSelectView:InitComponents()
     self.img_title=ComponentUtilGet.Image(self.transform,"BackGround/img_title");
     self.btn_coinAdd=ComponentUtilGet.Button(self.transform,"content/top/SelfHead/Money/btn_coinAdd");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/top/btn_close");
-    self.btn_car1=ComponentUtilGet.Button(self.transform,"content/center/item/btn_car1");
-    self.btn_car2=ComponentUtilGet.Button(self.transform,"content/center/item (1)/btn_car2");
-    self.btn_car3=ComponentUtilGet.Button(self.transform,"content/center/item (2)/btn_car3");
+    self.GoldNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/top/SelfHead/Money/GoldNumber");
+    self.img_head=ComponentUtilGet.Image(self.transform,"content/top/SelfHead/HeadPic/Head");
+    self.img_kuang=ComponentUtilGet.Image(self.transform,"content/top/SelfHead/HeadPic");
 end
 
 ---清空组件
@@ -27,9 +27,9 @@ function CarLogoSelectView:ClearComponents()
     self.img_title=nil;
     self.btn_coinAdd=nil;
     self.btn_close=nil;
-    self.btn_car1=nil;
-    self.btn_car2=nil;
-    self.btn_car3=nil;
+    self.GoldNumber=nil;
+    self.img_head=nil;
+    self.img_kuang=nil;
 end
 
 ---初始化View数据

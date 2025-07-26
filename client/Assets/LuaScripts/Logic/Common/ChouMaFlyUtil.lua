@@ -117,6 +117,7 @@ end
 
 function ChouMaFlyUtil:DestroyCoinFly(coinObj,endPos,delay)
     if endPos == nil or coinObj == nil then
+        if coinObj then GameObject.Destroy(coinObj) end
         return
     end
     -- 创建动画序列

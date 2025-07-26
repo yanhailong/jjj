@@ -218,6 +218,7 @@ function VietnamChessGameView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
         self.chipInfos[i].button.interactable = VietnamChessConfig.allow and VietnamChessConfig.dizhuNumArr[i]<=VietnamChessConfig.goldRealNum
     end
+    
 end
 
 ---设置续投按钮是否可以点击 当前局已经手动投注或者上局未投注不能点 其他可点
@@ -232,7 +233,7 @@ end
 ---本玩家下注动画
 function VietnamChessGameView:PayXiaZhuCoinFly(side)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode,VietnamChessConfig.dizhuIndex,self.selfPlayer.transform.position,self.xiazhuStarAreas[side],
-            self.ctrl.model.config.betList[VietnamChessConfig.dizhuIndex])
+            self.model.config.betList[VietnamChessConfig.dizhuIndex])
 end
 ---通过id找到玩家
 function VietnamChessGameView:FindPlayerByID(id)
@@ -247,20 +248,20 @@ end
 function VietnamChessGameView:PayOtherXiaZhuCoinFly(data)
     self:UpdateXiaZhuLabel()
 
-    for i=1,#self.ctrl.model.players do
+    for i=1,#self.model.players do
         ---其他Top玩家下注动画
-        if data.id == self.ctrl.model.players[i].id then
+        if data.id == self.model.players[i].id then
             local playerItem = self:FindPlayerByID(data.id)
             if playerItem ~= nil then
                 ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.dizhuType,playerItem.transform.position,self.xiazhuStarAreas[data.areaType],
-                        self.ctrl.model.config.betList[data.dizhuType])
+                        self.model.config.betList[data.dizhuType])
             end
             break
         end
 
         if i>=6 then
             ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.dizhuType,self.btn_players.transform.position,self.xiazhuStarAreas[data.areaType],
-                    self.ctrl.model.config.betList[data.dizhuType])
+                    self.model.config.betList[data.dizhuType])
             break
         end
     end
@@ -271,7 +272,7 @@ function VietnamChessGameView:RefresAreaCoin()
     if VietnamChessConfig.allXiaZhuData and #VietnamChessConfig.allXiaZhuData>0 then
         for i=1,#VietnamChessConfig.allXiaZhuData do
             ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,VietnamChessConfig.allXiaZhuData[i].dizhuType,self.xiazhuStarAreas[VietnamChessConfig.allXiaZhuData[i].areaType],
-                    self.ctrl.model.config.betList[VietnamChessConfig.allXiaZhuData[i].dizhuType])
+                    self.model.config.betList[VietnamChessConfig.allXiaZhuData[i].dizhuType])
         end
     end
 end
@@ -303,10 +304,10 @@ end
 function VietnamChessGameView:InitChouMa()
     ---底注数值
     for i=1,#self.chipInfos do
-        if self.ctrl.model.config.betList[i] then
+        if self.model.config.betList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(VietnamChessConfig.dizhuImgAtlas,VietnamChessConfig.dizhuColor[i])
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.ctrl.model.config.betList[i])
+            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.config.betList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")

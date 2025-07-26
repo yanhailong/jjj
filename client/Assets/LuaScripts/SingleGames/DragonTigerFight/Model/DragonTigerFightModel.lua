@@ -78,16 +78,6 @@ function DragonTigerFightModel:OnEnterRoom(msg)
     end
 end
 
-
-function updateUI()
-    for playerId, info in pairs(playerDataMap) do
-        if not info.handled then
-            print("刷新玩家", playerId, "数据", info.data)
-            -- updatePlayerUI(playerId, info.data)
-            info.handled = true
-        end
-    end
-end
 -- 广播玩家押注信息 NotifyPlayerBet 
 function DragonTigerFightModel:OnBetting(msg)
     if msg and msg.code == 200 and self.initState then
@@ -130,6 +120,7 @@ function DragonTigerFightModel:OnGameStatus(msg)
 end
 --收到开始下注消息
 function DragonTigerFightModel:OnStartXiaZhu(msg)
+    if not self.initState then return end
     self.status = 2
     self.endTime = msg.waitEndTime
     self.ctrl.view:OnGameStatus(self.status)
@@ -161,6 +152,7 @@ function DragonTigerFightModel:OnGameResult(msg)
 end
 
 function DragonTigerFightModel:ShowResult()
+    if not self.initState then return end
     self.players = self.Result.playerInfos --前6玩家信息
     ---显示牌面结果
     self.ctrl.view:ResultEffect(self.Result)

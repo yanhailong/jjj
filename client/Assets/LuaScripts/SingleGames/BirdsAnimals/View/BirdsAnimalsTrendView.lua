@@ -55,6 +55,7 @@ end
 
 function BirdsAnimalsTrendView:InitResultItem(transform)
     local table = {}
+    table.obj = transform.gameObject
     table.icon = ComponentUtilGet.Image(transform, "icon");
     table.new = ComponentUtilGet.Image(transform,"new");
     table.ShowLogo = function(logo_id)
@@ -62,9 +63,11 @@ function BirdsAnimalsTrendView:InitResultItem(transform)
             table.icon.sprite = BirdsAnimalsHelper.LoadLogoSprite(logo_id);
             table.new.gameObject:SetActive(false)
             table.icon.gameObject:SetActive(true)
+            table.obj:SetActive(true)
         else
-            table.new.gameObject:SetActive(false)
-            table.icon.gameObject:SetActive(false)
+            --table.new.gameObject:SetActive(false)
+            --table.icon.gameObject:SetActive(false)
+            table.obj:SetActive(false)
         end
     end
 
@@ -80,7 +83,7 @@ function BirdsAnimalsTrendView:UpdateHistory(history)
     local total = #historyList
     for i=1,50 do
         if i <= total then
-            self.resultsItems[i].ShowLogo(historyList[i])
+            self.resultsItems[i].ShowLogo(historyList[i].animalId)
             if i==total then self.resultsItems[i].ShowNew(true) end
         else
             self.resultsItems[i].ShowLogo()
@@ -92,32 +95,30 @@ function BirdsAnimalsTrendView:UpdateHistory(history)
     local offset=math.max(#historyList-49,1)
     local count = #historyList-offset+1
     for i=#historyList,offset,-1 do
-        self.rateData[historyList[i]]=self.rateData[historyList[i]]+1
+        self.rateData[historyList[i].animalId]=self.rateData[historyList[i].animalId]+1
     end
 
     self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=0
     self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou]=0
 
-    if count>0 then
-        for i=1,12 do
-            local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
-            if logo_id<=12 then
-                self.rateData[logo_id]=math.floor(self.rateData[logo_id]*1000/count)/10
-                self.rateTmps[i].text = self.rateData[logo_id].."%"
-                if BirdsAnimalsHelper.IsFeiQinType(logo_id) then
-                    self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]+self.rateData[logo_id]
-                elseif BirdsAnimalsHelper.IsZouShouType(logo_id) then
-                    self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou]=self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou]+self.rateData[logo_id]
-                end
+    for i=1,12 do
+        local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
+        if logo_id<=12 then
+            self.rateData[logo_id]=count>0 and math.floor(self.rateData[logo_id]*1000/count)/10 or 0
+            self.rateTmps[i].text = self.rateData[logo_id].."%"
+            if BirdsAnimalsHelper.IsFeiQinType(logo_id) then
+                self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]+self.rateData[logo_id]
+            elseif BirdsAnimalsHelper.IsZouShouType(logo_id) then
+                self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou]=self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou]+self.rateData[logo_id]
             end
         end
-        for i=1,12 do
-            local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
-            if logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin then
-                self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin].."%"
-            elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou then
-                self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou].."%" 
-            end
+    end
+    for i=1,12 do
+        local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
+        if logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin then
+            self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin].."%"
+        elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou then
+            self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou].."%"
         end
     end
 end

@@ -4,12 +4,6 @@ CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsGame].ctrl =require "SingleGam
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsGame].view=require "SingleGames/BirdsAnimals/View/BirdsAnimalsGameView";
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsGame].model=require "SingleGames/BirdsAnimals/Model/BirdsAnimalsGameModel";
 
-CtrlNames.BirdsAnimalsPlayers="BirdsAnimalsPlayers";
-CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsPlayers]={};
-CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsPlayers].ctrl =require "SingleGames/BirdsAnimals/Ctrl/BirdsAnimalsPlayersCtrl";
-CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsPlayers].view=require "SingleGames/BirdsAnimals/View/BirdsAnimalsPlayersView";
-CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsPlayers].model=require "SingleGames/BirdsAnimals/Model/BirdsAnimalsPlayersModel";
-
 CtrlNames.BirdsAnimalsRule="BirdsAnimalsRule";
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsRule]={};
 CtrlManager.CtrlsCollection[CtrlNames.BirdsAnimalsRule].ctrl =require "SingleGames/BirdsAnimals/Ctrl/BirdsAnimalsRuleCtrl";

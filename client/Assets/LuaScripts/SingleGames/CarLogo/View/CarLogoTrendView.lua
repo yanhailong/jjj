@@ -52,16 +52,20 @@ end
 
 function CarLogoTrendView:InitResultItem(transform)
     local table = {}
+    table.obj = transform.gameObject
     table.icon = ComponentUtilGet.Image(transform, "icon");
     table.new = ComponentUtilGet.Image(transform,"new");
-    table.ShowLogo = function(logo_id)
-        if logo_id then
-            table.icon.sprite = CarLogoHelper.LoadLogoSprite(logo_id);
+    table.ShowLogo = function(index)
+        if index then
+            local logoId = CarLogoConfig.FindIndexByLogoId(index)
+            table.icon.sprite = CarLogoHelper.LoadLogoSprite(logoId);
             table.new.gameObject:SetActive(false)
             table.icon.gameObject:SetActive(true)
+            table.obj:SetActive(true)
         else
-            table.new.gameObject:SetActive(false)
-            table.icon.gameObject:SetActive(false)
+            --table.new.gameObject:SetActive(false)
+            --table.icon.gameObject:SetActive(false)
+            table.obj:SetActive(false)
         end
     end
 
@@ -90,14 +94,13 @@ function CarLogoTrendView:UpdateHistory(history)
     local offset=math.max(#historyList-49,1)
     local count = #historyList-offset+1
     for i=#historyList,offset,-1 do
-        self.rateData[historyList[i]]=self.rateData[historyList[i]]+1
+        local logoId = CarLogoConfig.FindIndexByLogoId(historyList[i])
+        self.rateData[logoId]=self.rateData[logoId]+1
     end
 
-    if count>0 then
-        for i=1,8 do
-            self.rateData[i]=math.floor(self.rateData[i]*1000/count)/10
-            self.rateTmps[i].text = self.rateData[i].."%"
-        end
+    for i=1,8 do
+        self.rateData[i]=count>0 and math.floor(self.rateData[i]*1000/count)/10 or 0
+        self.rateTmps[i].text = self.rateData[i].."%"
     end
 end
 

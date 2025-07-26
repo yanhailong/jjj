@@ -15,6 +15,10 @@ pb_CarLogo.NotifyLoongTigerWarSettleInfo = 81922
 pb_CarLogo.NotifyAnimalsTableInfo = 90241
 --- 响应,msgID=0x16082,desc=通知飞禽走兽结算信息
 pb_CarLogo.NotifyAnimalsSettlement = 90242
+--- 响应,msgID=0x17081,desc=豪车俱乐部桌面信息，下注，结算，断线重连
+pb_CarLogo.NotifyLuxuryCarClubTableInfo = 94337
+--- 响应,msgID=0x17082,desc=通知豪车俱乐部结算信息
+pb_CarLogo.NotifyLuxuryCarClubSettlement = 94338
 --- 请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
 pb_CarLogo.ReqBaccaratTableSummaryList = 98305
 --- 请求,msgID=0x18002,desc=请求获取百家乐房间摘要信息
@@ -64,6 +68,8 @@ PbMsg[81921] = 'NotifyLoongTigerWarInfo'
 PbMsg[81922] = 'NotifyLoongTigerWarSettleInfo'
 PbMsg[90241] = 'NotifyAnimalsTableInfo'
 PbMsg[90242] = 'NotifyAnimalsSettlement'
+PbMsg[94337] = 'NotifyLuxuryCarClubTableInfo'
+PbMsg[94338] = 'NotifyLuxuryCarClubSettlement'
 PbMsg[98305] = 'ReqBaccaratTableSummaryList'
 PbMsg[98306] = 'ReqBaccaratTableSummary'
 PbMsg[98308] = 'ReqBaccaratTableInfo'
