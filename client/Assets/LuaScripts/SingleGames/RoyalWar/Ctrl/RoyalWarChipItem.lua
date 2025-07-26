@@ -1,6 +1,6 @@
 ---@class RoyalWarChipItem
 local RoyalWarChipItem = Class("RoyalWarChipItem")
----@type BaccaratConfig
+---@type RoyalWarConfig
 local config=require("SingleGames/RoyalWar/RoyalWarConfig")
 function RoyalWarChipItem:ctor(obj,ctrl)
     ---@type UnityEngine.GameObject

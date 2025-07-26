@@ -24,12 +24,12 @@ function RoyalWarZhuPanItem:InitState()
 end
 
 ---刷新显示
-function RoyalWarZhuPanItem:RefreshShow(data,isFlicker)
-    self.obj_Red:SetActive(data[1]);
-    self.obj_Black:SetActive(not data[1]);
-    if(isFlicker) then
+function RoyalWarZhuPanItem:RefreshShow(data,isFirst)
+    self.obj_Red:SetActive(data[1]==1);
+    self.obj_Black:SetActive(data[1]==2);
+    if(isFirst) then
         local image;
-        if(data[1]) then
+        if(data[1]==1) then
             image = ComponentUtilGet.Image(self.obj_Red);
         else
             image = ComponentUtilGet.Image(self.obj_Black);
@@ -39,6 +39,7 @@ function RoyalWarZhuPanItem:RefreshShow(data,isFlicker)
         self.zhuPanSequence:SetLoops(6,loopType.Yoyo)
         self.zhuPanSequence:Play();
     end
+    
 end
 
 function RoyalWarZhuPanItem:Destroy()

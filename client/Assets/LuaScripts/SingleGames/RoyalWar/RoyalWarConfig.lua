@@ -3,9 +3,11 @@ local RoyalWarConfig = Class("RoyalWarConfig");
 local this = RoyalWarConfig;
 
 this.GameSate = {
+    None = 0,
     Start = 1,--开始阶段
     Bet =2,--下注阶段
-    Settlement =3,--结算阶段
+    Deal =3,--结算阶段(需要发牌)
+    Settlement =4,--直接展示结果
 }
 ---筹码类型
 this.ChipState={
@@ -31,47 +33,45 @@ this.ColourType = {
 }
 ---牌型
 this.CardType = {
-    Leopard =6, --豹子
-    ShunJin = 5, --顺金
-    JinHua = 4, -- 金花
-    ShunZi = 3, -- 顺子
-    DuiZi = 2, -- 对子
     DanZhang = 1, --单张
-    
+    DuiZi = 2, -- 对子
+    ShunZi = 3, -- 顺子
+    JinHua = 4, -- 金花
+    ShunJin = 5, --顺金
+    Leopard =6, --豹子
 }
----获取是哪种牌型
-function this.GetCardType(oneNum,twoNum,threeNum,oneColour,twoColour,threeColour)
-    if(oneNum == twoNum and oneNum == threeNum) then--豹子
-        return this.CardType.Leopard;
-    elseif(oneColour==twoColour and twoColour == threeColour) then--花色相同
-        if(this.GetCardIsShunZi(oneNum,twoNum,threeNum)) then--是顺子
-            return this.CardType.ShunJin;
-        else--不是顺子
-            return this.CardType.JinHua;
-        end
-    elseif(this.GetCardIsShunZi(oneNum,twoNum,threeNum)) then--是顺子
-        return this.CardType.ShunZi;
-    elseif(oneNum == twoNum or oneNum == threeNum or twoNum==threeNum ) then--是对子
-        return this.CardType.DuiZi;
-    else
-        return this.CardType.DanZhang;
-    end    
-end
----返回是不是顺子
-function this.GetCardIsShunZi(oneNum,twoNum,threeNum)
-    local nums = {oneNum,twoNum,threeNum}
-    table.sort(nums)
-    return ((nums[2]-nums[1]) == 1) and ((nums[3]-nums[2]) == 1)
-end
-
 
 this.ABNames = {
-    icons="SingleGames/RoyalWar/atlas",--icon
+    icons="SingleGames/RoyalWar/atlas/icon",--icon
     cardType_Pics="SingleGames/RoyalWar/atlas/cardType",--牌型资源名
     prefabsItem = "SingleGames/RoyalWar/prefabs/main" ,--预支item路径
     chipPool = "SingleGames/RoyalWar/prefabs/Pool",--筹码
+    audios = "SingleGames/RoyalWar/audios/",--音效
     Card="Common/GameArtsCommon/GameFight/alats/card",--牌
+    commonMain = "Common/GameArtsCommon/GameFight/alats/main",--通用资源主路径
 }
+function this.InitUIImageGray()
+    --this.material = resMgr:LoadMaterial("Common/Material/UIImageGray",typeof(UnityEngine.Material))
+    this.material = resMgr:LoadMaterial("Common/Material/UIImageGray")
+end
+
+function this.GetUIImageGray()
+    return this.material;
+end
+---通用资源
+this.commonMain_Pics = {}
+function this.InitCommonMainPic()
+    local pics=resMgr:LoadAllAssets(this.ABNames.commonMain,typeof(UnityEngine.Sprite))
+    for i = 0, pics.Length-1 do
+        local pic=pics[i];
+        this.commonMain_Pics[pic.name]=pic;
+    end
+end
+---获取通用资源Sprite
+function this.GetCommonMainPic(iconName)
+    return this.commonMain_Pics[iconName];
+end
+
 this.icon_Pics={}
 function this.InitIconPic()
     local pics=resMgr:LoadAllAssets(this.ABNames.icons,typeof(UnityEngine.Sprite))
@@ -152,6 +152,23 @@ function this.GetRedCardTypeName(type)
         return "hhdz_dz_1"
     end
 end
+
+---获取牌型的声音资源名字
+function this.GetRedCardAudioName(type)
+    if(type == this.CardType.Leopard) then
+        return "p_BaoZi"
+    elseif(type == this.CardType.ShunJin) then
+        return "p_tongHuaShun"
+    elseif(type == this.CardType.JinHua) then
+        return "p_tonghua"
+    elseif(type == this.CardType.ShunZi) then
+        return "p_shunZi"
+    elseif(type == this.CardType.DuiZi) then
+        return "p_duiZi"
+    elseif(type == this.CardType.DanZhang) then
+        return "p_danZhang"
+    end
+end
 ---获取牌型的资源名字
 function this.GetBlackCardTypeName(type)
     if(type == this.CardType.Leopard) then
@@ -169,20 +186,20 @@ function this.GetBlackCardTypeName(type)
     end
 end
 
----获取牌型的真名字
+---获取牌型的多语言ID
 function this.GetCardTypeTrueName(type)
     if(type == this.CardType.Leopard) then
-        return "豹子"
+        return "200100018"
     elseif(type == this.CardType.ShunJin) then
-        return "顺金"
+        return "200100017"
     elseif(type == this.CardType.JinHua) then
-        return "金花"
+        return "200100016"
     elseif(type == this.CardType.ShunZi) then
-        return "顺子"
+        return "200100015"
     elseif(type == this.CardType.DuiZi) then
-        return "对子"
+        return "200100014"
     elseif(type == this.CardType.DanZhang) then
-        return "单张"
+        return "200100013"
     end
 end
 

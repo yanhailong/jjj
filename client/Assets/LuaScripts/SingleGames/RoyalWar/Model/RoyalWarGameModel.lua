@@ -18,6 +18,7 @@ end
 
 function RoyalWarGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_RoyalWar.NotifyPhaseChangInfo, self.NotifyPhaseChangInfo, self)
+	WebNetEvent.AddListener(pb_RoyalWar.NotifyRoomReadyWait, self.NotifyRoomReadyWait, self)
 	WebNetEvent.AddListener(pb_RoyalWar.NotifyRedBlackWarInfo, self.NotifyRedBlackWarInfo, self)
 	WebNetEvent.AddListener(pb_RoyalWar.NotifyRedBlackWarSettleInfo, self.NotifyRedBlackWarSettleInfo, self)
 	WebNetEvent.AddListener(pb_RoyalWar.NotifyPlayerBet, self.NotifyPlayerBet, self)
@@ -41,22 +42,25 @@ function RoyalWarGameModel:NotifyRedBlackWarInfo(msg)
 	end
 end
 ---通知红黑大战VS（开始下一局）
-function RoyalWarGameModel:NotifyRoomReadyWait()
+function RoyalWarGameModel:NotifyRoomReadyWait(msg)
 	if(msg.code == 200) then
 		look("通知红黑大战VS（开始下一局）")
+		self.ctrl:NotifyRoomReadyWait();
 	end
 end
 
 ---红黑大战开始下注通知
 function RoyalWarGameModel:NotifyPhaseChangInfo(msg)
 	if(msg.code == 200) then
-		look("红黑大战阶段变化通知成功")
+		look("红黑大战开始下注通知成功",msg)
+		self.ctrl:NotifyPhaseChangInfo(msg);
 	end
 end
 ---通知红黑大战结算
 function RoyalWarGameModel:NotifyRedBlackWarSettleInfo(msg)
 	if(msg.code == 200) then
-		look("通知红黑大战结算成功")
+		look("通知红黑大战结算")
+		self.ctrl:NotifyRedBlackWarSettleInfo(msg)
 	end
 end
 ---请求红黑大战的押注
@@ -91,6 +95,7 @@ function RoyalWarGameModel:RespTablePlayerInfo(data)
 		CtrlManager.SingleShow(CtrlNames.PlayerRankPanel,data.tablePlayerInfo)
 	end
 end
+
 --region 事件方法
 
 --endregion

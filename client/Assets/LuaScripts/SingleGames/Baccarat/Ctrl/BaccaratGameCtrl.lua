@@ -14,6 +14,7 @@ local BaccaratPlayerItem = require("SingleGames/Baccarat/Ctrl/BaccaratPlayerItem
 local BaccaratChipItems = require("SingleGames/Baccarat/Ctrl/BaccaratChipItems")
 ---游戏阶段
 local  gameStage ={
+	None = 0,
 	Begin = 1,--开始阶段
 	Bet =2,--下注阶段
 	Deal =3,--发牌后开始结算
@@ -216,7 +217,6 @@ function BaccaratGameCtrl:RefreshUIDataShow()
 end
 
 function BaccaratGameCtrl:InitUIShow()
-	
 	CurBet={};
 	SelfBetBankerAllNum = 0;
 	SelfBetPlayerAllNum = 0;
@@ -297,6 +297,7 @@ function BaccaratGameCtrl:FirstEntryGame(data)
 	--BottomNoteChildImages = self.view.obj_ChipContent.transform:GetComponentsInChildren(UnityEngine.UI.Image,true)
 	self:SetBetButtonInteractable(false);
 	self:RefreshDataShow();
+	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
 	self:InitTableAreaInfos();
 	self.view.tmp_AllOtherNumber.text = data.playerTotalNum
 end
@@ -353,6 +354,7 @@ function BaccaratGameCtrl:RefreshDataShow()
 		if(BaccaratTableInfo.totalTime == endCountDown) then --需要展示发牌
 			curGameStage = gameStage.Deal
 		elseif(endCountDown <=4) then --显示等待结束
+			curGameStage = gameStage.None
 			self.view.obj_WaitEndGame:SetActive(true);
 			local downTime = math.floor(endCountDown);
 			self.view.txt_WaitCountDown.text =downTime;
@@ -369,8 +371,6 @@ function BaccaratGameCtrl:RefreshDataShow()
 		end
 	end
 	self:RefreshGameStage()
-	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
-	
 end
 
 ---第一次进入游戏初始化区域下注信息
@@ -762,7 +762,9 @@ end
 
 ---飞筹码到对应玩家头像上
 function BaccaratGameCtrl:PlayChipToPlayer()
-	SoundManager:PlayClip(config.ABNames.audios.."ding")
+	if(#PlayerChangedGolds>0) then
+		SoundManager:PlayClip(config.ABNames.audios.."ding")
+	end
 	local betInfoDescendingList =betInfoList;
 	table.sort(betInfoDescendingList, function(a, b) return a > b end);
 	
@@ -770,6 +772,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--自己赢钱了
 			local selfWinGold = v.playerWinGold+v.playerBetGold
 			self:ScreeningChip(betInfoDescendingList,selfWinGold,self.view.obj_Player.transform)
+			self:UpWinGoldNum(v.playerWinGold,self.view.obj_Player.transform)
 		elseif(self:IsInScene(v.playerId)) then --前6名的玩家赢钱了
 			for _, k in pairs(BaccaratPlayerItems) do
 				---@type BaccaratPlayerItem
@@ -777,6 +780,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 				if(item:GetPlayerId() == v.playerId) then
 					local winGold = v.playerWinGold+v.playerBetGold
 					self:ScreeningChip(betInfoDescendingList,winGold,item.transform)
+					self:UpWinGoldNum(v.playerWinGold,item.transform)
 				end
 			end
 		else
@@ -791,6 +795,17 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 	end
 	ChipTable = {}
 
+end
+
+---展示赢了多少金币
+function BaccaratGameCtrl:UpWinGoldNum(winGold,target)
+	local obj =self.objPools:Spawn(nil,self.view.obj_UpWin,target)
+	obj:SetActive(true);
+	local txtNum = ComponentUtilGet.Text(obj.transform,"Num");
+	txtNum.text =string.format("+"..winGold) ;
+	obj.transform:DOLocalMoveY(50,1):OnComplete(function()
+		self.objPools:UnSpawnPrefab(obj)
+	end);
 end
 ---筛选筹码r
 function BaccaratGameCtrl:ScreeningChip(list,winGold,target)
@@ -807,13 +822,7 @@ function BaccaratGameCtrl:ScreeningChip(list,winGold,target)
 	for _, chipObj in pairs(selfChip) do
 		self:PlayChipToPlayerTwo(chipObj,target)
 	end
-	local obj =self.objPools:Spawn(nil,self.view.obj_UpWin,target)
-	obj:SetActive(true);
-	local txtNum = ComponentUtilGet.Text(obj.transform,"Num");
-	txtNum.text =string.format("+"..winGold) ;
-	obj.transform:DOLocalMoveY(50,1):OnComplete(function()
-		self.objPools:UnSpawnPrefab(obj)
-	end);
+
 	
 end
 
@@ -959,6 +968,7 @@ function BaccaratGameCtrl:AddUIEvent()
 			local betData = {}
 			table.insert(betData,bet)
 			self.model:ReqBet(betData);
+			self:CloseBetRecord()
 		end)
 	end
 	
@@ -973,7 +983,11 @@ function BaccaratGameCtrl:AddUIEvent()
 		self.model:ReqTablePlayerInfo()--请求百家乐房间的玩家列表信息
 	end)
 end
-
+function BaccaratGameCtrl:CloseBetRecord()
+	BetRecord = {};
+	self.view.btn_Repeat.image.material = config.GetUIImageGray();
+	self.view.btn_Repeat.enabled =false;
+end
 ---选中哪个筹码
 function BaccaratGameCtrl:SetCheckedShow(BaccaratChipItem)
 	CurSelectChip = BaccaratChipItem;

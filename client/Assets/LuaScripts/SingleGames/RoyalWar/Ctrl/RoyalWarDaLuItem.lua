@@ -29,8 +29,8 @@ function RoyalWarDaLuItem:IsActive()
 end
 ---刷新显示
 function RoyalWarDaLuItem:RefreshShow(dataTable)
-    self.obj_Red:SetActive(dataTable);
-    self.obj_Black:SetActive(not dataTable);
+    self.obj_Red:SetActive(dataTable==1);
+    self.obj_Black:SetActive(dataTable==2);
 end
 
 ---获取索引

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3135011118872577121}
   - component: {fileID: 9033756195868742132}
   m_Layer: 5
-  m_Name: txt_Number
+  m_Name: Number
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: f0b75b598a9a0034d9670ac0b2ab604b, type: 2}
+    m_Font: {fileID: 12800000, guid: fd372a58c1579f6409d75cfd96c30b86, type: 2}
     m_FontSize: 0
     m_FontStyle: 0
     m_BestFit: 0
@@ -90,7 +90,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9134716039630210725}
   m_Layer: 5
-  m_Name: RoyalWarFiftyChip
+  m_Name: RoyalWarChip_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 9134716040015731116}
   - component: {fileID: 9134716040015731117}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -184,7 +184,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 80bfdc1b61aad1942b5513732a23b012, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 338ef504b3bb02841898766efd7169b5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

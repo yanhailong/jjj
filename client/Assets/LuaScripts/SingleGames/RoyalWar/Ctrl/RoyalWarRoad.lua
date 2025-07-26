@@ -58,28 +58,26 @@ end
 ---@param data 牌型数据
 ---@param isSettlement 是不是结算阶段
 function RoyalWarRoad:InitData(data,isSettlement)
-    for i, v in ipairs(data.cardStateList) do
-        if(isSettlement and i== #data.cardStateList) then
+    for i, v in ipairs(data.redBlackHistories) do
+        if(isSettlement and i== #data.redBlackHistories) then
             break;
         end
         local data2 = {};
-        data2[1] = v.winState
-        data2[2] = v.cardTypeWinState
+        data2[1] = v.winner
         table.insert(self.ZhuPanDataTable,data2)
     end
     for _, v in ipairs(self.ZhuPanDataTable) do
-        self:RefreshZhuPanShow(v)
+        self:RefreshZhuPanShow(v,false)
     end
 end
 ---刷新数据显示
-function RoyalWarRoad:RefreshData(data,isFlicker,IsNewRound)
-    if(IsNewRound) then
+function RoyalWarRoad:RefreshData(data)
+    if(#self.ZhuPanDataTable>=50) then
         self:CloseLuTable()
     end
     local data2 = {};
     data2[1] = data.winState;
-    data2[2] = data.cardTypeWinState
-    self:RefreshZhuPanShow(data2,isFlicker)
+    self:RefreshZhuPanShow(data2,true)
     table.insert(self.ZhuPanDataTable,data2);
 end
 
@@ -143,10 +141,10 @@ function RoyalWarRoad:InitYueYouLuTable()
 end
 
 ---刷新主盘路显示
-function RoyalWarRoad:RefreshZhuPanShow(data,isFlicker)
+function RoyalWarRoad:RefreshZhuPanShow(data,isFirst)
     if(#self.ZhuPanObjTable>=48) then
-        local length = math.floor((#self.ZhuPanObjTable-48)/6) +1;
-        for i = 1, length*6 do
+        --local length = math.floor((#self.ZhuPanObjTable-48)/6) +1;
+        for i = 1, 6 do
             self.ZhuPanObjTable[i]:SetActive(false);
         end
     end
@@ -156,7 +154,7 @@ function RoyalWarRoad:RefreshZhuPanShow(data,isFlicker)
     obj:SetActive(true);
     obj.transform.localScale = Vector3.one;
     table.insert(self.ZhuPanObjTable,obj);
-    item:RefreshShow(data,isFlicker)
+    item:RefreshShow(data,isFirst)
     table.insert(self.ZhuPanTable,item);
     self:AddDaLuTableShow(data);
 end
@@ -166,40 +164,24 @@ end
 function RoyalWarRoad:AddDaLuTableShow(data)
     local curIndex = 0; --当前的索引
     local curList = 0;--当前是第几列
-    local tieNum = 0;--和的数字
-    local whoWin;--谁赢
     local dataTable = {};--缓存的需要加入到数据结构里面的表
     local IsGoL; --是否走了L型了
     if(#self.DaLuDataTable==0) then--刚开始
         ---@type RoyalWarDaLuItem
         local item = self.DaLuTable[1];
-        if(data[1] == 3) then--和
-            tieNum=tieNum+1;
-            item:RefreshTieNumShow(tieNum);
-        else
-            whoWin = data[1];
-            item:RefreshShow(whoWin);
-        end
+        item:RefreshShow(data[1]);
         curList = 1;
         self.DaLuDataTable[curList] ={};
-        dataTable[1] = whoWin;
-        dataTable[2] = tieNum;
-        dataTable[3] = item;
-        dataTable[4] = false;
+        dataTable[1] = data[1];
+        dataTable[2] = item;
+        dataTable[3] = false;
         table.insert(self.DaLuDataTable[curList],dataTable)
     else
         curList = #self.DaLuDataTable;
         local lastPiece= self.DaLuDataTable[curList]
-        if data[1] == 3 then --如果是和就不往下面加，而是显示数字
-            tieNum = lastPiece[#lastPiece][2];
-            tieNum = tieNum+1;
-            lastPiece[#lastPiece][2] = tieNum;
-            ---@type RoyalWarDaLuItem
-            local lastItem = lastPiece[#lastPiece][3];
-            lastItem:RefreshTieNumShow(tieNum);
-        elseif(lastPiece[#lastPiece][1] == data[1]) then --如果和上一次的一样就往后面加
-            IsGoL = lastPiece[#lastPiece][4];
-            local lastItem = lastPiece[#lastPiece][3];
+        if(lastPiece[#lastPiece][1] == data[1]) then --如果和上一次的一样就往后面加
+            IsGoL = lastPiece[#lastPiece][3];
+            local lastItem = lastPiece[#lastPiece][2];
             if(IsGoL) then -- 已经开始走L型了
                 curIndex = lastItem:GetIndex()+6;
             else
@@ -214,9 +196,8 @@ function RoyalWarRoad:AddDaLuTableShow(data)
             ---@type RoyalWarDaLuItem
             local item = self.DaLuTable[curIndex];
             dataTable[1] = data[1];
-            dataTable[2] = tieNum;
-            dataTable[3] = item;
-            dataTable[4] = IsGoL;
+            dataTable[2] = item;
+            dataTable[3] = IsGoL;
             item:RefreshShow(data[1])
             table.insert(self.DaLuDataTable[curList],dataTable)
             self:AddDaYanZiLuTableShow();
@@ -233,9 +214,8 @@ function RoyalWarRoad:AddDaLuTableShow(data)
             ---@type RoyalWarDaLuItem
             local item = self.DaLuTable[curIndex];
             dataTable[1] =  data[1];
-            dataTable[2] = tieNum;
-            dataTable[3] = item;
-            dataTable[4] = IsGoL;
+            dataTable[2] = item;
+            dataTable[3] = IsGoL;
             item:RefreshShow(data[1])
             self.DaLuDataTable[curList] ={};
             table.insert(self.DaLuDataTable[curList],dataTable)
@@ -244,7 +224,6 @@ function RoyalWarRoad:AddDaLuTableShow(data)
             self:AddYueYouLuTableShow();
         end
     end
-
 end
 
 ---大眼路刷新显示
@@ -252,7 +231,7 @@ function RoyalWarRoad:AddDaYanZiLuTableShow()
     local curList = #self.DaLuDataTable;
     local lastPiece= self.DaLuDataTable[curList]
     ---@type RoyalWarDaLuItem
-    local lastItem = lastPiece[#lastPiece][3];
+    local lastItem = lastPiece[#lastPiece][2];
     local index = lastItem:GetIndex();
     if(index>=8) then--开始演化大眼路的走向
         local isEqual;
@@ -337,7 +316,7 @@ function RoyalWarRoad:AddXiaoLuTableShow()
     local curList = #self.DaLuDataTable;
     local lastPiece= self.DaLuDataTable[curList]
     ---@type RoyalWarDaLuItem
-    local lastItem = lastPiece[#lastPiece][3];
+    local lastItem = lastPiece[#lastPiece][2];
     local index = lastItem:GetIndex();
     if(index>=14) then--开始演化小路的走向
         local isEqual;
@@ -421,7 +400,7 @@ function RoyalWarRoad:AddYueYouLuTableShow()
     local curList = #self.DaLuDataTable;
     local lastPiece= self.DaLuDataTable[curList]
     ---@type RoyalWarDaLuItem
-    local lastItem = lastPiece[#lastPiece][3];
+    local lastItem = lastPiece[#lastPiece][2];
     local index = lastItem:GetIndex();
     if(index>=20) then--开始演化小路的走向
         local isEqual;

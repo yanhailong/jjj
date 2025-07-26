@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-11 10:27:15
+---DateTime: 2025-07-26 14:31:10
 ---
 ---@class RoyalWarGameView:BaseView
 local RoyalWarGameView=Class("RoyalWarGameView",BaseView)
@@ -61,27 +61,15 @@ function RoyalWarGameView:InitComponents()
     self.obj_Countdown=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_Countdown");
     self.txt_Countdown=ComponentUtilGet.Text(self.transform,"content/Process/obj_Countdown/txt_Countdown");
     self.obj_AboutEnd=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_AboutEnd");
-    self.txt_AboutEnd=ComponentUtilGet.Text(self.transform,"content/Process/obj_AboutEnd/txt_AboutEnd");
     self.obj_VS=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_VS");
     self.obj_BeginBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_BeginBet");
     self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_StopBet");
     self.obj_Settlement=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_Settlement");
+    self.obj_WaitEndGame=ComponentUtilGet.GameObject(self.transform,"content/Process/obj_WaitEndGame");
+    self.txt_WaitCountDown=ComponentUtilGet.Text(self.transform,"content/Process/obj_WaitEndGame/naoZhong/txt_WaitCountDown");
     self.rect_ChipParent=ComponentUtilGet.RectTransform(self.transform,"content/rect_ChipParent");
-    self.btn_One=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_One");
-    self.obj_checkedOne=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_One/obj_checkedOne");
-    self.txt_One=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_One/txt_One");
-    self.btn_Ten=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Ten");
-    self.obj_checkedTen=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Ten/obj_checkedTen");
-    self.txt_Ten=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Ten/txt_Ten");
-    self.btn_Fifty=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_Fifty");
-    self.obj_checkedFifty=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_Fifty/obj_checkedFifty");
-    self.txt_Fifty=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_Fifty/txt_Fifty");
-    self.btn_OneHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_OneHundred");
-    self.obj_checkedOneHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/obj_checkedOneHundred");
-    self.txt_OneHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_OneHundred/txt_OneHundred");
-    self.btn_FiveHundred=ComponentUtilGet.Button(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred");
-    self.obj_checkedFiveHundred=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/obj_checkedFiveHundred");
-    self.txt_FiveHundred=ComponentUtilGet.Text(self.transform,"content/DownRoot/BottomNote/btn_FiveHundred/txt_FiveHundred");
+    self.obj_ChipContent=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/ChipScrollView/Viewport/obj_ChipContent");
+    self.obj_chipItem=ComponentUtilGet.GameObject(self.transform,"content/DownRoot/obj_chipItem");
     self.btn_AllOther=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_AllOther");
     self.tmp_AllOtherNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/btn_AllOther/tmp_AllOtherNumber");
     self.btn_Repeat=ComponentUtilGet.Button(self.transform,"content/DownRoot/btn_Repeat");
@@ -90,6 +78,8 @@ function RoyalWarGameView:InitComponents()
     self.img_SelfHead=ComponentUtilGet.Image(self.transform,"content/DownRoot/obj_Player/SelfHead/img_SelfHeadPic/img_SelfHead");
     self.tmp_SelfGoldNumber=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/Money/tmp_SelfGoldNumber");
     self.tmp_SelfName=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/DownRoot/obj_Player/SelfHead/tmp_SelfName");
+    self.btn_Chipleft=ComponentUtilGet.Button(self.transform,"content/DownRoot/Image/btn_Chipleft");
+    self.btn_ChipRight=ComponentUtilGet.Button(self.transform,"content/DownRoot/Image (1)/btn_ChipRight");
     self.obj_PlayerRoot=ComponentUtilGet.GameObject(self.transform,"content/obj_PlayerRoot");
     self.btn_touch=ComponentUtilGet.Button(self.transform,"content/btn_touch");
     self.btn_Menu=ComponentUtilGet.Button(self.transform,"content/btn_Menu");
@@ -97,6 +87,7 @@ function RoyalWarGameView:InitComponents()
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_setting");
     self.btn_help=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_help");
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/mask/obj_Menu/btn_close");
+    self.obj_UpWin=ComponentUtilGet.GameObject(self.transform,"content/obj_UpWin");
 end
 
 ---清空组件
@@ -148,27 +139,15 @@ function RoyalWarGameView:ClearComponents()
     self.obj_Countdown=nil;
     self.txt_Countdown=nil;
     self.obj_AboutEnd=nil;
-    self.txt_AboutEnd=nil;
     self.obj_VS=nil;
     self.obj_BeginBet=nil;
     self.obj_StopBet=nil;
     self.obj_Settlement=nil;
+    self.obj_WaitEndGame=nil;
+    self.txt_WaitCountDown=nil;
     self.rect_ChipParent=nil;
-    self.btn_One=nil;
-    self.obj_checkedOne=nil;
-    self.txt_One=nil;
-    self.btn_Ten=nil;
-    self.obj_checkedTen=nil;
-    self.txt_Ten=nil;
-    self.btn_Fifty=nil;
-    self.obj_checkedFifty=nil;
-    self.txt_Fifty=nil;
-    self.btn_OneHundred=nil;
-    self.obj_checkedOneHundred=nil;
-    self.txt_OneHundred=nil;
-    self.btn_FiveHundred=nil;
-    self.obj_checkedFiveHundred=nil;
-    self.txt_FiveHundred=nil;
+    self.obj_ChipContent=nil;
+    self.obj_chipItem=nil;
     self.btn_AllOther=nil;
     self.tmp_AllOtherNumber=nil;
     self.btn_Repeat=nil;
@@ -177,6 +156,8 @@ function RoyalWarGameView:ClearComponents()
     self.img_SelfHead=nil;
     self.tmp_SelfGoldNumber=nil;
     self.tmp_SelfName=nil;
+    self.btn_Chipleft=nil;
+    self.btn_ChipRight=nil;
     self.obj_PlayerRoot=nil;
     self.btn_touch=nil;
     self.btn_Menu=nil;
@@ -184,6 +165,7 @@ function RoyalWarGameView:ClearComponents()
     self.btn_setting=nil;
     self.btn_help=nil;
     self.btn_close=nil;
+    self.obj_UpWin=nil;
 end
 
 ---初始化View数据

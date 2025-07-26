@@ -21,7 +21,7 @@ function RoyalWarCardTypeItem:RefreshShow(type)
         self.img_Type.sprite = config.GetIconPic("hhdz_dk_5")
     end
     
-    self.tmp_Type.text = config.GetCardTypeTrueName(type);
+    self.tmp_Type.text = LocalManager.GetStrById(config.GetCardTypeTrueName(type));
 end
 
 function RoyalWarCardTypeItem:Destroy()
