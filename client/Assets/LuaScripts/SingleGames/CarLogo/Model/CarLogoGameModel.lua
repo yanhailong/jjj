@@ -136,8 +136,8 @@ end
 
 -- 广播结算信息 NotifyLoongTigerWarSettleInfo
 function CarLogoGameModel:OnGameResult(msg)
-	if not self.initState then return end
-	self.Result = msg;
+	if not self.initState and msg.code ~=200 then return end
+	self.Result = msg.settlementInfo;
 	if #self.history>=50 then
 		self.history = {}
 	end

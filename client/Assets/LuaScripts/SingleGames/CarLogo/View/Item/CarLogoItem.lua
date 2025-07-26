@@ -6,7 +6,8 @@ local Vector3 = CS.UnityEngine.Vector3
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
-function CarLogoItem:ctor(go)
+function CarLogoItem:ctor(go,luaClass)
+    self.luaClass = luaClass
     self.transform=go.transform
     self.bg = ComponentUtilGet.Image(self.transform, "LogoBg")
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
@@ -62,13 +63,13 @@ function CarLogoItem:FlashLight(time,fadeTimes)
     --    Tools.SetColorAlpha_Float(self.choose, 0)
     --end)
     local t = time*fadeTimes+(fadeTimes-1)*0.2
-    self.light.gameObject:SetActive(true)
-    if self.light.isStopped  then
-        self.light:Play();
+    self.choose.gameObject:SetActive(true)
+    if self.choose.isStopped  then
+        self.choose:Play();
     end
     TimerManager.StartTimer(self.luaClass,function()
-        self.light:Stop();
-        self.light.gameObject:SetActive(false)
+        self.choose:Stop();
+        self.choose.gameObject:SetActive(false)
     end,t)
 end
 

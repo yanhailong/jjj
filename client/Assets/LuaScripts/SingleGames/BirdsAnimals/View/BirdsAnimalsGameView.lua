@@ -50,6 +50,8 @@ function BirdsAnimalsGameView:InitComponents()
     self.tipsStartXiaZhuSp=ComponentUtilGet.SkeletonGraphic(self.tipsStartXiaZhu.transform,"SkeletonGraphic (kaishijieshuxiazhu)")
 
     self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
+    self.tipsEnterWait=ComponentUtilGet.Transform(self.tipsTrs,"tips_enter_wait")
+    self.tipsEnterWaitTime=ComponentUtilGet.Text(self.tipsEnterWait,"naozhong/time")
 
     ---结果
     self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/result");
@@ -199,6 +201,7 @@ function BirdsAnimalsGameView:InitUI()
     self.tipsTimeEnd:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
     self.resultTrs.gameObject:SetActive(true);
+    self.tipsEnterWait.gameObject:SetActive(false)
     self:InitXiaZhuLabel()
     UpdateManager.AddUpdate(self,self.UpdateBetting)
     GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
@@ -730,7 +733,8 @@ function BirdsAnimalsGameView:OnGameStatus(status)
     self.tipsTimeEnd:SetActive(false)
     self.resultAnimal:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
-
+    self.tipsEnterWait.gameObject:SetActive(false)
+    
     if self.statusTimer then
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil

@@ -55,6 +55,9 @@ function CarLogoGameView:InitComponents()
     self.colockStateTimeNum=ComponentUtilGet.Text(self.colockStateTimeTrs,"tmp_time") --倒计时
     self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
 
+    self.tipsEnterWait=ComponentUtilGet.Transform(self.tipsTrs,"tips_enter_wait")
+    self.tipsEnterWaitTime=ComponentUtilGet.Text(self.tipsEnterWait,"naozhong/time")
+
     self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/center/result");
     self.resultCar=ComponentUtilGet.GameObject(self.resultTrs,"Car")
     self.resultCarObj=ComponentUtilGet.Transform(self.resultTrs,"Car/carObj")
@@ -73,7 +76,7 @@ function CarLogoGameView:InitComponents()
     self.logoViews = {};
     for i = 1, self.logosTrs.childCount do
         local parent = self.logosTrs:GetChild(i-1)
-        self.logoViews[i] = CarLogoItem.New(Tools.Instance(logoItem,parent))
+        self.logoViews[i] = CarLogoItem.New(Tools.Instance(logoItem,parent),self)
     end
     
     ---历史信息
@@ -168,6 +171,7 @@ function CarLogoGameView:InitUI()
     self.resultTrs.gameObject:SetActive(true);
     self.tipsTimeEnd:SetActive(false)
     self.tipsStartXiaZhu:SetActive(false)
+    self.tipsEnterWait.gameObject:SetActive(false)
     self:InitXiaZhuLabel()
     UpdateManager.AddUpdate(self,self.UpdateBetting)
     GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
@@ -622,7 +626,7 @@ function CarLogoGameView:UpdateRoomInfo(model)
             -- 更新总押注金额
             config.totalDiZhuNums[side] = value.betIdxTotal
             -- 更新玩家区域押注金额
-            config.selfDiZhuNums[side] = value.betValue
+            config.selfDiZhuNums[side] = model.betPointList[side]
             -- 更新区域筹码显示
             self:ShowAreaChouMa(value)
         end
@@ -714,7 +718,8 @@ function CarLogoGameView:OnGameStatus(status)
     self.tipsTimeEnd:SetActive(false)
     self.resultCar:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
-
+    self.tipsEnterWait.gameObject:SetActive(false)
+    
     if self.statusTimer then
         TimerManager.StopTimer(self,self.statusTimer)
         self.statusTimer = nil
