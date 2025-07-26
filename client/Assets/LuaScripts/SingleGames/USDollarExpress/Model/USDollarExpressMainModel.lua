@@ -26,6 +26,7 @@ function USDollarExpressMainModel:AddEvent()
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeStopAuto,self.NoticeStopAuto,self)
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.RollStop,self.RollStop,self)
 	WebNetEvent.AddListener(pb_USDollarExpress.ResConfigInfo,self.ResConfigInfo,self)
+	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAutoStart,self.NoticeAutoStart,self)
 end
 
 function USDollarExpressMainModel:BackHome()
@@ -39,24 +40,23 @@ function USDollarExpressMainModel:RemoveEvent()
 	WebNetEvent.RemoveAllTo(self)
 	GlobalEvent.RemoveAllTo(self)
 end
-
-function USDollarExpressMainModel:ReqStartGame(_dataSpin)
-	if _dataSpin then
-		self.dataSpin=_dataSpin
-	end
-	if self.dataSpin then
-		look("点击按钮传入事件",self.dataSpin)
-		if self.dataSpin.isAuto==true then
-			self.dataSpin.isAuto=false
-			config.selfMotionNum=self.dataSpin.autoNum
-		end
-	end
-
+---开始自动
+function USDollarExpressMainModel:NoticeAutoStart(autoNum)
+	config.selfMotionNum=autoNum
+	GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
+	GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
+	self:ReqStartGame()
+end
+---请求游戏
+function USDollarExpressMainModel:ReqStartGame()
 	local data={}
-	data.stakeVlue=self.dataSpin.betInfo
+	data.stakeVlue=config.stakeVlue
 	WebNetworkManager.SendMsg(pb_USDollarExpress.ReqStartGame,data)
-	
-	--self:ResStartGame({})
+
+end
+----下注改变
+function USDollarExpressMainModel:StakeVlueChange(stakeVlue)
+	config.stakeVlue=stakeVlue
 end
 
 function USDollarExpressMainModel:RollStop()

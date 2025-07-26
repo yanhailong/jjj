@@ -46,7 +46,13 @@ end
 
 ---添加UI事件
 function USDollarExpressJackPotsCtrl:AddUIEvent()
-
+	self.uiEventListener:AddClick(self.view.btn_mask, function
+	()
+		if self.func then
+			self.func()
+		end
+		self:Close()
+	end)
 end
 
 ---移除UI事件

@@ -1034,25 +1034,35 @@ function USDollarExpressMainCtrl:SetStateLast()
 			self:CheckEnterInvestGame()
 		end
 	else
-		if config.selfMotionNum>0 then
-			logError("自动旋转模式")
-			config.gameTypeState=0
-			config.selfMotionNum=config.selfMotionNum-1
-			logError("剩余自动旋转次数"..config.selfMotionNum)
-			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
-			if config.selfMotionNum==0 then
-				logError("自动旋转停止")
-				GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+		if self.model.status==0 then
+			if config.selfMotionNum>0 then
+				logError("自动旋转模式")
+				config.gameTypeState=0
+				config.selfMotionNum=config.selfMotionNum-1
+				logError("剩余自动旋转次数"..config.selfMotionNum)
+				GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
+				if config.selfMotionNum==0 then
+					logError("自动旋转停止")
+					GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeStopAuto)
+				end
+				self.model:ReqStartGame()
+				GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
+			else
+				---正常模式
+				GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+				self:CheckEnterInvestGame()
 			end
-			self.model:ReqStartGame()
-			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.AutoState)
-		elseif config.gameTypeState==1 or config.gameTypeState==2 then
-			logError("二选一模式---》")
 		else
-			---正常模式
-			GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
-			self:CheckEnterInvestGame()
+			if config.gameTypeState==1 or config.gameTypeState==2 then
+				logError("二选一模式---》")
+			else
+				---正常模式
+				GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange,SlotGlobal.gameState.Normal)
+				self:CheckEnterInvestGame()
+				
+			end
 		end
+
 	end
 	
 
@@ -1070,13 +1080,14 @@ function USDollarExpressMainCtrl:AddUIEvent()
 end
 
 ---下注信息改变修改奖池显示
-function USDollarExpressMainCtrl:BetInfoChange(betInfo)
-	self:RestJackPots(betInfo)
+function USDollarExpressMainCtrl:BetInfoChange(stakeVlue)
+	self:RestJackPots(stakeVlue)
+	self.model:StakeVlueChange(stakeVlue)
 end
 
-function USDollarExpressMainCtrl:RestJackPots(_betInfo)
-	config.curchipInfo=_betInfo
-	local betInfo=_betInfo
+function USDollarExpressMainCtrl:RestJackPots(stakeVlue)
+	config.curchipInfo=stakeVlue
+	local betInfo=stakeVlue
 	for i = 1, #self.poolList do
 		local jackPool=self.poolList[i]
 		local baseShow=math.floor(betInfo*jackPool.initTimes)

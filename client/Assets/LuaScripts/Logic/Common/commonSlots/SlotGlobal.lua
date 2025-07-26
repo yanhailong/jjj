@@ -7,6 +7,7 @@ this.gameEventName={
     StartSpin="StartSpin",--开始旋转
     BackHome="BackHome",--返回大厅
     OpenHelp="OpenHelp",--打开帮助
+    NoticeAutoStart="NoticeAutoStart",--通知自动开始
     NoticeAuto="NoticeAuto",--通知自动次数
     NoticeStopAuto="NoticeStopAuto",--通知停止自动
     RollStop="RollStop",--转动k快速停止

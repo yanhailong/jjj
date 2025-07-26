@@ -24,6 +24,7 @@ function USDollarExpressJackPotsView:InitComponents()
     self.txt_minor=ComponentUtilGet.Text(self.transform,"content/obj_eff_tc_minor_blue/txt_minor");
     self.obj_eff_tc_youwon_yellow=ComponentUtilGet.GameObject(self.transform,"content/obj_eff_tc_youwon_yellow");
     self.txt_youwon=ComponentUtilGet.Text(self.transform,"content/obj_eff_tc_youwon_yellow/txt_youwon");
+    self.btn_mask=ComponentUtilGet.GameObject(self.transform,"btn_mask")
 end
 
 ---清空组件

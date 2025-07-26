@@ -46,6 +46,24 @@ function UICommonSlotBtnsCtrl:Close()
     self.super.Close(self);
 end
 
+function UICommonSlotBtnsCtrl:AddAutoClick()
+	self.autoBtns={}
+	self.autoNum={25,50,100,200,500,99999999}
+	self.autoBtns[1]=self.view.btn_25
+	self.autoBtns[2]=self.view.btn_50
+	self.autoBtns[3]=self.view.btn_100
+	self.autoBtns[4]=self.view.btn_200
+	self.autoBtns[5]=self.view.btn_500
+	self.autoBtns[6]=self.view.btn_wx
+	for i = 1, #self.autoNum do
+		self.uiEventListener:AddClick(self.autoBtns[i], function()
+			self:SetObjFreeShow(false)
+			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAutoStart,self.autoNum[i])
+		end)
+	end
+end
+
+
 ---添加UI事件
 function UICommonSlotBtnsCtrl:AddUIEvent()
 	GlobalEvent.AddListener(SlotGlobal.gameEventName.NoticeAuto, self.NoticeAuto,self)
@@ -59,10 +77,7 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 			return
 		end
 		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=false
-		self.spinArgs.autoNum=0
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin)
 	end)
 	self.uiEventListener:AddLongPress(self.view.btn_start.gameObject, function()
 		self.isLongPress=true
@@ -71,54 +86,6 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_closeFreeMask, function
 	()
 		self:SetObjFreeShow(false)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_25, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=25
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_50, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=25
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_100, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=100
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_200, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=200
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_500, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=500
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
-	end)
-	self.uiEventListener:AddClick(self.view.btn_wx, function
-	()
-		self:SetObjFreeShow(false)
-		self.spinArgs.betInfo=self.stakeList[self.betIndex]
-		self.spinArgs.isAuto=true
-		self.spinArgs.autoNum=99999999
-		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin,self.spinArgs)
 	end)
 	
 	self.uiEventListener:AddClick(self.view.btn_auto, function
@@ -131,8 +98,8 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 	()
 		GlobalEvent.Notify(SlotGlobal.gameEventName.RollStop)
 	end)
-	
-	
+
+	self:AddAutoClick()
 end
 ---自动次数显示刷新
 function UICommonSlotBtnsCtrl:NoticeAuto(autoNum)

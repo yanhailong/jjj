@@ -21,6 +21,8 @@ this.iscarhasjackpot=false
 this.iscarjackpotvalue=0
 this.allAreaUnLock=false
 this.aboradCount=0
+---下注值
+this.stakeVlue=0
 
 ---@火车颜色
 this.TrainColorType={
