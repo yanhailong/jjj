@@ -88,6 +88,7 @@ end
 function UIHallCtrl:RefreshPlayerShow()
 	self.view.txt_vip.text=PlayerManager:GetPlayerInfo().vipLevel
 	self.view.tmp_coinNum.text=PlayerManager:GetPlayerInfo().goldNum
+	self.view.tmp_name.text=PlayerManager:GetPlayerInfo().playerId
 end
 
 
