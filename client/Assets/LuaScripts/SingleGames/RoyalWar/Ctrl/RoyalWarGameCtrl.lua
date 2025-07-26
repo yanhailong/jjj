@@ -304,17 +304,22 @@ function RoyalWarGameCtrl:InitData()
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.txt_Countdown.text = countDownTime;
-		if(countDownTime <= 3 and not self.view.obj_AboutEnd.activeSelf) then
-			self.view.obj_Countdown:SetActive(false);
-			self.view.obj_AboutEnd:SetActive(true);
+		if(countDownTime <= 3) then
+			SoundManager:PlayClip(config.ABNames.audios.."countdown3")
+			if(not self.view.obj_AboutEnd.activeSelf) then
+				self.view.obj_Countdown:SetActive(false);
+				self.view.obj_AboutEnd:SetActive(true);
+				Tools.PlayerSpineAniByName(AboutEndSpine,"action",false);
+			end
 			--self.view.txt_AboutEnd.text = countDownTime;
 		end
 		if(countDownTime<=0) then
+			SoundManager:PlayClip(config.ABNames.audios.."countdown32")
 			self.view.obj_AboutEnd:SetActive(false);
 			self.betCountDownTimer:Stop()
 		end
 	end,1,-1,true);
-	CurSelectChip = 0;
+	CurSelectChip = nil;
 	self:RefreshChipLeftRightBtnShow(false)
 	self:InitCardTypeData()
 end
@@ -525,7 +530,7 @@ function RoyalWarGameCtrl:EnterSettlement()
 		coroutine.wait(0.5)
 		SoundManager:PlayClip(config.ABNames.audios..config.GetRedCardAudioName(RedBlackWarSettleInfo.redCardType))
 		SoundManager:PlayClip(config.ABNames.audios.."faPai")
-		coroutine.wait(0.5)
+		coroutine.wait(1)
 		SoundManager:PlayClip(config.ABNames.audios..config.GetRedCardAudioName(RedBlackWarSettleInfo.blackCardType))
 		coroutine.wait(0.5)
 
@@ -802,7 +807,7 @@ function RoyalWarGameCtrl:AddUIEvent()
 end
 
 function RoyalWarGameCtrl:ReqBet(betAreaIdx)
-	if CurSelectChip == nil  or curGameStage~=  config.GameSate.Bet then
+	if CurSelectChip == nil  or curGameStage ~=  config.GameSate.Bet then
 		return;
 	end
 	local bet = {}
