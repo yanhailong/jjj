@@ -120,7 +120,7 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                     CorManager.StartCor(self.ctrl, function
                     ()
                         Tools.PlayerSpineAniByName(sp,"action",false)
-                        coroutine.wait(0.667)
+                        coroutine.wait(0.13)
                         Tools.PlayerSpineAniByName(sp,"xunhuan",true)
                     end)
                 elseif self.iconIndex>=19 and self.iconIndex<=22 then

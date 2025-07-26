@@ -101,7 +101,7 @@ function USDollarExpressTrainItem:DOPlayerAni()
 
     local midPos = self.ctrl.view.trans_txtMidd.position
     local endPos = self.ctrl.view.txt_value.transform.position
-    local maxScale = 1.5
+    local maxScale = 2
 
     ---@type DG.Tweening.Tween
     local tw = self.twObj.transform:DOMove(endPos, 0.6):SetEase(DG.Tweening.Ease.OutQuad)

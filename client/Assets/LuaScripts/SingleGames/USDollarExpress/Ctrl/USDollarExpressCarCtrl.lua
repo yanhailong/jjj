@@ -29,6 +29,7 @@ function USDollarExpressCarCtrl:CtrlInit(args)
 	self.enterType=args.enterType
 	self.trainInfoList=args.trainInfoList
 	--look("拉火车数据",self.trainInfoList)
+	self.view.ani:Play("USDollarExpressCar_ruchang")
 	self:InitData()
 	UpdateManager.AddUpdate(self,self.Update)
 
@@ -105,11 +106,10 @@ end
 
 function USDollarExpressCarCtrl:SetCarTitle(type)
 	if self.isFirstEnter==true then
-		self.isFirstEnter=false
-	end
-	if self.isFirstEnter==false then
+	else
 		self.view.ani:Play("USDollarExpressCar_top")
 	end
+	self.isFirstEnter=false
 	CorManager.StartCor(self, function
 	()
 		coroutine.wait(0.34)
