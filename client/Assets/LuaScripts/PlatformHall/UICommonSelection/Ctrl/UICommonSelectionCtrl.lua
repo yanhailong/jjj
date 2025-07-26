@@ -45,7 +45,7 @@ function UICommonSelectionCtrl:InitData()
 			item:SetActive(true)
 			item:InitData(wareHouseList[i])
 			self.uiEventListener:AddClick(item.gameObject,function ()
-				self:OnClickItem(i);
+				self:OnClickItem(wareHouseList[i].wareId);
 			end);
 		end
 	end

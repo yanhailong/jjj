@@ -47,6 +47,7 @@ function USDollarExpressMainModel:ReqStartGame(_dataSpin)
 	if self.dataSpin then
 		look("点击按钮传入事件",self.dataSpin)
 		if self.dataSpin.isAuto==true then
+			self.dataSpin.isAuto=false
 			config.selfMotionNum=self.dataSpin.autoNum
 		end
 	end
@@ -68,124 +69,7 @@ end
 
 function USDollarExpressMainModel:ResStartGame(msg)
 	look("收到请求开始游戏返回",msg)
-
-	--msg =
-	--{
-	--	["allWinGold"] = 29640,
-	--	["code"] = 200,
-	--	["status"] = 4,
-	--	["remainFreeCount"] = 0,
-	--	["iconList"] =
-	--	{
-	--		[1] = 18,
-	--		[2] = 5,
-	--		[3] = 5,
-	--		[4] = 5,
-	--		[5] = 18,
-	--		[6] = 18,
-	--		[7] = 18,
-	--		[8] = 18,
-	--		[9] = 18,
-	--		[10] = 18,
-	--		[11] = 18,
-	--		[12] = 18,
-	--		[13] = 18,
-	--		[14] = 18,
-	--		[15] = 18,
-	--		[16] = 18,
-	--		[17] = 6,
-	--		[18] = 6,
-	--		[19] = 15,
-	--		[20] = 5,
-	--	},
-	--	["dollarsInfo"] =
-	--	{
-	--		["coinIndexId"] = 0,
-	--		["dollarIndexIds"] =
-	--		{
-	--			[1] = 1,
-	--			[2] = 5,
-	--			[3] = 6,
-	--			[4] = 7,
-	--			[5] = 8,
-	--			[6] = 9,
-	--			[7] = 10,
-	--			[8] = 11,
-	--			[9] = 12,
-	--			[10] = 13,
-	--			[11] = 14,
-	--			[12] = 15,
-	--			[13] = 16,
-	--		},
-	--		["collectDollarIndexIds"] =
-	--		{
-	--			[1] = 1,
-	--			[2] = 5,
-	--			[3] = 6,
-	--			[4] = 7,
-	--			[5] = 8,
-	--			[6] = 9,
-	--			[7] = 10,
-	--			[8] = 11,
-	--			[9] = 12,
-	--			[10] = 13,
-	--			[11] = 14,
-	--			[12] = 15,
-	--			[13] = 16,
-	--		},
-	--		["dollarValueList"] =
-	--		{
-	--			[1] = 760,
-	--			[2] = 760,
-	--			[3] = 760,
-	--			[4] = 760,
-	--			[5] = 760,
-	--			[6] = 760,
-	--			[7] = 760,
-	--			[8] = 760,
-	--			[9] = 760,
-	--			[10] = 760,
-	--			[11] = 760,
-	--			[12] = 760,
-	--			[13] = 760,
-	--		},
-	--	},
-	--	["bigWinShow"] = 0,
-	--	["totalDollars"] = 5,
-	--	["resultLineInfoList"] =
-	--	{
-	--	},
-	--	["choosableAreas"] =
-	--	{
-	--		[1] = 1,
-	--		[2] = 2,
-	--		[3] = 3,
-	--		[4] = 6,
-	--		[5] = 7,
-	--		[6] = 8,
-	--	},
-	--	["allGold"] = 17663800,
-	--	["trainInfoList"] =
-	--	{
-	--		[1] =
-	--		{
-	--			["type"] = 15,
-	--			["poolId"] = 0,
-	--			["goldList"] =
-	--			{
-	--				[1] = 9880,
-	--				[2] = 9880,
-	--				[3] = 9880,
-	--			},
-	--		},
-	--	},
-	--}
-	
-	
-	
-
 	self:InitCardPos(msg.iconList)
-
 	self.resultLineInfoList=msg.resultLineInfoList		---中奖信息
 	self.allWinGold=tonumber(msg.allWinGold) 			---累计中奖金币
 	self.status=msg.status					---//当前状态 0.正常  1.普通二选一  2.黄金列车二选一  3.二选一之拉普通火车  4.二选一之拉黄金火车  5.二选一之免费模式6.
@@ -212,42 +96,10 @@ function USDollarExpressMainModel:ResStartGame(msg)
 		end
 		self:InitDollars(dollarsInfo)
 		self.collectDollarIndexIds=msg.dollarsInfo.collectDollarIndexIds
-		look("可以收集的美元飞入右侧",self.collectDollarIndexIds)
+		--look("可以收集的美元飞入右侧",self.collectDollarIndexIds)
 	end
-	look("self.dollarsInfo，self.coinIndexId",self.dollarsInfo,self.coinIndexId)
-	
-	
-	
-	
-
+	--look("self.dollarsInfo，self.coinIndexId",self.dollarsInfo,self.coinIndexId)
 	self.ctrl:OnStartDoSpin()
-	
-	---
-
-	--if self.status==0 then
-	--	config.gameTypeState=0
-	--	self.ctrl:OnStartDoSpin()--0.正常
-	--end
-	--if self.status==1 then--1.普通二选一
-	--	config.gameTypeState=1
-	--	self.ctrl:OnStartDoSpin()--还是要先转动一次
-	--end
-	--if self.status==2 then--2.黄金列车二选一
-	--	config.gameTypeState=2
-	--	self.ctrl:OnStartDoSpin()
-	--end
-	--if self.status==3 then--3.二选一之拉普通火车
-	--	config.gameTypeState=3
-	--	self.ctrl:OnStartDoSpin()
-	--end
-	--if self.status==4 then--4.二选一之拉黄金火车
-	--	config.gameTypeState=4
-	--	self.ctrl:OnStartDoSpin()
-	--end
-	--if self.status==5 then--5.二选一之免费模式
-	--	config.gameTypeState=5
-	--	self.ctrl:OnStartDoSpin()
-	--end
 end
 
 ---初始化卡牌位置

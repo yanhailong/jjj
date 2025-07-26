@@ -101,6 +101,10 @@ function USDollarExpressMapSelectCtrl:ResInvestArea(msg)
 			else
 				logError("这个区域没有中奖")
 				SoundManager:PlayClip(config.ABNames.audios.."pick_fail")
+				---@type UnityEngine.GameObject
+				self.alleffects[i]= self.objPools:SpawnPrefab(nil, config.ABNames.iconEffect,"eff_duanjingtiao", self.view.efects)
+				self.alleffects[i].transform.position=self.selectMapIds[i].obj.transform.position
+				coroutine.wait(1.33)
 			end
 
 		end

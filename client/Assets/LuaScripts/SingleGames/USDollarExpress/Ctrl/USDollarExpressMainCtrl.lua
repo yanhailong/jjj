@@ -371,7 +371,11 @@ function USDollarExpressMainCtrl:OnStartDoSpin()
 		return
 	end
 	self.isOnclickStart = true
-	GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange, SlotGlobal.gameState.RollState)
+	if config.selfMotionNum>0 then
+	else
+		GlobalEvent.Notify(SlotGlobal.gameEventName.GameStateChange, SlotGlobal.gameState.RollState)
+	end
+
 	self:ReSetData()
 	self.realCard=self.model.CardPos
 	for i = 1,5 do
@@ -1032,7 +1036,9 @@ function USDollarExpressMainCtrl:SetStateLast()
 	else
 		if config.selfMotionNum>0 then
 			logError("自动旋转模式")
+			config.gameTypeState=0
 			config.selfMotionNum=config.selfMotionNum-1
+			logError("剩余自动旋转次数"..config.selfMotionNum)
 			GlobalEvent.Notify(SlotGlobal.gameEventName.NoticeAuto,config.selfMotionNum)
 			if config.selfMotionNum==0 then
 				logError("自动旋转停止")

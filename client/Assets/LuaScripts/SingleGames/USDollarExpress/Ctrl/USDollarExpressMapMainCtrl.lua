@@ -29,6 +29,15 @@ function USDollarExpressMapMainCtrl:CtrlInit(args)
 	SoundManager:PlayClip(config.ABNames.audios.."trans_pick")
 	self.canvasGroup=ComponentUtilGet.CanvasGroup(self.view.transform,"USDollarExpresszhuanchang")
 	self.objspine=ComponentUtilGet.GameObject(self.USDollarExpresszhuanchang.transform,"eff_zhuanchang/SkeletonGraphic (guochang)")
+
+	self.choosableAreas=args
+	local index=Tools.RandomInt(1,#self.choosableAreas)
+	self.curSelectIndex=self.choosableAreas[index]
+	look("投资小游戏区域数据",self.choosableAreas)
+	for i = 1, #self.choosableAreas do
+		local id=self.choosableAreas[i]
+		self.view.maps[id].obj:SetActive(true)
+	end
 	CorManager.StartCor(self, function
 	()
 		coroutine.wait(1.5)
@@ -37,15 +46,12 @@ function USDollarExpressMapMainCtrl:CtrlInit(args)
 			self.USDollarExpresszhuanchang:SetActive(false)
 			self.canvasGroup.alpha=1
 			self.objspine:SetActive(true)
+
+			self:MapAutoSelect()
 		end
 	end)
-	self.choosableAreas=args
-	look("投资小游戏区域数据",self.choosableAreas)
-	for i = 1, #self.choosableAreas do
-		local id=self.choosableAreas[i]
-		self.view.maps[id].obj:SetActive(true)
-	end
 
+	
 end
 
 function USDollarExpressMapMainCtrl:InitAreas()
@@ -65,23 +71,30 @@ end
 
 ---添加UI事件
 function USDollarExpressMapMainCtrl:AddUIEvent()
-	self.isClick = false
-	for i = 1, 8 do
-		self.uiEventListener:AddClick(self.view.maps[i].obj, function
-		()
-			if self.isClick==true then
-				return
-			end
-			self.isClick=true
-			CorManager.StartCor(self, function
-			()
-				self.view.maps[i].objSelect:SetActive(true)
-				coroutine.wait(1)
-				CtrlManager.SingleShow(CtrlNames.USDollarExpressMapSelect,i)
-			end)
-		end)
-	end
+	--self.isClick = false
+	--for i = 1, 8 do
+	--	self.uiEventListener:AddClick(self.view.maps[i].obj, function
+	--	()
+	--		if self.isClick==true then
+	--			return
+	--		end
+	--		self.isClick=true
+	--		self:MapAutoSelect()
+	--	end)
+	--end
+
 end
+
+function USDollarExpressMapMainCtrl:MapAutoSelect()
+	CorManager.StartCor(self, function
+	()
+		coroutine.wait(1)
+		self.view.maps[self.curSelectIndex].objSelect:SetActive(true)
+		coroutine.wait(1.5)
+		CtrlManager.SingleShow(CtrlNames.USDollarExpressMapSelect,self.curSelectIndex)
+	end)
+end
+
 
 ---移除UI事件
 function USDollarExpressMapMainCtrl:RemoveEvent()
@@ -101,6 +114,7 @@ function USDollarExpressMapMainCtrl:allAreaUnLock()
 	config.gameTypeState=2
 	ctrl.model.status=2
 	ctrl:EndSmallGame()
+	self:Close()
 end
 
 
