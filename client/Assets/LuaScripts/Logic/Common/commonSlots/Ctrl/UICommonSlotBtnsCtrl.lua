@@ -79,6 +79,13 @@ function UICommonSlotBtnsCtrl:AddUIEvent()
 		self:SetObjFreeShow(false)
 		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin)
 	end)
+
+	self.uiEventListener:AddClick(self.view.btn_startmask, function()
+		self:SetObjFreeShow(false)
+		GlobalEvent.Notify(SlotGlobal.gameEventName.StartSpin)
+	end)
+	
+	
 	self.uiEventListener:AddLongPress(self.view.btn_start.gameObject, function()
 		self.isLongPress=true
 		self:SetObjFreeShow(true)
@@ -190,6 +197,7 @@ function UICommonSlotBtnsCtrl:SetGameState(gameState)
 	self.view.btn_stop.gameObject:SetActive(gameState==SlotGlobal.gameState.RollState)
 	self.view.btn_auto.gameObject:SetActive(gameState==SlotGlobal.gameState.AutoState)
 	self.view.btn_free.gameObject:SetActive(gameState==SlotGlobal.gameState.FreeState)
+	self.view.btn_startmask.gameObject:SetActive(gameState==SlotGlobal.gameState.Normal)
 	if gameState==SlotGlobal.gameState.Normal then
 		self:SetChipState(true)
 	else

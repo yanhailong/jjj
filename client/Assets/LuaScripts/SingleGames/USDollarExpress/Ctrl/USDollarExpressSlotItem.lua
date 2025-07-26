@@ -100,6 +100,7 @@ function USDollarExpressSlotItem:SetIsAward(isAward)
                 ---@type UnityEngine.GameObject
                 self.iconEffect= self.ctrl.objPools:SpawnPrefab(nil, config.ABNames.iconEffect,effectName, self.ctrl.view.rootEffects)
                 self.iconEffect.transform.position=self.transform.position
+                self.iconEffect.transform:SetAsLastSibling()
                 local sp=ComponentUtilGet.SkeletonGraphic(self.iconEffect.transform,"Spine_Chess")
                 if self.iconIndex>=12 and self.iconIndex<=14 then
 
