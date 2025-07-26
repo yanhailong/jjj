@@ -802,6 +802,9 @@ function RoyalWarGameCtrl:AddUIEvent()
 end
 
 function RoyalWarGameCtrl:ReqBet(betAreaIdx)
+	if CurSelectChip == nil  or curGameStage~=  config.GameSate.Bet then
+		return;
+	end
 	local bet = {}
 	bet.betValue = CurSelectChip.num;
 	bet.betAreaIdx =betAreaIdx;
