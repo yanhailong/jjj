@@ -20,6 +20,7 @@ DOTween:SetTweensCapacity(1000, 250);
 function CarLogoGameView:InitView()
 	---@type CarLogoGameCtrl
     self.ctrl=self.ctrl
+    self.bettingTime = 0
 	self:InitComponents()
 end
 
@@ -42,11 +43,12 @@ function CarLogoGameView:InitComponents()
     self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_playerNum")
     ---提示信息
     self.tipsTrs = ComponentUtilGet.Transform(self.transform,"content/center/tips")
-    
-    self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"tips_time_end")
-    self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"eff_xiazhu_tips")
-    self.tipsXaiZhuSP = ComponentUtilGet.SkeletonGraphic(self.tipsTrs,"eff_xiazhu_tips/xiazhu")
-    
+
+    self.tipsTimeEnd = ComponentUtilGet.GameObject(self.tipsTrs,"effect_CarLogo_EndOfBetting")
+    self.tipsTimeEndSp=ComponentUtilGet.SkeletonGraphic(self.tipsTimeEnd.transform,"SkeletonGraphic (kaishijieshuxiazhu)")
+    self.tipsStartXiaZhu = ComponentUtilGet.GameObject(self.tipsTrs,"effect_CarLogo_StartBetting")
+    self.tipsStartXiaZhuSp=ComponentUtilGet.SkeletonGraphic(self.tipsStartXiaZhu.transform,"SkeletonGraphic (kaishijieshuxiazhu)")
+
     self.colockStateTimeTrs = ComponentUtilGet.Transform(self.transform,"content/center/timer")
     self.colockStateLeftText1=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"tips1") --倒计时
     self.colockStateLeftText2=ComponentUtilGet.GameObject(self.colockStateTimeTrs,"tips2") --倒计时
@@ -55,6 +57,8 @@ function CarLogoGameView:InitComponents()
 
     self.resultTrs=ComponentUtilGet.Transform(self.transform,"content/center/result");
     self.resultCar=ComponentUtilGet.GameObject(self.resultTrs,"Car")
+    self.resultCarObj=ComponentUtilGet.Transform(self.resultTrs,"Car/carObj")
+    self.resultLogoObj=ComponentUtilGet.Transform(self.resultTrs,"Car/logoObj")
     ---下注区域
     self.areasTrs=ComponentUtilGet.Transform(self.transform,"content/center/areas")
     ---@type CarLogoAreaItem[]
@@ -64,10 +68,12 @@ function CarLogoGameView:InitComponents()
     end
     ---车标 跑马灯
     self.logosTrs=ComponentUtilGet.Transform(self.transform,"content/center/logos")
+    local logoItem=ComponentUtilGet.Transform(self.transform,"content/center/logositem/1")
     ---@type CarLogoItem[]
     self.logoViews = {};
     for i = 1, self.logosTrs.childCount do
-        self.logoViews[i] = CarLogoItem.New(self.logosTrs:GetChild(i-1))
+        local parent = self.logosTrs:GetChild(i-1)
+        self.logoViews[i] = CarLogoItem.New(Tools.Instance(logoItem,parent))
     end
     
     ---历史信息
@@ -132,10 +138,10 @@ end
 function CarLogoGameView:InitChouMa()
     ---底注数值
     for i=1,#self.chipInfos do
-        if self.ctrl.model.config.betList[i] then
+        if self.model.betPointList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.ctrl.model.config.betList[i])
+            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.betPointList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
@@ -158,10 +164,13 @@ function CarLogoGameView:InitUI()
 
     --请下注提示
     self.tmp_totalPlayerNum.text="0"
-    self.tipsXaiZhuSP.gameObject:SetActive(false)
     self.daojishiParticles.gameObject:SetActive(false)
     self.resultTrs.gameObject:SetActive(true);
+    self.tipsTimeEnd:SetActive(false)
+    self.tipsStartXiaZhu:SetActive(false)
     self:InitXiaZhuLabel()
+    UpdateManager.AddUpdate(self,self.UpdateBetting)
+    GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
 end
 
 function CarLogoGameView:DizhuPrev(isNext)
@@ -193,9 +202,10 @@ function CarLogoGameView:InitLogos()
         end
     end
 end
+
 ---闪灯
 function CarLogoGameView:FlashLight()
-    local time  = 0.2
+    local time  = 0.3
     for i=1,#self.logoViews do
         self.logoViews[i]:FlashLight(time,2)
     end
@@ -310,7 +320,7 @@ end
 ---
 function CarLogoGameView:LogoFlyToHistory(index)
     look(index)
-    self.history:PlayMoveAni(self.ctrl.model.history)
+    self.history:PlayMoveAni(self.model.history)
     self.logoViews[index]:FlyLogoHistory(self.resultTrs,self.history:GetPoint())
 
 end
@@ -323,15 +333,14 @@ function CarLogoGameView:UnChooseAllLogos()
 end
 
 --播放奔跑动画
---result {win_carlogo:{logo_index,logo_id},last_carlogo:{logo_index,logo_id}}
 function CarLogoGameView:PlayRuningAnimtion(result, isPlay, callFunc)
     if isPlay then
         CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Running)
         self.marqueeCallFunc = callFunc
-        self:IntMove(result.lastIndex, result.winIndex,6,6)
+        self:IntMove(self.model.lastIndex, result.rewardAreaIdx,6,6)
     else
-        self.LogoShowLinght(result.winIndex)
-        --self.history:UpdateBirdsAnimals(self.ctrl.model.history)
+        self.LogoShowLinght(result.rewardAreaIdx)
+        --self.history:UpdateBirdsAnimals(self.model.history)
         if callFunc then  callFunc() end
     end
 end
@@ -341,14 +350,21 @@ function CarLogoGameView:PlayCarEffectView(logo_id,callFunc)
     self.areasTrs.gameObject:SetActive(false)
     self.img_icon.sprite=CarLogoHelper.LoadLogoSprite(logo_id)
     self.img_car.sprite=CarLogoHelper.LoadLogoResultSprite(logo_id)
+    local carEff = CarLogoHelper.LoadLogoResultCar(logo_id)
+    local logoEff = CarLogoHelper.LoadLogoResultLogo(logo_id)
+    logoEff.transform:SetParent(self.resultLogoObj)
     
     self.img_car.transform.localScale=Vector3.Zero()
-    self.img_car.transform:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.InBack)
+    self.img_car.transform:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.InBack):OnComplete(function()
+        carEff.transform:SetParent(self.resultCarObj)
+    end)
     
     TimerManager.StartTimer(self,function()
         self.resultCar:SetActive(false)
         self.areasTrs.gameObject:SetActive(true)
-      
+        GameObject.Destroy(carEff)
+        GameObject.Destroy(logoEff)
+        
         if callFunc then callFunc() end
     end,1.2)
 end
@@ -367,24 +383,28 @@ function CarLogoGameView:ResultStageTimer(stage)
 end
 
 function CarLogoGameView:ResultStage(stage)
-    local result = self.ctrl.model.Result
+    local result = self.model.Result
     
 end
 --播放结算动画
 function CarLogoGameView:ResultEffect(result)
+    local LogoId = config.FindIndexByLogoId(result.rewardAreaIdx)
     --播放奔跑动画
     self:PlayRuningAnimtion(result, true,function()
         -- 显示结果
-        self:PlayCarEffectView(result.winSide,function()
+        self:PlayCarEffectView(LogoId,function()
             -- 播放赢的区域闪动
-            local index = CarLogoHelper.FindIndexById(result.winSide)
+            local index = CarLogoHelper.FindIndexById(LogoId)
             self.areaViews[index]:ShowWinFlashAnim()
-            
+            --金币回收动画
+            self:PlayCompeleCoinFLy()
+            --切换状态
+            self:OnGameStatus(4)
         end)
 
         -- 播放筹码飞动效果
         TimerManager.StartTimer(self,function()
-            self:LogoFlyToHistory(result.winIndex)
+            self:LogoFlyToHistory(result.rewardAreaIdx)
         end,0.4)
     end)
     
@@ -451,8 +471,9 @@ end
 
 function CarLogoGameView:UpdateDiZhuBtnState()
     for i=1,#self.chipInfos do
-        self.chipInfos[i].button.interactable = config.allow and self.ctrl.model.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
+        self.chipInfos[i].button.interactable = config.allow and self.model.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
     end
+    if self.chipInfos[config.dizhuIndex] then self.chipInfos[config.dizhuIndex].effects:SetActive(config.allow) end
 end
 ---更新自己信息
 function CarLogoGameView:UpdateSelf(player)
@@ -462,12 +483,12 @@ function CarLogoGameView:UpdateSelfGoldCount()
     self.selfPlayer:UpdateGoldCount(PlayerManager:GetPlayerInfo().goldNum)
 end
 function CarLogoGameView:UpdatePlayerTotal()
-    self.tmp_totalPlayerNum.text = self.ctrl.model.playersNum
+    self.tmp_totalPlayerNum.text = self.model.playersNum
 end
 ---本玩家下注动画
 function CarLogoGameView:PayXiaZhuCoinFly(side)
     ChouMaFlyUtil:AnimateCoin(self.dizhuNode,config.dizhuIndex,self.selfPlayer.transform.position,self.areaViews[side].noteRoot,
-            self.ctrl.model.betPointList[config.dizhuIndex])
+            self.model.betPointList[config.dizhuIndex])
     --下注音效
     CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
 end
@@ -487,7 +508,7 @@ function CarLogoGameView:PayOtherXiaZhuCoinFly(data)
         return
     end
     -- 其他玩家下注
-    local areaTotal = self.ctrl.model.AreaChipTotals
+    local areaTotal = self.model.AreaChipTotals
     self:UpdateXiaZhuLabel()
     if areaTotal[data.side] >= config.AreaChouMaLimit[data.side] then
         return
@@ -498,12 +519,13 @@ function CarLogoGameView:PayOtherXiaZhuCoinFly(data)
 end
 
 ---金币回收动画
-function CarLogoGameView:PlayCompeleCoinFLy(results)
+function CarLogoGameView:PlayCompeleCoinFLy()
+    local results = self.model.Result.playerChangedGolds
     --数据处理 winCurrency
     local targetPos = {}
     local winCurrency = {0,0}
     local totalCurrency = 0
-    targetPos[1] = self.selfPlayerRoot.position
+    targetPos[1] = self.selfPlayerRoot.transform.position
     targetPos[2] = self.btn_players.transform.position
     for i=1,#results do
         local player = results[i]
@@ -542,9 +564,9 @@ function CarLogoGameView:StartEffect(callFunc)
     --开始下注提示
     CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.KaiShiXiaZhu)
     self.tipsStartXiaZhu:SetActive(true)
+    Tools.PlayerSpineAniByName(self.tipsStartXiaZhuSp,"kaishixiazhu",false)
     self:UpdateXiaZhuLabel()
     TimerManager.StartTimer(self,function()
-        self.tipsStartXiaZhu:SetActive(false)
         CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.KaiShiXiaZhuEnd)
     end,1.5,0,false)
 end
@@ -556,8 +578,8 @@ function CarLogoGameView:EndEffect()
     --下注结束提示
     CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhu)
     self.tipsTimeEnd:SetActive(true)
+    Tools.PlayerSpineAniByName(self.tipsTimeEndSp,"jieshuxiazhu",false)
     TimerManager.StartTimer(self,function()
-        self.tipsTimeEnd:SetActive(false)
         CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhuEnd)
     end,1.5,0,false)
 
@@ -639,7 +661,7 @@ end
 -- 直接显示区域筹码 SideBetInfo
 function CarLogoGameView:ShowAreaChouMa(sideInfo)
     if not sideInfo.betGoldList then return end
-    local areaTotal = self.ctrl.model.AreaChipTotals
+    local areaTotal = self.model.AreaChipTotals
     local side = sideInfo.betIdx<config.gameID and sideInfo.betIdx or sideInfo.betIdx-config.gameID*100
     for ix=1,#sideInfo.betGoldList do
         local value = sideInfo.BetInfos[ix]
@@ -651,10 +673,33 @@ function CarLogoGameView:ShowAreaChouMa(sideInfo)
     end
 end
 
+--单独飞筹码处理 防止频繁UI更新卡住
+function CarLogoGameView:UpdateBetting()
+    if  not config.allow or Time.realtimeSinceStartup - self.bettingTime < 0.1 then return end
+    self.bettingTime = Time.realtimeSinceStartup
+
+    for playerId, msg in pairs(self.model.bettingDataMap) do
+        if not msg.handled then
+            for _, value in ipairs(msg.betTableInfoList) do
+                local bet = {
+                    side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
+                    index = self.ctrl.model:FindBetIndex(value.betValue),
+                    currency = msg.playerCurGold,
+                    playerId = msg.playerId,
+                    betValue = value.betValue,
+                    betIdxTotal = value.betIdxTotal,--区域总的押注数量
+                }
+                self:PayOtherXiaZhuCoinFly(bet)
+            end
+            msg.handled = true
+        end
+    end
+end
+
 -- 切换状态
 function CarLogoGameView:OnGameStatus(status)
     -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
-    self.ctrl.model.status = status
+    self.model.status = status
     config.lessSeconds = Mathf.Round(config.StageTime[status]/1000)
     config.allow= status==2
     -- 结算阶段 特殊处理
@@ -662,8 +707,6 @@ function CarLogoGameView:OnGameStatus(status)
         self:UpdateDiZhuBtnState()
         self:RepeatInit()
         self:InitXiaZhuLabel()
-        ---金币回收动画
-        self:PlayCompeleCoinFLy()
         return
     end
     
@@ -743,6 +786,7 @@ end
 function CarLogoGameView:Close()
     ChouMaFlyUtil:Destroy()
     TimerManager.StopAllTimer(self)
+    UpdateManager.ReMoveAll(self)
     CarLogoSounds.StopSoundMusic()
     self.super.Close(self);
 end

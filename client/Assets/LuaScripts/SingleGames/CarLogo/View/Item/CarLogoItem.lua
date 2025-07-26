@@ -6,16 +6,13 @@ local Vector3 = CS.UnityEngine.Vector3
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
-function CarLogoItem:ctor(trs)
-    self.transform=trs
+function CarLogoItem:ctor(go)
+    self.transform=go.transform
     self.bg = ComponentUtilGet.Image(self.transform, "LogoBg")
-    self.light = ComponentUtilGet.Image(self.transform, "Light")
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
-    self.choose = ComponentUtilGet.Transform(self.transform,"Choose");
-    self.huoChe = ComponentUtilGet.Image(self.transform,"HuoChe");
+    self.choose = ComponentUtilGet.GameObject(self.transform,"effect_CarLogo_xz_bk"):GetComponent("ParticleSystem");
     
     self.choose.gameObject:SetActive(true)
-    self.huoChe.gameObject:SetActive(false)
     self.image.transform.localScale = Vector3(0.56,0.56,1)
     self:ShowChoose(false)
 end
@@ -37,39 +34,42 @@ function CarLogoItem:ShowLogo(logo_id)
     self.logoId = logo_id;
 end
 
---显示火车
-function CarLogoItem:ShowHuoChe(state,alpha)
-    self.huoChe.gameObject:SetActive(state);
-    Tools.SetColorAlpha_Float(self.huoChe, alpha)
-end
-
 --显示选中
 function CarLogoItem:ShowChoose(state, doTween)
     if state then
         if doTween then
-            Tools.SetColorAlpha_Float(self.choose, 0)
-            --Tools.SetColorAlpha_Float(self.light, 0)
+            self.choose.gameObject:SetActive(false)
             -- 选中的图标由大变小效果
             self:DOFade(false)
         else
-            Tools.SetColorAlpha_Float(self.choose, 1)
-            --Tools.SetColorAlpha_Float(self.light, 1)
+            self.choose.gameObject:SetActive(true)
+            if self.choose.isStopped  then
+                self.choose:Play();
+            end
             -- 选中的图标由大变小效果
             self:DOFade(true)
         end
     else
-        Tools.SetColorAlpha_Float(self.choose, 0)
-        --Tools.SetColorAlpha_Float(self.light, 1)
+        self.choose.gameObject:SetActive(false)
         self:DOFade(false)
     end
 end
 
 ---閃燈
 function CarLogoItem:FlashLight(time,fadeTimes)
-    self:ShowChoose(false)
-    Tools.DOFade_Repeat(self.choose,time,fadeTimes,0,function()
-        Tools.SetColorAlpha_Float(self.choose, 0)
-    end)
+    --self:ShowChoose(false)
+    --Tools.DOFade_Repeat(self.choose,time,fadeTimes,0,function()
+    --    Tools.SetColorAlpha_Float(self.choose, 0)
+    --end)
+    local t = time*fadeTimes+(fadeTimes-1)*0.2
+    self.light.gameObject:SetActive(true)
+    if self.light.isStopped  then
+        self.light:Play();
+    end
+    TimerManager.StartTimer(self.luaClass,function()
+        self.light:Stop();
+        self.light.gameObject:SetActive(false)
+    end,t)
 end
 
 --- 选中的图标由大变小效果

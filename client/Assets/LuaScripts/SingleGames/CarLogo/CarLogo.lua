@@ -3,6 +3,7 @@ local CarLogo=Class("CarLogo",SubGame)
 
 function CarLogo:ctor(gameName,param)
     self.super.ctor(self,gameName,param)
+    self.secondUICtrlName = CtrlNames.CarLogoSelect
     --self.gameLoadingLuaPath="Logic/SubGame/GameLoading";
     --self.gameLoadingPanelPath="SingleGames/CarLogo/prefabs/CarLogoLoading";
     self.isLoadAllAssets=false;--是否进入游戏时加载所有资源

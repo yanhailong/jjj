@@ -7,73 +7,61 @@ CarLogoConfig.LOGO_MAX = 24;
 
 ---车标类型
 CarLogoConfig.LOGO_TYPE = {
-    LOGO1   = 1,
-    LOGO2   = 2,
-    LOGO3   = 3,
-    LOGO4   = 4,
-    LOGO5   = 5,
-    LOGO6   = 6,
-    LOGO7   = 7,
-    LOGO8   = 8
+    BJD = 1,
+    FLL = 2,
+    LBJN = 3,
+    BSJ = 4,
+    BC = 5,
+    BM = 6,
+    JB = 7,
+    KDLK = 8
 }
 
----车标图片
+---车标图片 Car_cb_  Car_
 CarLogoConfig.LOGO_IMAGES = {
-    [this.LOGO_TYPE.LOGO1] = "Car_cb_bjd",
-    [this.LOGO_TYPE.LOGO2] = "Car_cb_fll",
-    [this.LOGO_TYPE.LOGO3] = "Car_cb_lbjn",
-    [this.LOGO_TYPE.LOGO4] = "Car_cb_bsj",
-    [this.LOGO_TYPE.LOGO5] = "Car_cb_bc",
-    [this.LOGO_TYPE.LOGO6] = "Car_cb_bm",
-    [this.LOGO_TYPE.LOGO7] = "Car_cb_jb",
-    [this.LOGO_TYPE.LOGO8] = "Car_cb_kdlk"
+    [this.LOGO_TYPE.BJD] = "bjd", --法拉利 布加迪
+    [this.LOGO_TYPE.FLL] = "fll", --保时捷  法拉利
+    [this.LOGO_TYPE.LBJN] = "lbjn", --玛莎拉蒂 兰博基尼
+    [this.LOGO_TYPE.BSJ] = "bsj",  --奔驰 保时捷
+    [this.LOGO_TYPE.BC] = "bc",  --宝马 奔驰
+    [this.LOGO_TYPE.BM] = "bm",--凯迪拉克 宝马
+    [this.LOGO_TYPE.JB] = "jb",  --大众 捷豹
+    [this.LOGO_TYPE.KDLK] = "kdlk" --马自达 凯迪拉克
 }
 
 ---车标赔率
 CarLogoConfig.LOGO_ODDS = {
-    [this.LOGO_TYPE.LOGO1]   = 40,
-    [this.LOGO_TYPE.LOGO2]   = 30,
-    [this.LOGO_TYPE.LOGO3]   = 20,
-    [this.LOGO_TYPE.LOGO4]   = 10,
-    [this.LOGO_TYPE.LOGO5]   = 5,
-    [this.LOGO_TYPE.LOGO6]   = 5,
-    [this.LOGO_TYPE.LOGO7]   = 5,
-    [this.LOGO_TYPE.LOGO8]   = 5
+    [this.LOGO_TYPE.BJD]   = 40,
+    [this.LOGO_TYPE.FLL]   = 30,
+    [this.LOGO_TYPE.LBJN]   = 20,
+    [this.LOGO_TYPE.BSJ]   = 10,
+    [this.LOGO_TYPE.BC]   = 5,
+    [this.LOGO_TYPE.BM]   = 5,
+    [this.LOGO_TYPE.JB]   = 5,
+    [this.LOGO_TYPE.KDLK]   = 5
 };
 
 ---车标所在位置(从1开始，顺时针)
 CarLogoConfig.LOGO_IDX = {
-    [this.LOGO_TYPE.LOGO1] = {1,13},
-    [this.LOGO_TYPE.LOGO2] = {7, 19},
-    [this.LOGO_TYPE.LOGO3] = {10, 22},
-    [this.LOGO_TYPE.LOGO4] = {4, 16},
-    [this.LOGO_TYPE.LOGO5] = {6, 12, 18, 24},
-    [this.LOGO_TYPE.LOGO6] = {3, 9, 15, 21},
-    [this.LOGO_TYPE.LOGO7] = {2, 8, 14, 20},
-    [this.LOGO_TYPE.LOGO8] = {5, 11, 17, 23}
+    [this.LOGO_TYPE.BJD] = { 4, 16},
+    [this.LOGO_TYPE.FLL] = { 10, 22},
+    [this.LOGO_TYPE.LBJN] = { 1, 13},
+    [this.LOGO_TYPE.BSJ] = { 7, 19},
+    [this.LOGO_TYPE.BC] = { 3, 9, 15, 21},
+    [this.LOGO_TYPE.BM] = { 6, 12, 18, 24},
+    [this.LOGO_TYPE.JB] = { 5, 11, 17, 23},
+    [this.LOGO_TYPE.KDLK] = { 2, 8, 14, 20}
 };
 
----车标选中
-CarLogoConfig.LOGO_RESULT = {
-    [this.LOGO_TYPE.LOGO1] = "Car_bjd",
-    [this.LOGO_TYPE.LOGO2] = "Car_fll",
-    [this.LOGO_TYPE.LOGO3] = "Car_lbjn",
-    [this.LOGO_TYPE.LOGO4] = "Car_bsj",
-    [this.LOGO_TYPE.LOGO5] = "Car_bc",
-    [this.LOGO_TYPE.LOGO6] = "Car_bm",
-    [this.LOGO_TYPE.LOGO7] = "Car_jb",
-    [this.LOGO_TYPE.LOGO8] = "Car_kdlk"
-}
-
 CarLogoConfig.LOGO_HISTORY = {
-    this.LOGO_TYPE.LOGO1,
-    this.LOGO_TYPE.LOGO2,
-    this.LOGO_TYPE.LOGO3,
-    this.LOGO_TYPE.LOGO4,
-    this.LOGO_TYPE.LOGO5,
-    this.LOGO_TYPE.LOGO6,
-    this.LOGO_TYPE.LOGO7,
-    this.LOGO_TYPE.LOGO8
+    this.LOGO_TYPE.BJD,
+    this.LOGO_TYPE.FLL,
+    this.LOGO_TYPE.LBJN,
+    this.LOGO_TYPE.BSJ,
+    this.LOGO_TYPE.BC,
+    this.LOGO_TYPE.BM,
+    this.LOGO_TYPE.JB,
+    this.LOGO_TYPE.KDLK
 }
 
 CarLogoConfig.AUDIO_KEY = {
@@ -126,5 +114,13 @@ this.AreaChouMaLimit = { 60, 60, 60, 60, 60, 60, 60, 60}
 this.lastXiaZhuInfo = {}
 ---本局是否使用了复投
 this.isRepeat = false
+---根据位置返回logoID
+this.FindIndexByLogoId = function(index)
+    for logo_id, indexs in ipairs(this.LOGO_IDX) do
+        for i, ix in ipairs(indexs) do
+            if ix == index then return logo_id end
+        end
+    end
+end
 
 return this

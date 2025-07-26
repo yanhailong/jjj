@@ -45,16 +45,17 @@ function CarLogoHistoryItem:UpdateCarLogo(history)
 end
 
 function CarLogoHistoryItem:ShowLogo(transform,winSide,showNew)
+    local logoId = CarLogoConfig.FindIndexByLogoId(winSide)
     local image = ComponentUtilGet.Image(transform, "Icon")
-    image.sprite = CarLogoHelper.LoadLogoSprite(winSide);
+    image.sprite = CarLogoHelper.LoadLogoSprite(logoId);
     transform.gameObject:SetActive(true)
     self:ShowLogoNew(transform,showNew)
 end
 
 function CarLogoHistoryItem:ShowLogoNew(transform,showNew)
-    local choose = ComponentUtilGet.GameObject(transform, "Choose");
+    local choose = ComponentUtilGet.GameObject(transform, "effect_CarLogo_right_xz_bk"):GetComponent("ParticleSystem");
     local tag = ComponentUtilGet.GameObject(transform, "New");
-    choose:SetActive(showNew)
+    choose.gameObject:SetActive(showNew)
     tag:SetActive(showNew)
 end
 

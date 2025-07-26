@@ -16,7 +16,7 @@ function BirdsAnimalsItem:ctor(trs,luaClass)
     self.choose = ComponentUtilGet.GameObject(self.transform,"Choose/effect_BirdsAnimals_ts_bk_qiang"):GetComponent("ParticleSystem")
     self.Rate = ComponentUtilGet.Image(self.transform,"Rate")
     self.Text = ComponentUtilGet.Text(self.transform,"Text")
-    self.choose.gameObject:SetActive(true)
+    self.choose.gameObject:SetActive(false)
     self.light.gameObject:SetActive(false)
     self.Rate.gameObject:SetActive(false)
     self.Text.gameObject:SetActive(false)
@@ -66,7 +66,7 @@ function BirdsAnimalsItem:ShowChoose(state, doTween)
             self:DOFade(true)
         end
     else
-        Tools.SetColorAlpha_Float(self.choose, 0)
+        self.choose.gameObject:SetActive(false)
         self:DOFade(false)
     end
 end
@@ -76,6 +76,7 @@ function BirdsAnimalsItem:FlashLight(time,fadeTimes,delayTime)
     --self:ShowChoose(false)
     --Tools.DOFade_Repeat(self.choose,time,fadeTimes,delayTime,function() self:ShowChoose(false) end)
     local t = time*fadeTimes+(fadeTimes-1)*delayTime
+    self.light.gameObject:SetActive(true)
     if self.light.isStopped  then
         self.light:Play();
     end

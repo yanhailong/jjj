@@ -44,7 +44,7 @@ function BirdsAnimalsHistoryItem:UpdateBirdsAnimals(history)
         local endIndex = math.max(1,#historyList-#self.logos+1)
         local index = 1
         for i = #historyList,endIndex,-1 do
-            self:ShowLogo(self.logos[index],historyList[i],index==1)
+            self:ShowLogo(self.logos[index],historyList[i].animalId,index==1)
             index=index+1
         end
     end

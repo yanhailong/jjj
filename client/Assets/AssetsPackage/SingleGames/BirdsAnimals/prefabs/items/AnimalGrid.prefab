@@ -396,15 +396,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8769719282994143641, guid: 9df4b66433ff2aa47bda8cb4c8885f91, type: 3}
       propertyPath: m_Scale3D.x
-      value: 1.05
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8769719282994143641, guid: 9df4b66433ff2aa47bda8cb4c8885f91, type: 3}
       propertyPath: m_Scale3D.y
-      value: 1.05
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8769719282994143641, guid: 9df4b66433ff2aa47bda8cb4c8885f91, type: 3}
       propertyPath: m_Scale3D.z
-      value: 1.05
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8874732643342205784, guid: 9df4b66433ff2aa47bda8cb4c8885f91, type: 3}
       propertyPath: m_Enabled
@@ -574,15 +574,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3903296060446893860, guid: b44ac06ac5da0c84fbd0f430aa6a849e, type: 3}
       propertyPath: m_Scale3D.x
-      value: 1.07
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3903296060446893860, guid: b44ac06ac5da0c84fbd0f430aa6a849e, type: 3}
       propertyPath: m_Scale3D.y
-      value: 1.07
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3903296060446893860, guid: b44ac06ac5da0c84fbd0f430aa6a849e, type: 3}
       propertyPath: m_Scale3D.z
-      value: 1.07
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4875146680797471396, guid: b44ac06ac5da0c84fbd0f430aa6a849e, type: 3}
       propertyPath: m_Enabled

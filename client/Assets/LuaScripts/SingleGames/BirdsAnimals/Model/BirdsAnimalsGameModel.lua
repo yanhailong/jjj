@@ -19,8 +19,10 @@ function BirdsAnimalsGameModel:Awake()
 	self.sideBetInfos={}
 	self.history = {}
 	self.Result = {}
+	self.bettingDataMap = {}
 	self.AreaChipTotals = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 	self.playersNum=0
+	self.lastIndex = 1
 	--请求进入房间
 	self:ReqEnterRoom()
 end
@@ -64,12 +66,11 @@ end
 function BirdsAnimalsGameModel:OnEnterRoom(msg)
 	self.betPointList = msg.betPointList
 	self.sideBetInfos = msg.tableAreaInfos
-	self.history = msg.histories
-	self.players = msg.playerInfos
+	self.history = msg.settlementHistory or {}
 	self.status = self:TransEGamePhase(msg.gamePhase)
 	self.endTime = msg.tableCountDownTime
 	self.playersNum = msg.totalPlayerNum
-	self.Result = msg.settleInfos --NotifyLoongTigerWarSettleInfo 结算信息
+	self.Result = msg.settlementInfo
 	self.ctrl.view:UpdateRoomInfo(self)
 	self.initState = true
 	--如果有结果直接显示
@@ -81,16 +82,31 @@ end
 -- 广播玩家押注信息 NotifyPlayerBet 
 function BirdsAnimalsGameModel:OnBetting(msg)
 	if msg and msg.code == 200 and self.initState then
-		for _, value in ipairs(msg.betTableInfoList or {}) do
-			local bet = {
-				side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
-				index = self:FindBetIndex(value.betValue),
-				currency = msg.playerCurGold,
-				playerId = msg.playerId,
-				betValue = value.betValue,
-				betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
-			}
-			self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+		--自己的直接显示
+		if msg.playerId == PlayerManager:GetPlayerInfo().playerId then
+			for _, value in ipairs(msg.betTableInfoList or {}) do
+				local bet = {
+					side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
+					index = self:FindBetIndex(value.betValue),
+					currency = msg.playerCurGold,
+					playerId = msg.playerId,
+					betValue = value.betValue,
+					betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
+				}
+				self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+			end
+			return
+		end
+		--其他玩家批量更新
+		msg.handled = false
+		if self.bettingDataMap[msg.playerId] and not self.bettingDataMap[msg.playerId].handled then
+			for i = 1, #msg.betTableInfoList do
+				table.insert(self.bettingDataMap[msg.playerId].betTableInfoList, msg.betTableInfoList[i])
+			end
+			msg.betTableInfoList = self.bettingDataMap[msg.playerId].betTableInfoList
+			self.bettingDataMap[msg.playerId] = msg
+		else
+			self.bettingDataMap[msg.playerId] = msg
 		end
 	end
 end
@@ -101,9 +117,11 @@ function BirdsAnimalsGameModel:OnGameStatus(msg)
 	self.status = 1
 	self.endTime = msg.waitEndTime
 	self.ctrl.view:OnGameStatus(self.status)
+	self.bettingDataMap = {}
 end
 --收到开始下注消息
 function BirdsAnimalsGameModel:OnStartXiaZhu(msg)
+	if not self.initState then return end
 	self.status = 2
 	self.endTime = msg.waitEndTime
 	self.ctrl.view:OnGameStatus(self.status)
@@ -112,9 +130,8 @@ end
 -- 房间玩家信息更新
 function BirdsAnimalsGameModel:UpdatePlayerInfo(msg)
 	if self.initState and msg.tableChangedPlayerInfos then
-		self.players = msg.tableChangedPlayerInfos
 		self.playersNum = msg.totalPlayerNum
-		self.ctrl.view:UpdatePlayers(self.players)
+		self.ctrl.view:UpdatePlayerTotal()
 	end
 end
 
@@ -125,7 +142,8 @@ function BirdsAnimalsGameModel:OnGameResult(msg)
 	if #self.history>=50 then
 		self.history = {}
 	end
-	table.insert(self.history,msg.winState)
+	local historyItem = {betIdxId=msg.rewardAreaIdx,animalId=msg.animalsId[1]}
+	table.insert(self.history,historyItem)
 
 	--切换状态
 	self.status = 3
@@ -135,7 +153,7 @@ function BirdsAnimalsGameModel:OnGameResult(msg)
 end
 
 function BirdsAnimalsGameModel:ShowResult()
-	self.players = self.Result.playerInfos --前6玩家信息
+	if not self.initState then return end
 	---显示牌面结果
 	self.ctrl.view:ResultEffect(self.Result)
 end
@@ -154,6 +172,7 @@ function BirdsAnimalsGameModel:ResetConfig()
 	end
 	self.sideBetInfos={}
 	self.Result = {}
+	self.bettingDataMap = {}
 	self.AreaChipTotals = {0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 end
 

@@ -5,7 +5,7 @@ local BirdsAnimalsHelper = {}
 local atlasPath = "SingleGames/BirdsAnimals/atlas"
 ---加载Logo
 function BirdsAnimalsHelper.LoadLogoSprite(logo_id)
-    if BirdsAnimalsConfig.ANIMA_ICON_IMAGES[logo_id] == nil then look("xxxxxxxxxxxxx"..logo_id) end
+    if BirdsAnimalsConfig.ANIMA_ICON_IMAGES[logo_id] == nil then look("xxxxxxxxxxxxx"..logo_id) return nil end
     return resMgr:LoadSprite(atlasPath.."/animal",BirdsAnimalsConfig.ANIMA_ICON_IMAGES[logo_id]);
 end
 
