@@ -775,53 +775,50 @@ function RoyalWarGameCtrl:AddUIEvent()
 	self.uiEventListener:AddClick(self.view.btn_BetBlack,function()
 		--下注黑方区域
 		--请求下注
-		local bet = {}
-		bet.betValue = CurSelectChip.num;
-		bet.betAreaIdx = 20010002 ;
-		local betData = {}
-		table.insert(betData,bet)
-		self.model:ReqBet(betData);
-		self:CloseBetRecord();
+		self:ReqBet(20010002);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetRed,function()
 		--下注红方区域
 		--请求下注
-		local bet = {}
-		bet.betValue = CurSelectChip.num;
-		bet.betAreaIdx =20010001;
-		local betData = {}
-		table.insert(betData,bet)
-		self.model:ReqBet(betData);
-		self:CloseBetRecord();
+		self:ReqBet(20010001);
 	end)
 
 	self.uiEventListener:AddClick(self.view.btn_BetLucky,function()
 		--下注幸运一击区域
 		--请求下注
-		local bet = {}
-		bet.betValue = CurSelectChip.num;
-		bet.betAreaIdx = 20010003;
-		local betData = {}
-		table.insert(betData,bet)
-		self.model:ReqBet(betData);
-		self:CloseBetRecord();
+		self:ReqBet(20010003);
 	end)
 	self.uiEventListener:AddClick(self.view.btn_Repeat,function()
 		--点击续押
 		self.view.btn_Repeat.image.material = config.GetUIImageGray();
 		self.view.btn_Repeat.enabled =false;
 		self.model:ReqBet(BetRecord);
+		SoundManager:PlayClip(config.ABNames.audios.."xiazhu4")
 	end)
 	self.uiEventListener:AddClick(self.view.btn_AllOther,function()
 		self.model:ReqTablePlayerInfo()--请求百家乐房间的玩家列表信息
 	end)
 end
 
+function RoyalWarGameCtrl:ReqBet(betAreaIdx)
+	local bet = {}
+	bet.betValue = CurSelectChip.num;
+	bet.betAreaIdx =betAreaIdx;
+	local betData = {}
+	table.insert(betData,bet)
+	self.model:ReqBet(betData);
+	self:CloseBetRecord();
+	SoundManager:PlayClip(config.ABNames.audios.."add_chip")
+	
+end
+
 function RoyalWarGameCtrl:CloseBetRecord()
-	BetRecord = {};
-	self.view.btn_Repeat.image.material = config.GetUIImageGray();
-	self.view.btn_Repeat.enabled =false;
+	if(#BetRecord>0) then
+		BetRecord = {};
+		self.view.btn_Repeat.image.material = config.GetUIImageGray();
+		self.view.btn_Repeat.enabled =false;
+	end
 end
 
 ---筹码飞行到指定区域
