@@ -87,6 +87,7 @@ CarLogoConfig.CURVE_KEYS = {
 }
 
 this.dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
+this.effectPath = "SingleGames/CarLogo/effects/prefab"
 
 ---游戏ID
 this.gameID = 200400
@@ -116,8 +117,8 @@ this.lastXiaZhuInfo = {}
 this.isRepeat = false
 ---根据位置返回logoID
 this.FindIndexByLogoId = function(index)
-    for logo_id, indexs in ipairs(this.LOGO_IDX) do
-        for i, ix in ipairs(indexs) do
+    for logo_id, pos in pairs(this.LOGO_IDX) do
+        for i, ix in ipairs(pos) do
             if ix == index then return logo_id end
         end
     end

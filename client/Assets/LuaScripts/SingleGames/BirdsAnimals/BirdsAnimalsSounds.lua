@@ -32,13 +32,17 @@ local SOUND_ANIMAL ={
 --音乐特效
 function BirdsAnimalsSounds.PlaySoundEffic(key)
     local soundName = SOUND_NAMES[key]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 
 --动物声音
 function BirdsAnimalsSounds.PlaySoundAnimal(logoId)
     local soundName = SOUND_ANIMAL[logoId]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 
 --背景音乐

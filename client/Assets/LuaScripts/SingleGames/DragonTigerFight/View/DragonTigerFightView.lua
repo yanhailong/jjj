@@ -288,7 +288,7 @@ function DragonTigerFightView:PlayCompeleCoinFLy(results)
     local targetPos = {}
     local winCurrency = {0,0}
     local totalCurrency = 0
-    targetPos[1] = self.selfPlayerRoot.transform.position
+    targetPos[1] = self.selfPlayerRoot.position
     targetPos[2] = self.btn_players.transform.position
     for i=1,#results do
         local player = results[i]
@@ -638,9 +638,9 @@ function DragonTigerFightView:ShowAreaChouMa(sideInfo)
     if not sideInfo.betGoldList then return end
     local areaTotal = self.model.AreaChipTotals
     local side = sideInfo.betIdx<config.gameID and sideInfo.betIdx or sideInfo.betIdx-config.gameID*100
-    for ix=1,#sideInfo.betGoldList do
-        local value = sideInfo.BetInfos[ix]
-        local index = self.ctrl.model:FindBetIndex(value)
+    for i=1,#sideInfo.betGoldList do
+        local value = sideInfo.betGoldList[i]
+        local index = self.model:FindBetIndex(value)
         if areaTotal[side] < config.AreaChouMaLimit[side] then
             areaTotal[side]=areaTotal[side]+1
             ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,index,self.xiazhuStarAreas[side],value)
@@ -658,7 +658,7 @@ function DragonTigerFightView:UpdateBetting()
             for _, value in ipairs(msg.betTableInfoList) do
                 local bet = {
                     side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
-                    index = self.ctrl.model:FindBetIndex(value.betValue),
+                    index = self.model:FindBetIndex(value.betValue),
                     currency = msg.playerCurGold,
                     playerId = msg.playerId,
                     betValue = value.betValue,
@@ -717,7 +717,7 @@ function DragonTigerFightView:OnGameStatus(status)
     end
 
     if status == 1 then -- 准备阶段
-        self.ctrl.model:ResetConfig()
+        self.model:ResetConfig()
         self:UpdateDiZhuBtnState()
         self:SetRepeatState(false)
         self:StartEffect()

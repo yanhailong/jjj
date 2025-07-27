@@ -47,7 +47,7 @@ function VietnamChessGameModel:PlayerXiaZhu()
 	VietnamChessConfig.allXiaZhuData[#VietnamChessConfig.allXiaZhuData+1] = data
 	VietnamChessConfig.totalDiZhuNums[data.areaType] = VietnamChessConfig.totalDiZhuNums[data.areaType]+VietnamChessConfig.dizhuNumArr[data.dizhuType]
 
-	self.ctrl.view:PayOtherXiaZhuCoinFly(data)
+	self.view:PayOtherXiaZhuCoinFly(data)
 end
 
 ---更新玩家信息
@@ -57,7 +57,7 @@ function VietnamChessGameModel:OnPlayerMsg()
 	for i=1,50 do
 		self.players[i] = {id=i,name="role"..i,coin=Tools.RandomInt(1,10000)}
 	end
-	self.ctrl.view:UpdatePlayers(self.players)
+	self.view:UpdatePlayers(self.players)
 end
 
 ---下注完成结算
@@ -66,7 +66,7 @@ function VietnamChessGameModel:OnXiaZhuComplete()
 	local cards = {Tools.RandomInt(1,13),Tools.RandomInt(1,13)}
 	---显示结果动画
 	---回收金币奖励动画
-	self.ctrl.view:PlayCompeleCoinFLy(VietnamChessConfig.allXiaZhuData,self.players,cards)
+	self.view:PlayCompeleCoinFLy(VietnamChessConfig.allXiaZhuData,self.players,cards)
 
 	---清理下注数据
 	VietnamChessConfig.allXiaZhuData = {}
@@ -83,7 +83,7 @@ function VietnamChessGameModel:UpdateHistoryRecord()
 		self.game_his_items = {}
 	end
 	table.insert(self.game_his_items,VietnamChessConfig.sideColor)
-	self.ctrl.view:UpdateRoleView(self.game_his_items)
+	self.view:UpdateRoleView(self.game_his_items)
 	
 end
 --endregion

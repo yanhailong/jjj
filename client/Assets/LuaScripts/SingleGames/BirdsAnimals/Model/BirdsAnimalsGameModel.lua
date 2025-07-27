@@ -15,7 +15,6 @@ function BirdsAnimalsGameModel:Awake()
 	self.status = 1
 	self.endTime = 0
 	self.betPointList = {}
-	self.players = {} -- 前6玩家信息
 	self.sideBetInfos={}
 	self.history = {}
 	self.Result = {}
@@ -66,12 +65,12 @@ end
 function BirdsAnimalsGameModel:OnEnterRoom(msg)
 	self.betPointList = msg.betPointList
 	self.sideBetInfos = msg.tableAreaInfos
-	self.history = msg.settlementHistory or {}
+	self.history = self:SetHistory(msg.settlementHistory)
 	self.status = self:TransEGamePhase(msg.gamePhase)
 	self.endTime = msg.tableCountDownTime
 	self.playersNum = msg.totalPlayerNum
 	self.Result = msg.settlementInfo
-	self.ctrl.view:UpdateRoomInfo(self)
+	self.view:UpdateRoomInfo(self)
 	self.initState = true
 	--如果有结果直接显示
 	if self.Result then
@@ -93,7 +92,7 @@ function BirdsAnimalsGameModel:OnBetting(msg)
 					betValue = value.betValue,
 					betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
 				}
-				self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+				self.view:PayOtherXiaZhuCoinFly(bet)
 			end
 			return
 		end
@@ -114,40 +113,40 @@ end
 -- 重新开始游戏的消息 NotifyRoomReadyWait
 function BirdsAnimalsGameModel:OnGameStatus(msg)
 	if  not self.initState then return end
+	self.view:OnGameStatus(4)
 	self.status = 1
 	self.endTime = msg.waitEndTime
-	self.ctrl.view:OnGameStatus(self.status)
+	logError("OnGameStatus:"..os.date("%H:%M:%S", math.modf(self.endTime/1000)))
+	self.view:OnGameStatus(self.status)
 	self.bettingDataMap = {}
+	self:OnStartXiaZhu(msg)
 end
 --收到开始下注消息
 function BirdsAnimalsGameModel:OnStartXiaZhu(msg)
 	if not self.initState then return end
 	self.status = 2
 	self.endTime = msg.waitEndTime
-	self.ctrl.view:OnGameStatus(self.status)
+	self.view:OnGameStatus(self.status)
 end
 
 -- 房间玩家信息更新
 function BirdsAnimalsGameModel:UpdatePlayerInfo(msg)
 	if self.initState and msg.tableChangedPlayerInfos then
 		self.playersNum = msg.totalPlayerNum
-		self.ctrl.view:UpdatePlayerTotal()
+		self.view:UpdatePlayerTotal()
 	end
 end
 
 -- 广播结算信息 NotifyLoongTigerWarSettleInfo
 function BirdsAnimalsGameModel:OnGameResult(msg)
-	if not self.initState then return end
-	self.Result = msg;
-	if #self.history>=50 then
-		self.history = {}
-	end
-	local historyItem = {betIdxId=msg.rewardAreaIdx,animalId=msg.animalsId[1]}
-	table.insert(self.history,historyItem)
-
+	if not self.initState and msg.code ~=200 then return end
+	self.Result = msg.settlementInfo;
+	self.endTime = self.Result.tableCountDownTime;
+	table.insert(self.history,self.Result.rewardAreaIdx)
+	logError("OnGameResult:"..os.date("%H:%M:%S", math.modf(self.Result.tableCountDownTime/1000)))
 	--切换状态
 	self.status = 3
-	self.ctrl.view:OnGameStatus(self.status)
+	self.view:OnGameStatus(self.status)
 
 	self:ShowResult()
 end
@@ -155,7 +154,7 @@ end
 function BirdsAnimalsGameModel:ShowResult()
 	if not self.initState then return end
 	---显示牌面结果
-	self.ctrl.view:ResultEffect(self.Result)
+	self.view:ResultEffect(self.Result)
 end
 --玩家列表信息返回 
 function BirdsAnimalsGameModel:UpdateAllPlayers(msg)
@@ -190,10 +189,18 @@ function BirdsAnimalsGameModel:TransEGamePhase(value)
 	--[准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 	if value == "WAIT_READY" or "START_GAME" == 0  then return 1 end
 	if value == "BET" then return 2 end
-	if value == "PLAY_CART" then return 3 end
-	if value == "GAME_ROUND_OVER_SETTLEMENT" then return 4 end
+	if value == "PLAY_CART" or "GAME_ROUND_OVER_SETTLEMENT" then return 3 end
+	--if value == "GAME_ROUND_OVER_SETTLEMENT" then return 4 end
 	return 5
 end
 
+function BirdsAnimalsGameModel:SetHistory(tables)
+	local history = {}
+	if not tables then return history end
+	for i=1,#tables do
+		table.insert(history,tables[i].betIdxId)
+	end
+	return history
+end
 
 return BirdsAnimalsGameModel

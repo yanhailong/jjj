@@ -50,7 +50,7 @@ end
 
 function BirdsAnimalsAreaItem:ShowWinFlashAnim()
 	self.choose1.gameObject:SetActive(true);
-	Tools.DOFade_Repeat(self.choose1,0.5,2,0,function()
+	Tools.DOFade_Repeat(self.choose1,0.5,3,0,function()
 		self.choose1.gameObject:SetActive(false);
 	end)
 end

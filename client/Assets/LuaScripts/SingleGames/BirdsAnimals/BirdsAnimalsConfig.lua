@@ -179,5 +179,13 @@ this.AreaChouMaLimit = { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}
 this.lastXiaZhuInfo = {}
 ---本局是否使用了复投
 this.isRepeat = false
+---根据位置返回logoID
+this.FindIndexByLogoId = function(index)
+    for logo_id, pos in pairs(this.LOGO_IDX) do
+        for i, ix in ipairs(pos) do
+            if ix == index then return logo_id end
+        end
+    end
+end
 
 return this

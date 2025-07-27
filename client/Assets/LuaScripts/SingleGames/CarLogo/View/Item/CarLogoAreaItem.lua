@@ -31,12 +31,12 @@ end
 
 function CarLogoAreaItem:UpdateTotal(num)
 	self.totalNum.text = num
-	self.totalNum.gameObject:SetActive(num>0)
+	--self.totalNum.gameObject:SetActive(num>0)
 end
 
 function CarLogoAreaItem:UpdateSelf(num)
 	self.selfNum.text=num
-	self.selfNum.gameObject:SetActive(num>0)
+	--self.selfNum.gameObject:SetActive(num>0)
 end
 
 return CarLogoAreaItem

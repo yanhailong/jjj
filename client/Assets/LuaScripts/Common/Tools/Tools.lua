@@ -1262,15 +1262,12 @@ end
 function this.CacStageLessTime(current_status,current_time_ms,game_end_time_ms,phase_times)
     -- 计算当前阶段开始时间
     local phase_start_time_ms = game_end_time_ms
-    for i = 1, current_status - 1 do
+    for i = #phase_times, current_status + 1, -1 do
         phase_start_time_ms = phase_start_time_ms - phase_times[i]
     end
 
-    -- 计算当前阶段结束时间
-    local phase_end_time_ms = phase_start_time_ms - phase_times[current_status]
-
     -- 计算当前阶段剩余时间
-    local remaining_time_ms = phase_end_time_ms - current_time_ms
+    local remaining_time_ms = phase_start_time_ms - current_time_ms
 
     -- 如果剩余时间小于0，说明阶段已经结束
     if remaining_time_ms < 0 then

@@ -68,8 +68,7 @@ function BirdsAnimalsGameView:InitComponents()
     self.areaViews = {};
     self.areaViews[1] = BirdsAnimalsAreaItem.New(areaItem,1);
     for i = 2, 12 do
-        local areaObj = Tools.Instance(areaItem.gameObject)
-        areaObj.transform:SetParent(self.areasTrs,false)
+        local areaObj = Tools.Instance(areaItem.gameObject,self.areasTrs)
         self.areaViews[i] = BirdsAnimalsAreaItem.New(areaObj.transform,i);
     end
     ---车标 跑马灯
@@ -231,8 +230,8 @@ end
 
 ---初始化图标
 function BirdsAnimalsGameView:InitLogos()
-    for logo_id, indexs in pairs(config.LOGO_IDX) do
-        for i, index in ipairs(indexs) do
+    for logo_id, pos in pairs(config.LOGO_IDX) do
+        for i, index in ipairs(pos) do
             self.logoViews[index]:ShowLogo(logo_id);
         end
     end
@@ -255,11 +254,6 @@ end
 ------start Logo Marquee-----
 function BirdsAnimalsGameView:InitMarquee()
     self.marqueeCallFunc = nil
-    if self.marqueeCor then
-        coroutine.stop(self.marqueeCor)
-        self.marqueeCor = nil
-    end
-
     self.curve = CS.UnityEngine.AnimationCurve()
     for i=1,#config.CURVE_KEYS do
         self.curve:AddKey(config.CURVE_KEYS[i][1], config.CURVE_KEYS[i][2])
@@ -274,12 +268,10 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
 
         local startTime = Time.realtimeSinceStartup - (time - leftTime);
         local deltaTime = Time.realtimeSinceStartup - startTime;
-        local lastIndex = from + Mathf.FloorToInt(self.curve:Evaluate(deltaTime / time) * (to - from)) - 1
+        local lastIndex = from + Mathf.FloorToInt(self.curve:Evaluate(deltaTime / time) * (to - from))
         local newIndex = lastIndex
         local runIndex = 0
-
-        self.marqueeCor=coroutine.start( function()
-            coroutine.yield(CS.UnityEngine.WaitForSeconds(1.5))--等待闪灯
+        CorManager.StartCor(self.ctrl,function()
             while deltaTime<time and lastIndex<to do
                 deltaTime = Time.realtimeSinceStartup - startTime;
                 newIndex = from + Mathf.FloorToInt(self.curve:Evaluate(deltaTime / time) * (to - from))
@@ -287,21 +279,21 @@ function BirdsAnimalsGameView:IntMove(from, to, leftTime, time)
                     lastIndex = i;
 
                     local index = i% config.ANIMAL_MAX
-                    if index<=0 then
-                        index = index + config.ANIMAL_MAX
+                    if index==0 then
+                        index = config.ANIMAL_MAX
                     end
-
-                    self.logoViews[index]:ShowChoose(true)
-                    if runIndex>0 then
-                        self.logoViews[runIndex]:ShowChoose(true, true)
+                    
+                    if runIndex~=index then
+                        self.logoViews[index]:ShowChoose(true)
+                        if runIndex>0 then
+                            self.logoViews[runIndex]:ShowChoose(true, true)
+                        end
+                        runIndex = index
                     end
-                    runIndex = index
                 end
                 coroutine.yield(CS.UnityEngine.WaitForEndOfFrame())
             end
-            coroutine.stop(self.marqueeCor)
-            self.marqueeCor = nil
-
+            
             if self.marqueeCallFunc then
                 self.marqueeCallFunc()
                 self.marqueeCallFunc = nil
@@ -342,20 +334,19 @@ function BirdsAnimalsGameView:UnChooseAllLogos()
 end
 
 --播放奔跑动画
-function BirdsAnimalsGameView:PlayRuningAnimtion(result, isPlay, callFunc)
-    if isPlay then
+function BirdsAnimalsGameView:PlayRuningAnimtion(result, leftTime, callFunc)
+    if leftTime>1 then
         --慢速旋转
         BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.XuanZhuan)
         --转轴旋转
         BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Running)
         self.marqueeCallFunc = callFunc
-        self:IntMove(self.model.lastIndex, result.rewardAreaIdx,6,6)
-        self.model.lastIndex = result.rewardAreaIdx
+        self:IntMove(self.model.lastIndex, result.rewardAreaIdx,leftTime,6)
     else
-        self.LogoShowLinght(result.rewardAreaIdx)
-        --self.history:UpdateBirdsAnimals(self.model.history)
+        self:LogoShowLinght(result.rewardAreaIdx)
         if callFunc then  callFunc() end
     end
+    self.model.lastIndex = result.rewardAreaIdx
 end
 
 function BirdsAnimalsGameView:PlayCarEffectView(logo_id,callFunc)
@@ -364,20 +355,18 @@ function BirdsAnimalsGameView:PlayCarEffectView(logo_id,callFunc)
     self.img_icon.sprite=BirdsAnimalsHelper.LoadLogoSprite(logo_id)
     self.txt_name.text=BirdsAnimalsHelper.LoadNameLanguage(logo_id)
     self.img_icon:SetNativeSize()
-    Tools.PlayerSpineAniByName(self.resultSp,"action",false)
-    --动物音效
-    BirdsAnimalsSounds.PlaySoundAnimal(logo_id)
     
     self.img_icon_bg.localScale=Vector3.Zero()
-    self.img_icon_bg:DOScale(Vector3(1,1,1),0.6):SetEase(Ease.OutBack):OnComplete(function()
-        TimerManager.StartTimer(self,function()
-            --关闭
-            self.resultAnimal:SetActive(false)
-            if callFunc then callFunc() end
-        end,2)
-
+    self.img_icon_bg:DOScale(Vector3(1,1,1),0.3):SetEase(Ease.OutBack)
+    Tools.PlayerSpineAniByName(self.resultSp,"action",false)
+    CorManager.StartCor(self.ctrl, function
+    ()
+        coroutine.wait(0.3)
+        BirdsAnimalsSounds.PlaySoundAnimal(logo_id)
+        coroutine.wait(2)
+        self.resultAnimal:SetActive(false)
+        if callFunc then callFunc() end
     end)
-
 end
 
 function BirdsAnimalsGameView:ResultStageTimer(stage)
@@ -400,33 +389,40 @@ end
 
 --播放结算动画
 function BirdsAnimalsGameView:ResultEffect(result)
+    local LogoId = config.FindIndexByLogoId(result.rewardAreaIdx)
     --播放奔跑动画
-    self:PlayRuningAnimtion(result, true,function()
-        -- 显示结果
-        self:PlayCarEffectView(result.animalsId[1],function()
-            -- 播放赢的区域闪动
-            local index = BirdsAnimalsHelper.FindIndexById(result.animalsId[1])
-            self.areaViews[index]:ShowWinFlashAnim()
+    local leftTime = Mathf.Round((self.model.endTime - ServerTimeSync:GetTimeStamp())/1000)-7
+    CorManager.StartCor(self.ctrl,function()
+        --闪灯
+        self:FlashLight()
+        coroutine.yield(CS.UnityEngine.WaitForSeconds(1.5))
 
-            --飞鸟和走兽区域闪动
-            if BirdsAnimalsHelper.IsFeiQinType(result.animalsId[1]) then
-                self.areaViews[3]:ShowWinFlashAnim()
-            elseif BirdsAnimalsHelper.IsZouShouType(result.animalsId[1]) then
-                self.areaViews[4]:ShowWinFlashAnim()
-            end
-            
-            --金币回收动画
-            self:PlayCompeleCoinFLy()
-            --切换状态
-            self:OnGameStatus(4)
+        self:PlayRuningAnimtion(result, leftTime,function()
+            -- 显示结果
+            self:PlayCarEffectView(LogoId,function()
+                -- 播放赢的区域闪动
+                local index = BirdsAnimalsHelper.FindIndexById(LogoId)
+                self.areaViews[index]:ShowWinFlashAnim()
+
+                --飞鸟和走兽区域闪动
+                if BirdsAnimalsHelper.IsFeiQinType(LogoId) then
+                    self.areaViews[3]:ShowWinFlashAnim()
+                elseif BirdsAnimalsHelper.IsZouShouType(LogoId) then
+                    self.areaViews[4]:ShowWinFlashAnim()
+                end
+
+                --金币回收动画
+                self:PlayCompeleCoinFLy()
+            end)
+
+            -- 播放筹码飞动效果
+            TimerManager.StartTimer(self,function()
+                self:LogoFlyToHistory(result.rewardAreaIdx)
+            end,0.4)
         end)
 
-        -- 播放筹码飞动效果
-        TimerManager.StartTimer(self,function()
-            self:LogoFlyToHistory(result.rewardAreaIdx)
-        end,0.4)
     end)
-
+    
 end
 ---切换当前选中的底注
 function BirdsAnimalsGameView:ChangeDiZhu(index)
@@ -545,6 +541,7 @@ end
 ---金币回收动画
 function BirdsAnimalsGameView:PlayCompeleCoinFLy()
     local results = self.model.Result.playerChangedGolds
+    if not results then return end
     --数据处理 winCurrency
     local targetPos = {}
     local winCurrency = {0,0}
@@ -591,16 +588,14 @@ function BirdsAnimalsGameView:StartEffect()
 end
 
 function BirdsAnimalsGameView:EndEffect()
-    --闪灯
-    self:FlashLight()
-
     --下注结束提示
     BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhu)
     self.tipsTimeEnd:SetActive(true)
     Tools.PlayerSpineAniByName(self.tipsTimeEndSp,"jieshuxiazhu",false)
     -- 停止下注吹哨
-    BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhuEnd)
-    
+    TimerManager.StartTimer(self,function()
+        BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.StopXiaZhuEnd)
+    end,1.1,0,false)
 end
 
 ---设置续投按钮是否可以点击 当前局已经手动投注或者上局未投注不能点 其他可点
@@ -641,7 +636,7 @@ function BirdsAnimalsGameView:UpdateRoomInfo(model)
             -- 更新总押注金额
             config.totalDiZhuNums[side] = value.betIdxTotal
             -- 更新玩家区域押注金额
-            config.selfDiZhuNums[side] = value.betValue
+            config.selfDiZhuNums[side] = 0
             -- 更新区域筹码显示
             self:ShowAreaChouMa(value)
         end
@@ -649,18 +644,18 @@ function BirdsAnimalsGameView:UpdateRoomInfo(model)
     end
 
     -- 5. 刷新当前游戏状态和倒计时
-    local lessTime = Tools.CacStageLessTime(model.status,ServerTimeSync:GetTimeStamp(),model.endTime,config.StageTime)
+    local lessTime = model.endTime - ServerTimeSync:GetTimeStamp()
     look("当前阶段剩余时间（毫秒）："..lessTime)
     if lessTime<=0 then
         --进行下一阶段
         if model.status<4 then self:OnGameStatus(model.status+1) end
     else--更新当前阶段
-        self:OnGameStatus(model.status)
+        self:OnGameStatus(model.status,Mathf.Round(lessTime/1000))
     end
 
     -- 提示 等待本对局结束
-    if model.Result or (lessTime<=0 and model.status==2) then--有结果 或者 发消息的时候还没结束但是收到消息已结束
-        local lessSeconds = Mathf.Round((model.endTime - ServerTimeSync:GetTimeStamp())/1000)
+    if model.Result or (lessTime<=0 and model.status>=2) then--有结果 或者 发消息的时候还没结束但是收到消息已结束
+        local lessSeconds = Mathf.Round(lessTime/1000)
         if lessSeconds>1 then--时间太少不展示
             self.tipsEnterWait.gameObject:SetActive(true)
             self.tipsEnterWaitTime.text = tostring(lessSeconds)
@@ -683,9 +678,9 @@ function BirdsAnimalsGameView:ShowAreaChouMa(sideInfo)
     if not sideInfo.betGoldList then return end
     local areaTotal = self.model.AreaChipTotals
     local side = sideInfo.betIdx<config.gameID and sideInfo.betIdx or sideInfo.betIdx-config.gameID*100
-    for ix=1,#sideInfo.betGoldList do
-        local value = sideInfo.BetInfos[ix]
-        local index = self.ctrl.model:FindBetIndex(value)
+    for i=1,#sideInfo.betGoldList do
+        local value = sideInfo.betGoldList[i]
+        local index = self.model:FindBetIndex(value)
         if areaTotal[side] < config.AreaChouMaLimit[side] then
             areaTotal[side]=areaTotal[side]+1
             ChouMaFlyUtil:CreatCoinInArea(self.dizhuNode,index,self.areaViews[side].noteRoot,value)
@@ -703,7 +698,7 @@ function BirdsAnimalsGameView:UpdateBetting()
             for _, value in ipairs(msg.betTableInfoList) do
                 local bet = {
                     side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
-                    index = self.ctrl.model:FindBetIndex(value.betValue),
+                    index = self.model:FindBetIndex(value.betValue),
                     currency = msg.playerCurGold,
                     playerId = msg.playerId,
                     betValue = value.betValue,
@@ -717,18 +712,12 @@ function BirdsAnimalsGameView:UpdateBetting()
 end
 
 -- 切换状态
-function BirdsAnimalsGameView:OnGameStatus(status)
+function BirdsAnimalsGameView:OnGameStatus(status,seconds)
     -- status: 1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
     self.model.status = status
-    config.lessSeconds = Mathf.Round(config.StageTime[status]/1000)
+    config.lessSeconds = seconds or Mathf.Round(config.StageTime[status]/1000)
     config.allow= status==2
-    -- 结算阶段 特殊处理
-    if status == 4 then
-        self:UpdateDiZhuBtnState()
-        self:RepeatInit()
-        self:InitXiaZhuLabel()
-        return
-    end
+
     -- 隐藏所有阶段相关UI
     self.tipsTimeEnd:SetActive(false)
     self.resultAnimal:SetActive(false)
@@ -745,7 +734,7 @@ function BirdsAnimalsGameView:OnGameStatus(status)
     end
     
     if status == 1 then -- 准备阶段
-        self.ctrl.model:ResetConfig()
+        self.model:ResetConfig()
         self:UpdateDiZhuBtnState()
         self:SetRepeatState(false)
         self:StartEffect()
@@ -785,6 +774,10 @@ function BirdsAnimalsGameView:OnGameStatus(status)
                 self.statusTimer = nil
             end
         end, 1, config.lessSeconds,true)
+	elseif status == 4 then
+        self:UpdateDiZhuBtnState()
+        self:RepeatInit()
+        self:InitXiaZhuLabel()
     end
 end
 

@@ -20,14 +20,15 @@ function BirdsAnimalsTrendView:InitComponents()
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/background/btn_close");
     self.resultsTrs=ComponentUtilGet.Transform(self.transform,"content/results")
     self.rateTrs=ComponentUtilGet.Transform(self.transform,"content/rate")
-    self.rateTmps={}
+    self.rateText ={}
     for i=1,12 do
-        table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
+        table.insert(self.rateText,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
     end
     self.resultsItems={}
-    table.insert(  self.resultsItems,self:InitResultItem(self.resultsTrs:GetChild(0)))
+    local itemTrs = self.resultsTrs:GetChild(0)
+    table.insert(  self.resultsItems,self:InitResultItem(itemTrs))
     for i=1,49 do
-        table.insert(self.resultsItems, self:InitResultItem(Tools.Instance(self.resultsTrs:GetChild(0),self.resultsTrs)))
+        table.insert(self.resultsItems, self:InitResultItem(Tools.Instance(itemTrs,self.resultsTrs).transform))
     end
 end
 
@@ -58,9 +59,10 @@ function BirdsAnimalsTrendView:InitResultItem(transform)
     table.obj = transform.gameObject
     table.icon = ComponentUtilGet.Image(transform, "icon");
     table.new = ComponentUtilGet.Image(transform,"new");
-    table.ShowLogo = function(logo_id)
-        if logo_id then
-            table.icon.sprite = BirdsAnimalsHelper.LoadLogoSprite(logo_id);
+    table.ShowLogo = function(index)
+        if index then
+            local logoId = BirdsAnimalsConfig.FindIndexByLogoId(index)
+            table.icon.sprite = BirdsAnimalsHelper.LoadLogoSprite(logoId);
             table.new.gameObject:SetActive(false)
             table.icon.gameObject:SetActive(true)
             table.obj:SetActive(true)
@@ -81,10 +83,12 @@ end
 function BirdsAnimalsTrendView:UpdateHistory(history)
     local historyList = history
     local total = #historyList
+    local offset=math.max(total-49,1)
     for i=1,50 do
-        if i <= total then
-            self.resultsItems[i].ShowLogo(historyList[i].animalId)
-            if i==total then self.resultsItems[i].ShowNew(true) end
+        if offset <= total then
+            self.resultsItems[i].ShowLogo(historyList[offset])
+            if offset==total then self.resultsItems[i].ShowNew(true) end
+            offset=offset+1
         else
             self.resultsItems[i].ShowLogo()
         end
@@ -92,10 +96,13 @@ function BirdsAnimalsTrendView:UpdateHistory(history)
 
     ---概率
     self.rateData = {0,0,0,0,0,0,0,0,0,0,0,0}
-    local offset=math.max(#historyList-49,1)
-    local count = #historyList-offset+1
-    for i=#historyList,offset,-1 do
-        self.rateData[historyList[i].animalId]=self.rateData[historyList[i].animalId]+1
+    local offset2 =math.max(#historyList-49,1)
+    local count = #historyList- offset2 +1
+    for i= offset2,#historyList do
+        local logoId = BirdsAnimalsConfig.FindIndexByLogoId(historyList[i])
+        if self.rateData[logoId] then
+            self.rateData[logoId]=self.rateData[logoId]+1
+        end
     end
 
     self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=0
@@ -105,7 +112,7 @@ function BirdsAnimalsTrendView:UpdateHistory(history)
         local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
         if logo_id<=12 then
             self.rateData[logo_id]=count>0 and math.floor(self.rateData[logo_id]*1000/count)/10 or 0
-            self.rateTmps[i].text = self.rateData[logo_id].."%"
+            self.rateText[i].text = self.rateData[logo_id].."%"
             if BirdsAnimalsHelper.IsFeiQinType(logo_id) then
                 self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]=self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin]+self.rateData[logo_id]
             elseif BirdsAnimalsHelper.IsZouShouType(logo_id) then
@@ -116,9 +123,9 @@ function BirdsAnimalsTrendView:UpdateHistory(history)
     for i=1,12 do
         local logo_id=BirdsAnimalsConfig.ANIMA_HISTORY[i]
         if logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin then
-            self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin].."%"
+            self.rateText[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.FeiQin].."%"
         elseif logo_id==BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou then
-            self.rateTmps[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou].."%"
+            self.rateText[i].text = self.rateData[BirdsAnimalsConfig.ANIMAL_TYPE.ZouShou].."%"
         end
     end
 end

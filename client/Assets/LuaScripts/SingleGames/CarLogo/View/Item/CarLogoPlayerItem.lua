@@ -15,6 +15,7 @@ function CarLogoPlayerItem:ctor(go)
     self.headKuang = ComponentUtilGet.Image(self.transform,"HeadPic")
     self.headIcon = ComponentUtilGet.Image(self.transform,"HeadPic/Head")
     self.goldCount = ComponentUtilGet.TextMeshProUGUI(self.transform,"Money/GoldNumber")
+    self.playerName = ComponentUtilGet.TextMeshProUGUI(self.transform,"PlayerName");
     self.resultNum = ComponentUtilGet.TextMeshProUGUI(self.transform,"result")
     self.resultNum.gameObject:SetActive(false)
 end
@@ -51,9 +52,15 @@ end
 
 
 function CarLogoPlayerItem:UpdatePlayer(player)
-    self.goldCount.text = player.coin
-    self.player = player
-    self.id = player.id
+    if player == nil then
+        self.gameObject:SetActive(false)
+    else
+        self.gameObject:SetActive(true)
+        self.goldCount.text = player.goldNum
+        self.playerName.text = player.playerName
+        self.player = player
+        self.id = player.playerId
+    end
 end
 
 return CarLogoPlayerItem

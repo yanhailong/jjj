@@ -26,7 +26,8 @@ end
 
 ---初始化数据
 function BirdsAnimalsGameCtrl:InitData()
-	
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
 end
 
 function BirdsAnimalsGameCtrl:Close()
@@ -69,7 +70,7 @@ end
 
 function BirdsAnimalsGameCtrl:AddAreaClickEvents()
 	for i=1,self.view.areasTrs.childCount do
-		self.uiEventListener:AddClick(self.view.areasTrs:GetChild(i-1),function(obj)
+		self.uiEventListener:AddClick(self.view.areasTrs:GetChild(i-1),function()
 			self:OnClickCenterYaZhuSide(i)
 		end)
 	end
@@ -116,6 +117,7 @@ end
 ---销毁UI
 function BirdsAnimalsGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	CorManager.StopAll(self)
 end
 
 return BirdsAnimalsGameCtrl
