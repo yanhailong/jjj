@@ -22,7 +22,7 @@ function main:init(lancher)
 
     main:LoadCommonAssets(function
     ()
-        CtrlManager.SingleShow(CtrlNames.UILogin, function
+        CtrlManager.SingleShow(CtrlNames.UILogin):AddAsyncOpenCallback(function
         ()
             lancher:PreLoadingClose()
         end)

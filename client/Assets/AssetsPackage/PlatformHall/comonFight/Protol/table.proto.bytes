@@ -1,9 +1,16 @@
-syntax = "proto3";import "room.proto";//结算信息
+syntax = "proto3";import "room.proto";//飞禽走兽历史记录bean
+message AnimalsHistoryBean {
+  int32 betIdxId = 1;  //下注ID
+  int32 animalId = 2;  //动物ID 1-鹦鹉 2-鸽子 5-老虎 6-耗牛 7-火烈鸟 8-老鹰 9-金鲨 10-银鲨 11-狮子 12-熊 13-通杀 14-通赔
+}
+
+//结算信息
 message AnimalsSettlementInfo {
   int32 rewardAreaIdx = 1;  //中奖区域ID
   repeated BetTableInfo betTableInfos = 2;  //玩家场上押注数据
   int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
   repeated PlayerChangedGold playerChangedGolds = 4;  //玩家金币变化列表
+  repeated int32 animalsId = 5;  //动物ID列表
 }
 
 //百家乐基础信息
@@ -91,6 +98,14 @@ message TablePlayerInfo {
   int32 winCount = 7;  //近20局赢的总局数
 }
 
+//结算信息
+message LuxuryCarClubSettlementInfo {
+  int32 rewardAreaIdx = 1;  //中奖区域ID
+  repeated BetTableInfo betTableInfos = 2;  //玩家场上押注数据
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated PlayerChangedGold playerChangedGolds = 4;  //玩家金币变化列表
+}
+
 //红黑大战历史记录
 message RedBlackWarHistory {
   int32 winner = 1;  //获胜方(1红 2黑)
@@ -167,7 +182,7 @@ message NotifyAnimalsTableInfo {
   repeated int32 betPointList = 5;  //押分分值列表
   TablePlayerInfo playerInfo = 6;  //当前玩家信息
   int32 totalPlayerNum = 7;  //房间总人数
-  repeated int32 settlementHistory = 8;  //结算历史，首次进入时发送，下注区域id列表
+  repeated AnimalsHistoryBean settlementHistory = 8;  //结算历史，首次进入时发送，下注区域id列表
   AnimalsSettlementInfo settlementInfo = 9;  //结算信息，当阶段为结算时发送
 }
 
@@ -176,6 +191,27 @@ message NotifyAnimalsSettlement {
   enum E_MsgID {def = 0; msgID = 90242;};
   int32 code = 1;  //状态码
   AnimalsSettlementInfo settlementInfo = 2;  //结算信息
+}
+
+//响应,msgID=0x17081,desc=豪车俱乐部桌面信息，下注，结算，断线重连
+message NotifyLuxuryCarClubTableInfo {
+  enum E_MsgID {def = 0; msgID = 94337;};
+  int32 code = 1;  //状态码
+  EGamePhase gamePhase = 2;  //场上阶段信息
+  int64 tableCountDownTime = 3;  //场上倒计时结束时间戳
+  repeated BetTableInfo tableAreaInfos = 4;  //区域下注信息
+  repeated int32 betPointList = 5;  //押分分值列表
+  TablePlayerInfo playerInfo = 6;  //当前玩家信息
+  int32 totalPlayerNum = 7;  //房间总人数
+  repeated int32 settlementHistory = 8;  //结算历史，首次进入时发送，下注区域id列表
+  LuxuryCarClubSettlementInfo settlementInfo = 9;  //结算信息，当阶段为结算时发送
+}
+
+//响应,msgID=0x17082,desc=通知豪车俱乐部结算信息
+message NotifyLuxuryCarClubSettlement {
+  enum E_MsgID {def = 0; msgID = 94338;};
+  int32 code = 1;  //状态码
+  LuxuryCarClubSettlementInfo settlementInfo = 2;  //结算信息
 }
 
 //请求,msgID=0x18001,desc=请求获取百家乐房间摘要信息
@@ -244,6 +280,7 @@ message RespBaccaratTableInfo {
   repeated PlayerChangedGold playerChangedGolds = 5;  //结算时玩家赢的金币值
   BaccaratSettlementInfo baccaratSettlementInfo = 6;  //场上结算信息，如果场上阶段不为结算，此值为空
   repeated int32 betInfoList = 7;  //压分列表
+  int32 playerTotalNum = 8;  //玩家总人数
 }
 
 //响应,msgID=0x18085,desc=百家乐通知下注开始

@@ -67,7 +67,7 @@ end
 
 function this.InitUIImageGray()
     --this.material = resMgr:LoadMaterial("Common/Material/UIImageGray",typeof(UnityEngine.Material))
-    this.material = resMgr:LoadMaterial("Common/Material/UIImageGray")
+    this.material = resMgr:LoadMaterial("Common/Material","UIImageGray")
 end
 
 function this.GetUIImageGray()
