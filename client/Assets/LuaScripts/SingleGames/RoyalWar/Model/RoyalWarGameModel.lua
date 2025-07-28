@@ -17,12 +17,12 @@ function RoyalWarGameModel:Close()
 end
 
 function RoyalWarGameModel:AddEvent()
-	WebNetEvent.AddListener(pb_RoyalWar.NotifyPhaseChangInfo, self.NotifyPhaseChangInfo, self)
-	WebNetEvent.AddListener(pb_RoyalWar.NotifyRoomReadyWait, self.NotifyRoomReadyWait, self)
-	WebNetEvent.AddListener(pb_RoyalWar.NotifyRedBlackWarInfo, self.NotifyRedBlackWarInfo, self)
-	WebNetEvent.AddListener(pb_RoyalWar.NotifyRedBlackWarSettleInfo, self.NotifyRedBlackWarSettleInfo, self)
-	WebNetEvent.AddListener(pb_RoyalWar.NotifyPlayerBet, self.NotifyPlayerBet, self)
-	WebNetEvent.AddListener(pb_RoyalWar.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPhaseChangInfo, self.NotifyPhaseChangInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRoomReadyWait, self.NotifyRoomReadyWait, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRedBlackWarInfo, self.NotifyRedBlackWarInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRedBlackWarSettleInfo, self.NotifyRedBlackWarSettleInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.NotifyPlayerBet, self)
+	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
 end
 
 function RoyalWarGameModel:RemoveEvent()
@@ -31,7 +31,7 @@ end
 ---请求红黑大战房间信息
 function RoyalWarGameModel:ReqRoomBaseInfo()
 	look("请求红黑大战房间信息")
-	WebNetworkManager.SendMsg(pb_RoyalWar.ReqRoomBaseInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqRoomBaseInfo)
 end
 
 ---通知红黑大战桌上信息
@@ -69,7 +69,7 @@ function RoyalWarGameModel:ReqBet(betData)
 	local data ={}
 	data.reqBetBeans = betData;
 	look("请求红黑大战的押注",data)
-	WebNetworkManager.SendMsg(pb_RoyalWar.ReqBet,data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBet,data)
 end
 
 ---推送下注信息
@@ -85,7 +85,7 @@ end
 ---请求红黑大战的玩家列表信息
 function RoyalWarGameModel:ReqTablePlayerInfo()
 	look("请求百家乐房间的玩家列表信息")
-	WebNetworkManager.SendMsg(pb_RoyalWar.ReqTablePlayerInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 ---返回红黑大战房间的玩家列表信息
 function RoyalWarGameModel:RespTablePlayerInfo(data)

@@ -17,11 +17,11 @@ function BaccaratGameModel:Close()
 end
 
 function BaccaratGameModel:AddEvent()
-	WebNetEvent.AddListener(pb_Baccarat.NotifyPlayerBet, self.NotifyPlayerBet, self)
-	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratBetStart, self.NotifyBaccaratBetStart, self)
-	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespExitRoomInGame, self.RespExitRoomInGame, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.NotifyPlayerBet, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyBaccaratBetStart, self.NotifyBaccaratBetStart, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.RespExitRoomInGame, self.RespExitRoomInGame, self)
+	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
 end
 
 function BaccaratGameModel:RemoveEvent()
@@ -35,7 +35,7 @@ function BaccaratGameModel:ReqBet(betData)
 	local data ={}
 	data.reqBetBeans = betData;
 	look("请求下注",data)
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqBet,data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBet,data)
 end
 ---推送下注信息
 function BaccaratGameModel:NotifyPlayerBet(data)
@@ -70,7 +70,7 @@ end
 ---请求退出房间
 function BaccaratGameModel:ReqExitRoomInGame()
 	look("请求退出房间")
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqExitRoomInGame)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqExitRoomInGame)
 end
 ---返回推出房间
 function BaccaratGameModel:RespExitRoomInGame(data)
@@ -82,14 +82,14 @@ end
 ---请求百家乐房间的玩家列表信息
 function BaccaratGameModel:ReqTablePlayerInfo()
 	look("请求百家乐房间的玩家列表信息")
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqTablePlayerInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 ---返回百家乐房间的玩家列表信息
 function BaccaratGameModel:RespTablePlayerInfo(data)
 	if(data.code == 200) then
 		look("返回百家乐房间的玩家列表信息成功")
 		require("Logic/Common/PlayerRankPanel/MVCHead")
-		CtrlManager.SingleShow(CtrlNames.PlayerRankPanel,data.tablePlayerInfo)
+		CtrlManager.SingleShow(pb_comonFight.PlayerRankPanel,data.tablePlayerInfo)
 	end
 end
 

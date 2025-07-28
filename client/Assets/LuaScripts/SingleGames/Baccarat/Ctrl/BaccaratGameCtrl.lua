@@ -161,10 +161,15 @@ function BaccaratGameCtrl:InitData()
 	self.betCountDownTimer = TimerManager.CreateTimer(self,function()
 		countDownTime = countDownTime-1;
 		self.view.txt_Countdown.text = countDownTime;
-		if(countDownTime == 3) then
+		if(countDownTime == 3)then
 			Tools.PlayerSpineAniByName(AlarmClockSpine,"action",true)
 		end
+		
+		if(countDownTime <= 3) then
+			SoundManager:PlayClip(config.ABNames.audios.."countdown3")
+		end
 		if(countDownTime<=0) then
+			SoundManager:PlayClip(config.ABNames.audios.."countdown32")
 			self.betCountDownTimer:Stop()
 		end
 	end,1,-1,true);
@@ -803,7 +808,7 @@ function BaccaratGameCtrl:UpWinGoldNum(winGold,target)
 	obj:SetActive(true);
 	local txtNum = ComponentUtilGet.Text(obj.transform,"Num");
 	txtNum.text =string.format("+"..winGold) ;
-	obj.transform:DOLocalMoveY(50,1):OnComplete(function()
+	obj.transform:DOLocalMoveY(100,1):OnComplete(function()
 		self.objPools:UnSpawnPrefab(obj)
 	end);
 end
@@ -822,8 +827,6 @@ function BaccaratGameCtrl:ScreeningChip(list,winGold,target)
 	for _, chipObj in pairs(selfChip) do
 		self:PlayChipToPlayerTwo(chipObj,target)
 	end
-
-	
 end
 
 ---获取某个玩家需要回收多少筹码和数量

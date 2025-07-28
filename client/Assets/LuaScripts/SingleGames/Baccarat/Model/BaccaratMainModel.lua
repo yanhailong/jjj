@@ -17,10 +17,10 @@ function BaccaratMainModel:Close()
 end
 
 function BaccaratMainModel:AddEvent()
-	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableSummaryList, self.RespBaccaratTableSummaryList, self)
-	WebNetEvent.AddListener(pb_Baccarat.NotifyBaccaratTableSummary, self.NotifyBaccaratTableSummary, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespJoinRoomInGame, self.RespJoinRoomInGame, self)
-	WebNetEvent.AddListener(pb_Baccarat.RespBaccaratTableInfo, self.RespBaccaratTableInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.RespBaccaratTableSummaryList, self.RespBaccaratTableSummaryList, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyBaccaratTableSummary, self.NotifyBaccaratTableSummary, self)
+	WebNetEvent.AddListener(pb_comonFight.RespJoinRoomInGame, self.RespJoinRoomInGame, self)
+	WebNetEvent.AddListener(pb_comonFight.RespBaccaratTableInfo, self.RespBaccaratTableInfo, self)
 end
 
 function BaccaratMainModel:RemoveEvent()
@@ -32,7 +32,7 @@ function BaccaratMainModel:ReqBaccaratTableSummaryList(wareId)
 	local data={}
 	data.wareId=wareId;
 	look("请求进入到百家乐大厅",data)
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableSummaryList,data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBaccaratTableSummaryList,data)
 end
 ---返回进入到百家乐大厅
 function BaccaratMainModel:RespBaccaratTableSummaryList(data)
@@ -50,7 +50,7 @@ function BaccaratMainModel:ReqBaccaratTableSummary(roomId,roundId)
 	data.roomId=roomId;
 	data.roundId=roundId;
 	look("请求百家乐游戏进入下一个阶段",data)
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableSummary,data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBaccaratTableSummary,data)
 end
 ---通知百家乐游戏进入下一个阶段
 function BaccaratMainModel:NotifyBaccaratTableSummary(data)
@@ -67,7 +67,7 @@ function BaccaratMainModel:ReqJoinRoomInGame(roomId,gameType,wareId)
 	data.gameType=gameType;
 	data.wareId=wareId;
 	look("请求进入百家乐房间",data)
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqJoinRoomInGame,data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqJoinRoomInGame,data)
 end
 ---进入百家类房间返回
 function BaccaratMainModel:RespJoinRoomInGame(msg)
@@ -82,7 +82,7 @@ end
 ---请求百家乐房间数据
 function BaccaratMainModel:ReqBaccaratTableInfo()
 	look("请求百家乐房间数据")
-	WebNetworkManager.SendMsg(pb_Baccarat.ReqBaccaratTableInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBaccaratTableInfo)
 end
 ---返回百家乐房间数据
 function BaccaratMainModel:RespBaccaratTableInfo(msg)
