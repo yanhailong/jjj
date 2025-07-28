@@ -283,6 +283,7 @@ end
 
 ---首次进入游戏刷新显示
 function BaccaratGameCtrl:FirstEntryGame(data)
+	self.isNeedClearRoad = false;
 	self.GamePhase = data.gamePhase;--游戏阶段信息
 	self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
 	self:InitDataShow(data.cardStateList)
@@ -323,7 +324,7 @@ function BaccaratGameCtrl:NotifyBaccaratRoundStart(data)
 	BetRecord = CurBet;
 	RoundNumber = RoundNumber+1;
 	self:RefreshUIDataShow()
-	self.BaccaratRoadScripts:RefreshData(BaccaratSettlementInfo.cardState,true,false)
+	self.BaccaratRoadScripts:RefreshData(BaccaratSettlementInfo.cardState,true,self.isNeedClearRoad)
 	self:InitUIShow()
 	
 	BaccaratTableInfo = data.baccaratTableInfo
@@ -342,6 +343,7 @@ function BaccaratGameCtrl:NotifyBaccaratSettlementInfo(data)
 end
 ---通知押注类房间玩家信息变化
 function BaccaratGameCtrl:NotifyTableRoomPlayerInfoChange(data)
+	self.isNeedClearRoad = data.needClearRoad;
 	BaccaratTableInfo = data.tableChangedPlayerInfos;
 	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
 	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
@@ -1075,7 +1077,7 @@ function BaccaratGameCtrl:PlayChip(data,playerId)
 	
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,"BaccaratChip_"..chipIndex,targetRect.transform)
 	chip:SetActive(true)
-	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = data.betValue;
+	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = StringUtil.FormatNumber(data.betValue);
 	chip.transform.localScale =  Vector3.one*0.6
 	if(isSelf) then
 		chip.transform.position = self.view.obj_Player.transform.position;

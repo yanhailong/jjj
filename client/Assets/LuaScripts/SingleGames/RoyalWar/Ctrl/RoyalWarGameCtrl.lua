@@ -414,6 +414,12 @@ function RoyalWarGameCtrl:EnterBetGame()
 	self.betCountDownTimer:Start();
 end
 
+---通知押注类房间玩家信息变化
+function RoyalWarGameCtrl:NotifyTableRoomPlayerInfoChange(data)
+	self:RefreshPlayerInfo(data.tablePlayerInfoList);
+	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
+end
+
 ---初始化要显示的数据（接入服务器数据要，要赋值服务器那边的数据显示）
 function RoyalWarGameCtrl:InitDataShow(data)
 	RedWinNumber=0;
@@ -868,7 +874,7 @@ function RoyalWarGameCtrl:PlayChip(data,playerId)
 	end
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,"RoyalWarChip_"..chipIndex,targetRect.transform)
 	chip:SetActive(true)
-	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = data.betValue;
+	ComponentUtilGet.Text(chip.transform,"Icon/Number").text =StringUtil.FormatNumber(data.betValue);
 	chip.transform.localScale =  Vector3.one*0.6
 	if(isSelf) then
 		chip.transform.position = self.view.obj_Player.transform.position;

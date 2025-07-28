@@ -56,6 +56,7 @@ message BaccaratTableSingleRes {
   BaccaratBaseInfo baccaratBaseInfo = 1;  //百家乐游戏基础信息
   BaccaratCardState baccaratCardState = 2;  //百家乐牌状态
   int32 roundId = 3;  //对局ID
+  bool needClearRoad = 4;  //是否需要清除路单, 在结算阶段告知下一回合服务器是否会重新洗牌
 }
 
 //百家乐房间摘要
@@ -297,6 +298,7 @@ message NotifyBaccaratSettlementInfo {
   BaccaratTableInfo baccaratTableInfo = 2;  //桌面的数据
   BaccaratSettlementInfo baccaratSettlementInfo = 3;  //场上结算信息，如果场上阶段不为结算，此值为空
   repeated PlayerChangedGold playerChangedGolds = 4;  //结算时玩家赢的金币值
+  bool needClearRoad = 5;  //是否需要清除路单, 在结算阶段告知下一回合服务器是否会重新洗牌
 }
 
 //响应,msgID=0x18087,desc=在游戏中返回加入房间

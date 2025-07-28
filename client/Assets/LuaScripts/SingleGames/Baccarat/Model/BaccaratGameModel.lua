@@ -22,6 +22,7 @@ function BaccaratGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_comonFight.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
 	WebNetEvent.AddListener(pb_comonFight.RespExitRoomInGame, self.RespExitRoomInGame, self)
 	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.NotifyTableRoomPlayerInfoChange, self)
 end
 
 function BaccaratGameModel:RemoveEvent()
