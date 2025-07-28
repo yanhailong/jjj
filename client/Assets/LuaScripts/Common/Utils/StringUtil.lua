@@ -763,18 +763,17 @@ function StringUtil.formatString(format, ...)
     return str
 end
 
--- 底注数值 K 百万M 十亿B 单位
-function StringUtil.CheckDiZhu(value)
-    if value then
-        if value>=1000 then
-            if value>=1000000 then
-                if value>=1000000000 then
-                    return Mathf.Floor(value/1000000000).."B"
-                end
-                return Mathf.Floor(value/1000000).."M"
-            end
-            return Mathf.Floor(value/1000).."K"
-        end
-        return value
+---数字处理  K（千）、M（百万）、B（十亿）、T（万亿）、P（千万亿）、E（百亿亿）‌、Z十万亿亿）、Y（亿亿亿）
+---@param number底注数字
+---@param decimals小数位数默认0
+function StringUtil.FormatNumber(number,decimals)
+    assert(tonumber(number), "传入参数非正确number类型！")
+    decimals = decimals or 0
+    local units = {"", "K", "M", "B", "T", "P", "E", "Z", "Y"}
+    local unitIndex = 1
+    while number >= 1000 and unitIndex < #units do
+        number = number / 1000
+        unitIndex = unitIndex + 1
     end
+    return string.format( "%."..decimals.."f%s", number, units[unitIndex])
 end 
