@@ -381,9 +381,9 @@ function RoyalWarGameCtrl:RefreshGameStage()
 		elseif curGameStage == config.GameSate.Bet then
 			self:EnterBetGame();
 		elseif curGameStage == config.GameSate.Deal then
-			self:EnterSettlement();
+			self:EnterDeal();
 		elseif curGameStage == config.GameSate.Settlement then
-			
+			self:EnterSettlement();
 		end
 	end)
 	
@@ -473,9 +473,71 @@ function RoyalWarGameCtrl:RefreshPlayerInfo(playerInfoList)
 		item:RefreshPlayerInfoShow(v);
 	end
 end
-
----进入结算阶段
+---直接展示结果
 function RoyalWarGameCtrl:EnterSettlement()
+	self.view.obj_CardBg:SetActive(true);
+	self.view.obj_RoadRoot:SetActive(false)
+	if self.SettlementCor then
+		coroutine.stop(self.SettlementCor)
+		self.SettlementCor=nil
+	end
+	self.SettlementCor=	CorManager:StartCor(function()--翻牌
+		local redCardNumOne = RedBlackWarSettleInfo.redCards[1];
+		local redCardNumTwo = RedBlackWarSettleInfo.redCards[2];
+		local redCardNumThree = RedBlackWarSettleInfo.redCards[3];
+
+		local blackCardNumOne = RedBlackWarSettleInfo.blackCards[1];
+		local blackCardNumTwo =  RedBlackWarSettleInfo.blackCards[2];
+		local blackCardNumThree =  RedBlackWarSettleInfo.blackCards[3];
+
+		self.view.img_RedCardOne.sprite = config.GetCardPic("card_"..redCardNumOne);
+		self.view.img_RedCardTwo.sprite = config.GetCardPic("card_"..redCardNumTwo);
+		self.view.img_RedCardThree.sprite = config.GetCardPic("card_"..redCardNumThree);
+
+		self.view.img_BlackCardOne.sprite = config.GetCardPic("card_"..blackCardNumOne);
+		self.view.img_BlackCardTwo.sprite = config.GetCardPic("card_"..blackCardNumTwo);
+		self.view.img_BlackCardThree.sprite = config.GetCardPic("card_"..blackCardNumThree);
+
+		self.view.img_RedResultNumber.sprite =  config.GetIconCardTypePic(config.GetRedCardTypeName(RedBlackWarSettleInfo.redCardType))
+		self.view.img_RedResultNumber:SetNativeSize();
+		self.view.img_BlackResultNumber.sprite =  config.GetIconCardTypePic(config.GetBlackCardTypeName(RedBlackWarSettleInfo.blackCardType))
+		self.view.img_BlackResultNumber:SetNativeSize();
+
+		if(RedBlackWarSettleInfo.redCardType == config.CardType.DanZhang) then
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_7")
+		else
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_8")
+		end
+
+		if(RedBlackWarSettleInfo.blackCardType== config.CardType.DanZhang) then
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_7")
+		else
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_8")
+		end
+		self.view.ator_CardRoot:Play("RoyalWarDealCard",0,1)
+		self.isRedWin = RedBlackWarSettleInfo.winState==1;
+		self.view.obj_RedWin:SetActive(self.isRedWin)
+		self.view.obj_BlackWin:SetActive(not self.isRedWin);
+		if(RedBlackWarSettleInfo.winState == 1) then
+			SoundManager:PlayClip(config.ABNames.audios.."redWin")
+			Tools.PlayerSpineAniByName(RedWinSpine,"action",false)
+		else
+			SoundManager:PlayClip(config.ABNames.audios.."blackWin")
+			Tools.PlayerSpineAniByName(BlackSpine,"action",false)
+		end
+		self.IsLucky = RedBlackWarSettleInfo.redCardType~=config.CardType.DanZhang or RedBlackWarSettleInfo.blackCardType~=config.CardType.DanZhang;
+		self:Flicker();
+		if(RedBlackWarSettleInfo.redCardType>RedBlackWarSettleInfo.blackCardType) then
+			self:RefreshCardTypeData(RedBlackWarSettleInfo.redCardType)
+		else
+			self:RefreshCardTypeData(RedBlackWarSettleInfo.blackCardType)
+		end
+		coroutine.wait(3)
+		self:PlayChipToPlayer()
+	end)
+end
+---进入结算阶段(从翻牌开始)
+function RoyalWarGameCtrl:EnterDeal()
 	self.view.obj_StopBet:SetActive(true);
 	self.view.obj_AboutEnd:SetActive(false);
 	self.view.obj_CardBg:SetActive(true);

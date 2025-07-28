@@ -776,4 +776,4 @@ function StringUtil.FormatNumber(number,decimals)
         unitIndex = unitIndex + 1
     end
     return string.format( "%."..decimals.."f%s", number, units[unitIndex])
-end 
+end
