@@ -85,6 +85,7 @@ function CarLogoGameView:InitComponents()
     self.history=CarLogoHistoryItem.New(self.historyObj)
 
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.dizhuScrollRect=ComponentUtilGet.ScrollRect(self.transform,"content/bottom/chouma")
     self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
     self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
     self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
@@ -98,7 +99,7 @@ function CarLogoGameView:InitComponents()
     for i = 1, 7 do
         local chipItem={}
         chipItem.obj=self.dizhu:GetChild(i-1).gameObject
-        chipItem.rectTrans=self.dizhu:GetChild(i-1)
+        chipItem.rectTrans=ComponentUtilGet.Transform(self.dizhu:GetChild(i-1),"Button")
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
         chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
         chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
@@ -143,7 +144,7 @@ function CarLogoGameView:InitChouMa()
         if self.model.betPointList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.betPointList[i])
+            self.chipInfos[i].num.text = StringUtil.FormatNumber(self.model.betPointList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
@@ -174,27 +175,6 @@ function CarLogoGameView:InitUI()
     self:InitXiaZhuLabel()
     UpdateManager.AddUpdate(self,self.UpdateBetting)
     GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
-end
-
-function CarLogoGameView:DizhuPrev(isNext)
-    if isNext==false then
-        if self.dizhupos then
-            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
-            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-            self.img_prev.transform.localScale = Vector3.one
-            self.img_next.transform.localScale = Vector3.one
-            self.dizhupos = false
-        end
-    else if not self.dizhupos then
-        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
-        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-        self.img_prev.transform.localScale = Vector3(-1,1,1)
-        self.img_next.transform.localScale = Vector3(-1,1,1)
-        self.dizhupos = true
-    end
-    end
 end
 
 ---初始化车标
@@ -228,26 +208,23 @@ function CarLogoGameView:LogoShowLinght(index)
 end
 
 function CarLogoGameView:DizhuPrev(isNext)
-    if isNext==false then
-        if self.dizhupos then
-            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
-            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-            self.img_prev.transform.localScale = Vector3.one
-            self.img_next.transform.localScale = Vector3.one
-            self.dizhupos = false
-        end
-    else if not self.dizhupos then
-        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
+    local target = isNext and 1 or 0
+    self.dizhuScrollRect:DOHorizontalNormalizedPos(target,1):SetEase(Ease.OutBack)
+end
+
+function CarLogoGameView:ChangeDiZhuNav(isRight)
+    if isRight then
         self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
         self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
         self.img_prev.transform.localScale = Vector3(-1,1,1)
         self.img_next.transform.localScale = Vector3(-1,1,1)
-        self.dizhupos = true
-    end
+    else
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_prev.transform.localScale = Vector3.one
+        self.img_next.transform.localScale = Vector3.one
     end
 end
-
 ------start Logo Marquee-----
 function CarLogoGameView:InitMarquee()
     self.marqueeCallFunc = nil

@@ -28,6 +28,7 @@ function DragonTigerFightView:InitComponents()
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
     self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.btn_players.transform,"tmp_total_player_num")
     self.dizhu=ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.dizhuScrollRect=ComponentUtilGet.ScrollRect(self.transform,"content/bottom/chouma")
     self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
     self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
     self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
@@ -63,7 +64,7 @@ function DragonTigerFightView:InitComponents()
     for i = 1, 7 do
         local chipItem={}
         chipItem.obj=self.dizhu:GetChild(i-1).gameObject
-        chipItem.rectTrans=self.dizhu:GetChild(i-1)
+        chipItem.rectTrans=ComponentUtilGet.Transform(self.dizhu:GetChild(i-1),"Button")
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
         chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
         chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
@@ -99,7 +100,6 @@ function DragonTigerFightView:InitComponents()
     self.tipsEnterWait=ComponentUtilGet.Transform(self.tipsTrs,"tips_enter_wait")
     self.tipsEnterWaitTime=ComponentUtilGet.Text(self.tipsEnterWait,"naozhong/time")
     
-    self.daojishiParticles =ComponentUtilGet.GameObject(self.tipsTrs,"eff_daojishi/eff_daojishi"):GetComponent("ParticleSystem")
     self.huWo=ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_hu_won/eff_DragonTigerFight_hu_won"):GetComponent("ParticleSystem")
     self.longWo=ComponentUtilGet.GameObject(self.tipsTrs,"eff_DragonTigerFight_long_won/eff_DragonTigerFight_long_won"):GetComponent("ParticleSystem")
     ---路单信息
@@ -146,23 +146,21 @@ function DragonTigerFightView:ClearComponents()
 end
 
 function DragonTigerFightView:DizhuPrev(isNext)
-    if isNext==false then
-        if self.dizhupos then
-            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
-            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-            self.img_prev.transform.localScale = Vector3.one
-            self.img_next.transform.localScale = Vector3.one
-            self.dizhupos = false
-        end
-    else if not self.dizhupos then
-        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
+    local target = isNext and 1 or 0
+    self.dizhuScrollRect:DOHorizontalNormalizedPos(target,1):SetEase(Ease.OutBack)
+end
+
+function DragonTigerFightView:ChangeDiZhuNav(isRight)
+    if isRight then
         self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
         self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
         self.img_prev.transform.localScale = Vector3(-1,1,1)
         self.img_next.transform.localScale = Vector3(-1,1,1)
-        self.dizhupos = true
-        end
+    else
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_prev.transform.localScale = Vector3.one
+        self.img_next.transform.localScale = Vector3.one
     end
 end
 
@@ -328,7 +326,7 @@ function DragonTigerFightView:InitChouMa()
         if self.model.betPointList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.betPointList[i])
+            self.chipInfos[i].num.text = StringUtil.FormatNumber(self.model.betPointList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
@@ -351,7 +349,7 @@ function DragonTigerFightView:InitUI()
     for i=1,#self.AllOtherPlayerHeads do
         self.AllOtherPlayerHeads[i]:UpdatePlayer(nil)
     end
-    self:InitChouMa()
+    self.ctrl.commCtrl:BindData(config,true,self.model.betPointList,self.btn_players,self.xiazhuStarAreas)
     ---路单数据
     self.RoadHistoryRecord = nil
     
@@ -366,7 +364,6 @@ function DragonTigerFightView:InitUI()
     self.tipsStartXiaZhu:SetActive(false)
     self.tipsTimeEnd:SetActive(false)
     self.tipsTimeThree:SetActive(false)
-    self.daojishiParticles.gameObject:SetActive(false)
     self.resultWinTrs.gameObject:SetActive(false)
     self.colockNumTrs.gameObject:SetActive(false)
     self.tipsEnterWait.gameObject:SetActive(false)
@@ -374,8 +371,6 @@ function DragonTigerFightView:InitUI()
     self.resultCard2:Hiden()
     self.roadView.gameObject:SetActive(true)
     self:InitXiaZhuLabel()
-    UpdateManager.AddUpdate(self,self.UpdateBetting)
-    GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
 end
 ---初始化View数据
 function DragonTigerFightView:InitPanelData(args)
@@ -521,16 +516,6 @@ function DragonTigerFightView:StartEffect()
     self.startTrs.gameObject:SetActive(true)
     Tools.PlayerSpineAniByName(self.startSp,"action",false)
     DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.BET_READY)
-end
-
----倒计时3秒
-function DragonTigerFightView:PlayDaoJiShiEffect()
-
-    self.daojishiParticles.gameObject:SetActive(true)
-    self.tipsTimeThree:SetActive(true)
-    if self.daojishiParticles.isStopped  then
-        self.daojishiParticles:Play();
-    end
 end
 
 ---更新自己信息
@@ -698,7 +683,6 @@ function DragonTigerFightView:OnGameStatus(status)
     self.resultWinTrs.gameObject:SetActive(false)
     self.tipsCenterTxt.gameObject:SetActive(false)
     self.tipsWaitopenTxt.gameObject:SetActive(false)
-    self.daojishiParticles.gameObject:SetActive(false)
     self.tipsEnterWait.gameObject:SetActive(false)
     self.colockNumTrs.gameObject:SetActive(false)
     self.roadView.gameObject:SetActive(true)
@@ -737,7 +721,7 @@ function DragonTigerFightView:OnGameStatus(status)
             self.colockStateTimeNum.text = tostring(config.lessSeconds)
             if config.lessSeconds == 3 then
                 self.colockStateTimeTrs.gameObject:SetActive(false)
-                self:PlayDaoJiShiEffect()
+                self.ctrl.commCtrl:PlayDaoJiShiEffect()
             end
             if config.lessSeconds <= 0 then
                 TimerManager.StopTimer(self,self.statusTimer)
@@ -777,7 +761,6 @@ end
 function DragonTigerFightView:Close()
     ChouMaFlyUtil:Destroy()
     TimerManager.StopAllTimer(self)
-    UpdateManager.ReMoveAll(self)
     DragonTigerFightSounds.StopSoundMusic()
     self.super.Close(self);
 end

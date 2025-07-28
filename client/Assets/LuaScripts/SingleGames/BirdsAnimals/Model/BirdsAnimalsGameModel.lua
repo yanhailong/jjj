@@ -31,13 +31,13 @@ function BirdsAnimalsGameModel:Close()
 end
 
 function BirdsAnimalsGameModel:AddEvent()
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyAnimalsTableInfo, self.OnEnterRoom, self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyRoomReadyWait, self.OnGameStatus, self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyAnimalsSettlement, self.OnGameResult, self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyPlayerBet, self.OnBetting, self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.RespTablePlayerInfo,self.UpdateAllPlayers,self)
-	WebNetEvent.AddListener(pb_BirdsAnimals.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyAnimalsTableInfo, self.OnEnterRoom, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRoomReadyWait, self.OnGameStatus, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyAnimalsSettlement, self.OnGameResult, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.OnBetting, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo,self.UpdateAllPlayers,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
 end
 
 function BirdsAnimalsGameModel:RemoveEvent()
@@ -47,11 +47,11 @@ end
 --region 事件方法
 -- 进入房间请求
 function BirdsAnimalsGameModel:ReqEnterRoom()
-	WebNetworkManager.SendMsg(pb_BirdsAnimals.ReqRoomBaseInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqRoomBaseInfo)
 end
 -- 押注
 function BirdsAnimalsGameModel:Bet(data)
-	WebNetworkManager.SendMsg(pb_BirdsAnimals.ReqBet, data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBet, data)
 end
 --退出房间
 function BirdsAnimalsGameModel:ExitRoom()
@@ -59,7 +59,7 @@ function BirdsAnimalsGameModel:ExitRoom()
 end
 --获取房间玩家信息
 function BirdsAnimalsGameModel:ReqRoomPlayers()
-	WebNetworkManager.SendMsg(pb_BirdsAnimals.ReqTablePlayerInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 -- 进入房间返回 NotifyLoongTigerWarInfo
 function BirdsAnimalsGameModel:OnEnterRoom(msg)

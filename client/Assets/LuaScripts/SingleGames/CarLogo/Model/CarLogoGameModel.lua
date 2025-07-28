@@ -31,13 +31,13 @@ function CarLogoGameModel:Close()
 end
 
 function CarLogoGameModel:AddEvent()
-	WebNetEvent.AddListener(pb_CarLogo.NotifyLuxuryCarClubTableInfo, self.OnEnterRoom, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyRoomReadyWait, self.OnGameStatus, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyLuxuryCarClubSettlement, self.OnGameResult, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyPlayerBet, self.OnBetting, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
-	WebNetEvent.AddListener(pb_CarLogo.RespTablePlayerInfo,self.UpdateAllPlayers,self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyLuxuryCarClubTableInfo, self.OnEnterRoom, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRoomReadyWait, self.OnGameStatus, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyLuxuryCarClubSettlement, self.OnGameResult, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.OnBetting, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo,self.UpdateAllPlayers,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
 end
 
 function CarLogoGameModel:RemoveEvent()
@@ -47,11 +47,11 @@ end
 --region 事件方法
 -- 进入房间请求
 function CarLogoGameModel:ReqEnterRoom()
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqRoomBaseInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqRoomBaseInfo)
 end
 -- 押注
 function CarLogoGameModel:Bet(data)
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqBet, data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBet, data)
 end
 --退出房间
 function CarLogoGameModel:ExitRoom()
@@ -59,7 +59,7 @@ function CarLogoGameModel:ExitRoom()
 end
 --获取房间玩家信息
 function CarLogoGameModel:ReqRoomPlayers()
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqTablePlayerInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 -- 进入房间返回 NotifyLoongTigerWarInfo
 function CarLogoGameModel:OnEnterRoom(msg)

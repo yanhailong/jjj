@@ -8,6 +8,7 @@ local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
 
 function DragonTigerFightModel:Awake()
     self.super.Awake(self);
+    ---@type DragonTigerFightCtrl
     self.ctrl=self.ctrl
     
     self.initState = false
@@ -21,8 +22,6 @@ function DragonTigerFightModel:Awake()
     self.bettingDataMap = {}
     self.AreaChipTotals = {0,0,0}
     self.playersNum=0
-    --请求进入房间
-    self:ReqEnterRoom()
 end
 
 function DragonTigerFightModel:Close()
@@ -30,13 +29,13 @@ function DragonTigerFightModel:Close()
 end
 
 function DragonTigerFightModel:AddEvent()
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyLoongTigerWarInfo, self.OnEnterRoom, self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyRoomReadyWait, self.OnGameStatus, self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyLoongTigerWarSettleInfo, self.OnGameResult, self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyPlayerBet, self.OnBetting, self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.RespTablePlayerInfo,self.UpdateAllPlayers,self)
-    WebNetEvent.AddListener(pb_DragonTigerFight.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyLoongTigerWarInfo, self.OnEnterRoom, self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyRoomReadyWait, self.OnGameStatus, self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyLoongTigerWarSettleInfo, self.OnGameResult, self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.OnBetting, self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
+    WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo,self.UpdateAllPlayers,self)
+    WebNetEvent.AddListener(pb_comonFight.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
 end
 
 function DragonTigerFightModel:RemoveEvent()
@@ -46,11 +45,11 @@ end
 --region 事件方法
 -- 进入房间请求
 function DragonTigerFightModel:ReqEnterRoom()
-    WebNetworkManager.SendMsg(pb_DragonTigerFight.ReqRoomBaseInfo)
+    WebNetworkManager.SendMsg(pb_comonFight.ReqRoomBaseInfo)
 end
 -- 押注
 function DragonTigerFightModel:Bet(data)
-    WebNetworkManager.SendMsg(pb_DragonTigerFight.ReqBet, data)
+    WebNetworkManager.SendMsg(pb_comonFight.ReqBet, data)
 end
 --退出房间
 function DragonTigerFightModel:ExitRoom()
@@ -58,7 +57,7 @@ function DragonTigerFightModel:ExitRoom()
 end
 --获取房间玩家信息
 function DragonTigerFightModel:ReqRoomPlayers()
-    WebNetworkManager.SendMsg(pb_DragonTigerFight.ReqTablePlayerInfo)
+    WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 -- 进入房间返回 NotifyLoongTigerWarInfo
 function DragonTigerFightModel:OnEnterRoom(msg)
@@ -116,7 +115,7 @@ function DragonTigerFightModel:OnGameStatus(msg)
     self.status = 1
     self.endTime = msg.waitEndTime
     self.view:OnGameStatus(self.status)
-    self.bettingDataMap = {}
+    self.ctrl.commCtrl.bettingDataMap = {}
 end
 --收到开始下注消息
 function DragonTigerFightModel:OnStartXiaZhu(msg)
@@ -172,8 +171,8 @@ function DragonTigerFightModel:ResetConfig()
     end
     self.sideBetInfos={}
     self.Result = {}
-    self.AreaChipTotals = {0,0,0}
-    self.bettingDataMap = {}
+    config.AreaChipTotals = {0,0,0}
+    config.bettingDataMap = {}
 end
 
 --endregion

@@ -110,6 +110,7 @@ function BirdsAnimalsGameView:InitComponents()
     self.history=BirdsAnimalsHistoryItem.New(self.historyObj)
 
     self.dizhu = ComponentUtilGet.Transform(self.transform,"content/bottom/chouma/Viewport/Content");
+    self.dizhuScrollRect=ComponentUtilGet.ScrollRect(self.transform,"content/bottom/chouma")
     self.btn_prev = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/prev");
     self.btn_next = ComponentUtilGet.Button(self.transform, "content/bottom/chouma/next");
     self.img_prev = ComponentUtilGet.Image(self.btn_prev.transform,"img");
@@ -124,7 +125,7 @@ function BirdsAnimalsGameView:InitComponents()
     for i = 1, 7 do
         local chipItem={}
         chipItem.obj=self.dizhu:GetChild(i-1).gameObject
-        chipItem.rectTrans=self.dizhu:GetChild(i-1)
+        chipItem.rectTrans=ComponentUtilGet.Transform(self.dizhu:GetChild(i-1),"Button")
         chipItem.button=ComponentUtilGet.Button(chipItem.rectTrans)
         chipItem.image=ComponentUtilGet.Image(chipItem.rectTrans)
         chipItem.num=ComponentUtilGet.Text(chipItem.rectTrans,"number")
@@ -174,7 +175,7 @@ function BirdsAnimalsGameView:InitChouMa()
         if self.model.betPointList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"yx_ph_cm_"..i)
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.betPointList[i])
+            self.chipInfos[i].num.text = StringUtil.FormatNumber(self.model.betPointList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")
@@ -206,28 +207,6 @@ function BirdsAnimalsGameView:InitUI()
     GameObject.Destroy(ComponentUtilGet.HorizontalLayoutGroup(self.dizhu))
 end
 
-function BirdsAnimalsGameView:DizhuPrev(isNext)
-    if isNext==false then
-        if self.dizhupos then
-            self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x+412,1):SetEase(Ease.OutBack)
-            self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-            self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-            self.img_prev.transform.localScale = Vector3.one
-            self.img_next.transform.localScale = Vector3.one
-            self.dizhupos = false
-        end
-    else if not self.dizhupos then
-        self.dizhu:DOLocalMoveX(self.dizhu.localPosition.x-412,1):SetEase(Ease.OutBack)
-        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
-        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
-        self.img_prev.transform.localScale = Vector3(-1,1,1)
-        self.img_next.transform.localScale = Vector3(-1,1,1)
-        self.dizhupos = true
-    end
-    end
-end
-
-
 ---初始化图标
 function BirdsAnimalsGameView:InitLogos()
     for logo_id, pos in pairs(config.LOGO_IDX) do
@@ -248,6 +227,25 @@ end
 function BirdsAnimalsGameView:LogoShowLinght(index)
     for i, view in ipairs(self.logoViews) do
         view:ShowChoose(true,i ~= index)
+    end
+end
+
+function BirdsAnimalsGameView:DizhuPrev(isNext)
+    local target = isNext and 1 or 0
+    self.dizhuScrollRect:DOHorizontalNormalizedPos(target,1):SetEase(Ease.OutBack)
+end
+
+function BirdsAnimalsGameView:ChangeDiZhuNav(isRight)
+    if isRight then
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_prev.transform.localScale = Vector3(-1,1,1)
+        self.img_next.transform.localScale = Vector3(-1,1,1)
+    else
+        self.img_prev.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou1")
+        self.img_next.sprite = resMgr:LoadSprite(config.dizhuImgAtlas,"d_ph_jiantou2")
+        self.img_prev.transform.localScale = Vector3.one
+        self.img_next.transform.localScale = Vector3.one
     end
 end
 
@@ -402,8 +400,9 @@ function BirdsAnimalsGameView:ResultEffect(result)
             self:PlayCarEffectView(LogoId,function()
                 -- 播放赢的区域闪动
                 local index = BirdsAnimalsHelper.FindIndexById(LogoId)
-                self.areaViews[index]:ShowWinFlashAnim()
-
+                if index then --跳过通杀、通赔
+                    self.areaViews[index]:ShowWinFlashAnim()
+                end
                 --飞鸟和走兽区域闪动
                 if BirdsAnimalsHelper.IsFeiQinType(LogoId) then
                     self.areaViews[3]:ShowWinFlashAnim()

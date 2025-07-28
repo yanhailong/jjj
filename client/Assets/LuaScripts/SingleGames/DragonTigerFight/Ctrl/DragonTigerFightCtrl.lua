@@ -25,14 +25,18 @@ function DragonTigerFightCtrl:CtrlInit(args)
 end
 
 function DragonTigerFightCtrl:InitData()
-    
+    ---@type CommFightBtnsCtrl
+    self.commCtrl = CtrlManager.SingleShow(CtrlNames.CommFightBtns, self):AddAsyncOpenCallback(function()
+        --请求进入房间
+        self.model:ReqEnterRoom()
+    end)
 end
-
 
 function DragonTigerFightCtrl:AddUIEvent()
     self:AddFunctionButtons()
     self:AddBetButtons()
     self:AddAreaClickEvents()
+    self:AddDiZhuScrollRect()
 end
 
 function DragonTigerFightCtrl:AddFunctionButtons()
@@ -52,7 +56,7 @@ end
 
 function DragonTigerFightCtrl:AddBetButtons()
     for i, chipInfo in ipairs(self.view.chipInfos) do
-        self.uiEventListener:AddClick(chipInfo.button, function()
+        self.uiEventListener:AddClick(chipInfo.button.gameObject, function()
             if config.allow then
                 self.view:ChangeDiZhu(i)
                 look("btn 抵住数值" .. config.dizhuIndex)
@@ -66,6 +70,16 @@ function DragonTigerFightCtrl:AddAreaClickEvents()
     for idx, btn in ipairs(areaButtons) do
         self.uiEventListener:AddClick(btn, function(obj) self:OnClickCenterYaZhuSide(idx) end)
     end
+end
+
+function DragonTigerFightCtrl:AddDiZhuScrollRect()
+    self.uiEventListener:AddScrollRect(self.view.dizhuScrollRect.gameObject,function(pos)
+        if Mathf.Abs(pos.x - 1) < 0.01 then --判断是否滑动到最右
+            self.view:ChangeDiZhuNav(true)
+        elseif Mathf.Abs(pos.x) < 0.01 then-- 判断是否滑动到最左
+            self.view:ChangeDiZhuNav(false)
+        end
+    end)
 end
 
 function DragonTigerFightCtrl:RepeatBet()
@@ -105,13 +119,16 @@ function DragonTigerFightCtrl:RemoveEvent()
 end
 
 --region UI事件方法
-
+function DragonTigerFightCtrl:OnClickHelp()
+    CtrlManager.SingleShow(CtrlNames.DragonTigerFightRule)
+end
 --endregion
 
 
 ---销毁UI
 function DragonTigerFightCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+    self.commCtrl:Close()
 end
 
 return DragonTigerFightCtrl

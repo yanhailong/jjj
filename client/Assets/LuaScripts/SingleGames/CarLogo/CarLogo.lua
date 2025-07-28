@@ -10,7 +10,7 @@ function CarLogo:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function CarLogo:Init()
-    require("SingleGames/CarLogo/MsgPro/pb_CarLogo")
+    require("PlatformHall/comonFight/MsgPro/pb_comonFight")
 end
 
 function CarLogo:EnterGame()

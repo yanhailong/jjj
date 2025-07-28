@@ -37,7 +37,7 @@ function ChouMaFlyUtil:AnimateCoin(coin,coin_type,start_pos,target,dizhuNum,pare
     local img = ComponentUtilGet.Image(coinObj.transform,"img")
     local num = ComponentUtilGet.Text(coinObj.transform,"num")
     img.sprite = resMgr:LoadSprite(ImgAtlas,"yx_ph_cm_"..coin_type)
-    num.text = StringUtil.CheckDiZhu(dizhuNum)
+    num.text = StringUtil.FormatNumber(dizhuNum)
     
     -- 获取目标区域的矩形顶点
     local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)
@@ -81,7 +81,7 @@ function ChouMaFlyUtil:CreatCoinInArea(coin,coin_type,target,dizhuNum)
     local img = ComponentUtilGet.Image(coinObj.transform,"img")
     local num = ComponentUtilGet.Text(coinObj.transform,"num")
     img.sprite = resMgr:LoadSprite(ImgAtlas,"yx_ph_cm_"..coin_type)
-    num.text = StringUtil.CheckDiZhu(dizhuNum)
+    num.text = StringUtil.FormatNumber(dizhuNum)
 
     -- 获取目标区域的矩形顶点
     local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)

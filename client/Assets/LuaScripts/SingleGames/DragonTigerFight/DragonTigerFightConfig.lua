@@ -32,6 +32,10 @@ this.fadeTime = 0.5
 this.fadeTimes = 1
 --- 玩家下注显示筹码数限制
 this.AreaChouMaLimit = { 80, 80, 60}
+---累计下注数据
+this.AreaChipTotals = {0,0,0}
+---本局下注数据
+this.bettingDataMap = {}
 
 ---复投
 this.lastXiaZhuInfo = {}
