@@ -776,7 +776,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 	for _, v in ipairs(PlayerChangedGolds) do
 		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--自己赢钱了
 			local selfWinGold = v.playerWinGold+v.playerBetGold
-			self:ScreeningChip(betInfoDescendingList,selfWinGold,self.view.obj_Player.transform)
+			self:ScreeningChip(betInfoDescendingList,v.playerWinGold,self.view.obj_Player.transform)
 			self:UpWinGoldNum(v.playerWinGold,self.view.obj_Player.transform)
 		elseif(self:IsInScene(v.playerId)) then --前6名的玩家赢钱了
 			for _, k in pairs(BaccaratPlayerItems) do
@@ -784,7 +784,7 @@ function BaccaratGameCtrl:PlayChipToPlayer()
 				local item = k;
 				if(item:GetPlayerId() == v.playerId) then
 					local winGold = v.playerWinGold+v.playerBetGold
-					self:ScreeningChip(betInfoDescendingList,winGold,item.transform)
+					self:ScreeningChip(betInfoDescendingList,v.playerWinGold,item.transform)
 					self:UpWinGoldNum(v.playerWinGold,item.transform)
 				end
 			end

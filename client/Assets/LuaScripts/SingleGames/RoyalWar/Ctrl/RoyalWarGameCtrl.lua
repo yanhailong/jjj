@@ -507,7 +507,9 @@ function RoyalWarGameCtrl:EnterSettlement()
 	
 		
 		self.view.img_RedResultNumber.sprite =  config.GetIconCardTypePic(config.GetRedCardTypeName(RedBlackWarSettleInfo.redCardType))
+		self.view.img_RedResultNumber:SetNativeSize();
 		self.view.img_BlackResultNumber.sprite =  config.GetIconCardTypePic(config.GetBlackCardTypeName(RedBlackWarSettleInfo.blackCardType))
+		self.view.img_BlackResultNumber:SetNativeSize();
 		
 		if(RedBlackWarSettleInfo.redCardType == config.CardType.DanZhang) then
 			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_7")
@@ -590,7 +592,7 @@ function RoyalWarGameCtrl:PlayChipToPlayer()
 	for _, v in ipairs(RedBlackWarSettleInfo.playerSettleInfos) do
 		if(v.playerId == PlayerManager:GetPlayerInfo().playerId) then--自己赢钱了
 			local selfWinGold = v.playerWinGold+v.playerBetGold
-			self:ScreeningChip(betInfoDescendingList,selfWinGold,self.view.obj_Player.transform)
+			self:ScreeningChip(betInfoDescendingList,v.playerWinGold,self.view.obj_Player.transform)
 			self:UpWinGoldNum(v.playerWinGold,self.view.obj_Player.transform)
 		elseif(self:IsInScene(v.playerId)) then --前6名的玩家赢钱了
 			for _, k in pairs(RoyalWarPlayerItems) do
@@ -598,7 +600,7 @@ function RoyalWarGameCtrl:PlayChipToPlayer()
 				local item = k;
 				if(item:GetPlayerId() == v.playerId) then
 					local winGold = v.playerWinGold+v.playerBetGold
-					self:ScreeningChip(betInfoDescendingList,winGold,item.transform)
+					self:ScreeningChip(betInfoDescendingList,v.playerWinGold,item.transform)
 					self:UpWinGoldNum(v.playerWinGold,item.transform)
 				end
 			end
