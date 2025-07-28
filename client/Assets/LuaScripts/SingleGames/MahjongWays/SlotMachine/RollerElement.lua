@@ -8,29 +8,27 @@ function RollerElement.New(go)
     return self
 end
 
-function RollerElement:Init(roller, icons, index, Count, elementHeight, ElementIconPrefab, Height, manager, offset, AddItems, isOpenReboundAnimation,ElementInitCompleted, ChangeRandomIcons_Event,
-SetResultIcons_Event)
+function RollerElement:Init(roller, index, slotMachine)
     self.roller = roller
-    self.icons = icons
     self.index = index
-    self.ItemsPerAxis = Count
-    self.ElementHeight = elementHeight
-    self.manager = manager
-    self.offset = offset
-    self.AddItems = AddItems
-    self.isOpenReboundAnimation = isOpenReboundAnimation
-    self.BounceOffset = elementHeight / 2
-    self.top = (elementHeight * Count) / 2 - self.BounceOffset
+    self.ItemsPerAxis = slotMachine.ItemsPerAxis + slotMachine.AddItems * 2
+    self.ElementHeight = slotMachine.ElementHeight
+    self.slotMachine = slotMachine
+    self.offset = slotMachine.StartOffset - self.slotMachine.ElementHeight / 2
+    self.AddItems = slotMachine.AddItems
+    self.isOpenReboundAnimation = slotMachine.isOpenReboundAnimation
+    self.BounceOffset = slotMachine.ElementHeight / 2
+    self.top = (slotMachine.ElementHeight * self.ItemsPerAxis) / 2 - self.BounceOffset
     self.ResetThreshold = -self.top - 50
     self.originalPos = self.transform.localPosition
-    self.elementIcon = CS.UnityEngine.GameObject.Instantiate(ElementIconPrefab, self.transform)
+    self.elementIcon = CS.UnityEngine.GameObject.Instantiate(slotMachine.ElementIconPrefab, self.transform)
     self.elementIcon.transform.localPosition = CS.UnityEngine.Vector3.zero
     self.elementIcon.transform.localScale = CS.UnityEngine.Vector3.one
     roller.stop:Add(function() self.StartRoll = false end)
     roller.changeSpeed:Add(function(speed) self.speed = speed end)
-    ElementInitCompleted:Invoke(self, self.elementIcon, self.roller.index, self.index);
-    self.ChangeRandomIcons_Event = ChangeRandomIcons_Event;
-    self.SetResultIcons_Event = SetResultIcons_Event;
+    slotMachine.ElementInitCompleted:Invoke(self, self.elementIcon, self.roller.index, self.index);
+    self.ChangeRandomIcons_Event = slotMachine.ChangeRandomIcons_Event;
+    self.SetResultIcons_Event = slotMachine.SetResultIcons_Event;
 end
 
 function RollerElement:GetIndex()
@@ -58,38 +56,40 @@ end
 
 function RollerElement:RotatingAnimation(time)
     return self.transform:DOLocalMoveY(self.transform.localPosition.y - self.ElementHeight, time)
-               :SetEase(CS.DG.Tweening.Ease.Linear)
-               :OnComplete(function()
-        if self.transform.localPosition.y <= self.ResetThreshold then
-            self.ChangeRandomIcons_Event:Invoke(self, self.elementIcon, self.roller.index, self.index)
-            self.transform.localPosition = CS.UnityEngine.Vector3(self.originalPos.x, self.top, self.originalPos.z)
-        end
-    end)
-               :WaitForCompletion()
+        :SetEase(CS.DG.Tweening.Ease.Linear)
+        :OnComplete(function()
+            if self.transform.localPosition.y <= self.ResetThreshold then
+                self.ChangeRandomIcons_Event:Invoke(self, self.elementIcon, self.roller.index, self.index)
+                self.transform.localPosition = CS.UnityEngine.Vector3(self.originalPos.x, self.top, self.originalPos.z)
+            end
+        end)
+        :WaitForCompletion()
 end
 
 function RollerElement:SetAsynResult(isAsyn)
     return coroutine.start(function()
         local index = self:GetIndex()
         if not isAsyn then
-            if index >= self.AddItems and index < self.ItemsPerAxis - self.AddItems  then
-                self.SetResultIcons_Event:Invoke(self, self.elementIcon, self.roller.index, index-(self.AddItems-1))
+            if index >= self.AddItems and index < self.ItemsPerAxis - self.AddItems then
+                self.SetResultIcons_Event:Invoke(self, self.elementIcon, self.roller.index, index - (self.AddItems - 1))
             end
             return
         end
         for i = 1, self.ItemsPerAxis do
             coroutine.yield(
-                    self.transform:DOLocalMoveY(self.transform.localPosition.y - self.ElementHeight, self.speed)
-                        :SetEase(CS.DG.Tweening.Ease.Linear)
-                        :OnComplete(function()
-                        if self.transform.localPosition.y <= self.ResetThreshold then
-                            if index >= self.AddItems and index < (self.ItemsPerAxis - self.AddItems)  then
-                                self.SetResultIcons_Event:Invoke(self, self.elementIcon, self.roller.index, index-(self.AddItems-1))
-                            end
-                            self.transform.localPosition = CS.UnityEngine.Vector3(self.originalPos.x, self.top, self.originalPos.z)
+                self.transform:DOLocalMoveY(self.transform.localPosition.y - self.ElementHeight, self.speed)
+                :SetEase(CS.DG.Tweening.Ease.Linear)
+                :OnComplete(function()
+                    if self.transform.localPosition.y <= self.ResetThreshold then
+                        if index >= self.AddItems and index < (self.ItemsPerAxis - self.AddItems) then
+                            self.SetResultIcons_Event:Invoke(self, self.elementIcon, self.roller.index,
+                                index - (self.AddItems - 1))
                         end
-                    end)
-                        :WaitForCompletion()
+                        self.transform.localPosition = CS.UnityEngine.Vector3(self.originalPos.x, self.top,
+                            self.originalPos.z)
+                    end
+                end)
+                :WaitForCompletion()
             )
         end
     end)
@@ -97,13 +97,13 @@ end
 
 function RollerElement:ReboundAnimation()
     return coroutine.start(function()
-         coroutine.yield(
-                self.transform:DOLocalMoveY(self.transform.localPosition.y - self.BounceOffset, 0.2)
-                    :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
+        coroutine.yield(
+            self.transform:DOLocalMoveY(self.transform.localPosition.y - self.BounceOffset, 0.2)
+            :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
         )
-         coroutine.yield(
-                self.transform:DOLocalMoveY(self.transform.localPosition.y + self.BounceOffset, 0.2)
-                    :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
+        coroutine.yield(
+            self.transform:DOLocalMoveY(self.transform.localPosition.y + self.BounceOffset, 0.2)
+            :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
         )
     end)
 end
@@ -120,7 +120,7 @@ function RollerElement:DropAnimation(steps, time, sequentialIndex, onComplete)
                 (self.offset - (self.AddItems - 1) * self.ElementHeight) + self.ElementHeight * sequentialIndex,
                 0
             )
-            coroutine.yield(nil)
+            coroutine.yield(0)
             --设置掉落图标
         end
 
@@ -128,8 +128,8 @@ function RollerElement:DropAnimation(steps, time, sequentialIndex, onComplete)
             local targetY = self.transform.localPosition.y - self.ElementHeight
             coroutine.yield(
                 self.transform:DOLocalMoveY(targetY, time)
-                    :SetEase(CS.DG.Tweening.Ease.Linear)
-                    :WaitForCompletion()
+                :SetEase(CS.DG.Tweening.Ease.Linear)
+                :WaitForCompletion()
             )
         end
 
@@ -138,15 +138,16 @@ function RollerElement:DropAnimation(steps, time, sequentialIndex, onComplete)
         if onComplete then onComplete() end
     end
 end
- function RollerElement:IsView()
-     local index = self:GetIndex()
-         if index >= self.AddItems and index < self.ItemsPerAxis - self.AddItems then
-             return true,index,self
-         end
-         return false,index,self
- end
-function RollerElement:Close()
 
+function RollerElement:IsView()
+    local index = self:GetIndex()
+    if index >= self.AddItems and index < self.ItemsPerAxis - self.AddItems then
+        return true, index, self
+    end
+    return false, index, self
+end
+
+function RollerElement:Close()
     self.transform:DOKill()
 end
 

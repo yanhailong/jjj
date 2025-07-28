@@ -36,7 +36,7 @@ function Roller:SetParentNode(content)
     self.Manager.StartOffset = offset
 
     content:GetComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
-    CS.UnityEngine.Vector2(contentWidth, contentHeight)
+        CS.UnityEngine.Vector2(contentWidth, contentHeight)
     content.localPosition = CS.UnityEngine.Vector3.zero
 
     self:CreateElement(content, self.Manager.ItemsPerAxis + self.Manager.AddItems * 2)
@@ -49,59 +49,46 @@ function Roller:CreateElement(root, total)
         go.transform:SetParent(root)
         go.transform.localScale = CS.UnityEngine.Vector3.one
         go:AddComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
-        CS.UnityEngine.Vector2(self.Manager.ElementWight, self.Manager.ElementHeight)
+            CS.UnityEngine.Vector2(self.Manager.ElementWight, self.Manager.ElementHeight)
         go.transform.localPosition = CS.UnityEngine.Vector3(
-                0,
-                (self.Manager.StartOffset - i * self.Manager.ElementHeight) - self.Manager.ElementHeight / 2,
-                0
+            0,
+            (self.Manager.StartOffset - i * self.Manager.ElementHeight) - self.Manager.ElementHeight / 2,
+            0
         )
         local element = RollerElement.New(go)
         table.insert(self.elements, element)
-        element:Init(
-                self,
-                self.Manager.icons,
-                i,
-                self.Manager.ItemsPerAxis + self.Manager.AddItems * 2,
-                self.Manager.ElementHeight,
-                self.Manager.ElementIconPrefab,
-                self.Manager.ElementHeight,
-                self.Manager,
-                self.Manager.StartOffset - self.Manager.ElementHeight / 2,
-                self.Manager.AddItems,
-                self.Manager.isOpenReboundAnimation,
-                self.Manager.ElementInitCompleted,
-                self.Manager.ChangeRandomIcons_Event,
-                self.Manager.SetResultIcons_Event
-
-        )
+        element:Init(self, i, self.Manager)
     end
 end
 
 function Roller:ChangeSpeed(speed)
     self.changeSpeed:Invoke(speed)
 end
+
 --得到当前轴上的所有元素
 function Roller:GetAllElement()
     return self.elements
 end
+
 --得到当前轴上的所有元素
 function Roller:GetAllViewElement()
-    local temp={}
-    for k,v in pairs(self.elements) do
-     local IsView,index,Element=   v:IsView()
+    local temp = {}
+    for k, v in pairs(self.elements) do
+        local IsView, index, Element = v:IsView()
         if IsView then
-            temp[index]=Element
+            temp[index] = Element
         end
     end
     return temp
 end
+
 --是否包含某个元素
 function Roller:IsContainselement()
     ---self.elements[i]
 end
 
 function Roller:Completed()
-    self.Manager.RollerCompleted_Event:Invoke(self,self.index)
+    self.Manager.RollerCompleted_Event:Invoke(self, self.index)
 end
 
 function Roller:StartGame(waitTime, speed)
@@ -185,9 +172,9 @@ function table.contains(tbl, val)
 end
 
 function Roller:Close()
-     for i, v in ipairs(self.elements) do
-         v:Close();
-     end
+    for i, v in ipairs(self.elements) do
+        v:Close();
+    end
 end
 
 return Roller
