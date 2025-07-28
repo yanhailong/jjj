@@ -70,7 +70,7 @@ function DragonTigerFightModel:OnEnterRoom(msg)
     self.endTime = msg.tableCountDownTime
     self.playersNum = msg.totalPlayerNum
     self.Result = msg.settleInfos --NotifyLoongTigerWarSettleInfo 结算信息
-    self.ctrl.view:UpdateRoomInfo(self)
+    self.view:UpdateRoomInfo(self)
     self.initState = true
     --如果有结果直接显示
     if self.Result then
@@ -92,7 +92,7 @@ function DragonTigerFightModel:OnBetting(msg)
                     betValue = value.betValue,
                     betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
                 }
-                self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+                self.view:PayOtherXiaZhuCoinFly(bet)
             end
             return
         end
@@ -115,7 +115,7 @@ function DragonTigerFightModel:OnGameStatus(msg)
     if  not self.initState then return end
     self.status = 1
     self.endTime = msg.waitEndTime
-    self.ctrl.view:OnGameStatus(self.status)
+    self.view:OnGameStatus(self.status)
     self.bettingDataMap = {}
 end
 --收到开始下注消息
@@ -123,7 +123,7 @@ function DragonTigerFightModel:OnStartXiaZhu(msg)
     if not self.initState then return end
     self.status = 2
     self.endTime = msg.waitEndTime
-    self.ctrl.view:OnGameStatus(self.status)
+    self.view:OnGameStatus(self.status)
 end
 
 -- 房间玩家信息更新
@@ -131,7 +131,7 @@ function DragonTigerFightModel:UpdatePlayerInfo(msg)
     if self.initState and msg.tableChangedPlayerInfos then
         self.players = msg.tableChangedPlayerInfos
         self.playersNum = msg.totalPlayerNum
-        self.ctrl.view:UpdatePlayers(self.players)
+        self.view:UpdatePlayers(self.players)
     end
 end
 
@@ -146,7 +146,7 @@ function DragonTigerFightModel:OnGameResult(msg)
     
     --切换状态
     self.status = 3
-    self.ctrl.view:OnGameStatus(self.status)
+    self.view:OnGameStatus(self.status)
 
     self:ShowResult()
 end
@@ -155,7 +155,7 @@ function DragonTigerFightModel:ShowResult()
     if not self.initState then return end
     self.players = self.Result.playerInfos --前6玩家信息
     ---显示牌面结果
-    self.ctrl.view:ResultEffect(self.Result)
+    self.view:ResultEffect(self.Result)
 end
 --玩家列表信息返回 
 function DragonTigerFightModel:UpdateAllPlayers(msg)

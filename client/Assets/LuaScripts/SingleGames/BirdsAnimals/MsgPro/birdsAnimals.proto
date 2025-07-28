@@ -1,109 +1,55 @@
-syntax="proto3";
-
-
-
-//--------网络接口----------
-//请求,msgID=0x7531,desc=进入房间
-message ReqBirdsAnimalsEnterRoom {
-  enum E_MsgID { def = 0;msgID = 30001; };
-  int32 roomType = 1;//选择类型 1、普通场 2、中级场 3、高级场
-}
-
-//响应,msgID=0x7532,desc=返回房间信息
-message ResBirdsAnimalsEnterRoom {
-  enum E_MsgID { def = 0;msgID = 30002; };
-  //房间基本信息
-  int32 roomId = 1;//房间ID
-  RoomBetConfig config = 2;//当前房间配置 Room_Bet
-
-  //押注池信息
-  repeated SideBetInfo sideBetInfos = 3;//押注池信息
-
-  //玩家信息
-  repeated PlayerInfo players = 4;//房间里所有玩家
-
-  //历史记录信息
-  repeated int32 history = 5;// 历史记录信息 
-
-  //流程状态信息
-  int32 status = 6;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
-  int32 seconds = 7;//当前状态剩余秒数
-}
-
-//请求,msgID=0x7533,desc=玩家押注上报
-message ReqBirdsAnimalsBetting{
-  enum E_MsgID { def = 0;msgID = 30003; };
-  int32 side = 1;//押注位置
-  int64 amount = 2;//押注金额
-};
-
-//响应,msgID=0x7534,desc=广播玩家押注信息
-message ResBirdsAnimalsBetting{
-  enum E_MsgID { def = 0;msgID = 30004; };
-  repeated BetInfo betList = 1;//列表，多个投注信息 （如果服务器同时收到多个就一起下发）
-};
-
-//响应,msgID=0x7535,desc=广播切换状态时的信息
-message ResBirdsAnimalsGameStatus{
-  enum E_MsgID { def = 0;msgID = 30005; };
-  int32 status = 1;//当前牌局状态,1准备阶段，2押分阶段，3亮牌阶段，4结算阶段
-  int32 seconds = 2;//当前状态剩余秒数
-};
-
-//响应,msgID=0x7536,desc=广播玩家离开房间的消息
-message ResBirdsAnimalsPlayerLeaveRoom{
-  enum E_MsgID { def = 0;msgID = 30006; };
-  int32 userId = 1;//玩家ID
-};
-
-//响应,msgID=0x7537,desc=广播玩家进入房间的消息
-message ResBirdsAnimalsPlayerEnterRoom{
-  enum E_MsgID { def = 0;msgID = 30007; };
-  repeated PlayerInfo player = 1;//进入的玩家信息
-}
-
-//响应,msgID=0x7538,desc=广播结算信息
-message ResBirdsAnimalsGameResult{
-  enum E_MsgID { def = 0;msgID = 30008; };
-   int32 winSide = 1;//本局命中的ID
-   int32 winIndex  = 2;  //本局命中的位置
-   int32 lastIndex = 3;  //上一局命中的位置
-
-  repeated PlayerInfo players = 4;// 所有玩家信息 赢的需要填 winCurrency字段 默认0
-};
-
-//---------公共数据---------
-//房间配置 Room_Bet 用于显示当前房间所用筹码和阶段时间控制
-message RoomBetConfig {
-  int32 roomID = 1;//倍场ID
-  int32 betBase = 2;// 倍场底注
-  repeated int32 betList = 3;// 押分筹码列表
-  repeated int32 StageTime = 4;//阶段信息
-}
-
-
-//单个玩家信息
-message PlayerInfo{
-  int32 id = 1;//ID
-  string name = 2;//名字
-  string avatar = 3;//头像
-  string frame = 4;//头像框
-  int64 currency = 5;//金币数量 (用于显示和排名)
-  int64 winCurrency = 6;//玩家这一局赢了多少
-}
-
-//下注信息
-message BetInfo{
-  int32 side = 1;//押注位置，1=龙，2=虎，3=和
-  int64 amounts = 2;//押注金额
-  int32 playerId = 3;//押注玩家id
-  int64 currency = 4;//玩家金币数量 前端同步
-};
-
-
-//每个注池信息
-message SideBetInfo{
-  int32 side = 1;//押注位置，1=龙，2=虎，3=和
-  int64 amounts = 2;//押注总金额
-  repeated BetInfo BetInfos = 3;//押注详细信息
-};
+[2] = 90241,
+[3] = 
+{
+    [settlementHistory] = 
+    {
+        [1] = 
+        {
+            [animalId] = 3,
+            [betIdxId] = 1,
+        },
+    },
+    [gamePhase] = GAME_ROUND_OVER_SETTLEMENT,
+    [playerInfo] = 
+    {
+        [vipLevel] = 100000,
+        [playerName] = player1000002,
+        [local] = 192.168.3.66,
+        [totalBet] = 0,
+        [winCount] = 0,
+        [playerId] = 1000002,
+        [goldNum] = 1000000,
+    },
+    [tableCountDownTime] = 1753590473972,
+    [totalPlayerNum] = 2,
+    [code] = 200,
+    [tableAreaInfos] = 
+    {
+    },
+    [betPointList] = 
+    {
+        [1] = 10,
+        [2] = 50,
+        [3] = 100,
+        [4] = 500,
+        [5] = 1000,
+        [6] = 5000,
+        [7] = 10000,
+    },
+    [settlementInfo] = 
+    {
+        [rewardAreaIdx] = 3,
+        [playerChangedGolds] = 
+        {
+        },
+        [animalsId] = 
+        {
+            [1] = 3,
+            [2] = 3,
+        },
+        [tableCountDownTime] = 1753590473972,
+        [betTableInfos] = 
+        {
+        },
+    },
+},

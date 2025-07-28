@@ -26,7 +26,8 @@ end
 
 ---初始化数据
 function CarLogoGameCtrl:InitData()
-	
+	---@type ObjectPoolUtil
+	self.objPools=ObjectPoolUtil.New()
 end
 
 function CarLogoGameCtrl:Close()
@@ -68,7 +69,7 @@ end
 
 function CarLogoGameCtrl:AddAreaClickEvents()
 	for i=1,self.view.areasTrs.childCount do
-		self.uiEventListener:AddClick(self.view.areasTrs:GetChild(i-1),function(obj)
+		self.uiEventListener:AddClick(self.view.areasTrs:GetChild(i-1),function()
 			self:OnClickCenterYaZhuSide(i)
 		end)
 	end
@@ -115,6 +116,7 @@ end
 ---销毁UI
 function CarLogoGameCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+	CorManager.StopAll(self)
 end
 
 return CarLogoGameCtrl

@@ -15,26 +15,30 @@ local SOUND_NAMES = {
 }
 
 local SOUND_ANIMAL ={
+    "Sound_Car_MAZIDA",     --中布加迪车标播放该音效，单次
+    "Sound_Car_FERRARI",     --中法拉利车标播放音效，单次
+    "Sound_Car_MASHA",     --中兰博基尼车标播放音效，单次
+    "Sound_Car_PORSCHE",     --中保时捷车标播放音效，单次
     "Sound_Car_BENZ",     --中奔驰车标播报音效，单次
     "Sound_Car_BMW",     --中宝马车标播报音效，单次
-    "Sound_Car_FERRARI",     --中法拉利车标播放音效，单次
-    "Sound_Car_KAIDI",     --中凯迪拉克车标播放音效，单次
-    "Sound_Car_MASHA",     --中兰博基尼车标播放音效，单次
-    "Sound_Car_MAZIDA",     --中布加迪车标播放该音效，单次
-    "Sound_Car_PORSCHE",     --中保时捷车标播放音效，单次
     "Sound_Car_VW",     --中捷豹车标播放音效，单次
+    "Sound_Car_KAIDI",     --中凯迪拉克车标播放音效，单次
 }
 
 --音乐特效
 function CarLogoSounds.PlaySoundEffic(key)
     local soundName = SOUND_NAMES[key]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 
 --动物声音
 function CarLogoSounds.PlaySoundAnimal(logoId)
     local soundName = SOUND_ANIMAL[logoId]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 
 --背景音乐

@@ -6,7 +6,8 @@ local Vector3 = CS.UnityEngine.Vector3
 local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
-function CarLogoItem:ctor(go)
+function CarLogoItem:ctor(go,luaClass)
+    self.luaClass = luaClass
     self.transform=go.transform
     self.bg = ComponentUtilGet.Image(self.transform, "LogoBg")
     self.image = ComponentUtilGet.Image(self.transform, "Icon");
@@ -19,7 +20,7 @@ end
 
 function CarLogoItem:FlyLogoHistory(result,target)
     local gameObj = Tools.Instance(self.image.gameObject)
-    gameObj.transform:SetParent(result)
+    gameObj.transform:SetParent(result,false)
     gameObj.transform.localScale = Vector3(0.56,0.56,1);
     gameObj.transform.position = self.transform.position;
     gameObj.transform:DOMove(target,1):SetEase(Ease.InOutQuad):OnComplete(function ()
@@ -61,14 +62,14 @@ function CarLogoItem:FlashLight(time,fadeTimes)
     --Tools.DOFade_Repeat(self.choose,time,fadeTimes,0,function()
     --    Tools.SetColorAlpha_Float(self.choose, 0)
     --end)
-    local t = time*fadeTimes+(fadeTimes-1)*0.2
-    self.light.gameObject:SetActive(true)
-    if self.light.isStopped  then
-        self.light:Play();
+    local t = fadeTimes
+    self.choose.gameObject:SetActive(true)
+    if self.choose.isStopped  then
+        self.choose:Play();
     end
     TimerManager.StartTimer(self.luaClass,function()
-        self.light:Stop();
-        self.light.gameObject:SetActive(false)
+        self.choose:Stop();
+        self.choose.gameObject:SetActive(false)
     end,t)
 end
 

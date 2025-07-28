@@ -69,8 +69,9 @@ function CarLogoGameModel:OnEnterRoom(msg)
 	self.status = self:TransEGamePhase(msg.gamePhase)
 	self.endTime = msg.tableCountDownTime
 	self.playersNum = msg.totalPlayerNum
-	self.Result = msg.settlementInfo 
-	self.ctrl.view:UpdateRoomInfo(self)
+	self.Result = msg.settlementInfo
+
+	self.view:UpdateRoomInfo(self)
 	self.initState = true
 	--如果有结果直接显示
 	if self.Result then
@@ -92,7 +93,7 @@ function CarLogoGameModel:OnBetting(msg)
 					betValue = value.betValue,
 					betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
 				}
-				self.ctrl.view:PayOtherXiaZhuCoinFly(bet)
+				self.view:PayOtherXiaZhuCoinFly(bet)
 			end
 			return
 		end
@@ -113,39 +114,40 @@ end
 -- 重新开始游戏的消息 NotifyRoomReadyWait
 function CarLogoGameModel:OnGameStatus(msg)
 	if  not self.initState then return end
+	self.view:OnGameStatus(4)
 	self.status = 1
 	self.endTime = msg.waitEndTime
-	self.ctrl.view:OnGameStatus(self.status)
+	logError("OnGameStatus:"..os.date("%H:%M:%S", math.modf(self.endTime/1000)))
+	self.view:OnGameStatus(self.status)
 	self.bettingDataMap = {}
+	self:OnStartXiaZhu(msg)
 end
 --收到开始下注消息
 function CarLogoGameModel:OnStartXiaZhu(msg)
 	if not self.initState then return end
 	self.status = 2
 	self.endTime = msg.waitEndTime
-	self.ctrl.view:OnGameStatus(self.status)
+	self.view:OnGameStatus(self.status)
 end
 
 -- 房间玩家信息更新
 function CarLogoGameModel:UpdatePlayerInfo(msg)
 	if self.initState and msg.tableChangedPlayerInfos then
 		self.playersNum = msg.totalPlayerNum
-		self.ctrl.view:UpdatePlayerTotal()
+		self.view:UpdatePlayerTotal()
 	end
 end
 
 -- 广播结算信息 NotifyLoongTigerWarSettleInfo
 function CarLogoGameModel:OnGameResult(msg)
-	if not self.initState then return end
-	self.Result = msg;
-	if #self.history>=50 then
-		self.history = {}
-	end
-	table.insert(self.history,msg.rewardAreaIdx)
-
+	if not self.initState and msg.code ~=200 then return end
+	self.Result = msg.settlementInfo;
+	self.endTime = msg.settlementInfo.tableCountDownTime;
+	table.insert(self.history,self.Result.rewardAreaIdx)
+	logError("OnGameResult:"..os.date("%H:%M:%S", math.modf(self.Result.tableCountDownTime/1000)))
 	--切换状态
 	self.status = 3
-	self.ctrl.view:OnGameStatus(self.status)
+	self.view:OnGameStatus(self.status)
 
 	self:ShowResult()
 end
@@ -153,7 +155,7 @@ end
 function CarLogoGameModel:ShowResult()
 	if not self.initState then return end
 	---显示牌面结果
-	self.ctrl.view:ResultEffect(self.Result)
+	self.view:ResultEffect(self.Result)
 end
 --玩家列表信息返回 
 function CarLogoGameModel:UpdateAllPlayers(msg)
@@ -188,8 +190,8 @@ function CarLogoGameModel:TransEGamePhase(value)
 	--[准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 	if value == "WAIT_READY" or "START_GAME" == 0  then return 1 end
 	if value == "BET" then return 2 end
-	if value == "PLAY_CART" then return 3 end
-	if value == "GAME_ROUND_OVER_SETTLEMENT" then return 4 end
+	if value == "PLAY_CART" or "GAME_ROUND_OVER_SETTLEMENT" then return 3 end
+	--if value == "GAME_ROUND_OVER_SETTLEMENT" then return 4 end
 	return 5
 end
 

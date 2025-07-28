@@ -24,7 +24,7 @@ end
 
 function BirdsAnimalsItem:FlyLogoHistory(result,target)
     local gameObj = Tools.Instance(self.image.gameObject)
-    gameObj.transform:SetParent(result)
+    gameObj.transform:SetParent(result,false)
     gameObj.transform.localScale = Vector3(0.52,0.52,1);
     gameObj.transform.position = self.transform.position;
     gameObj.transform:DOMove(target,1):SetEase(Ease.InOutQuad):OnComplete(function ()

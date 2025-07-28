@@ -20,14 +20,15 @@ function CarLogoTrendView:InitComponents()
     self.btn_close=ComponentUtilGet.Button(self.transform,"content/background/btn_close");
     self.resultsTrs=ComponentUtilGet.Transform(self.transform,"content/results")
     self.rateTrs=ComponentUtilGet.Transform(self.transform,"content/rate")
-    self.rateTmps={}
+    self.rateText={}
     for i=1,self.rateTrs.childCount do
-        table.insert(self.rateTmps,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
+        table.insert(self.rateText,ComponentUtilGet.TextMeshProUGUI(self.rateTrs:GetChild(i-1),"num"))
     end
     self.resultsItems={}
-    table.insert(  self.resultsItems,self:InitResultItem(self.resultsTrs:GetChild(0)))
+    local itemTrs = self.resultsTrs:GetChild(0)
+    table.insert(  self.resultsItems,self:InitResultItem(itemTrs))
     for i=1,49 do
-        table.insert(self.resultsItems, self:InitResultItem(Tools.Instance(self.resultsTrs:GetChild(0),self.resultsTrs)))
+        table.insert(self.resultsItems, self:InitResultItem(Tools.Instance(itemTrs,self.resultsTrs).transform))
     end
 end
 
@@ -77,13 +78,14 @@ function CarLogoTrendView:InitResultItem(transform)
 end
 
 function CarLogoTrendView:UpdateHistory(history)
-    ---测试
     local historyList = history
     local total = #historyList
+    local offset=math.max(total-49,1)
     for i=1,50 do
-        if i <= total then
-            self.resultsItems[i].ShowLogo(historyList[i])
-            if i==total then self.resultsItems[i].ShowNew(true) end
+        if offset <= total then
+            self.resultsItems[i].ShowLogo(historyList[offset])
+            if offset==total then self.resultsItems[i].ShowNew(true) end
+            offset=offset+1
         else
             self.resultsItems[i].ShowLogo()
         end
@@ -91,16 +93,16 @@ function CarLogoTrendView:UpdateHistory(history)
     
     ---概率
     self.rateData = {0,0,0,0,0,0,0,0}
-    local offset=math.max(#historyList-49,1)
-    local count = #historyList-offset+1
-    for i=#historyList,offset,-1 do
+    local offset2 =math.max(#historyList-49,1)
+    local count = #historyList- offset2 +1
+    for i= offset2,#historyList do
         local logoId = CarLogoConfig.FindIndexByLogoId(historyList[i])
         self.rateData[logoId]=self.rateData[logoId]+1
     end
 
     for i=1,8 do
         self.rateData[i]=count>0 and math.floor(self.rateData[i]*1000/count)/10 or 0
-        self.rateTmps[i].text = self.rateData[i].."%"
+        self.rateText[i].text = self.rateData[i].."%"
     end
 end
 

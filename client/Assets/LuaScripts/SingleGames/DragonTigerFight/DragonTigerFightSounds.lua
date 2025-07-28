@@ -52,30 +52,34 @@ local SOUND_BET_ROM = {
 --音乐特效
 function DragonTigerFightSounds.PlaySoundEffic(key)
     local soundName = SOUND_NAMES[key]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 
 --牌型声音
 function DragonTigerFightSounds.PlaySoundCard(cardId)
     local index = cardId%13
     local soundName = SOUND_CARD[index]
-    if not soundName then
-        logError(cardId)
-        return
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
     end
-    SoundManager:PlayClip(soundPath..soundName)
 end
 --结果音效
 function DragonTigerFightSounds.PlaySoundWin(result,isEF)
     local soundName = SOUND_WIN[result]
     if isEF then soundName = SOUND_WIN_EF[result] end
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 --其余玩家筹码下注飞行音效
 function DragonTigerFightSounds.OtherFlyBet()
     local index = Tools.RandomInt(1,4)
     local soundName = SOUND_BET_ROM[index]
-    SoundManager:PlayClip(soundPath..soundName)
+    if soundName then
+        SoundManager:PlayClip(soundPath..soundName)
+    end
 end
 --背景音乐
 function DragonTigerFightSounds.PlaySoundMusic()
