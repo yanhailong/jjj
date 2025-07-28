@@ -132,7 +132,7 @@ function USDollarExpressMainCtrl:ReSetData()
 		CorManager.StopCor(self,self.cor001)
 		self.cor001=nil
 	end
-
+	self.isHasQdeffeffects=false
 	---默认都转3圈结束转动
 	self.rollCircles={}
 	if config.gameTypeState==1 or config.gameTypeState==2  then
@@ -262,6 +262,13 @@ end
 ---特殊模式展示大框
 function USDollarExpressMainCtrl:ShowBigKuang(wheelId)
 	logError("wheelId:"..wheelId)
+
+	if wheelId>0 then
+		if self.isSpecialIcons1[wheelId]==true then
+			SoundManager:PlayClip(config.ABNames.audios.."reel_notify1")--all aboard图标期待动画音效
+		end
+	end
+	
 	if config.gameTypeState==1 or config.gameTypeState==2 then
 		for i = 1, 5 do
 			if wheelId==i then
