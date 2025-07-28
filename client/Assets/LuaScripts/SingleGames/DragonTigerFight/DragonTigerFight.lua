@@ -13,6 +13,7 @@ end
 function DragonTigerFight:Init()
     require("PlatformHall/comonFight/MsgPro/pb_comonFight")
     require("PlatformHall/comonFight/MVCHead")
+    require("Logic/Common/PlayerRankPanel/MVCHead")
 end
 
 function DragonTigerFight:EnterGame()

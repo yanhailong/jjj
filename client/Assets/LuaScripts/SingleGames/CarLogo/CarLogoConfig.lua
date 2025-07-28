@@ -91,19 +91,8 @@ this.effectPath = "SingleGames/CarLogo/effects/prefab"
 
 ---游戏ID
 this.gameID = 200400
----当前选中的底注
-this.dizhuIndex = 1
----底注数值
-this.dizhuNumArr = {1,10,50,100,500,1000,2000}
 ---结算各动画阶段时间
 this.ResultStageTime = {1,0.5,1,1,2,3,2.5,1}
----当前是否可以下注
-this.allow = false
----当前总底注
-this.totalDiZhuNums = {0,0,0,0,0,0,0,0}
----当前个人底注
-this.selfDiZhuNums = {0,0,0,0,0,0,0,0}
-this.selfXiaZhuInfo = {}
 ---阶段时间 [准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]
 this.StageTime = {0,15000,11000,0 }
 ---当前状态剩余秒数 13
@@ -111,10 +100,25 @@ this.lessSeconds = 13
 --- 其他玩家下注显示筹码数限制
 this.AreaChouMaLimit = { 60, 60, 60, 60, 60, 60, 60, 60}
 
+---当前选中的底注
+this.dizhuIndex = 1
+---当前是否可以下注
+this.allow = false
+---当前总底注
+this.totalDiZhuNums = {0,0,0,0,0,0,0,0}
+---当前个人底注
+this.selfDiZhuNums = {0,0,0,0,0,0,0,0}
+---累计下注数据
+this.AreaChipTotals = {0,0,0,0,0,0,0,0}
+---本局下注数据
+this.bettingDataMap = {}
 ---复投
 this.lastXiaZhuInfo = {}
+---本局下注数据
+this.selfXiaZhuInfo = {}
 ---本局是否使用了复投
 this.isRepeat = false
+
 ---根据位置返回logoID
 this.FindIndexByLogoId = function(index)
     for logo_id, pos in pairs(this.LOGO_IDX) do

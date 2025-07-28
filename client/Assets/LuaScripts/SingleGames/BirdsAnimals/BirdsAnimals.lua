@@ -10,6 +10,8 @@ function BirdsAnimals:ctor(gameName,param)
 end
 function BirdsAnimals:Init()
     require("PlatformHall/comonFight/MsgPro/pb_comonFight")
+    require("PlatformHall/comonFight/MVCHead")
+    require("Logic/Common/PlayerRankPanel/MVCHead")
 end
 
 function BirdsAnimals:EnterGame()

@@ -9,7 +9,6 @@ local ChouMaFlyUtil=require("Logic/Common/ChouMaFlyUtil")
 
 local dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
 
-local DOTween = CS.DG.Tweening.DOTween
 local Ease = CS.DG.Tweening.Ease
 
 ---构造函数
@@ -22,6 +21,15 @@ function CommFightBtnsCtrl:ctor(ctrlName,param)
 	self.view = self.view
 	---@type CommFightBtnsModel
 	self.model = self.model
+
+	self.bettingTime = 0
+	self.OnClickHelp = nil
+	self.OnClickClose = nil
+	self.PayOtherXiaZhuCoinFlyEnd = nil
+	self.PaySelfXiaZhuCoinFlyEnd = nil
+	self.PlayCompeleCoinFLyEnd = nil
+	self.PlayCompeleCoinFLySelfEnd = nil
+	self.UpdateXiaZhuLabel = nil
 end
 
 ---初始化
@@ -33,40 +41,33 @@ end
 
 ---初始化数据
 function CommFightBtnsCtrl:InitData()
-	---当前选中的底注
-	self.dizhuIndex=0
-	---当前是否可以下注
-	self.allow=false
+	
 end
 
 ---获取到服务器betPointList时更新筹码数值
----@param haveOtherPlayer是否显示其他玩家
----@param betPointList筹码数值
----@param btn_players用户获取坐标
-function CommFightBtnsCtrl:BindData(config,haveOtherPlayer,betPointList,btn_players,xiaZhuAreas)
+---@param config配置
+---@param showTopPlayer是否显示其他玩家
+---@param position玩家按钮坐标
+---@param xiaZhuAreas下注区域点位 UnityEngine.RectTransform[]
+function CommFightBtnsCtrl:BindData(config,showTopPlayer,xiaZhuAreas)
 	self.config = config
-	self.betPointList = betPointList
-	self.btn_players = btn_players
-	self.haveOtherPlayer = haveOtherPlayer
+	self.showTopPlayer = showTopPlayer
+	---@type UnityEngine.RectTransform[]
 	self.xiaZhuAreas = xiaZhuAreas
-	
-	self:InitChouMa()
 end
-
 
 function CommFightBtnsCtrl:Close()
     self.super.Close(self);
 end
 
-function CommFightBtnsCtrl:GetDizhuIndex()
-	return self.dizhuIndex
-end
 function CommFightBtnsCtrl:GetSelfPlayer()
 	return self.selfPlayer
 end
+
 function CommFightBtnsCtrl:GetOtherPlayer(index)
 	return self.AllOtherPlayerHeads[index]
 end
+
 ---通过id找到TOP6玩家
 function CommFightBtnsCtrl:FindPlayerByID(playerId)
 	for i=1,#self.AllOtherPlayerHeads do
@@ -104,9 +105,17 @@ function CommFightBtnsCtrl:InitUI()
 		self.AllOtherPlayerHeads[#self.AllOtherPlayerHeads + 1] = PlayerItem.New(otherPlayerTrs:GetChild(i-1))
 	end
 	self.selfPlayer = PlayerItem.New(self.view.selfPlayerRoot)
+
+	---初始值
+	self.view.tmp_totalPlayerNum.text="0"
+	---其他玩家信息
+	for i=1,#self.AllOtherPlayerHeads do
+		self.AllOtherPlayerHeads[i]:UpdatePlayer(nil)
+	end
 end
 
-function CommFightBtnsCtrl:InitChouMa()
+function CommFightBtnsCtrl:InitChouMa(betList)
+	self.betPointList = betList
 	---底注数值
 	for i=1,#self.chipInfos do
 		if self.betPointList[i] then
@@ -124,6 +133,21 @@ function CommFightBtnsCtrl:InitChouMa()
 	end
 	--默认选中第一个
 	self:ChangeSelectDiZhu(1)
+end
+
+-- 直接显示区域筹码 SideBetInfo
+function CommFightBtnsCtrl:ShowAreaChouMa(sideInfo)
+	if not sideInfo.betGoldList then return end
+	local areaTotal =self.config.AreaChipTotals
+	local side = sideInfo.betIdx<self.config.gameID and sideInfo.betIdx or sideInfo.betIdx-self.config.gameID*100
+	for i=1,#sideInfo.betGoldList do
+		local value = sideInfo.betGoldList[i]
+		local index = self:FindBetIndex(value)
+		if areaTotal[side] <self.config.AreaChouMaLimit[side] then
+			areaTotal[side]=areaTotal[side]+1
+			ChouMaFlyUtil:CreatCoinInArea(self.view.dizhuNode,index,self.xiaZhuAreas[side],value)
+		end
+	end
 end
 ---设置菜单显示隐藏
 function CommFightBtnsCtrl:SettingFade()
@@ -166,11 +190,11 @@ function CommFightBtnsCtrl:ChangeSelectDiZhu(index)
 	end
 
 	-- 如果点击的是当前已选中的按钮，不做任何操作
-	if index == self.dizhuIndex and self.chipInfos[index].effects.activeSelf then
+	if index == self.config.dizhuIndex and self.chipInfos[index].effects.activeSelf then
 		return
 	end
 
-	local oldChip = self.chipInfos[self.dizhuIndex]
+	local oldChip = self.chipInfos[self.config.dizhuIndex]
 	local newChip = self.chipInfos[index]
 
 	-- 停止之前按钮的所有动画
@@ -200,26 +224,27 @@ function CommFightBtnsCtrl:ChangeSelectDiZhu(index)
 	end
 
 	-- 更新配置中的当前选中索引
-	self.dizhuIndex = index
+	self.config.dizhuIndex = index
 end
 
 ---启用/禁用下注按钮
 function CommFightBtnsCtrl:UpdateDiZhuBtnState()
 	for i=1,#self.chipInfos do
-		self.chipInfos[i].button.interactable = self.allow and self.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
+		self.chipInfos[i].button.interactable = self.config.allow and self.betPointList[i]<=PlayerManager:GetPlayerInfo().goldNum
 	end
-	if self.chipInfos[self.dizhuIndex] then self.chipInfos[self.dizhuIndex].effects:SetActive(self.allow) end
+	if self.chipInfos[self.config.dizhuIndex] then self.chipInfos[self.config.dizhuIndex].effects:SetActive(self.config.allow) end
 end
 
 ---更新自己信息
 function CommFightBtnsCtrl:UpdateSelf(player)
+	player = player or PlayerManager:GetPlayerInfo()
 	self.selfPlayer:UpdatePlayer(player)
 end
 function CommFightBtnsCtrl:UpdateSelfGoldCount()
 	self.selfPlayer:UpdateGoldCount(PlayerManager:GetPlayerInfo().goldNum)
 end
 function CommFightBtnsCtrl:UpdatePlayerNum(playersNum)
-	self.tmp_totalPlayerNum.text = tostring(playersNum)
+	self.view.tmp_totalPlayerNum.text = tostring(playersNum)
 end
 ---其他玩家信息更新
 function CommFightBtnsCtrl:UpdatePlayers(players)
@@ -250,7 +275,8 @@ end
 ---本玩家下注动画
 ---@param targetTrans下注区域
 function CommFightBtnsCtrl:PaySelfXiaZhuCoinFly(side)
-	ChouMaFlyUtil:AnimateCoin(self.dizhuNode,self.dizhuIndex,self.selfPlayer.transform.position,self.xiaZhuAreas[side], self.betPointList[self.dizhuIndex])
+	ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,self.config.dizhuIndex,self.selfPlayer.transform.position,self.xiaZhuAreas[side], self.betPointList[self.config.dizhuIndex])
+	if self.PaySelfXiaZhuCoinFlyEnd then self.PaySelfXiaZhuCoinFlyEnd() end
 end
 
 ---其他玩家下注动画
@@ -258,35 +284,36 @@ end
 ---@param config子游戏的配置
 ---@param areas下注区域集合
 function CommFightBtnsCtrl:PayOtherXiaZhuCoinFly(data)
-	local config = self.config
-	local areas = self.xiaZhuAreas
 	-- 更新总押注金额
-	config.totalDiZhuNums[data.side] = data.betIdxTotal
+	self.config.totalDiZhuNums[data.side] = data.betIdxTotal
 	-- 自己下注
 	local selfId = PlayerManager:GetPlayerInfo().playerId
 	if selfId==data.playerId then
-		config.selfDiZhuNums[data.side] = config.selfDiZhuNums[data.side] + data.betValue
+		self.config.selfDiZhuNums[data.side] =self.config.selfDiZhuNums[data.side] + data.betValue
 		PlayerManager:GetPlayerInfo().goldNum = data.currency or 0; -- 更新金币
-		table.insert(config.selfXiaZhuInfo,data)
+		table.insert(self.config.selfXiaZhuInfo,data)
 		self:PaySelfXiaZhuCoinFly(data.side)
+		if self.UpdateXiaZhuLabel then self:UpdateXiaZhuLabel() end
 		self:UpdateSelfGoldCount()
 		return
 	end
 	-- 其他玩家下注
-	local areaTotal = config.AreaChipTotals
-	local playerItem = self.haveOtherPlayer and self:FindPlayerByID(data.playerId) or nil
+	if self.UpdateXiaZhuLabel then self:UpdateXiaZhuLabel() end
+	local areaTotal =self.config.AreaChipTotals
+	local playerItem = self.showTopPlayer and self:FindPlayerByID(data.playerId) or nil
 	if playerItem ~= nil then
 		playerItem:UpdateGoldCount(data.currency or 0) --更新数值
 	end
-	if areaTotal[data.side] >= config.AreaChouMaLimit[data.side] then
+	if areaTotal[data.side] >=self.config.AreaChouMaLimit[data.side] then
 		return
 	end
 	if playerItem ~= nil then
-		ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.index,playerItem.transform.position,areas[data.side],data.betValue)
+		ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,playerItem.transform.position,self.xiaZhuAreas[data.side],data.betValue)
 	else
-		ChouMaFlyUtil:AnimateCoin(self.dizhuNode,data.index,self.btn_players.transform.position,areas[data.side],data.betValue)
+		ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,self.view.btn_players.transform.position,self.xiaZhuAreas[data.side],data.betValue)
 	end
 	areaTotal[data.side] = areaTotal[data.side] + 1
+	if self.PayOtherXiaZhuCoinFlyEnd then self.PayOtherXiaZhuCoinFlyEnd() end
 end
 
 
@@ -296,19 +323,20 @@ function CommFightBtnsCtrl:PlayCompeleCoinFLy(results)
 	local targetPos = {}
 	local winCurrency = {0,0}
 	local totalCurrency = 0
-	targetPos[1] = self.selfPlayerRoot.position
-	targetPos[2] = self.btn_players.transform.position
+	targetPos[1] = self.view.selfPlayerRoot.position
+	targetPos[2] = self.view.btn_players.transform.position
 	for i=1,#results do
 		local player = results[i]
 		--跳过没有赢钱的玩家
 		if player.playerWinGold == 0 then goto continue end
-		local playerItem = self.haveOtherPlayer and self:FindPlayerByID(player.playerId) or nil
+		local playerItem = self.showTopPlayer and self:FindPlayerByID(player.playerId) or nil
 		totalCurrency = totalCurrency + player.playerWinGold
 		if player.playerId == PlayerManager:GetPlayerInfo().playerId then
 			winCurrency[1] = player.playerWinGold
 			self.selfPlayer:ShowResultCount( player.playerWinGold)
 			PlayerManager:GetPlayerInfo().goldNum = PlayerManager:GetPlayerInfo().goldNum + player.playerWinGold;
 			self:UpdateSelfGoldCount() -- 更新金币
+			if self.PlayCompeleCoinFLySelfEnd then self.PlayCompeleCoinFLySelfEnd() end
 		elseif  playerItem ~= nil then
 			targetPos[#targetPos+1] = playerItem.transform.position
 			winCurrency[#winCurrency+1] =  player.playerWinGold
@@ -327,14 +355,15 @@ function CommFightBtnsCtrl:PlayCompeleCoinFLy(results)
 		ratios = {0,1}
 	end
 	ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
+	if self.PlayCompeleCoinFLyEnd then self.PlayCompeleCoinFLyEnd() end
 end
 
 --单独飞筹码处理 防止频繁UI更新卡住
 function CommFightBtnsCtrl:UpdateBetting()
-	if  not self.allow or not self.config or Time.realtimeSinceStartup - self.bettingTime < 0.1 then return end
+	if  not self.config or not self.config.allow  or Time.realtimeSinceStartup - self.bettingTime < 0.1 then return end
 	self.bettingTime = Time.realtimeSinceStartup
 
-	for playerId, msg in pairs(self.bettingDataMap) do
+	for playerId, msg in pairs(self.config.bettingDataMap) do
 		if not msg.handled then
 			for _, value in ipairs(msg.betTableInfoList) do
 				local bet = {
@@ -356,7 +385,7 @@ end
 function CommFightBtnsCtrl:PlayDaoJiShiEffect()
 	self.view.daojishiObj:SetActive(true)
 	local daojishiParticles = self.view.daojishiObj:GetComponent("ParticleSystem")
-	if daojishiParticles.isStopped  then
+	if daojishiParticles and daojishiParticles.isStopped  then
 		daojishiParticles:Play();
 	end
 end
@@ -382,10 +411,10 @@ function CommFightBtnsCtrl:AddUIEvent()
 end
 
 function CommFightBtnsCtrl:AddFunctionButtons()
-	self.uiEventListener:AddClick(self.view.btn_close, function() self.subGameCtr:Close() end)
+	self.uiEventListener:AddClick(self.view.btn_close, function() if self.OnClickClose then self.OnClickClose() end end)
 	self.uiEventListener:AddClick(self.view.btn_muen,function() self:SettingFade()  end)
 	self.uiEventListener:AddClick(self.view.btn_touch,function() self:SettingFade()  end)
-	self.uiEventListener:AddClick(self.view.btn_help, function() if self.subGameCtr.OnClickHelp then self.subGameCtr:OnClickHelp() end end)
+	self.uiEventListener:AddClick(self.view.btn_help, function() if self.OnClickHelp then self:OnClickHelp() end end)
 	self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
 	self.uiEventListener:AddClick(self.view.btn_players, function() self:ReqRoomPlayers() end)
 	self.uiEventListener:AddClick(self.view.btn_prev,function()  self:OnClickDiZhuNav(false) end)
@@ -396,7 +425,7 @@ function CommFightBtnsCtrl:AddBetButtons()
 		self.uiEventListener:AddClick(chipInfo.button.gameObject, function()
 			if self.config and self.config.allow then
 				self:ChangeSelectDiZhu(i)
-				look("btn 抵住数值" .. self.dizhuIndex)
+				look("btn 抵住数值" .. self.config.dizhuIndex)
 			end
 		end)
 	end
@@ -414,6 +443,7 @@ end
 function CommFightBtnsCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 	UpdateManager.ReMoveAll(self)
+	ChouMaFlyUtil:Destroy()
 end
 
 --region UI事件方法

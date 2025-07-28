@@ -16,7 +16,7 @@ end
 function CommFightBtnsView:InitComponents()
     self.btn_recharge=ComponentUtilGet.Button(self.transform,"content/top/btn_recharge");
     self.btn_players=ComponentUtilGet.Button(self.transform,"content/bottom/btn_players");
-    self.tmp_totalPlayerNum=ComponentUtilGet.TextMeshProUGUI(self.transform,"content/bottom/btn_players/tmp_total_player_num");
+    self.tmp_totalPlayerNum=ComponentUtilGet.Text(self.transform,"content/bottom/btn_players/tmp_total_player_num");
     self.btn_muen=ComponentUtilGet.GameObject(self.transform,"content/setting/btn_muen");
     self.btn_touch=ComponentUtilGet.Button(self.transform,"content/setting/btn_touch");
     self.btn_setting=ComponentUtilGet.Button(self.transform,"content/setting/mask/muen/btn_setting");

@@ -5,7 +5,7 @@
 ---@class BirdsAnimalsGameCtrl:BaseCtrl
 local BirdsAnimalsGameCtrl=Class("BirdsAnimalsGameCtrl",BaseCtrl)
 local config =require("SingleGames/BirdsAnimals/BirdsAnimalsConfig")
-
+local BirdsAnimalsSounds = require("SingleGames/BirdsAnimals/BirdsAnimalsSounds")
 ---构造函数
 function BirdsAnimalsGameCtrl:ctor(ctrlName,param)
     self.layer=2;
@@ -28,7 +28,43 @@ end
 function BirdsAnimalsGameCtrl:InitData()
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
+	---@type CommFightBtnsCtrl
+	self.commCtrl = CtrlManager.SingleShow(CtrlNames.CommFightBtns, self):AddAsyncOpenCallback(function()
+		--请求进入房间
+		self.model:ReqEnterRoom()
+	end)
+	self:BindCommFightData()
 end
+
+
+function BirdsAnimalsGameCtrl:BindCommFightData()
+	self.commCtrl:BindData(config,false,self.view.xiazhuStarAreas)
+	self.commCtrl.OnClickHelp = function()
+		CtrlManager.SingleShow(CtrlNames.BirdsAnimalsRule)
+	end
+	self.commCtrl.OnClickClose = function()
+		self:Close()
+	end
+	self.commCtrl.UpdateXiaZhuLabel = function()
+		self.view:UpdateXiaZhuLabel()
+	end
+	self.commCtrl.PayOtherXiaZhuCoinFlyEnd = function()
+		--下注音效
+		BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
+	end
+	self.commCtrl.PaySelfXiaZhuCoinFlyEnd = function()
+		--下注音效
+		BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
+	end
+	self.commCtrl.PlayCompeleCoinFLyEnd = function()
+		--分筹码音效
+	end
+	self.commCtrl.PlayCompeleCoinFLySelfEnd = function()
+		-- 播放得奖音效
+		BirdsAnimalsSounds.PlaySoundEffic(config.AUDIO_KEY.WinBet)
+	end
+end
+
 
 function BirdsAnimalsGameCtrl:Close()
     self.super.Close(self);
@@ -37,35 +73,12 @@ end
 
 function BirdsAnimalsGameCtrl:AddUIEvent()
 	self:AddFunctionButtons()
-	self:AddBetButtons()
 	self:AddAreaClickEvents()
 end
 
 function BirdsAnimalsGameCtrl:AddFunctionButtons()
-	self.uiEventListener:AddClick(self.view.btn_close, function() self:Close() end)
-	self.uiEventListener:AddClick(self.view.btn_muen,function() self.view:SettingFade()  end)
-	self.uiEventListener:AddClick(self.view.btn_touch,function() self.view:SettingFade()  end)
-	self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.BirdsAnimalsRule) end)
-	self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
-	self.uiEventListener:AddClick(self.view.btn_players, function()
-		self.model:ReqRoomPlayers()
-	end)
 	self.uiEventListener:AddClick(self.view.btn_trend,function() CtrlManager.SingleShow(CtrlNames.BirdsAnimalsTrend,self.model.history) end)
 	self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
-	self.uiEventListener:AddClick(self.view.btn_prev,function()  self.view:DizhuPrev(false) end)
-	self.uiEventListener:AddClick(self.view.btn_next,function()  self.view:DizhuPrev(true) end)
-end
-
-
-function BirdsAnimalsGameCtrl:AddBetButtons()
-	for i, chipInfo in ipairs(self.view.chipInfos) do
-		self.uiEventListener:AddClick(chipInfo.button, function()
-			if config.allow then
-				self.view:ChangeDiZhu(i)
-				look("btn 抵住数值" .. config.dizhuNumArr[config.dizhuIndex])
-			end
-		end)
-	end
 end
 
 function BirdsAnimalsGameCtrl:AddAreaClickEvents()
