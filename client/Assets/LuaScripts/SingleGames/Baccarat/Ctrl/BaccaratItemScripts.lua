@@ -68,8 +68,7 @@ end
 ---刷新单个数据显示
 function BaccaratItemScripts:RefreshDataShow(data)
     self.CurGamePhase = data.baccaratBaseInfo.eGamePhase;
-    self.IsNewRound = data.baccaratBaseInfo.remainingCardNum > self.RemainingCardNum;
-    self.RemainingCardNum = data.baccaratBaseInfo.remainingCardNum;
+    self.IsNewRound = data.needClearRoad;
     if( data.baccaratBaseInfo.eGamePhase == "GAME_ROUND_OVER_SETTLEMENT" ) then
         self.BaccaratBaseInfo = data.baccaratCardState;
         table.insert(self.BaccaratTableSummary.cardStateList,data.baccaratCardState)
@@ -117,20 +116,6 @@ function BaccaratItemScripts:Update()
                 end
                 self:RefreshTmpShow();
             end
-            --if(self.CurGamePhase == "BET") then--下注结束请求结算
-            --    self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.baccaratBaseInfo.roomId, #self.BaccaratTableSummary.cardStateList)
-            --elseif(self.CurGamePhase == "GAME_ROUND_OVER_SETTLEMENT") then --结算结算，请求下一局    
-            --    self.BaccaratRoadScripts:RefreshData(self.BaccaratBaseInfo,false,self.IsNewRound)
-            --    if(self.BaccaratBaseInfo.winState==  config.WhoWin.BankerWin) then
-            --        self.BankerWinNum = self.BankerWinNum+1
-            --    elseif(self.BaccaratBaseInfo.winState==config.WhoWin.PlayerWin) then
-            --        self.PlayerWinNum = self.PlayerWinNum+1
-            --    elseif(self.BaccaratBaseInfo.winState==config.WhoWin.TieWin) then
-            --        self.TieWinNum = self.TieWinNum+1
-            --    end
-            --    self:RefreshTmpShow();
-            --    self.ctrl.model:ReqBaccaratTableSummary(self.BaccaratTableSummary.baccaratBaseInfo.roomId, #self.BaccaratTableSummary.cardStateList)
-            --end
         end
     end
 end
