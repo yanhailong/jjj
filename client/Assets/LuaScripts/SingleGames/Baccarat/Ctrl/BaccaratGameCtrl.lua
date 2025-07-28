@@ -254,12 +254,7 @@ function BaccaratGameCtrl:InitUIShow()
 	self.view.tmp_PPairBetNum.text = "0.00";
 	self.view.tmp_TieBetNum.text = "0.00";
 	self.view.tmp_BPairBetNum.text = "0.00";
-	self.view.btn_Repeat.enabled = #BetRecord>0;
-	if(#BetRecord>0) then
-		self.view.btn_Repeat.image.material = nil;
-	else
-		self.view.btn_Repeat.image.material = config.GetUIImageGray();
-	end
+	
 end
 
 ---刷新自己下注的筹码数量是否显示
@@ -518,6 +513,12 @@ end
 
 ---设置按钮的显示状态
 function BaccaratGameCtrl:SetBetButtonInteractable(state)
+	self.view.btn_Repeat.enabled = #BetRecord>0;
+	if(#BetRecord>0) then
+		self.view.btn_Repeat.image.material = nil;
+	else
+		self.view.btn_Repeat.image.material = config.GetUIImageGray();
+	end
 	for _, v in pairs(ChipItems) do
 		---@type BaccaratChipItems
 		local item = v;

@@ -111,13 +111,13 @@ function RoyalWarGameCtrl:NotifyRedBlackWarInfo(data)
 		chipItem:InitUIShow(i,betInfoList[i]);
 		table.insert(ChipItems,chipItem);
 	end
-	self:RefreshDataShow(data);
 	self.RoyalWarScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
 	self:RefreshPlayerInfo(data.playerInfos);
 	self:SetBetButtonInteractable(false);
 	self:InitDataShow(data.redBlackHistories)
 	self:InitTableAreaInfos(data.tableAreaInfos);
 	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
+	self:RefreshDataShow(data);
 end
 
 ---第一次进入游戏初始化区域下注信息
@@ -325,6 +325,7 @@ function RoyalWarGameCtrl:InitData()
 end
 
 function RoyalWarGameCtrl:InitUIShow()
+	CurBet={};
 	SelfBetBlackAllNum = 0;
 	SelfBetRedAllNum =0;
 	SelfBetLuckyAllNum =0;
@@ -347,17 +348,16 @@ function RoyalWarGameCtrl:InitUIShow()
 	self.view.tmp_SelfBetBlackNum.text="0.00"
 	self.view.tmp_SelfBetLuckyNum.text="0.00"
 
+	
+end
+---设置按钮的显示状态
+function RoyalWarGameCtrl:SetBetButtonInteractable(state)
 	self.view.btn_Repeat.enabled = #BetRecord>0;
 	if(#BetRecord>0) then
 		self.view.btn_Repeat.image.material = nil;
 	else
 		self.view.btn_Repeat.image.material = config.GetUIImageGray();
 	end
-
-	
-end
----设置按钮的显示状态
-function RoyalWarGameCtrl:SetBetButtonInteractable(state)
 	for _, v in pairs(ChipItems) do
 		---@type BaccaratChipItems
 		local item = v;
