@@ -9,7 +9,7 @@ function RoyalWar:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function RoyalWar:Init()
-    require("SingleGames/RoyalWar/MsgPro/pb_RoyalWar")
+    require("PlatformHall/comonFight/MsgPro/pb_comonFight")
 end
 
 function RoyalWar:EnterGame()

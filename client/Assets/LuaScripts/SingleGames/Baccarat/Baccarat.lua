@@ -9,7 +9,7 @@ function Baccarat:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function Baccarat:Init()
-    require("SingleGames/Baccarat/MsgPro/pb_Baccarat")
+    require("PlatformHall/comonFight/MsgPro/pb_comonFight")
 end
 
 function Baccarat:EnterGame()
