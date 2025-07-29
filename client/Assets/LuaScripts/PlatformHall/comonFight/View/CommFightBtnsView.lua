@@ -32,6 +32,7 @@ function CommFightBtnsView:InitComponents()
     self.selfPlayerRoot  = ComponentUtilGet.Transform(self.transform,"content/bottom/SelfHead")
     self.daojishiObj =ComponentUtilGet.GameObject(self.transform,"content/daojishi/effect_Common_daojishi/effect_Common_daojishi")
     self.muenRect=ComponentUtilGet.RectTransform(self.transform,"content/setting/mask/muen")
+    self.choumaPool= ComponentUtilGet.Transform(self.transform,"content/pool")
     self.ctrl:InitUI()
 end
 

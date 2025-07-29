@@ -41,7 +41,8 @@ end
 
 ---初始化数据
 function CommFightBtnsCtrl:InitData()
-	
+	---@type ChouMaFlyUtil
+	self.chouMaFlyUtil=ChouMaFlyUtil.New(self.view.choumaPool)
 end
 
 ---获取到服务器betPointList时更新筹码数值
@@ -145,7 +146,7 @@ function CommFightBtnsCtrl:ShowAreaChouMa(sideInfo)
 		local index = self:FindBetIndex(value)
 		if areaTotal[side] <self.config.AreaChouMaLimit[side] then
 			areaTotal[side]=areaTotal[side]+1
-			ChouMaFlyUtil:CreatCoinInArea(self.view.dizhuNode,index,self.xiaZhuAreas[side],value)
+			self.chouMaFlyUtil:CreatCoinInArea(self.view.dizhuNode,index,self.xiaZhuAreas[side],value)
 		end
 	end
 end
@@ -275,7 +276,7 @@ end
 ---本玩家下注动画
 ---@param targetTrans下注区域
 function CommFightBtnsCtrl:PaySelfXiaZhuCoinFly(side)
-	ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,self.config.dizhuIndex,self.selfPlayer.transform.position,self.xiaZhuAreas[side], self.betPointList[self.config.dizhuIndex])
+	self.chouMaFlyUtil:AnimateCoin(self.view.dizhuNode,self.config.dizhuIndex,self.selfPlayer.transform.position,self.xiaZhuAreas[side], self.betPointList[self.config.dizhuIndex])
 	if self.PaySelfXiaZhuCoinFlyEnd then self.PaySelfXiaZhuCoinFlyEnd() end
 end
 
@@ -308,9 +309,9 @@ function CommFightBtnsCtrl:PayOtherXiaZhuCoinFly(data)
 		return
 	end
 	if playerItem ~= nil then
-		ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,playerItem.transform.position,self.xiaZhuAreas[data.side],data.betValue)
+		self.chouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,playerItem.transform.position,self.xiaZhuAreas[data.side],data.betValue)
 	else
-		ChouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,self.view.btn_players.transform.position,self.xiaZhuAreas[data.side],data.betValue)
+		self.chouMaFlyUtil:AnimateCoin(self.view.dizhuNode,data.index,self.view.btn_players.transform.position,self.xiaZhuAreas[data.side],data.betValue)
 	end
 	areaTotal[data.side] = areaTotal[data.side] + 1
 	if self.PayOtherXiaZhuCoinFlyEnd then self.PayOtherXiaZhuCoinFlyEnd() end
@@ -354,7 +355,7 @@ function CommFightBtnsCtrl:PlayCompeleCoinFLy(results)
 	if totalCurrency==0 then
 		ratios = {0,1}
 	end
-	ChouMaFlyUtil:DestroyCoin(targetPos,ratios)
+	self.chouMaFlyUtil:DestroyCoin(targetPos,ratios)
 	if self.PlayCompeleCoinFLyEnd then self.PlayCompeleCoinFLyEnd() end
 end
 
@@ -443,7 +444,7 @@ end
 function CommFightBtnsCtrl:RemoveEvent()
 	self.super.RemoveEvent(self);
 	UpdateManager.ReMoveAll(self)
-	ChouMaFlyUtil:Destroy()
+	self.chouMaFlyUtil:Destroy()
 end
 
 --region UI事件方法
