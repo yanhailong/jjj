@@ -1,7 +1,7 @@
 local Roller = {}
 Roller.__index = Roller
 
-local RollerElement = require("SingleGames/MahjongWays/SlotMachine/RollerElement") -- 引用模块
+local RollerElement = require("SingleGames/MahjongWays/SlotMachine/RollerElement")
 
 function Roller.New(gameObject)
     local self = setmetatable({}, Roller)
@@ -13,14 +13,14 @@ function Roller.New(gameObject)
     return self
 end
 
-function Roller:Init(manager, index)
-    self.Manager = manager
+function Roller:Init(slotMachine, index)
+    self.slotMachine = slotMachine
     self.index = index
-    self.column = manager.ItemsPerAxis
-    self.drop = manager.dropTime
+    self.column = slotMachine.config.ItemsPerAxis
+    self.drop = slotMachine.config.dropTime
     self.Multiple = 1
     self.stopImmediately = false
-    self.Manager.StopImmediatelyEvent:Add(function(_) self.stopImmediately = true end)
+    self.slotMachine.StopImmediatelyEvent:Add(function(_) self.stopImmediately = true end)
 
     local content = CS.UnityEngine.GameObject("Content")
     content.transform:SetParent(self.transform)
@@ -30,16 +30,16 @@ function Roller:Init(manager, index)
 end
 
 function Roller:SetParentNode(content)
-    local contentHeight = self.Manager.ElementHeight * (self.Manager.ItemsPerAxis + self.Manager.AddItems * 2)
-    local contentWidth = self.Manager.AxisSize.x
+    local contentHeight = self.slotMachine.config.ElementHeight * (self.slotMachine.config.ItemsPerAxis + self.slotMachine.config.AddItems * 2)
+    local contentWidth = self.slotMachine.config.AxisSize.x
     local offset = contentHeight / 2
-    self.Manager.StartOffset = offset
+    self.slotMachine.startOffset = offset
 
     content:GetComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
         CS.UnityEngine.Vector2(contentWidth, contentHeight)
     content.localPosition = CS.UnityEngine.Vector3.zero
 
-    self:CreateElement(content, self.Manager.ItemsPerAxis + self.Manager.AddItems * 2)
+    self:CreateElement(content, self.slotMachine.config.ItemsPerAxis + self.slotMachine.config.AddItems * 2)
 end
 
 function Roller:CreateElement(root, total)
@@ -49,15 +49,15 @@ function Roller:CreateElement(root, total)
         go.transform:SetParent(root)
         go.transform.localScale = CS.UnityEngine.Vector3.one
         go:AddComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
-            CS.UnityEngine.Vector2(self.Manager.ElementWight, self.Manager.ElementHeight)
+            CS.UnityEngine.Vector2(self.slotMachine.config.ElementWight, self.slotMachine.config.ElementHeight)
         go.transform.localPosition = CS.UnityEngine.Vector3(
             0,
-            (self.Manager.StartOffset - i * self.Manager.ElementHeight) - self.Manager.ElementHeight / 2,
+            (self.slotMachine.startOffset - i * self.slotMachine.config.ElementHeight) - self.slotMachine.config.ElementHeight / 2,
             0
         )
         local element = RollerElement.New(go)
         table.insert(self.elements, element)
-        element:Init(self, i, self.Manager)
+        element:Init(self, i, self.slotMachine)
     end
 end
 
@@ -88,11 +88,12 @@ function Roller:IsContainselement()
 end
 
 function Roller:Completed()
-    self.Manager.RollerCompleted_Event:Invoke(self, self.index)
+    self.slotMachine.RollerCompleted_Event:Invoke(self, self.index)
 end
 
-function Roller:StartGame(waitTime, speed)
+function Roller:StartGame(waitTime, speed,delayed)
     return function()
+        coroutine.yield(CS.UnityEngine.WaitForSeconds(delayed))
         self.stopImmediately = false
         for i, element in ipairs(self.elements) do
             element:Roll(speed / self.Multiple, i == #self.elements and function() self:Completed() end or nil)
@@ -128,8 +129,8 @@ function Roller:Drop(winningIndices)
     local keyValues = {}
     for _, elem in ipairs(self.elements) do
         local idx = elem:GetIndex()
-        if idx >= self.Manager.AddItems and idx < self.column + self.Manager.AddItems then
-            keyValues[idx - (self.Manager.AddItems - 1)] = elem
+        if idx >= self.slotMachine.config.AddItems and idx < self.column + self.slotMachine.config.AddItems then
+            keyValues[idx - (self.slotMachine.config.AddItems - 1)] = elem
         end
     end
 

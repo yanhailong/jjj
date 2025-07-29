@@ -1,6 +1,6 @@
 ---@class MahjongWaysMainCtrl:BaseCtrl
 local MahjongWaysMainCtrl = Class("MahjongWaysMainCtrl", BaseCtrl)
-local SlotMachineConfig = require "SingleGames/MahjongWays/SlotMachineConfig"
+local SlotMachineConfig = require "SingleGames/MahjongWays/MahjongWaysConfig"
 ---构造函数
 function MahjongWaysMainCtrl:ctor(ctrlName, param)
     self.layer = 3;
@@ -16,6 +16,7 @@ end
 ---初始化
 function MahjongWaysMainCtrl:CtrlInit(args)
     self.super.CtrlInit(self, args);
+    Application.targetFrameRate=-1
     SlotMachineConfig.InitIconPic()
     self:InitData()
 end
@@ -24,7 +25,7 @@ end
 function MahjongWaysMainCtrl:InitData()
     local SlotMachine = require("SingleGames/MahjongWays/SlotMachine/SlotMachine")
     self.SlotGame = SlotMachine.New();
-    self.SlotGame.ElementInitCompleted:Add(self.ElementInit, self)
+    self.SlotGame.ElementInitCompleted_Event:Add(self.ElementInit, self)
     self.SlotGame.SingleRollerCompleted_Event:Add(self.SingleRollerCompleted, self)
     self.SlotGame.AllRollerCompleted_Event:Add(self.AllRollerCompleted, self)
     self.SlotGame.DropCompleted_Event:Add(self.DropCompleted, self)
@@ -37,7 +38,7 @@ end
 --元素初始化逻辑
 function MahjongWaysMainCtrl:ElementInit(rollerElement, elementIcon, rollerIndex, elementIndex)
     log("元素初始化完成")
-    --可以对元素进行一些自定义数据
+    --可以对元素进行一些自定义数据和方法
     rollerElement.icon = elementIcon.transform:Find("UsualStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))
     rollerElement.WinStatus = elementIcon.transform:Find("WinStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))
     rollerElement.MoveStatus = elementIcon.transform:Find("MoveStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))

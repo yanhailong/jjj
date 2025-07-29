@@ -2,6 +2,7 @@ local SlotMachine = {}
 SlotMachine.__index = SlotMachine
 require("SingleGames/MahjongWays/SlotMachine/XLuaUtil")
 local Roller = require("SingleGames/MahjongWays/SlotMachine/Roller")
+local Config = require("SingleGames/MahjongWays/SlotMachine/SlotMachineConfig")
 local GameState = {
     NotStarted = 1,
     Rotating = 2,
@@ -10,104 +11,81 @@ local GameState = {
     DropCompleted = 5,
     Completed = 6
 }
+
 function SlotMachine.New()
-    local self = setmetatable({}, SlotMachine)
-
-    self.itemPos = {}
-    self.Root = nil
-    self.Line = nil
-    self.point = nil
-    self.axis = {}
-
+    local self                       = setmetatable({}, SlotMachine)
+    self.root                        = nil
+    self.axis                        = {}
     -- 内部事件
-    self.StopImmediatelyEvent = XLuaUtil.CreateEvent()
-    self.RollerCompleted_Event = XLuaUtil.CreateEvent()
+    self.StopImmediatelyEvent        = XLuaUtil.CreateEvent()
+    self.RollerCompleted_Event       = XLuaUtil.CreateEvent()
     -- 外部监听
     self.SingleRollerCompleted_Event = XLuaUtil.CreateEvent() --单轴停止事件
-    self.DropCompleted_Event = XLuaUtil.CreateEvent()         --掉落完成事件
-    self.ElementInitCompleted = XLuaUtil.CreateEvent()        --元素初始化完成事件
-    self.AllRollerCompleted_Event = XLuaUtil.CreateEvent()    --滚动完成事件
-    self.ChangeRandomIcons_Event = XLuaUtil.CreateEvent()     --切换随机滚动图标事件
-    self.SetResultIcons_Event = XLuaUtil.CreateEvent()        --设置结果图标事件
+    self.DropCompleted_Event         = XLuaUtil.CreateEvent() --掉落完成事件
+    self.ElementInitCompleted_Event  = XLuaUtil.CreateEvent() --元素初始化完成事件
+    self.AllRollerCompleted_Event    = XLuaUtil.CreateEvent() --滚动完成事件
+    self.ChangeRandomIcons_Event     = XLuaUtil.CreateEvent() --切换随机滚动图标事件
+    self.SetResultIcons_Event        = XLuaUtil.CreateEvent() --设置结果图标事件
     -- 状态控制
-    self.RollerCompleted_Number = 0
-    self.index = 0
-
-    -- 配置
-    self.waitTime = 5.0
-    self.speed = 0.05
-    self.isLineWait = false --是否
-    self.StopInterval = 1.0
-    self.isDrop = true
-    self.isOpenReboundAnimation = true
-    self.AxisCount = 5
-    self.ItemsPerAxis = 3
-    self.AddItems = 3
-    self.dropTime = 0.2
-    self.isOpenSingleAxisMask = false
-    self.ElementHeight = 300
-    self.ElementWight = 330
-    self.AxisStartPos = CS.UnityEngine.Vector3(-680, -40, 0)
-    self.MaskStartPos = CS.UnityEngine.Vector3(0, 0, 0)
-    self.AxisOffset = 345
-    self.AxisSize = CS.UnityEngine.Vector2(337, 964)
-    self.AxisSizeOffset = 0
-    self.StartOffset = 0
-    self.ElementIconPrefab = nil
+    self.rollerCompleted_Number      = 0
     -- 内部状态
-    self.RollerCoroutines = {}
-    self.lineIndex = 0
-
-
-    self.State = GameState.NotStarted;
+    self.rollerCoroutines            = {}
+    self.state                       = GameState.NotStarted;
+    self.startOffset                 = 0
+    self.elementIconPrefab           = nil
+    self.config                      = Config
     return self
 end
+
 ---@param root根节点  ,elementIconPrefab元素预制件
 function SlotMachine:Create(root, elementIconPrefab)
     self.transform = root
-    self.ElementIconPrefab = elementIconPrefab
+    self.elementIconPrefab = elementIconPrefab
     self.axis = {}
-    self.RollerCoroutines = {}
-    self.RollerCompleted_Number = 0
+    self.rollerCoroutines = {}
+    self.rollerCompleted_Number = 0
     self:Init(self.transform)
-    self.RollerCompleted_Event:Add(function(i) self:RollerCompleted(i) end)
+    self.RollerCompleted_Event:Add(self.RollerCompleted, self)
 end
 
 --停止
 function SlotMachine:Stop()
-    if self.State == GameState.Rotating then
+    if self.state == GameState.Rotating then
         self.StopImmediatelyEvent:Invoke(self)
     end
 end
 
 function SlotMachine:Init(root)
     local parent = root
-    if not self.isOpenSingleAxisMask then
+    if not self.config.isOpenSingleAxisMask then
         local mask = CS.UnityEngine.GameObject("Mask")
         mask.transform:SetParent(root)
         mask.transform.localScale = CS.UnityEngine.Vector3.one
         mask:AddComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
-            CS.UnityEngine.Vector2(self.AxisOffset * self.AxisCount,
-                self.ItemsPerAxis * self.ElementHeight + self.AxisSizeOffset)
+            CS.UnityEngine.Vector2(self.config.AxisOffset * self.config.AxisCount,
+                self.config.ItemsPerAxis * self.config.ElementHeight + self.config.AxisSizeOffset)
         mask:AddComponent(typeof(CS.UnityEngine.UI.RectMask2D))
-        mask.transform.localPosition = self.MaskStartPos
+        mask.transform.localPosition = self.config.MaskStartPos
         self.AxisStartPos = CS.UnityEngine.Vector3(
-            -self.ElementWight * self.AxisCount / 2 + self.ElementWight / 2 + self.MaskStartPos.x,
+            -self.config.ElementWight * self.config.AxisCount / 2 + self.config.ElementWight / 2 +
+            self.config.MaskStartPos.x,
             0,
             0
         )
         parent = mask.transform
     end
 
-    for i = 0, self.AxisCount - 1 do
+    for i = 0, self.config.AxisCount - 1 do
         local go = CS.UnityEngine.GameObject("Axis" .. i)
         go.transform:SetParent(parent)
         go.transform.localScale = CS.UnityEngine.Vector3.one
-        go.transform.localPosition = Vector3(-(self.AxisOffset * self.AxisCount) / 2 + self.AxisOffset / 2, 0, 0) +
-        CS.UnityEngine.Vector3(1, 0, 0) * self.AxisOffset * i
+        go.transform.localPosition = Vector3(
+                -(self.config.AxisOffset * self.config.AxisCount) / 2 + self.config.AxisOffset / 2, 0, 0) +
+            CS.UnityEngine.Vector3(1, 0, 0) * self.config.AxisOffset * i
         go:AddComponent(typeof(CS.UnityEngine.RectTransform)).sizeDelta =
-            CS.UnityEngine.Vector2(self.ElementWight, self.ItemsPerAxis * self.ElementHeight + self.AxisSizeOffset)
-        if self.isOpenSingleAxisMask then
+            CS.UnityEngine.Vector2(self.config.ElementWight,
+                self.config.ItemsPerAxis * self.config.ElementHeight + self.config.AxisSizeOffset)
+        if self.config.isOpenSingleAxisMask then
             go:AddComponent(typeof(CS.UnityEngine.UI.RectMask2D))
         end
 
@@ -116,37 +94,39 @@ function SlotMachine:Init(root)
         self.axis[i + 1] = roller
     end
 end
+
 --开始滚动
 function SlotMachine:StartRollers()
-    if self.State == GameState.Completed or self.State == GameState.NotStarted then
-        self.State = GameState.Rotating
-        self.RollerCompleted_Number = 0
+    if self.state == GameState.Completed or self.state == GameState.NotStarted then
+        self.state = GameState.Rotating
+        self.rollerCompleted_Number = 0
         for i, roller in ipairs(self.axis) do
-            local delay = self.isLineWait and self.waitTime or (i / self.StopInterval)
-            local co = coroutine.start(roller:StartGame(delay, self.speed))
-            self.RollerCoroutines[i] = co
+            local delay = self.config.isLineWait and self.config.waitTime or (i / self.config.StopInterval)
+            print((i-1)*(self.config.speed/2))
+            local co = coroutine.start(roller:StartGame(delay, self.config.speed,(i-1)*(self.config.speed/2)))
+            self.rollerCoroutines[i] = co
         end
     end
 end
 
 function SlotMachine:StopAllRollers()
-    for _, co in pairs(self.RollerCoroutines) do
+    for _, co in pairs(self.rollerCoroutines) do
         if co then coroutine.stop(co) end
     end
-    self.RollerCoroutines = {}
+    self.rollerCoroutines = {}
 end
 
-function SlotMachine:RollerCompleted(index)
-    self.SingleRollerCompleted_Event:Invoke(index)
-    self.RollerCompleted_Number = self.RollerCompleted_Number + 1
-    if self.RollerCompleted_Number == self.AxisCount then
-        self.State = GameState.RotationCompleted
+function SlotMachine:RollerCompleted(Roller, index)
+    self.SingleRollerCompleted_Event:Invoke(Roller, index)
+    self.rollerCompleted_Number = self.rollerCompleted_Number + 1
+    if self.rollerCompleted_Number == self.config.AxisCount then
+        self.state = GameState.RotationCompleted
         self.AllRollerCompleted_Event:Invoke()
     end
 end
 
 function SlotMachine:SetDrop(WinPattern)
-    self.State = GameState.Dropping
+    self.state = GameState.Dropping
     self.dropFinishedCount = 0
     self.totalAxis = #self.axis
     for key, roller in ipairs(self.axis) do
@@ -157,24 +137,25 @@ function SlotMachine:SetDrop(WinPattern)
             end
         end
         if WinPattern[key] ~= nil then
-            roller:Settlement(self.isDrop, WinPattern[key])
+            roller:Settlement(self.config.isDrop, WinPattern[key])
         end
     end
 end
 
 function SlotMachine:OnAllDropCompleted()
-    self.State = GameState.DropCompleted
+    self.state = GameState.DropCompleted
     self.DropCompleted_Event:Invoke()
 end
 
 function SlotMachine:SetCompletedState()
-    self.State = GameState.Completed;
+    self.state = GameState.Completed;
 end
 
 --改变速度
 function SlotMachine:ChangeSpeed(rollerIndex, speed)
     self.axis[rollerIndex]:ChangeSpeed(speed)
 end
+
 --关闭游戏
 function SlotMachine:Close()
     for i, v in ipairs(self.axis) do

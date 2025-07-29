@@ -11,22 +11,22 @@ end
 function RollerElement:Init(roller, index, slotMachine)
     self.roller = roller
     self.index = index
-    self.ItemsPerAxis = slotMachine.ItemsPerAxis + slotMachine.AddItems * 2
-    self.ElementHeight = slotMachine.ElementHeight
+    self.ItemsPerAxis = slotMachine.config.ItemsPerAxis + slotMachine.config.AddItems * 2
+    self.ElementHeight = slotMachine.config.ElementHeight
     self.slotMachine = slotMachine
-    self.offset = slotMachine.StartOffset - self.slotMachine.ElementHeight / 2
-    self.AddItems = slotMachine.AddItems
-    self.isOpenReboundAnimation = slotMachine.isOpenReboundAnimation
-    self.BounceOffset = slotMachine.ElementHeight / 2
-    self.top = (slotMachine.ElementHeight * self.ItemsPerAxis) / 2 - self.BounceOffset
+    self.offset = slotMachine.startOffset - slotMachine.config.ElementHeight / 2
+    self.AddItems = slotMachine.config.AddItems
+    self.isOpenReboundAnimation = slotMachine.config.isOpenReboundAnimation
+    self.BounceOffset = slotMachine.config.ElementHeight / 2
+    self.top = (slotMachine.config.ElementHeight * self.ItemsPerAxis) / 2 - self.BounceOffset
     self.ResetThreshold = -self.top - 50
     self.originalPos = self.transform.localPosition
-    self.elementIcon = CS.UnityEngine.GameObject.Instantiate(slotMachine.ElementIconPrefab, self.transform)
+    self.elementIcon = CS.UnityEngine.GameObject.Instantiate(slotMachine.elementIconPrefab, self.transform)
     self.elementIcon.transform.localPosition = CS.UnityEngine.Vector3.zero
     self.elementIcon.transform.localScale = CS.UnityEngine.Vector3.one
     roller.stop:Add(function() self.StartRoll = false end)
     roller.changeSpeed:Add(function(speed) self.speed = speed end)
-    slotMachine.ElementInitCompleted:Invoke(self, self.elementIcon, self.roller.index, self.index);
+    slotMachine.ElementInitCompleted_Event:Invoke(self, self.elementIcon, self.roller.index, self.index);
     self.ChangeRandomIcons_Event = slotMachine.ChangeRandomIcons_Event;
     self.SetResultIcons_Event = slotMachine.SetResultIcons_Event;
 end
@@ -46,7 +46,7 @@ function RollerElement:LoopRoll(onComplete)
         while self.StartRoll do
             coroutine.yield(self:RotatingAnimation(self.speed))
         end
-        coroutine.yield(self:SetAsynResult(true))
+        coroutine.yield(self:SetAsynResult(false))
         if self.isOpenReboundAnimation then
             coroutine.yield(self:ReboundAnimation())
         end
@@ -56,6 +56,7 @@ end
 
 function RollerElement:RotatingAnimation(time)
     return self.transform:DOLocalMoveY(self.transform.localPosition.y - self.ElementHeight, time)
+            :SetUpdate(CS.DG.Tweening.UpdateType.Fixed)
         :SetEase(CS.DG.Tweening.Ease.Linear)
         :OnComplete(function()
             if self.transform.localPosition.y <= self.ResetThreshold then
@@ -102,7 +103,7 @@ function RollerElement:ReboundAnimation()
             :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
         )
         coroutine.yield(
-            self.transform:DOLocalMoveY(self.transform.localPosition.y + self.BounceOffset, 0.2)
+            self.transform:DOLocalMoveY(self.transform.localPosition.y + self.BounceOffset, 0.15)
             :SetEase(CS.DG.Tweening.Ease.Linear):WaitForCompletion()
         )
     end)
