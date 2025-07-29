@@ -313,7 +313,7 @@ function BaccaratGameCtrl:NotifyBaccaratRoundStart(data)
 		for _, value in pairs(ChipTable) do
 			self.objPools:UnSpawnPrefab(value.chip)
 		end
-		ChipTable = {}
+		ChipTable	 = {}
 	end
 	
 	BetRecord = CurBet;
@@ -672,7 +672,6 @@ end
 
 ---直接展示牌面后结算
 function BaccaratGameCtrl:EnterSettlement()
-	logError("直接展示牌面后结算");
 	if self.SettlementCor then
 		coroutine.stop(self.SettlementCor)
 		self.SettlementCor=nil
@@ -1154,6 +1153,8 @@ function BaccaratGameCtrl:RealCloseDestroy()
 	BestSixPlayerObjs = {}
 	BaccaratPlayerItems = {}
 	ChipItems = {}
+	ChipTable = {}
+	CurBet={};
 end
 
 return BaccaratGameCtrl

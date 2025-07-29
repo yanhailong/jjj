@@ -89,7 +89,7 @@ function BaccaratMainModel:RespBaccaratTableInfo(msg)
 	if(msg.code == 200) then
 		look("返回百家乐房间数据",msg)
 		CtrlManager.SingleShow(CtrlNames.BaccaratGame,msg)
-		self:Close()
+		self.ctrl:Close()
 	else
 		look("返回百家乐房间数据失败",msg.code)
 	end
