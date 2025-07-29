@@ -23,6 +23,7 @@ function RoyalWarGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_comonFight.NotifyRedBlackWarSettleInfo, self.NotifyRedBlackWarSettleInfo, self)
 	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.NotifyPlayerBet, self)
 	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.NotifyTableRoomPlayerInfoChange, self)
 end
 
 function RoyalWarGameModel:RemoveEvent()
@@ -95,7 +96,13 @@ function RoyalWarGameModel:RespTablePlayerInfo(data)
 		CtrlManager.SingleShow(CtrlNames.PlayerRankPanel,data.tablePlayerInfo)
 	end
 end
-
+---通知押注类房间玩家信息变化
+function RoyalWarGameModel:NotifyTableRoomPlayerInfoChange(data)
+	if(data.code == 200) then
+		look("通知押注类房间玩家信息变化",data)
+		self.ctrl:NotifyTableRoomPlayerInfoChange(data);
+	end
+end
 --region 事件方法
 
 --endregion

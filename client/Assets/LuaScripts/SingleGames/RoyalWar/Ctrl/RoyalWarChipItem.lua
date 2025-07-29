@@ -23,7 +23,7 @@ function RoyalWarChipItem:InitUIShow(index,number)
     self.num = number;
     self.index = index;
     self.icon.sprite = config.GetCommonMainPic("yx_ph_cm_"..index);
-    self.number.text = number;
+    self.number.text = StringUtil.FormatNumber(number);
     self.checked:SetActive(false)
 end
 

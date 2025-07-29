@@ -254,12 +254,7 @@ function BaccaratGameCtrl:InitUIShow()
 	self.view.tmp_PPairBetNum.text = "0.00";
 	self.view.tmp_TieBetNum.text = "0.00";
 	self.view.tmp_BPairBetNum.text = "0.00";
-	self.view.btn_Repeat.enabled = #BetRecord>0;
-	if(#BetRecord>0) then
-		self.view.btn_Repeat.image.material = nil;
-	else
-		self.view.btn_Repeat.image.material = config.GetUIImageGray();
-	end
+	
 end
 
 ---刷新自己下注的筹码数量是否显示
@@ -283,6 +278,7 @@ end
 
 ---首次进入游戏刷新显示
 function BaccaratGameCtrl:FirstEntryGame(data)
+	self.isNeedClearRoad = false;
 	self.GamePhase = data.gamePhase;--游戏阶段信息
 	self.BaccaratRoadScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
 	self:InitDataShow(data.cardStateList)
@@ -317,13 +313,13 @@ function BaccaratGameCtrl:NotifyBaccaratRoundStart(data)
 		for _, value in pairs(ChipTable) do
 			self.objPools:UnSpawnPrefab(value.chip)
 		end
-		ChipTable = {}
+		ChipTable	 = {}
 	end
 	
 	BetRecord = CurBet;
 	RoundNumber = RoundNumber+1;
 	self:RefreshUIDataShow()
-	self.BaccaratRoadScripts:RefreshData(BaccaratSettlementInfo.cardState,true,false)
+	self.BaccaratRoadScripts:RefreshData(BaccaratSettlementInfo.cardState,true,self.isNeedClearRoad)
 	self:InitUIShow()
 	
 	BaccaratTableInfo = data.baccaratTableInfo
@@ -342,6 +338,7 @@ function BaccaratGameCtrl:NotifyBaccaratSettlementInfo(data)
 end
 ---通知押注类房间玩家信息变化
 function BaccaratGameCtrl:NotifyTableRoomPlayerInfoChange(data)
+	self.isNeedClearRoad = data.needClearRoad;
 	BaccaratTableInfo = data.tableChangedPlayerInfos;
 	self:RefreshPlayerInfo(BaccaratTableInfo.tablePlayerInfoList);
 	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
@@ -516,6 +513,12 @@ end
 
 ---设置按钮的显示状态
 function BaccaratGameCtrl:SetBetButtonInteractable(state)
+	self.view.btn_Repeat.enabled = #BetRecord>0;
+	if(#BetRecord>0) then
+		self.view.btn_Repeat.image.material = nil;
+	else
+		self.view.btn_Repeat.image.material = config.GetUIImageGray();
+	end
 	for _, v in pairs(ChipItems) do
 		---@type BaccaratChipItems
 		local item = v;
@@ -669,7 +672,6 @@ end
 
 ---直接展示牌面后结算
 function BaccaratGameCtrl:EnterSettlement()
-	logError("直接展示牌面后结算");
 	if self.SettlementCor then
 		coroutine.stop(self.SettlementCor)
 		self.SettlementCor=nil
@@ -1075,7 +1077,7 @@ function BaccaratGameCtrl:PlayChip(data,playerId)
 	
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,"BaccaratChip_"..chipIndex,targetRect.transform)
 	chip:SetActive(true)
-	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = data.betValue;
+	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = StringUtil.FormatNumber(data.betValue);
 	chip.transform.localScale =  Vector3.one*0.6
 	if(isSelf) then
 		chip.transform.position = self.view.obj_Player.transform.position;
@@ -1151,6 +1153,8 @@ function BaccaratGameCtrl:RealCloseDestroy()
 	BestSixPlayerObjs = {}
 	BaccaratPlayerItems = {}
 	ChipItems = {}
+	ChipTable = {}
+	CurBet={};
 end
 
 return BaccaratGameCtrl

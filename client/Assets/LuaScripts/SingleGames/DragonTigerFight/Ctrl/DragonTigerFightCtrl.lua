@@ -6,6 +6,7 @@
 local DragonTigerFightCtrl=Class("DragonTigerFightCtrl",BaseCtrl)
 ---@type DragonTigerFightConfig
 local config=require("SingleGames/DragonTigerFight/DragonTigerFightConfig")
+local DragonTigerFightSounds = require("SingleGames/DragonTigerFight/DragonTigerFightSounds")
 
 ---构造函数
 function DragonTigerFightCtrl:ctor(ctrlName,param)
@@ -25,40 +26,49 @@ function DragonTigerFightCtrl:CtrlInit(args)
 end
 
 function DragonTigerFightCtrl:InitData()
-    
+    ---@type CommFightBtnsCtrl
+    self.commCtrl = CtrlManager.SingleShow(CtrlNames.CommFightBtns, self):AddAsyncOpenCallback(function()
+        --请求进入房间
+        self.model:ReqEnterRoom()
+    end)
+    self:BindCommFightData()
 end
 
+function DragonTigerFightCtrl:BindCommFightData()
+    self.commCtrl:BindData(config,true,self.view.xiazhuStarAreas)
+    self.commCtrl.OnClickHelp = function()
+        CtrlManager.SingleShow(CtrlNames.DragonTigerFightRule)
+    end
+    self.commCtrl.OnClickClose = function()
+        self:Close()
+    end
+    self.commCtrl.UpdateXiaZhuLabel = function() 
+        self.view:UpdateXiaZhuLabel()
+    end
+    self.commCtrl.PayOtherXiaZhuCoinFlyEnd = function()
+        --其余玩家筹码下注飞行音效
+        DragonTigerFightSounds.OtherFlyBet()
+    end
+    self.commCtrl.PaySelfXiaZhuCoinFlyEnd = function()
+        --下注音效
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.ADD_CHIP)
+    end
+    self.commCtrl.PlayCompeleCoinFLyEnd = function()
+        --分筹码音效
+        DragonTigerFightSounds.PlaySoundEffic(config.AUDIO_KEY.END_COIN_FLY)
+    end
+    self.commCtrl.PlayCompeleCoinFLySelfEnd = function()
+        -- 播放得奖音效
+    end
+end
 
 function DragonTigerFightCtrl:AddUIEvent()
     self:AddFunctionButtons()
-    self:AddBetButtons()
     self:AddAreaClickEvents()
 end
 
 function DragonTigerFightCtrl:AddFunctionButtons()
-    self.uiEventListener:AddClick(self.view.btn_close, function() self:Close() end)
-    self.uiEventListener:AddClick(self.view.btn_muen,function() self.view:SettingFade()  end)
-    self.uiEventListener:AddClick(self.view.btn_touch,function() self.view:SettingFade()  end)
-    self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.DragonTigerFightRule) end)
-    self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
-    self.uiEventListener:AddClick(self.view.btn_players, function()
-        self.model:ReqRoomPlayers()
-    end)
     self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
-    self.uiEventListener:AddClick(self.view.btn_prev,function()  self.view:DizhuPrev(false) end)
-    self.uiEventListener:AddClick(self.view.btn_next,function()  self.view:DizhuPrev(true) end)
-end
-
-
-function DragonTigerFightCtrl:AddBetButtons()
-    for i, chipInfo in ipairs(self.view.chipInfos) do
-        self.uiEventListener:AddClick(chipInfo.button, function()
-            if config.allow then
-                self.view:ChangeDiZhu(i)
-                look("btn 抵住数值" .. config.dizhuIndex)
-            end
-        end)
-    end
 end
 
 function DragonTigerFightCtrl:AddAreaClickEvents()
@@ -112,6 +122,7 @@ end
 ---销毁UI
 function DragonTigerFightCtrl:RealCloseDestroy()
 	self.super.RealCloseDestroy(self);
+    self.commCtrl:Close()
 end
 
 return DragonTigerFightCtrl

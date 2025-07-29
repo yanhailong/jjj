@@ -3,6 +3,7 @@ local DragonTigerFight=Class("DragonTigerFight",SubGame)
 
 function DragonTigerFight:ctor(gameName,param)
     self.super.ctor(self,gameName,param)
+    self.secondUICtrlName = CtrlNames.DragonTigerSelect
     -- 无加载界面
     --self.gameLoadingLuaPath="Logic/SubGame/GameLoading";
     --self.gameLoadingPanelPath="SingleGames/DragonTigerFight/prefabs/DragonTigerFightLoading";
@@ -10,7 +11,9 @@ function DragonTigerFight:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function DragonTigerFight:Init()
-    require("SingleGames/DragonTigerFight/MsgPro/pb_DragonTigerFight")
+    require("PlatformHall/comonFight/MsgPro/pb_comonFight")
+    require("PlatformHall/comonFight/MVCHead")
+    require("Logic/Common/PlayerRankPanel/MVCHead")
 end
 
 function DragonTigerFight:EnterGame()

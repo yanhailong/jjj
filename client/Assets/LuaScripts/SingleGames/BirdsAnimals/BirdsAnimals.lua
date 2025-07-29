@@ -9,7 +9,9 @@ function BirdsAnimals:ctor(gameName,param)
     self.isLoadAsync=true;--异步加载游戏资源
 end
 function BirdsAnimals:Init()
-    require("SingleGames/BirdsAnimals/MsgPro/pb_BirdsAnimals")
+    require("PlatformHall/comonFight/MsgPro/pb_comonFight")
+    require("PlatformHall/comonFight/MVCHead")
+    require("Logic/Common/PlayerRankPanel/MVCHead")
 end
 
 function BirdsAnimals:EnterGame()

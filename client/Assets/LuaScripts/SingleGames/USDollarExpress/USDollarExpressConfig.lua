@@ -164,7 +164,7 @@ this.iconEffect={
     [14]="Eff_Chess_wild5x",
     [15]="Eff_Chess_huoche_45du",
     [16]="Eff_Chess_jinbi_$",
-    [17]="Eff_Chess_kuangche",
+    [17]="Eff_Chess_kuangche",--==allBorld
     [18]="Eff_Chess_glod",
     [19]="Eff_Chess_huoche_zhengmian_green",
     [20]="Eff_Chess_huoche_zhengmian_blue",

@@ -6,6 +6,7 @@ local ObjectPoolUtil = Class("ObjectPoolUtil")
 
 function ObjectPoolUtil:ctor(name)
     self.name=name
+    ---@type ObjectPool[]
     self.poolFactory={}
 end
 

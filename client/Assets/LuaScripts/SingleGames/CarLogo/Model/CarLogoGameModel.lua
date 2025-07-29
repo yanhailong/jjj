@@ -18,12 +18,10 @@ function CarLogoGameModel:Awake()
 	self.sideBetInfos={}
 	self.history = {}
 	self.Result = {}
-	self.bettingDataMap = {}
-	self.AreaChipTotals = {0,0,0,0,0,0,0,0}
 	self.playersNum=0
 	self.lastIndex = 1
-	--请求进入房间
-	self:ReqEnterRoom()
+	config.AreaChipTotals = {0,0,0,0,0,0,0,0}
+	config.bettingDataMap = {}
 end
 
 function CarLogoGameModel:Close()
@@ -31,13 +29,13 @@ function CarLogoGameModel:Close()
 end
 
 function CarLogoGameModel:AddEvent()
-	WebNetEvent.AddListener(pb_CarLogo.NotifyLuxuryCarClubTableInfo, self.OnEnterRoom, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyRoomReadyWait, self.OnGameStatus, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyLuxuryCarClubSettlement, self.OnGameResult, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyPlayerBet, self.OnBetting, self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
-	WebNetEvent.AddListener(pb_CarLogo.RespTablePlayerInfo,self.UpdateAllPlayers,self)
-	WebNetEvent.AddListener(pb_CarLogo.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyLuxuryCarClubTableInfo, self.OnEnterRoom, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyRoomReadyWait, self.OnGameStatus, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyLuxuryCarClubSettlement, self.OnGameResult, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPlayerBet, self.OnBetting, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.UpdatePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo,self.UpdateAllPlayers,self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyPhaseChangInfo,self.OnStartXiaZhu,self)
 end
 
 function CarLogoGameModel:RemoveEvent()
@@ -47,11 +45,11 @@ end
 --region 事件方法
 -- 进入房间请求
 function CarLogoGameModel:ReqEnterRoom()
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqRoomBaseInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqRoomBaseInfo)
 end
 -- 押注
 function CarLogoGameModel:Bet(data)
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqBet, data)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqBet, data)
 end
 --退出房间
 function CarLogoGameModel:ExitRoom()
@@ -59,7 +57,7 @@ function CarLogoGameModel:ExitRoom()
 end
 --获取房间玩家信息
 function CarLogoGameModel:ReqRoomPlayers()
-	WebNetworkManager.SendMsg(pb_CarLogo.ReqTablePlayerInfo)
+	WebNetworkManager.SendMsg(pb_comonFight.ReqTablePlayerInfo)
 end
 -- 进入房间返回 NotifyLoongTigerWarInfo
 function CarLogoGameModel:OnEnterRoom(msg)
@@ -81,32 +79,32 @@ end
 
 -- 广播玩家押注信息 NotifyPlayerBet 
 function CarLogoGameModel:OnBetting(msg)
-	if msg and msg.code == 200 and self.initState then
+	if msg and msg.code == 200 and self.initState and self.ctrl.commCtrl then
 		--自己的直接显示
 		if msg.playerId == PlayerManager:GetPlayerInfo().playerId then
 			for _, value in ipairs(msg.betTableInfoList or {}) do
 				local bet = {
 					side = value.betIdx<config.gameID and value.betIdx or value.betIdx-config.gameID*100,
-					index = self:FindBetIndex(value.betValue),
+					index = self.ctrl.commCtrl:FindBetIndex(value.betValue),
 					currency = msg.playerCurGold,
 					playerId = msg.playerId,
 					betValue = value.betValue,
 					betIdxTotal = value.betIdxTotal,--区域下标的总的押注数量
 				}
-				self.view:PayOtherXiaZhuCoinFly(bet)
+				self.ctrl.commCtrl:PayOtherXiaZhuCoinFly(bet)
 			end
 			return
 		end
 		--其他玩家批量更新
 		msg.handled = false
-		if self.bettingDataMap[msg.playerId] and not self.bettingDataMap[msg.playerId].handled then
+		if config.bettingDataMap[msg.playerId] and not config.bettingDataMap[msg.playerId].handled then
 			for i = 1, #msg.betTableInfoList do
-				table.insert(self.bettingDataMap[msg.playerId].betTableInfoList, msg.betTableInfoList[i])
+				table.insert(config.bettingDataMap[msg.playerId].betTableInfoList, msg.betTableInfoList[i])
 			end
-			msg.betTableInfoList = self.bettingDataMap[msg.playerId].betTableInfoList
-			self.bettingDataMap[msg.playerId] = msg
+			msg.betTableInfoList = config.bettingDataMap[msg.playerId].betTableInfoList
+			config.bettingDataMap[msg.playerId] = msg
 		else
-			self.bettingDataMap[msg.playerId] = msg
+			config.bettingDataMap[msg.playerId] = msg
 		end
 	end
 end
@@ -119,7 +117,7 @@ function CarLogoGameModel:OnGameStatus(msg)
 	self.endTime = msg.waitEndTime
 	logError("OnGameStatus:"..os.date("%H:%M:%S", math.modf(self.endTime/1000)))
 	self.view:OnGameStatus(self.status)
-	self.bettingDataMap = {}
+	config.bettingDataMap = {}
 	self:OnStartXiaZhu(msg)
 end
 --收到开始下注消息
@@ -160,31 +158,23 @@ end
 --玩家列表信息返回 
 function CarLogoGameModel:UpdateAllPlayers(msg)
 	if msg.code == 200 and msg.tablePlayerInfo then
-		require("Logic/Common/PlayerRankPanel/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.PlayerRankPanel,msg.tablePlayerInfo)
 	end
 end
 
 function CarLogoGameModel:ResetConfig()
+	self.sideBetInfos={}
+	self.Result = {}
 	for i=1,#config.selfDiZhuNums do
 		config.selfDiZhuNums[i]=0
 		config.totalDiZhuNums[i]=0
 	end
-	self.sideBetInfos={}
-	self.Result = {}
-	self.bettingDataMap = {}
-	self.AreaChipTotals = {0,0,0,0,0,0,0,0}
+	config.AreaChipTotals = {0,0,0,0,0,0,0,0}
+	config.bettingDataMap = {}
 end
 
 --endregion
-function CarLogoGameModel:FindBetIndex(value)
-	for i=1,#self.betPointList do
-		if self.betPointList[i]==value then
-			return i
-		end
-	end
-	return nil
-end
+
 
 function CarLogoGameModel:TransEGamePhase(value)
 	--[准备阶段时间-毫秒，押分阶段时间-毫秒，亮牌阶段时间-毫秒，结算阶段-毫秒]

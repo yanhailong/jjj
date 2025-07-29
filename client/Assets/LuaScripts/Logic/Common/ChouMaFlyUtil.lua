@@ -10,11 +10,18 @@ local Rect = UnityEngine.Rect
 local ChouMaFlyUtil=Class("ChouMaFlyUtil")
 local ImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
 
----scale
-local scale = 0.5
----桌面上的底注
-local coins = {}
 DOTween:SetTweensCapacity(1000, 250);
+
+function ChouMaFlyUtil:ctor(layer,scale)
+    ---缓存的位置
+    self.layer = layer
+    ---桌面上的底注
+    self.coins = {}
+    ---金币缩放
+    self.scale = scale or 0.5
+    ---@type ObjectPoolUtil
+    self.objPools=ObjectPoolUtil.New("ChouMaFlyUtil")
+end
 ---
 ---金币抛到桌面上
 ---@param coin筹码对象
@@ -24,20 +31,20 @@ DOTween:SetTweensCapacity(1000, 250);
 ---@param dizhuNum筹码数值
 ---@param parent显示到指定父节点可选
 function ChouMaFlyUtil:AnimateCoin(coin,coin_type,start_pos,target,dizhuNum,parent)
-    local coinObj = GameObject.Instantiate(coin)
+    local coinObj = self.objPools:Spawn(nil,coin,self.layer)
     
     -- 设置金币初始位置和激活状态
     coinObj.transform:SetParent(parent or target.transform,false)
-    coinObj.transform.localScale = Vector3(scale,scale,1)
+    coinObj.transform.localScale = Vector3(self.scale,self.scale,1)
     coinObj.transform.position = start_pos
     coinObj:SetActive(true)
 
-    coins[#coins+1] = coinObj
+    self.coins[#self.coins+1] = coinObj
     
     local img = ComponentUtilGet.Image(coinObj.transform,"img")
     local num = ComponentUtilGet.Text(coinObj.transform,"num")
     img.sprite = resMgr:LoadSprite(ImgAtlas,"yx_ph_cm_"..coin_type)
-    num.text = StringUtil.CheckDiZhu(dizhuNum)
+    num.text = StringUtil.FormatNumber(dizhuNum)
     
     -- 获取目标区域的矩形顶点
     local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)
@@ -54,8 +61,8 @@ function ChouMaFlyUtil:AnimateCoin(coin,coin_type,start_pos,target,dizhuNum,pare
     sequence:Append(coinObj.transform:DOMove(endPos, 0.5):SetEase(Ease.OutQuad))
     --sequence:Join(coinObj.transform:DOJump(endPos, jumpHeight, 1, 0.8):SetEase(Ease.OutQuad))
     -- sequence:Join(coinObj.transform:DORotate(Vector3(0,0, Tools.Random(0, 360)), 0.8, RotateMode.FastBeyond360))
-    sequence:Join(coinObj.transform:DOScale(scale+0.2, 0.5):SetEase(Ease.OutQuad))
-    sequence:Append(coinObj.transform:DOScale(scale, 0.3):SetEase(Ease.OutQuad))
+    sequence:Join(coinObj.transform:DOScale(self.scale+0.2, 0.5):SetEase(Ease.OutQuad))
+    sequence:Append(coinObj.transform:DOScale(self.scale, 0.3):SetEase(Ease.OutQuad))
     -- 动画完成后保持金币在桌面上
     sequence:OnComplete(function()
         -- 可以在这里添加金币落地后的效果，如声音等
@@ -71,17 +78,17 @@ end
 ---@param target目标区域
 ---@param dizhuNum筹码数值
 function ChouMaFlyUtil:CreatCoinInArea(coin,coin_type,target,dizhuNum)
-    local coinObj = GameObject.Instantiate(coin)
+    local coinObj = self.objPools:Spawn(nil,coin,self.layer)
 
     -- 设置金币初始位置和激活状态
     coinObj.transform:SetParent(target.transform,false)
-    coinObj.transform.localScale = Vector3(scale,scale,1)
-    coins[#coins+1] = coinObj
+    coinObj.transform.localScale = Vector3(self.scale,self.scale,1)
+    self.coins[#self.coins+1] = coinObj
 
     local img = ComponentUtilGet.Image(coinObj.transform,"img")
     local num = ComponentUtilGet.Text(coinObj.transform,"num")
     img.sprite = resMgr:LoadSprite(ImgAtlas,"yx_ph_cm_"..coin_type)
-    num.text = StringUtil.CheckDiZhu(dizhuNum)
+    num.text = StringUtil.FormatNumber(dizhuNum)
 
     -- 获取目标区域的矩形顶点
     local corners = CS.System.Array.CreateInstance(typeof(CS.UnityEngine.Vector3),4)
@@ -99,7 +106,7 @@ end
 ---duration 总动画时长（秒），可选，默认2秒
 function ChouMaFlyUtil:DestroyCoin(targetPos, ratios, duration)
     duration = duration or 2 -- 默认2秒
-    local results = distributeCoins(#coins, ratios)
+    local results = self:distributeCoins(#self.coins, ratios)
     local groupStart = 1
     for i = 1, #results do
         local groupCount = results[i]
@@ -107,19 +114,21 @@ function ChouMaFlyUtil:DestroyCoin(targetPos, ratios, duration)
             local groupEnd = groupStart + groupCount - 1
             for j = groupStart, groupEnd do
                 local delay = groupCount > 1 and ((j - groupStart) / (groupCount - 1)) * duration or 0
-                self:DestroyCoinFly(coins[j], targetPos[i], delay)
+                self:DestroyCoinFly(self.coins[j], targetPos[i], delay)
             end
             groupStart = groupEnd + 1
         end
     end
-    coins = {}
+    self.coins = {}
 end
 
 function ChouMaFlyUtil:DestroyCoinFly(coinObj,endPos,delay)
     if endPos == nil or coinObj == nil then
-        if coinObj then GameObject.Destroy(coinObj) end
+        if coinObj then self.objPools:UnSpawnPrefab(coinObj) end
         return
     end
+    local parent = PanelManager.GetLayer(3)
+    coinObj.transform:SetParent(parent,false)
     -- 创建动画序列
     local sequence = DOTween.Sequence()
     -- 设置金币动画效果
@@ -128,32 +137,29 @@ function ChouMaFlyUtil:DestroyCoinFly(coinObj,endPos,delay)
     sequence:Join(coinObj.transform:DOScale(0, 0.3):SetEase(Ease.OutQuad):SetDelay(0.5))
     -- 动画完成后保持金币在桌面上
     sequence:OnComplete(function()
-        GameObject.Destroy(coinObj)
+        self.objPools:UnSpawnPrefab(coinObj)
     end)
 
     sequence:Play()
 end
 
 ---金币分配
-function distributeCoins(totalCoins, ratios)
+function ChouMaFlyUtil:distributeCoins(totalCoins, ratios)
     local n = #ratios
     local result = {}
     local sum = 0
-
-    -- Step 1: Calculate the expected number of coins for each person
+    
     for i = 1, n do
         result[i] = totalCoins * ratios[i]
         sum = sum + result[i]
     end
-
-    -- Step 2: Adjust the results to make them integers
+    
     local remaining = totalCoins
     for i = 1, n do
         result[i] = math.floor(result[i])
         remaining = remaining - result[i]
     end
-
-    -- Step 3: Distribute the remaining coins
+    
     local index = 1
     while remaining > 0 do
         result[index] = result[index] + 1
@@ -163,11 +169,9 @@ function distributeCoins(totalCoins, ratios)
             index = 1
         end
     end
-
-    -- Step 4: Ensure each person gets at least one coin
+    
     for i = 1, n do
         if result[i] == 0 then
-            -- Find someone with more than one coin to give
             for j = 1, n do
                 if result[j] > 1 then
                     result[j] = result[j] - 1
@@ -182,7 +186,7 @@ function distributeCoins(totalCoins, ratios)
 end
 
 function ChouMaFlyUtil:Destroy()
-    coins = {}
+    self.coins = {}
 end
 
 return ChouMaFlyUtil

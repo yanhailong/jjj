@@ -22,6 +22,7 @@ function BaccaratGameModel:AddEvent()
 	WebNetEvent.AddListener(pb_comonFight.NotifyBaccaratSettlementInfo, self.NotifyBaccaratSettlementInfo, self)
 	WebNetEvent.AddListener(pb_comonFight.RespExitRoomInGame, self.RespExitRoomInGame, self)
 	WebNetEvent.AddListener(pb_comonFight.RespTablePlayerInfo, self.RespTablePlayerInfo, self)
+	WebNetEvent.AddListener(pb_comonFight.NotifyTableRoomPlayerInfoChange, self.NotifyTableRoomPlayerInfoChange, self)
 end
 
 function BaccaratGameModel:RemoveEvent()
@@ -77,6 +78,7 @@ function BaccaratGameModel:RespExitRoomInGame(data)
 	if(data.code == 200) then
 		look("返回推出房间成功")
 		self.ctrl:Close();
+		CtrlManager.SingleShow(CtrlNames.BaccaratMain);
 	end
 end
 ---请求百家乐房间的玩家列表信息

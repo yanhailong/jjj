@@ -307,7 +307,7 @@ function VietnamChessGameView:InitChouMa()
         if self.model.config.betList[i] then
             self.chipInfos[i].obj:SetActive(true)
             self.chipInfos[i].image.sprite = resMgr:LoadSprite(VietnamChessConfig.dizhuImgAtlas,VietnamChessConfig.dizhuColor[i])
-            self.chipInfos[i].num.text = StringUtil.CheckDiZhu(self.model.config.betList[i])
+            self.chipInfos[i].num.text = StringUtil.FormatNumber(self.model.config.betList[i])
 
             local img = ComponentUtilGet.Image(self.dizhuNode.transform,"img")
             local num = ComponentUtilGet.Text(self.dizhuNode.transform,"num")

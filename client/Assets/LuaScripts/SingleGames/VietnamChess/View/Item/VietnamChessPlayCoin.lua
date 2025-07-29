@@ -104,7 +104,7 @@ end
 ---targetPos 目标 {v3,v3,v3...}
 ---ratios 比例 {0.1,0.3,0.6}
 function VietnamChessPlayCoin:DestroyCoin(targetPos,ratios)
-    local results = distributeCoins(#coins,ratios)
+    local results = self:distributeCoins(#coins,ratios)
     local index = 1
     local next = 0
     for i=1,#coins do
@@ -137,7 +137,7 @@ function VietnamChessPlayCoin:DestroyCoinFly(coinObj,endPos)
 end
 
 ---金币分配
-function distributeCoins(totalCoins, ratios)
+function VietnamChessPlayCoin:distributeCoins(totalCoins, ratios)
     local n = #ratios
     local result = {}
     local sum = 0

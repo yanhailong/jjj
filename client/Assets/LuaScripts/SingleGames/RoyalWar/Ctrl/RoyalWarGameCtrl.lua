@@ -111,13 +111,13 @@ function RoyalWarGameCtrl:NotifyRedBlackWarInfo(data)
 		chipItem:InitUIShow(i,betInfoList[i]);
 		table.insert(ChipItems,chipItem);
 	end
-	self:RefreshDataShow(data);
 	self.RoyalWarScripts:InitData(data,self.GamePhase.gamePhase == "GAME_ROUND_OVER_SETTLEMENT");
 	self:RefreshPlayerInfo(data.playerInfos);
 	self:SetBetButtonInteractable(false);
 	self:InitDataShow(data.redBlackHistories)
 	self:InitTableAreaInfos(data.tableAreaInfos);
 	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
+	self:RefreshDataShow(data);
 end
 
 ---第一次进入游戏初始化区域下注信息
@@ -325,6 +325,7 @@ function RoyalWarGameCtrl:InitData()
 end
 
 function RoyalWarGameCtrl:InitUIShow()
+	CurBet={};
 	SelfBetBlackAllNum = 0;
 	SelfBetRedAllNum =0;
 	SelfBetLuckyAllNum =0;
@@ -347,17 +348,16 @@ function RoyalWarGameCtrl:InitUIShow()
 	self.view.tmp_SelfBetBlackNum.text="0.00"
 	self.view.tmp_SelfBetLuckyNum.text="0.00"
 
+	
+end
+---设置按钮的显示状态
+function RoyalWarGameCtrl:SetBetButtonInteractable(state)
 	self.view.btn_Repeat.enabled = #BetRecord>0;
 	if(#BetRecord>0) then
 		self.view.btn_Repeat.image.material = nil;
 	else
 		self.view.btn_Repeat.image.material = config.GetUIImageGray();
 	end
-
-	
-end
----设置按钮的显示状态
-function RoyalWarGameCtrl:SetBetButtonInteractable(state)
 	for _, v in pairs(ChipItems) do
 		---@type BaccaratChipItems
 		local item = v;
@@ -381,9 +381,9 @@ function RoyalWarGameCtrl:RefreshGameStage()
 		elseif curGameStage == config.GameSate.Bet then
 			self:EnterBetGame();
 		elseif curGameStage == config.GameSate.Deal then
-			self:EnterSettlement();
+			self:EnterDeal();
 		elseif curGameStage == config.GameSate.Settlement then
-			
+			self:EnterSettlement();
 		end
 	end)
 	
@@ -412,6 +412,12 @@ function RoyalWarGameCtrl:EnterBetGame()
 	self.view.obj_BeginBet:SetActive(false);
 	self:SetBetButtonInteractable(true);
 	self.betCountDownTimer:Start();
+end
+
+---通知押注类房间玩家信息变化
+function RoyalWarGameCtrl:NotifyTableRoomPlayerInfoChange(data)
+	self:RefreshPlayerInfo(data.tablePlayerInfoList);
+	self.view.tmp_AllOtherNumber.text = data.totalPlayerNum
 end
 
 ---初始化要显示的数据（接入服务器数据要，要赋值服务器那边的数据显示）
@@ -467,9 +473,71 @@ function RoyalWarGameCtrl:RefreshPlayerInfo(playerInfoList)
 		item:RefreshPlayerInfoShow(v);
 	end
 end
-
----进入结算阶段
+---直接展示结果
 function RoyalWarGameCtrl:EnterSettlement()
+	self.view.obj_CardBg:SetActive(true);
+	self.view.obj_RoadRoot:SetActive(false)
+	if self.SettlementCor then
+		coroutine.stop(self.SettlementCor)
+		self.SettlementCor=nil
+	end
+	self.SettlementCor=	CorManager:StartCor(function()--翻牌
+		local redCardNumOne = RedBlackWarSettleInfo.redCards[1];
+		local redCardNumTwo = RedBlackWarSettleInfo.redCards[2];
+		local redCardNumThree = RedBlackWarSettleInfo.redCards[3];
+
+		local blackCardNumOne = RedBlackWarSettleInfo.blackCards[1];
+		local blackCardNumTwo =  RedBlackWarSettleInfo.blackCards[2];
+		local blackCardNumThree =  RedBlackWarSettleInfo.blackCards[3];
+
+		self.view.img_RedCardOne.sprite = config.GetCardPic("card_"..redCardNumOne);
+		self.view.img_RedCardTwo.sprite = config.GetCardPic("card_"..redCardNumTwo);
+		self.view.img_RedCardThree.sprite = config.GetCardPic("card_"..redCardNumThree);
+
+		self.view.img_BlackCardOne.sprite = config.GetCardPic("card_"..blackCardNumOne);
+		self.view.img_BlackCardTwo.sprite = config.GetCardPic("card_"..blackCardNumTwo);
+		self.view.img_BlackCardThree.sprite = config.GetCardPic("card_"..blackCardNumThree);
+
+		self.view.img_RedResultNumber.sprite =  config.GetIconCardTypePic(config.GetRedCardTypeName(RedBlackWarSettleInfo.redCardType))
+		self.view.img_RedResultNumber:SetNativeSize();
+		self.view.img_BlackResultNumber.sprite =  config.GetIconCardTypePic(config.GetBlackCardTypeName(RedBlackWarSettleInfo.blackCardType))
+		self.view.img_BlackResultNumber:SetNativeSize();
+
+		if(RedBlackWarSettleInfo.redCardType == config.CardType.DanZhang) then
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_7")
+		else
+			self.view.img_RedResultBg.sprite = config.GetIconPic("hhdz_dk_8")
+		end
+
+		if(RedBlackWarSettleInfo.blackCardType== config.CardType.DanZhang) then
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_7")
+		else
+			self.view.img_BlackResultBg.sprite = config.GetIconPic("hhdz_dk_8")
+		end
+		self.view.ator_CardRoot:Play("RoyalWarDealCard",0,1)
+		self.isRedWin = RedBlackWarSettleInfo.winState==1;
+		self.view.obj_RedWin:SetActive(self.isRedWin)
+		self.view.obj_BlackWin:SetActive(not self.isRedWin);
+		if(RedBlackWarSettleInfo.winState == 1) then
+			SoundManager:PlayClip(config.ABNames.audios.."redWin")
+			Tools.PlayerSpineAniByName(RedWinSpine,"action",false)
+		else
+			SoundManager:PlayClip(config.ABNames.audios.."blackWin")
+			Tools.PlayerSpineAniByName(BlackSpine,"action",false)
+		end
+		self.IsLucky = RedBlackWarSettleInfo.redCardType~=config.CardType.DanZhang or RedBlackWarSettleInfo.blackCardType~=config.CardType.DanZhang;
+		self:Flicker();
+		if(RedBlackWarSettleInfo.redCardType>RedBlackWarSettleInfo.blackCardType) then
+			self:RefreshCardTypeData(RedBlackWarSettleInfo.redCardType)
+		else
+			self:RefreshCardTypeData(RedBlackWarSettleInfo.blackCardType)
+		end
+		coroutine.wait(3)
+		self:PlayChipToPlayer()
+	end)
+end
+---进入结算阶段(从翻牌开始)
+function RoyalWarGameCtrl:EnterDeal()
 	self.view.obj_StopBet:SetActive(true);
 	self.view.obj_AboutEnd:SetActive(false);
 	self.view.obj_CardBg:SetActive(true);
@@ -868,7 +936,7 @@ function RoyalWarGameCtrl:PlayChip(data,playerId)
 	end
 	local chip = self.objPools:SpawnPrefab(nil,config.ABNames.chipPool,"RoyalWarChip_"..chipIndex,targetRect.transform)
 	chip:SetActive(true)
-	ComponentUtilGet.Text(chip.transform,"Icon/Number").text = data.betValue;
+	ComponentUtilGet.Text(chip.transform,"Icon/Number").text =StringUtil.FormatNumber(data.betValue);
 	chip.transform.localScale =  Vector3.one*0.6
 	if(isSelf) then
 		chip.transform.position = self.view.obj_Player.transform.position;

@@ -1,8 +1,4 @@
---
---time:{time}
---{paramdesc} 
---@desc 
---
+
 ---@class DragonTigerFightConfig
 local DragonTigerFightConfig=Class("DragonTigerFightConfig")
 local this = DragonTigerFightConfig;
@@ -13,17 +9,6 @@ this.gameID = 200101
 this.StageTime = {2000,13000,13000,0}
 ---结算各动画阶段时间
 this.ResultStageTime = {1,0.5,1,1,2,3,2.5,1}
-
----当前选中的底注
-this.dizhuIndex = 0
----底注数值
-this.dizhuImgAtlas = "Common/GameArtsCommon/GameFight/alats/main"
----当前是否可以下注
-this.allow = true
----当前总底注
-this.totalDiZhuNums = {0,0,0}
----当前个人底注
-this.selfDiZhuNums = {0,0,0}
 ---当前状态剩余秒数 13
 this.lessSeconds = 13
 ---闪烁时间
@@ -33,6 +18,18 @@ this.fadeTimes = 1
 --- 玩家下注显示筹码数限制
 this.AreaChouMaLimit = { 80, 80, 60}
 
+---当前选中的底注
+this.dizhuIndex = 0
+---当前是否可以下注
+this.allow = true
+---当前总底注
+this.totalDiZhuNums = {0,0,0}
+---当前个人底注
+this.selfDiZhuNums = {0,0,0}
+---累计下注数据
+this.AreaChipTotals = {0,0,0}
+---本局下注数据
+this.bettingDataMap = {}
 ---复投
 this.lastXiaZhuInfo = {}
 ---本局下注数据

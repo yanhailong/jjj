@@ -5,6 +5,7 @@
 ---@class CarLogoGameCtrl:BaseCtrl
 local CarLogoGameCtrl=Class("CarLogoGameCtrl",BaseCtrl)
 local config =require("SingleGames/CarLogo/CarLogoConfig")
+local CarLogoSounds =  require("SingleGames/CarLogo/CarLogoSounds")
 
 ---构造函数
 function CarLogoGameCtrl:ctor(ctrlName,param)
@@ -28,7 +29,43 @@ end
 function CarLogoGameCtrl:InitData()
 	---@type ObjectPoolUtil
 	self.objPools=ObjectPoolUtil.New()
+	---@type CommFightBtnsCtrl
+	self.commCtrl = CtrlManager.SingleShow(CtrlNames.CommFightBtns, self):AddAsyncOpenCallback(function()
+		--请求进入房间
+		self.model:ReqEnterRoom()
+	end)
+	self:BindCommFightData()
 end
+
+
+function CarLogoGameCtrl:BindCommFightData()
+	self.commCtrl:BindData(config,false,self.view.xiazhuStarAreas)
+	self.commCtrl.OnClickHelp = function()
+		CtrlManager.SingleShow(CtrlNames.CarLogoRule)
+	end
+	self.commCtrl.OnClickClose = function()
+		self:Close()
+	end
+	self.commCtrl.UpdateXiaZhuLabel = function()
+		self.view:UpdateXiaZhuLabel()
+	end
+	self.commCtrl.PayOtherXiaZhuCoinFlyEnd = function()
+		--其余玩家筹码下注飞行音效
+		CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
+	end
+	self.commCtrl.PaySelfXiaZhuCoinFlyEnd = function()
+		--下注音效
+		CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.Bet)
+	end
+	self.commCtrl.PlayCompeleCoinFLyEnd = function()
+		--分筹码音效
+	end
+	self.commCtrl.PlayCompeleCoinFLySelfEnd = function()
+		-- 播放得奖音效
+		CarLogoSounds.PlaySoundEffic(config.AUDIO_KEY.WinBet)
+	end
+end
+
 
 function CarLogoGameCtrl:Close()
     self.super.Close(self);
@@ -36,35 +73,12 @@ end
 
 function CarLogoGameCtrl:AddUIEvent()
 	self:AddFunctionButtons()
-	self:AddBetButtons()
 	self:AddAreaClickEvents()
 end
 
 function CarLogoGameCtrl:AddFunctionButtons()
-	self.uiEventListener:AddClick(self.view.btn_close, function() self:Close() end)
-	self.uiEventListener:AddClick(self.view.btn_muen,function() self.view:SettingFade()  end)
-	self.uiEventListener:AddClick(self.view.btn_touch,function() self.view:SettingFade()  end)
-	self.uiEventListener:AddClick(self.view.btn_help, function() CtrlManager.SingleShow(CtrlNames.CarLogoRule) end)
-	self.uiEventListener:AddClick(self.view.btn_setting, function() look("打开设置界面") end)
-	self.uiEventListener:AddClick(self.view.btn_players, function()
-		self.model:ReqRoomPlayers()
-	end)
 	self.uiEventListener:AddClick(self.view.btn_trend,function() CtrlManager.SingleShow(CtrlNames.CarLogoTrend,self.model.history) end)
 	self.uiEventListener:AddClick(self.view.btn_repeat, function() self:RepeatBet() end)
-	self.uiEventListener:AddClick(self.view.btn_prev,function()  self.view:DizhuPrev(false) end)
-	self.uiEventListener:AddClick(self.view.btn_next,function()  self.view:DizhuPrev(true) end)
-end
-
-
-function CarLogoGameCtrl:AddBetButtons()
-	for i, chipInfo in ipairs(self.view.chipInfos) do
-		self.uiEventListener:AddClick(chipInfo.button, function()
-			if config.allow then
-				self.view:ChangeDiZhu(i)
-				look("btn 抵住数值" .. config.dizhuNumArr[config.dizhuIndex])
-			end
-		end)
-	end
 end
 
 function CarLogoGameCtrl:AddAreaClickEvents()
