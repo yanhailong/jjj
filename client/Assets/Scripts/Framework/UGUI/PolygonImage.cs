@@ -12,6 +12,8 @@ public class PolygonImage : Image {
     {
         base.Awake();
         polygonCollider2D = this.GetComponent<PolygonCollider2D>();
+        RectTransform rect;
+        //rect.TransformVector
     }
 
     public override bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)

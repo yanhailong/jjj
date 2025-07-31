@@ -45,6 +45,10 @@ pb_comonFight.NotifyBaccaratSettlementInfo = 98438
 pb_comonFight.RespJoinRoomInGame = 98439
 --- 响应,msgID=0x18088,desc=在游戏中返回退出房间
 pb_comonFight.RespExitRoomInGame = 98440
+--- 响应,msgID=0x19081,desc=骰宝桌面信息，下注，结算，断线重连
+pb_comonFight.NotifyDiceTreasureTableInfo = 102529
+--- 响应,msgID=0x19082,desc=通知骰宝结算信息
+pb_comonFight.NotifyDiceTreasureSettlement = 102530
 --- 请求,msgID=0x20001,desc=请求下注
 pb_comonFight.ReqBet = 131073
 --- 请求,msgID=0x20003,desc=请求获取百人牌桌的玩家信息
@@ -83,6 +87,8 @@ PbMsg[98437] = 'NotifyBaccaratBetStart'
 PbMsg[98438] = 'NotifyBaccaratSettlementInfo'
 PbMsg[98439] = 'RespJoinRoomInGame'
 PbMsg[98440] = 'RespExitRoomInGame'
+PbMsg[102529] = 'NotifyDiceTreasureTableInfo'
+PbMsg[102530] = 'NotifyDiceTreasureSettlement'
 PbMsg[131073] = 'ReqBet'
 PbMsg[131075] = 'ReqTablePlayerInfo'
 PbMsg[131076] = 'ReqRoomBaseInfo'

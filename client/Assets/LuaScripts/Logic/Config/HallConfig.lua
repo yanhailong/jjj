@@ -53,6 +53,7 @@ GameNames = {
 	CarLogo="CarLogo",--豪车俱乐部
 	BirdsAnimals="BirdsAnimals",--飞禽走兽
 	RoyalWar="RoyalWar",--红黑大战
+	SicBo="SicBo",--骰子
 }
 
 ---游戏选择场景配置
@@ -64,6 +65,7 @@ GameSortID={
 	[5]=GameNames.CarLogo,--豪车俱乐部
 	[6]=GameNames.BirdsAnimals,--飞禽走兽
 	[7]=GameNames.RoyalWar,--红黑大战
+	[8]=GameNames.SicBo,--骰子
 }
 
 -- 游戏的配置
@@ -97,7 +99,10 @@ GameConfig = {
 		gameType = 200100,
 		Manager = "SingleGames/RoyalWar/RoyalWar",
 		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
+	},[GameNames.RoyalWar] = {
+		gameType = 200600,
+		Manager = "SingleGames/SicBo/SicBo",
+		EnterCtrlName = CtrlNames.UIHall, --游戏入口界面
 	},
-	
 }
 

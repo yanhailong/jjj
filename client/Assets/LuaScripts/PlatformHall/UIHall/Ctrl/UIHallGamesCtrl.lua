@@ -79,9 +79,13 @@ function UIHallGamesCtrl:OnClickGameItem(index)
 	--	require("SingleGames/DicePointsSumSize/MVCHead")
 	--	CtrlManager.SingleShow(CtrlNames.DicePointsSumSizeGame)
 	--end
-	if index == 8 then
+	--[[if index == 8 then
 		require("SingleGames/MahjongWays/MVCHead")
 		CtrlManager.SingleShow(CtrlNames.MahjongWaysMain)
+	end]]
+	if index == 8 then
+		require("SingleGames/SicBo/MVCHead")
+		CtrlManager.SingleShow(CtrlNames.SicBoMain)
 	end
 end
 

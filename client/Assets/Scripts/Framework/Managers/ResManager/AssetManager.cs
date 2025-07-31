@@ -312,6 +312,17 @@ public class AssetManager : SingletonMono<AssetManager>
         Sprite sprite = LoadAsset<Sprite>(abName, assetName);
         return sprite;
     }
+    //加载多个Sprite
+    public List<Sprite> LoadSprite_List(string abName, List<string> assetName = null)
+    {
+        List<Sprite> sprites = new List<Sprite>();
+        foreach (string name in assetName)
+        {
+            Sprite sprite = LoadAsset<Sprite>(abName, name);
+            sprites.Add(sprite);
+        }
+        return sprites;
+    }
     //加载贴图
     public Texture2D LoadTexture2D(string abName, string assetName = null)
     {

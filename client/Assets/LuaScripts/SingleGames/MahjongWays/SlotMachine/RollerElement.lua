@@ -122,7 +122,14 @@ function RollerElement:DropAnimation(steps, time, sequentialIndex, onComplete)
                 0
             )
             coroutine.yield(0)
-            --设置掉落图标
+            local index = math.floor((self.offset - ( self.transform.localPosition.y - self.ElementHeight * steps)) / self.ElementHeight + 0.5)
+            --if self.SetResultIcons_Event and self.roller and self.roller.dropResult then
+                --local icons = self.roller.dropResult[self.roller.index]
+               -- local iconRow = icons and icons[sequentialIndex + 1]
+                --if iconRow then
+                    self.SetResultIcons_Event:Invoke(self, self.elementIcon, self.roller.index, index)
+                --end
+            --end
         end
 
         for i = 1, steps do

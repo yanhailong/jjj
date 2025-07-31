@@ -16,7 +16,7 @@ end
 ---初始化
 function MahjongWaysMainCtrl:CtrlInit(args)
     self.super.CtrlInit(self, args);
-    Application.targetFrameRate=-1
+    Application.targetFrameRate = -1
     SlotMachineConfig.InitIconPic()
     self:InitData()
 end
@@ -37,27 +37,27 @@ end
 
 --元素初始化逻辑
 function MahjongWaysMainCtrl:ElementInit(rollerElement, elementIcon, rollerIndex, elementIndex)
-    log("元素初始化完成")
+    -- log("元素初始化完成")
     --可以对元素进行一些自定义数据和方法
     rollerElement.icon = elementIcon.transform:Find("UsualStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))
     rollerElement.WinStatus = elementIcon.transform:Find("WinStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))
     rollerElement.MoveStatus = elementIcon.transform:Find("MoveStatus"):GetComponent(typeof(CS.UnityEngine.UI.Image))
     rollerElement.IconData = 100; --自定义数据
-    log("元素的名字" .. tostring(elementIcon.name))
-    log("轴的引用" .. tostring(rollerIndex))
-    log("元素引用" .. tostring(elementIndex))
-    log(tostring(rollerElement.IconData))
+    -- log("元素的名字" .. tostring(elementIcon.name))
+    -- log("轴的引用" .. tostring(rollerIndex))
+    --log("元素引用" .. tostring(elementIndex))
+    -- log(tostring(rollerElement.IconData))
 end
 
 function MahjongWaysMainCtrl:SingleRollerCompleted(Roller, RollerIndex)
-    log(tostring(RollerIndex) .. "轴完成")
+    --log(tostring(RollerIndex) .. "轴完成")
     if RollerIndex == 1 then
         --Roller:GetAllElement()   --处理自定义元素数据,包括添加的
         --Roller:GetAllViewElement()--获取可是区域的元素
         for i, v in ipairs(Roller:GetAllViewElement()) do
 
         end
-        log("第一轴完成")
+        -- log("第一轴完成")
     end
     --self.SlotGame:ChangeSpeed(rollerIndex, speed)
     --处理加速，单轴事件
@@ -67,14 +67,23 @@ function MahjongWaysMainCtrl:ChangeRandomIcons(rollerElement, icon, rollerIdx, e
     local index = math.floor(CS.UnityEngine.Random.Range(1, 10))
     local icon = SlotMachineConfig.icon_Pics[SlotMachineConfig.iocnPicName[index]]
     rollerElement.icon.sprite = icon
-    log("改变随机图标")
+    -- log("改变随机图标")
 end
 
 local ResultTest = { { 8, 8, 8 }, { 1, 2, 3 }, { 3, 4, 5 }, { 6, 5, 8 }, { 6, 9, 6 } }
 function MahjongWaysMainCtrl:SetResultIcons(rollerElement, icon, rollerIdx, elementIdx)
     local icon = SlotMachineConfig.icon_Pics[SlotMachineConfig.iocnPicName[ResultTest[rollerIdx][elementIdx]]]
     rollerElement.icon.sprite = icon
-    log("设置开奖结果")
+    --log("设置开奖结果")
+end
+
+function MahjongWaysMainCtrl:ChangeResult(Drop)
+    local xxx = math.floor(CS.UnityEngine.Random.Range(1, 10))
+    for i, v in ipairs(Drop) do
+        for k = 1, #v do
+            ResultTest[i][k] = xxx
+        end
+    end
 end
 
 local times = 0 --连续掉落多少次
@@ -82,10 +91,12 @@ function MahjongWaysMainCtrl:AllRollerCompleted()
     --处理第一次掉落
     coroutine.start(function()
         coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
-        self.SlotGame:SetDrop({ { 1, 2 }, { 1, 2, 3 }, { 3 }, { 2, 3 }, { 1, 3 } })
+        local Drop = self:RandomElement()
+        self:ChangeResult(Drop)
+        self.SlotGame:SetDrop(Drop)
     end)
-    times = Tools.Random(0, 3) --随机掉落次数
-    log("旋转完成")
+     times = Tools.Random(0, 3) --随机掉落次数
+    --log("旋转完成")
 end
 
 --掉落完成
@@ -94,7 +105,9 @@ function MahjongWaysMainCtrl:DropCompleted()
     if times > 0 then
         coroutine.start(function()
             coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
-            self.SlotGame:SetDrop(self:RandomElement())
+            local Drop = self:RandomElement()
+            self:ChangeResult(Drop)
+            self.SlotGame:SetDrop(Drop)
         end)
         times = times - 1;
     else
