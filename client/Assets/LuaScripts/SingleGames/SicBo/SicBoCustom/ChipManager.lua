@@ -9,8 +9,33 @@ function ChipManager.New(root, prefab, icons)
     self.ChipObjectPool = ObjectPool:CreatePool("ChipPool", prefab, 10, 100, root.transform)
     return self
 end
+function ChipManager.FormatChipNumber(num)
+    local abs = math.abs(num)
+    local formatted
+    if abs >= 1e12 then
+        formatted = num / 1e12
+        return RemoveTrailingZeros(formatted) .. "T"
+    elseif abs >= 1e9 then
+        formatted = num / 1e9
+        return RemoveTrailingZeros(formatted) .. "B"
+    elseif abs >= 1e6 then
+        formatted = num / 1e6
+        return RemoveTrailingZeros(formatted) .. "M"
+    elseif abs >= 1e3 then
+        formatted = num / 1e3
+        return RemoveTrailingZeros(formatted) .. "K"
+    else
+        return tostring(num)
+    end
+end
 
---回收
+function ChipManager.RemoveTrailingZeros(n)
+    local s = string.format("%.2f", n)  -- 保留两位小数
+    s = s:gsub("(%..-)0+$", "%1")       -- 去掉末尾多余的0
+    s = s:gsub("%.$", "")                -- 去掉末尾小数点
+    return s
+end
+
 function ChipManager:MoveTargetPos(Chip_obj, target)
     Chip_obj.transform:DOMove(target.transform.position, 0.4, false):SetEase(CS.DG.Tweening.Ease.OutQuad):OnComplete(function()
         self:Unspawn(Chip_obj)

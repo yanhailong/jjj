@@ -1,5 +1,18 @@
-local SicBoConfig = Class("SicBoConfig");
-local this = SicBoConfig;
+local SicBoConfig = {}
+local this = SicBoConfig
+this.GameState = {
+    START_GAME = 0,                --游戏开始
+    BET = 1,                       --下注
+    PLAY_CART = 2,                 --出牌
+    DISS_MISS = 3,                 --解散房间
+    WAIT_READY = 4,                --等待开始
+    GAME_ROUND_OVER_SETTLEMENT = 5 --游戏一个回合结束进行结算
+}
+
+
+
+
+
 this.ABNames = {
     chipPool = "SingleGames/SicBo/prefabs",
     audios = "SingleGames/SicBo/audios/",
@@ -27,8 +40,6 @@ function this.Init()
     this.InitChipPrefab()
     this.InitChipIcon()
     require("PlatformHall/comonFight/MsgPro/pb_comonFight")
-
-
 end
 
 return this;

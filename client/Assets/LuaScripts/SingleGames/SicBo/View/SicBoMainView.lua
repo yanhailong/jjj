@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-07-31 17:29:10
+---DateTime: 2025-08-01 18:02:16
 ---
 ---@class SicBoMainView:BaseView
 local SicBoMainView=Class("SicBoMainView",BaseView)
@@ -16,32 +16,17 @@ end
 function SicBoMainView:InitComponents()
     self.obj_croupier=ComponentUtilGet.GameObject(self.transform,"Table/bg/chair/obj_croupier");
     self.obj_palyerSelf=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/obj_palyerSelf");
-    self.img_HeadImageSelf=ComponentUtilGet.Image(self.transform,"Table/Bottom/obj_palyerSelf/Head/img_HeadImageSelf");
-    self.txt_PlayerNameSelf=ComponentUtilGet.Text(self.transform,"Table/Bottom/obj_palyerSelf/txt_PlayerNameSelf");
-    self.txt_GoldTextSelf=ComponentUtilGet.Text(self.transform,"Table/Bottom/obj_palyerSelf/Gold/txt_GoldTextSelf");
-    self.obj_BetButtonPrefab=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/Viewport/obj_BetButtonPrefab");
-    self.txt_betMoneyText=ComponentUtilGet.Text(self.transform,"Table/Bottom/BetButtons/ButtonsList/Viewport/obj_BetButtonPrefab/txt_betMoneyText");
-    self.obj_Content=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/Viewport/obj_Content");
+    self.btn_BetButtonMove_Left=ComponentUtilGet.Button(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Left");
+    self.obj_disabe_Left=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Left/obj_disabe_Left");
+    self.obj_enable_Left=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Left/obj_enable_Left");
+    self.btn_BetButtonMove_Right=ComponentUtilGet.Button(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right");
+    self.obj_disabe_Right=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right/obj_disabe_Right");
+    self.obj_enable_Right=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right/obj_enable_Right");
+    self.obj_BetButtonPrefab=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/obj_BetButtonPrefab");
+    self.obj_Content=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/obj_Content");
     self.txt_otherPlayer=ComponentUtilGet.Text(self.transform,"Table/Bottom/OtherPlayer/txt_otherPlayer");
     self.btn_Rebet=ComponentUtilGet.Button(self.transform,"Table/Bottom/btn_Rebet");
-    self.img_HeadImage=ComponentUtilGet.Image(self.transform,"Table/Palyers/palyer_1/Head/img_HeadImage");
-    self.txt_PlayerName=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_1/txt_PlayerName");
-    self.txt_GoldText=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_1/Gold/txt_GoldText");
-    self.img_HeadImage_Head=ComponentUtilGet.Image(self.transform,"Table/Palyers/palyer_2/Head/img_HeadImage");
-    self.txt_PlayerName_palyer_2=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_2/txt_PlayerName");
-    self.txt_GoldText_Gold=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_2/Gold/txt_GoldText");
-    self.img_HeadImage_Head1030=ComponentUtilGet.Image(self.transform,"Table/Palyers/palyer_3/Head/img_HeadImage");
-    self.txt_PlayerName_palyer_3=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_3/txt_PlayerName");
-    self.txt_GoldText_Gold653=ComponentUtilGet.Text(self.transform,"Table/Palyers/palyer_3/Gold/txt_GoldText");
-    self.img_HeadImage_Head7306=ComponentUtilGet.Image(self.transform,"Table/Palyers1/palyer4/Head/img_HeadImage");
-    self.txt_PlayerName_palyer4=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer4/txt_PlayerName");
-    self.txt_GoldText_Gold9661=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer4/Gold/txt_GoldText");
-    self.img_HeadImage_Head309=ComponentUtilGet.Image(self.transform,"Table/Palyers1/palyer5/Head/img_HeadImage");
-    self.txt_PlayerName_palyer5=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer5/txt_PlayerName");
-    self.txt_GoldText_Gold2579=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer5/Gold/txt_GoldText");
-    self.img_HeadImage_Head6278=ComponentUtilGet.Image(self.transform,"Table/Palyers1/palyer6/Head/img_HeadImage");
-    self.txt_PlayerName_palyer6=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer6/txt_PlayerName");
-    self.txt_GoldText_Gold7582=ComponentUtilGet.Text(self.transform,"Table/Palyers1/palyer6/Gold/txt_GoldText");
+    self.obj_Palyers=ComponentUtilGet.GameObject(self.transform,"Table/obj_Palyers");
     self.obj_ChipPool=ComponentUtilGet.GameObject(self.transform,"Table/obj_ChipPool");
     self.obj_SelectArea=ComponentUtilGet.GameObject(self.transform,"Table/obj_SelectArea");
     self.obj_DiceBox_Big=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_Big");
@@ -72,32 +57,17 @@ end
 function SicBoMainView:ClearComponents()
     self.obj_croupier=nil;
     self.obj_palyerSelf=nil;
-    self.img_HeadImageSelf=nil;
-    self.txt_PlayerNameSelf=nil;
-    self.txt_GoldTextSelf=nil;
+    self.btn_BetButtonMove_Left=nil;
+    self.obj_disabe_Left=nil;
+    self.obj_enable_Left=nil;
+    self.btn_BetButtonMove_Right=nil;
+    self.obj_disabe_Right=nil;
+    self.obj_enable_Right=nil;
     self.obj_BetButtonPrefab=nil;
-    self.txt_betMoneyText=nil;
     self.obj_Content=nil;
     self.txt_otherPlayer=nil;
     self.btn_Rebet=nil;
-    self.img_HeadImage=nil;
-    self.txt_PlayerName=nil;
-    self.txt_GoldText=nil;
-    self.img_HeadImage_Head=nil;
-    self.txt_PlayerName_palyer_2=nil;
-    self.txt_GoldText_Gold=nil;
-    self.img_HeadImage_Head1030=nil;
-    self.txt_PlayerName_palyer_3=nil;
-    self.txt_GoldText_Gold653=nil;
-    self.img_HeadImage_Head7306=nil;
-    self.txt_PlayerName_palyer4=nil;
-    self.txt_GoldText_Gold9661=nil;
-    self.img_HeadImage_Head309=nil;
-    self.txt_PlayerName_palyer5=nil;
-    self.txt_GoldText_Gold2579=nil;
-    self.img_HeadImage_Head6278=nil;
-    self.txt_PlayerName_palyer6=nil;
-    self.txt_GoldText_Gold7582=nil;
+    self.obj_Palyers=nil;
     self.obj_ChipPool=nil;
     self.obj_SelectArea=nil;
     self.obj_DiceBox_Big=nil;
