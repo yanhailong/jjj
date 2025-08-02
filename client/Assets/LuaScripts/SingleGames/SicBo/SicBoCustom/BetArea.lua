@@ -41,6 +41,10 @@ function BetArea:ShowBetNumber()
     --self.SelfBetAmount.gameObject:SetActive(true)
 end
 
+function BetArea:StartSettlement(IsWin)
+    self.light.gameObject:SetActive(IsWin)
+end
+
 function BetArea:AddChip(number, go, player, isCount)
     log("玩家下注金额:" .. tostring(number))
     if isCount then
@@ -56,13 +60,16 @@ function BetArea:AddChip(number, go, player, isCount)
 end
 
 --结算
-function BetArea:Settlement()
+function BetArea:Settlement(IsWin)
     --local xx = #self.chips / #WinPlayers
     for i, v in ipairs(self.chips) do
         self.sicBoMainCtrl.ChipManager:MoveTargetPos(v, self.plays[1])
     end
     self.totaleBetAmount.gameObject:SetActive(false)
     self.SelfBetAmount.gameObject:SetActive(false)
+    self.light.gameObject:SetActive(false)
+    self.chips = {}
+    self.plays = {}
 end
 
 function BetArea:GetPos()

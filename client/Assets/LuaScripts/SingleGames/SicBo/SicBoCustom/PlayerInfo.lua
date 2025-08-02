@@ -7,7 +7,9 @@ function PlayerInfo.New(transform, index, sicBoMainCtrl)
     self.index = index
     self.sicBoMainCtrl = sicBoMainCtrl
     self.gold = 0
-    self:Init()
+    if index > -1 then
+        self:Init()
+    end
     return self
 end
 
@@ -25,27 +27,28 @@ function PlayerInfo:Init()
 end
 
 function PlayerInfo:Settlement(Number)
-    self.gold = self.gold + Number
-    if Number >= 0 then
-        self.MoveWinText.text = "+" .. tostring(Number)
-        self.MoveWinTextTrs.gameObject:SetActive(true)
-        self.MoveWinTextTrs:DOLocalMoveY(self.MoveWinTextPos.y + 100, 2):SetEase(CS.DG.Tweening.Ease.Linear)
-            :OnComplete(function()
-                self.MoveWinTextTrs.gameObject:SetActive(false)
-                self.MoveWinTextTrs.localPosition = self.MoveWinTextPos
-                self.GoldText.text = tostring(self.gold)
-            end
-            )
-    else
-        self.MoveLoseText.text = tostring(Number)
-        self.MoveLoseTextTrs.gameObject:SetActive(true)
-        self.MoveLoseTextTrs:DOLocalMoveY(self.MoveLoseTextPos.y + 100, 2):SetEase(CS.DG.Tweening.Ease.Linear)
-            :OnComplete(function()
+    if self.index > -1 then
+        log("play"..self.index)
+        self.gold = self.gold + Number
+        log("playNumber"..Number)
+        if Number >= 0 then
+            self.MoveWinText.text = "+" .. tostring(Number)
+            self.MoveWinTextTrs.gameObject:SetActive(true)
+            self.sicBoMainCtrl.SicBoAnimation:TextAnimation(self.MoveWinTextTrs,self.MoveWinText,function()
+                    self.MoveWinTextTrs.gameObject:SetActive(false)
+                    self.MoveWinTextTrs.localPosition = self.MoveWinTextPos
+                    self.GoldText.text = tostring(self.gold)
+                end
+                )
+        else
+            self.MoveLoseText.text = tostring(Number)
+            self.MoveLoseTextTrs.gameObject:SetActive(true)
+            self.sicBoMainCtrl.SicBoAnimation:TextAnimation(self.MoveLoseTextTrs,self.MoveLoseText,function()
                 self.MoveLoseTextTrs.gameObject:SetActive(false)
                 self.MoveLoseTextTrs.localPosition = self.MoveLoseTextPos
                 self.GoldText.text = tostring(self.gold)
-            end
-            )
+            end)
+        end
     end
 end
 

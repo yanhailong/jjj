@@ -1,6 +1,6 @@
 ---
 ---Create by Administrator
----DateTime: 2025-08-01 18:02:16
+---DateTime: 2025-08-02 16:14:04
 ---
 ---@class SicBoMainView:BaseView
 local SicBoMainView=Class("SicBoMainView",BaseView)
@@ -22,26 +22,20 @@ function SicBoMainView:InitComponents()
     self.btn_BetButtonMove_Right=ComponentUtilGet.Button(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right");
     self.obj_disabe_Right=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right/obj_disabe_Right");
     self.obj_enable_Right=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/btn_BetButtonMove_Right/obj_enable_Right");
-    self.obj_BetButtonPrefab=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/obj_BetButtonPrefab");
-    self.obj_Content=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/ButtonsList/obj_Content");
+    self.rect_ButtonsList=ComponentUtilGet.RectTransform(self.transform,"Table/Bottom/BetButtons/rect_ButtonsList");
+    self.obj_BetButtonPrefab=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/rect_ButtonsList/obj_BetButtonPrefab");
+    self.obj_Content=ComponentUtilGet.GameObject(self.transform,"Table/Bottom/BetButtons/rect_ButtonsList/obj_Content");
     self.txt_otherPlayer=ComponentUtilGet.Text(self.transform,"Table/Bottom/OtherPlayer/txt_otherPlayer");
     self.btn_Rebet=ComponentUtilGet.Button(self.transform,"Table/Bottom/btn_Rebet");
     self.obj_Palyers=ComponentUtilGet.GameObject(self.transform,"Table/obj_Palyers");
     self.obj_ChipPool=ComponentUtilGet.GameObject(self.transform,"Table/obj_ChipPool");
     self.obj_SelectArea=ComponentUtilGet.GameObject(self.transform,"Table/obj_SelectArea");
-    self.obj_DiceBox_Big=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_Big");
-    self.img_BigDice1=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Big/img_BigDice1");
-    self.img_BigDice2=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Big/img_BigDice2");
-    self.img_BigDice3=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Big/img_BigDice3");
-    self.obj_Lid=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_Big/obj_Lid");
-    self.obj_DiceBox_Mini=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_Mini");
-    self.img_MiniDice1=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Mini/img_MiniDice1");
-    self.img_MiniDice2=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Mini/img_MiniDice2");
-    self.img_MiniDice3=ComponentUtilGet.Image(self.transform,"Table/obj_DiceBox_Mini/img_MiniDice3");
-    self.obj_Lid_obj_DiceBox_Mini=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_Mini/obj_Lid");
-    self.obj_StartGame=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_StartGame");
-    self.obj_StartBet=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_StartBet");
-    self.obj_StopBet=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_StopBet");
+    self.obj_History=ComponentUtilGet.GameObject(self.transform,"Table/History/obj_History");
+    self.obj_DiceBox=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox");
+    self.obj_DiceBox_MiniPos=ComponentUtilGet.GameObject(self.transform,"Table/obj_DiceBox_MiniPos");
+    self.obj_StartGame=ComponentUtilGet.CanvasGroup(self.transform,"Table/GameState/obj_StartGame");
+    self.obj_StartBet=ComponentUtilGet.CanvasGroup(self.transform,"Table/GameState/obj_StartBet");
+    self.obj_StopBet=ComponentUtilGet.CanvasGroup(self.transform,"Table/GameState/obj_StopBet");
     self.obj_Tips=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_Tips");
     self.obj_TipsBet=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_Tips/obj_TipsBet");
     self.obj_TipsPrepare=ComponentUtilGet.GameObject(self.transform,"Table/GameState/obj_Tips/obj_TipsPrepare");
@@ -63,6 +57,7 @@ function SicBoMainView:ClearComponents()
     self.btn_BetButtonMove_Right=nil;
     self.obj_disabe_Right=nil;
     self.obj_enable_Right=nil;
+    self.rect_ButtonsList=nil;
     self.obj_BetButtonPrefab=nil;
     self.obj_Content=nil;
     self.txt_otherPlayer=nil;
@@ -70,16 +65,9 @@ function SicBoMainView:ClearComponents()
     self.obj_Palyers=nil;
     self.obj_ChipPool=nil;
     self.obj_SelectArea=nil;
-    self.obj_DiceBox_Big=nil;
-    self.img_BigDice1=nil;
-    self.img_BigDice2=nil;
-    self.img_BigDice3=nil;
-    self.obj_Lid=nil;
-    self.obj_DiceBox_Mini=nil;
-    self.img_MiniDice1=nil;
-    self.img_MiniDice2=nil;
-    self.img_MiniDice3=nil;
-    self.obj_Lid_obj_DiceBox_Mini=nil;
+    self.obj_History=nil;
+    self.obj_DiceBox=nil;
+    self.obj_DiceBox_MiniPos=nil;
     self.obj_StartGame=nil;
     self.obj_StartBet=nil;
     self.obj_StopBet=nil;

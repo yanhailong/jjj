@@ -20,6 +20,10 @@ public class ButtonPageSwiper : MonoBehaviour
         leftButton.onClick.AddListener(PrevPage);
         rightButton.onClick.AddListener(NextPage);
         UpdateButtonState();
+        DG.Tweening.DOTween.Sequence().Append(transform.DOMove(Vector3.zero,0.3f)).AppendCallback(()=> { }).Append(transform.DOMove(Vector3.zero, 0.3f));
+
+        //CanvasGroup canvasGroup;
+        //canvasGroup.DOFade(1, 1);
         
     }
 

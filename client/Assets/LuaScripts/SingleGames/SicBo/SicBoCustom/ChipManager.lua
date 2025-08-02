@@ -39,6 +39,7 @@ end
 function ChipManager:MoveTargetPos(Chip_obj, target)
     Chip_obj.transform:DOMove(target.transform.position, 0.4, false):SetEase(CS.DG.Tweening.Ease.OutQuad):OnComplete(function()
         self:Unspawn(Chip_obj)
+        target:Settlement(1000)
     end)
 end
 
@@ -65,6 +66,9 @@ function ChipManager:Unspawn(obj)
 end
 
 function ChipManager:DestroyAll()
+    for i, v in ipairs(self.chipComponents) do
+        i.transform:DOKill()
+    end
     self.chipComponents = nil;
     self.ChipObjectPool:DestroyAll()
 end

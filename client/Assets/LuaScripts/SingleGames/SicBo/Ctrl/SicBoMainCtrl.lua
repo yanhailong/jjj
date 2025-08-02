@@ -34,11 +34,14 @@ end
 function SicBoMainCtrl:InitGame()
     self.BetArea = {}
     self.PlayerInfo = {}
+    self.History = {}
     local BetArea = require "SingleGames/SicBo/SicBoCustom/BetArea"
     local PlayerInfo = require "SingleGames/SicBo/SicBoCustom/PlayerInfo"
     local Chip = require "SingleGames/SicBo/SicBoCustom/ChipManager"
+    local SicBoAnimation = require "SingleGames/SicBo/SicBoCustom/SicBoAnimation"
+    local HistoryItem = require("SingleGames/SicBo/SicBoCustom/HistoryItem")
+
     for i = 1, self.view.obj_Palyers.transform.childCount do
-        print("xxxx" .. self.view.obj_Palyers.transform.childCount)
         self.PlayerInfo[i] = PlayerInfo.New(self.view.obj_Palyers.transform:Find("palyer" .. i), i, self)
         self.PlayerInfo[i]:Enter({ 11, 11 })
         coroutine.start(function()
@@ -46,14 +49,29 @@ function SicBoMainCtrl:InitGame()
             self.PlayerInfo[i]:Settlement(Tools.RandomInt(-1000, 1000))
         end)
     end
+    self.PlayerSelf = PlayerInfo.New(self.view.obj_palyerSelf.transform, 0, self)
+
+    coroutine.start(function()
+        coroutine.yield(CS.UnityEngine.WaitForSeconds(5))
+        self.PlayerSelf:Settlement(Tools.RandomInt(-1000, 1000))
+    end)
+    --self.OtherPlayer = PlayerInfo.New(self.view.obj_OtherPlayer.transform, -1, self)
+    self.DealerPlayer = PlayerInfo.New(self.view.obj_croupier.transform, -2, self)
 
     for i = 1, self.view.obj_SelectArea.transform.childCount - 1 do
         self.BetArea[i] = BetArea.New(self.view.obj_SelectArea.transform:Find(tostring(i)), i, self)
         self.BetArea[i]:ShowBetNumber(self.config)
     end
+
+     for i = 1, self.view.obj_History.transform.childCount  do
+       self.History[i] = HistoryItem.New(self.view.obj_History.transform:Find("History_Item"..i), i, self)
+    end
+
     self.SelectAreaMask = self.view.obj_SelectArea.transform:GetComponent(typeof(CS.UnityEngine.CanvasGroup))
-    self.SelectAreaMask.interactable = true --开始下注
+
     self.ChipManager = Chip.New(self.view.obj_ChipPool, self.config.ChipPrefab, self.config.ChipIcon)
+
+    self.SicBoAnimation = SicBoAnimation.New(self.view.obj_DiceBox, self.view.obj_DiceBox_MiniPos, self)
     self:StartGame()
 end
 
@@ -83,45 +101,32 @@ function SicBoMainCtrl:EnterGame(data)
 end
 
 function SicBoMainCtrl:TestAnimation()
+    self.SicBoAnimation:Create({}, {})
     coroutine.start(function()
-        self.view.obj_DiceBox_Big:SetActive(true)
         while true do
             coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
-            --coroutine.yield(--self.view.obj_DiceBox_Big.transform:DOShakePosition(10, 100, 500, 0, false, false)
-            --:WaitForCompletion());
-            --coroutine.yield(self.view.obj_DiceBox_Big.transform:DOPunchPosition(Vector3(0, 200, 0), 2, 20, 0.9)
-            --:WaitForCompletion())
-            local shakeDuration = 0.2
-            local shakeHeight = 2
-            local originalPosition = self.view.obj_DiceBox_Big.transform.position
-            local shakeSequence = DOTween.Sequence()
-            for i = 0, 12 do
-                if i % 2 == 0 then
-                    shakeSequence:Append(self.view.obj_DiceBox_Big.transform:DOMoveY(
-                        originalPosition.y + shakeHeight,
-                        shakeDuration / 2
-                    ):SetEase(CS.DG.Tweening.Ease.InOutQuad));
-                else
-                    shakeSequence:Append(self.view.obj_DiceBox_Big.transform:DOMoveY(
-                        originalPosition.y,
-                        shakeDuration / 2
-                    ):SetEase(CS.DG.Tweening.Ease.InOutQuad));
-                end
-            end
-            shakeSequence:AppendInterval(0.3)
-            shakeSequence:Append(self.view.obj_DiceBox_Big.transform:DOMoveY(
-                originalPosition.y,
-                0.05
-            ):SetEase(CS.DG.Tweening.Ease.InOutQuad));
-            shakeSequence:Append(self.view.obj_DiceBox_Big.transform:DOShakePosition(0.1, 2, 50, 0, false, false))
-            --shakeSequence:Append(self.view.obj_DiceBox_Big.transform:DOShakePosition(
-            --0.5, Vector3(0.05, 0.02, 0.05), 5, 90));
-            coroutine.yield(shakeSequence:WaitForCompletion())
+            --[[coroutine.yield(self.SicBoAnimation:ChangeStateAnimation(self.view.obj_StartGame))
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
+            coroutine.yield(self.SicBoAnimation:ShakDice())
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
+            --coroutine.yield(self.SicBoAnimation:MoveScale())]]
+
+            coroutine.yield(self.SicBoAnimation:ReplaceHistoryRecord())
+            --[[coroutine.yield(self.SicBoAnimation:ChangeStateAnimation(self.view.obj_StartBet))
+            self.SelectAreaMask.interactable = true --开始下注
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(5))
+            coroutine.yield(self.SicBoAnimation:ChangeStateAnimation(self.view.obj_StopBet))
+            self.SelectAreaMask.interactable = false --开始下注
+            -- end
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(1))
+            coroutine.yield(self.SicBoAnimation:Lottery({ Tools.RandomInt(1, 6), Tools.RandomInt(1, 6), Tools.RandomInt(
+            1, 6) }))
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(2))
+            self:Dealer()
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(2))
+            self:Settlement()
+            coroutine.yield(CS.UnityEngine.WaitForSeconds(2))]]
         end
-        coroutine.yield(CS.UnityEngine.WaitForSeconds(10))
-        self:Dealer()
-        coroutine.yield(CS.UnityEngine.WaitForSeconds(10))
-        self:Settlement()
     end
     )
 end
@@ -132,65 +137,69 @@ function SicBoMainCtrl:CreatBetChip()
         local go = CS.UnityEngine.GameObject.Instantiate(self.view.obj_BetButtonPrefab, self.view.obj_Content.transform)
         go.transform:GetComponent(typeof(CS.UnityEngine.UI.Image)).sprite = self.config.ChipIcon[v / 100]
         go.transform:Find("betMoneyText"):GetComponent(typeof(CS.UnityEngine.UI.Text)).text = v
-        local SlectEffect1 = go.transform:Find("SlectEffect").gameObject
+        local Effect = go.transform:Find("SlectEffect").gameObject
+
         self.uiEventListener:AddClick(go:GetComponent(typeof(CS.UnityEngine.UI.Button)), function()
-            log("选择的下注筹码" .. i)
             self.model.CurrentSelectBetChip = i
             if SlectEffect ~= nil then
                 SlectEffect:SetActive(false)
-                SlectEffect = SlectEffect1
+                SlectEffect = Effect
                 SlectEffect:SetActive(true)
             else
-                SlectEffect = SlectEffect1
+                SlectEffect = Effect
                 SlectEffect:SetActive(true)
             end
         end)
         if i == 1 then
-            SlectEffect = SlectEffect1
+            SlectEffect = Effect
             SlectEffect:SetActive(true)
         end
         go:SetActive(true)
     end
+    self:AddPageturning()
+end
 
+function SicBoMainCtrl:AddPageturning()
+    coroutine.start(function()
+        coroutine.yield(0)
+        local pageContainer = self.view.obj_Content.transform:GetComponent(typeof(CS.UnityEngine.RectTransform)); --拖这个横向容器  RectTransform
+        local Width = self.view.rect_ButtonsList.sizeDelta.x
+        local remainder = pageContainer.sizeDelta.x % Width
+        local totalPages = math.floor(pageContainer.sizeDelta.x / Width) + (remainder > 0 and 1 or 0);
+        local pageWidth = Width; -- 每页宽度（根据分辨率设置）
+        local tweenTime = 0.3;   -- 动画时间
+        local currentPage = 0;
+        local moveTween;         --Tween
+        local UpdateButton = function()
+            self.view.btn_BetButtonMove_Left.interactable = currentPage < totalPages - 1;
+            self.view.obj_disabe_Left:SetActive(not (currentPage < totalPages - 1))
+            self.view.obj_enable_Left:SetActive(currentPage < totalPages - 1)
 
-    --self.view.obj_disabe_Left
-    --self.view.obj_enable_Left
-
-    --self.view.obj_disabe_Right
-    --self.view.obj_enable_Right=
-    local pageContainer=self.view.obj_Content.transform:GetComponent(typeof(CS.UnityEngine.RectTransform));    --拖这个横向容器  RectTransform
-    local leftButton;       --Button
-    local rightButton;      --Button
-    --ButtonsList/obj_Content --算出页数
-    local totalPages = 2;   -- 总页数
-    local pageWidth = 1095; -- 每页宽度（根据分辨率设置）
-    local tweenTime = 0.3;  -- 动画时间
-
-    local currentPage = 0;
-    local moveTween;  --Tween
-
-    local MoveToPage = function(pageIndex)
-        local targetX = -pageWidth * pageIndex;
-        if moveTween then
-            --moveTween.Kill(); --// 防止并发Tween
+            self.view.btn_BetButtonMove_Right.interactable = currentPage > 0;
+            self.view.obj_enable_Right:SetActive(currentPage > 0)
+            self.view.obj_disabe_Right:SetActive(not (currentPage > 0))
         end
 
-        moveTween = pageContainer:DOAnchorPosX(targetX, tweenTime):SetEase(CS.DG.Tweening.Ease.OutCubic);
-        --leftButton.interactable = currentPage > 0;
-        --rightButton.interactable = currentPage < totalPages - 1;
-    end
- self.uiEventListener:AddClick(self.view.btn_BetButtonMove_Left, function()
-        if (currentPage >= totalPages - 1) then return end;
-        currentPage = currentPage + 1;
-        MoveToPage(currentPage);
-    end);
-    self.uiEventListener:AddClick( self.view.btn_BetButtonMove_Right, function()
-        if (currentPage <= 0) then return end;
-        currentPage = currentPage - 1;
-        MoveToPage(currentPage);
-    end);
-    --leftButton.interactable = currentPage > 0;
-    --rightButton.interactable = currentPage < totalPages - 1;]]
+        local MoveToPage = function(pageIndex)
+            local targetX = -pageWidth * pageIndex;
+            if moveTween then
+                --moveTween.Kill(); --// 防止并发Tween
+            end
+            moveTween = pageContainer:DOAnchorPosX(targetX, tweenTime):SetEase(CS.DG.Tweening.Ease.OutCubic);
+            UpdateButton()
+        end
+        self.uiEventListener:AddClick(self.view.btn_BetButtonMove_Left, function()
+            if (currentPage >= totalPages - 1) then return end;
+            currentPage = currentPage + 1;
+            MoveToPage(currentPage);
+        end);
+        self.uiEventListener:AddClick(self.view.btn_BetButtonMove_Right, function()
+            if (currentPage <= 0) then return end;
+            currentPage = currentPage - 1;
+            MoveToPage(currentPage);
+        end);
+        UpdateButton()
+    end)
 end
 
 --[[//响应,msgID=0x20089
@@ -200,7 +209,7 @@ end
  EGamePhase gamePhase = 2;  //当前阶段
  int64 endTime = 3;  //结束时间戳
  }]]
-function SicBoMainCtrl.ChangeState(gameState, endTime, settlementInfo)
+function SicBoMainCtrl:ChangeState(gameState, endTime, settlementInfo)
     if self.config.GameState.START_GAME == gameState then                          --游戏开始
         log("游戏开始")
     elseif self.config.GameState.BET == gameState then                             --下注阶段
@@ -264,7 +273,7 @@ end
 function SicBoMainCtrl:OtherPlayerBet(palyerId, AreaIndex, number)
     local chip = self.ChipManager:PlayerBet(self.view.obj_palyerSelf, self.BetArea[number]:GetPos(),
         number * 100)
-    self.BetArea[AreaIndex]:AddChip(number * 100, chip)
+    self.BetArea[AreaIndex]:AddChip(number * 100, self.OtherPlayer, chip)
 end
 
 --玩家自己下注
@@ -277,12 +286,13 @@ function SicBoMainCtrl:SelfBet(AreaIndex, BetArea)
     local number = self.model:GetBetChip()
     local chip = self.ChipManager:PlayerBet(self.view.obj_palyerSelf, BetArea:GetPos(),
         number)
-    BetArea:AddChip(number, chip, self.view.obj_palyerSelf, true)
+    BetArea:AddChip(number, chip, self.PlayerSelf, true)
     self.sounds.PlayBetSoundEffic()
 end
 
 --庄家赔钱
 function SicBoMainCtrl:Dealer()
+    local winArea = {}
     for i = 1, 100 do
         local offset = Vector3(CS.UnityEngine.Random.Range(-0.3, 0.3), CS.UnityEngine.Random.Range(-0.3, 0.3),
             CS.UnityEngine.Random.Range(-0.5, 0.5))
@@ -291,7 +301,9 @@ function SicBoMainCtrl:Dealer()
         local chip = self.ChipManager:PlayerBet(self.view.obj_croupier,
             self.BetArea[number]:GetPos(),
             sl * 100)
-        self.BetArea[number]:AddChip(sl * 100, chip, self.view.obj_croupier, false)
+        self.BetArea[number]:StartSettlement(true)
+        -- table.insert(winArea,number)
+        self.BetArea[number]:AddChip(sl * 100, chip, self.DealerPlayer, false)
     end
 end
 
@@ -302,6 +314,7 @@ function SicBoMainCtrl:Settlement(data)
     -- repeated int32 betIdxId = 1;  //下注区域ID
     --repeated int32 diceList = 2;  //骰子开奖结果列表，骰子点数：1-6
     -- }
+    local number = math.floor(CS.UnityEngine.Random.Range(1, 100))
     for i, v in ipairs(self.BetArea) do
         v:Settlement()
     end
